@@ -1,11 +1,12 @@
 import glob
 import json
 import os
+import time
 from lxml import etree
 import requests
 
 KML_DIR = 'rotterdam/gis'
-JSON_DIR = 'duo/data/json/addresses'
+JSON_DIR = 'json/addresses'
 LOCATION_TYPES = ['locations', 'authorities', 'mainlocations']
 
 KMLS = {
@@ -46,7 +47,9 @@ def geocode_osm(address):
     }
 
     r = requests.get(OSM_API_URL, params=params, headers=headers)
-    print r.json
+    time.sleep(1)  # respect OSM API limits
+    if r.json:
+        return r.json
 
 
 GEO_SERVICES = {
