@@ -9,13 +9,13 @@ KML_DIR = 'rotterdam/gis'
 JSON_DIR = 'json/addresses'
 LOCATION_TYPES = ['locations', 'authorities', 'mainlocations']
 
-KMLS = {
-    'po': etree.parse(os.path.join(KML_DIR, 'po.xml')),
-    'vo': etree.parse(os.path.join(KML_DIR, 'vo.xml')),
-    'mbo': etree.parse(os.path.join(KML_DIR, 'mbo.xml')),
-    'hbowo': etree.parse(os.path.join(KML_DIR, 'hbowo.xml')),
-    'sbo': etree.parse(os.path.join(KML_DIR, 'sbo.xml')),
-}
+# KMLS = {
+#     'po': etree.parse(os.path.join(KML_DIR, 'po.xml')),
+#     'vo': etree.parse(os.path.join(KML_DIR, 'vo.xml')),
+#     'mbo': etree.parse(os.path.join(KML_DIR, 'mbo.xml')),
+#     'hbowo': etree.parse(os.path.join(KML_DIR, 'hbowo.xml')),
+#     'sbo': etree.parse(os.path.join(KML_DIR, 'sbo.xml')),
+# }
 
 MAPS_API_URL = 'http://maps.googleapis.com/maps/api/geocode/json'
 OSM_API_URL = 'http://nominatim.openstreetmap.org/search'
@@ -85,47 +85,47 @@ def add_geo(location, school, zipcode, nsmap):
 
     return location
 
-def match_school(json_file):
-    with open(json_file, 'r') as f:
-        location = json.load(f)
-        if location['education_sector'] != 'pabo':
-            zipcode = location['address']['zipcode'].replace(' ', '')
-            nsmap = KMLS[location['education_sector']].getroot().nsmap
-            # b.xpath('ms:GEOM//gml:coordinates/text()', namespaces=nsmap)
-            schools = KMLS[location['education_sector']].xpath('//gml:featureMember//ms:POSTCODE[text()="%s"]' % (zipcode), namespaces=nsmap)
-            if schools:
-                if len(schools) > 1:
-                    # Do some checking
-                    street_numbers = [school.getparent().xpath('ms:HUISNR/text()',\
-                        namespaces=nsmap)[0] for school in schools]
-                    if len(set(street_numbers)) == 1:
-                        school = schools[0].getparent()
-                        location = add_geo(location, school, zipcode, nsmap)
-                        return location
-                    else:
-                        for school in schools:
-                            street_nr = school.getparent().xpath('ms:HUISNR[text()="%s"]' % (location['address']['number']), namespaces=nsmap)
-                            if street_nr:
-                                location = add_geo(location, school.getparent(), zipcode, nsmap)
-                                return location
-                else:
-                    # Yaj, Rotterdam thingies found
-                    school = schools[0].getparent()
-                    location = add_geo(location, school, zipcode, nsmap)
-                    return location
+# def match_school(json_file):
+#     with open(json_file, 'r') as f:
+#         location = json.load(f)
+#         if location['education_sector'] != 'pabo':
+#             zipcode = location['address']['zipcode'].replace(' ', '')
+#             nsmap = KMLS[location['education_sector']].getroot().nsmap
+#             # b.xpath('ms:GEOM//gml:coordinates/text()', namespaces=nsmap)
+#             schools = KMLS[location['education_sector']].xpath('//gml:featureMember//ms:POSTCODE[text()="%s"]' % (zipcode), namespaces=nsmap)
+#             if schools:
+#                 if len(schools) > 1:
+#                     # Do some checking
+#                     street_numbers = [school.getparent().xpath('ms:HUISNR/text()',\
+#                         namespaces=nsmap)[0] for school in schools]
+#                     if len(set(street_numbers)) == 1:
+#                         school = schools[0].getparent()
+#                         location = add_geo(location, school, zipcode, nsmap)
+#                         return location
+#                     else:
+#                         for school in schools:
+#                             street_nr = school.getparent().xpath('ms:HUISNR[text()="%s"]' % (location['address']['number']), namespaces=nsmap)
+#                             if street_nr:
+#                                 location = add_geo(location, school.getparent(), zipcode, nsmap)
+#                                 return location
+#                 else:
+#                     # Yaj, Rotterdam thingies found
+#                     school = schools[0].getparent()
+#                     location = add_geo(location, school, zipcode, nsmap)
+#                     return location
 
 
-def match_rotterdam_schools():
-    for locationtype in LOCATION_TYPES:
-        counter = 0
-        json_files = glob.glob('%s/*.json' % (os.path.join(JSON_DIR,\
-                                                            locationtype)))
-        for json_file in json_files:
-            print '='*30, '%d/%d' % (counter, len(json_files)), '='*30
-            location = match_school(json_file)
-            if location:
-                write(location, os.path.join('data', json_file.split('/')[-1]))
-            counter += 1
+# def match_rotterdam_schools():
+#     for locationtype in LOCATION_TYPES:
+#         counter = 0
+#         json_files = glob.glob('%s/*.json' % (os.path.join(JSON_DIR,\
+#                                                             locationtype)))
+#         for json_file in json_files:
+#             print '='*30, '%d/%d' % (counter, len(json_files)), '='*30
+#             location = match_school(json_file)
+#             if location:
+#                 write(location, os.path.join('data', json_file.split('/')[-1]))
+#             counter += 1
 
 
 def geocode_schools(geocode_service='osm'):
