@@ -1,1 +1,7 @@
 scrapy
+argparse==1.2.1
+ipython==0.13
+lxml==3.0
+pymongo==2.3
+requests==0.14.1
+wsgiref==0.1.2
