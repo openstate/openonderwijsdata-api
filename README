@@ -1,1 +1,4 @@
-Repo for holding Rotterdam hackathon data stuff.
+Repository that holds OpenOnderwijsData
+
+# Notes
+PDFQuery is a bitch, but required for parsing pdfs to XML. We have an edited pdfquery.py. Maybe file a pull request sometime.

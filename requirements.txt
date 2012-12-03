@@ -6,4 +6,3 @@ cssselect==0.7.1
 pymongo==2.3
 requests==0.14.1
 wsgiref==0.1.2
-git+https://github.com/bartdegoede/pdfquery.git
