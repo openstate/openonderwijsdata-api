@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 
 from scrapy.conf import settings
@@ -19,27 +20,36 @@ class OWINSPSpider(BaseSpider):
         ('p2', '='), ('p1', 'plaats'), ('p2', '='), ('p3', 'PO'), ('p3', ''),
         ('p3', 'Rotterdam'), ('p1', '#'), ('p2', 'submit'), ('p3', 'Zoeken')]
 
-    def generate_search_url(self, city=settings['CITY'],
+    def generate_search_url(self, zips=settings['ZIPCODES'],
                     education_sector=settings['EDUCATION_SECTOR']):
-        # Generate the ridiculous search URL
-        search_url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/'\
+        search_urls = []
+        with open(zips, 'r') as f:
+            for line in f:
+                # Generate the ridiculous search URL
+                search_urls.append('http://toezichtkaart.owinsp.nl/schoolwijzer/'\
                      'zoekresultaat?xl=0&p1=%%23&p2=maxpg&p3=-1&p1=%%23'\
                      '&p2=hits&p3=-1&p1=sector&p2=%%3D'\
-                     '&p3=%(education_sector)s&p1=naam&p2=%%3D&p3=&p1=plaats'\
-                     '&p2=%%3D&p3=%(city)s&p1=%%23&p2=submit&p3=Zoeken'\
+                     '&p3=%(education_sector)s&p1=naam&p2=%%3D&p3=&p1=postcode'\
+                     '&p2=%%3D&p3=%(zipcode)s&p1=%%23&p2=submit&p3=Zoeken'\
                      '&p1=%%23&p2=curpg&p3=1'\
-                     % {'education_sector': education_sector, 'city': city}
+                     % {'education_sector': education_sector, 'zipcode':\
+                        line.strip()})
 
-        return search_url
+        return search_urls
 
     def start_requests(self):
-        return [Request(self.generate_search_url(), self.parse_search_results)]
+        return [Request(url, self.parse_search_results) for url in\
+                    self.generate_search_url()]
 
     def parse_search_results(self, response):
         hxs = HtmlXPathSelector(response)
 
         # Extract the link to the detail page of each school
-        for link in hxs.select('//li[@class="match"]/noscript/a/@href'):
+        search_hits = hxs.select('//li[@class="match"]/noscript/a/@href')
+        if not search_hits:
+            return
+
+        for link in search_hits:
             url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
                 % link.extract()
 
@@ -132,12 +142,22 @@ class OWINSPSpider(BaseSpider):
 
             for report in reports:
                 title = report.select('text()').extract()[0]
+                date, title = title.split(': ')
+                try:
+                    # Try to parse date
+                    date = datetime.strptime(date, '%d-%m-%Y')\
+                            .strftime('%Y-%m-%d')
+                except:
+                    print '=' * 80
+                    print date
+                    print
+                    pass
+
                 organisation['reports'].append({
                     'url': 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
                         % report.select('@href').extract()[0],
-                    'title': title[:-10].strip(),
-                    'date': '%s-%s-%s' % (title[-4:], title[-7:-5],
-                        title[-10:-8])
+                    'title': title.strip(),
+                    'date': date
                 })
 
         rating_history = hxs.select('//div[@class="blocknone"]'
@@ -145,11 +165,18 @@ class OWINSPSpider(BaseSpider):
         if rating_history:
             organisation['rating_history'] = []
 
-            for rating in rating_history:
+            for ratingstring in rating_history:
+                date, rating = ratingstring.split(': ')
+                try:
+                    # Try to parse date
+                    date = datetime.strptime(date, '%d-%m-%Y')\
+                            .strftime('%Y-%m-%d')
+                except:
+                    pass
+
                 organisation['rating_history'].append({
-                    'rating': rating[:-10].strip(),
-                    'date': '%s-%s-%s' % (rating[-4:], rating[-7:-5],
-                        rating[-10:-8])
+                    'rating': rating.strip(),
+                    'date': date
                 })
 
         organisation['education_sector'] = settings['EDUCATION_SECTOR'].lower()
