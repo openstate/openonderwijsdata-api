@@ -13,11 +13,12 @@ SPIDER_MODULES = ['onderwijsinspectie.spiders']
 NEWSPIDER_MODULE = 'onderwijsinspectie.spiders'
 USER_AGENT = '%s/%s' % (BOT_NAME, BOT_VERSION)
 
-# The city ('plaatsnaam') to retrieve
-CITY = 'Rotterdam'
+# File holding all zipcodes (4 digits!)
+ZIPCODES = '/Users/bart/Documents/Dispectu/onderwijsdata/'\
+           'onderwijsinspectie/zips.txt'
 # The education sector ('onderwijssector') to retrieve. Possbile values
 # are 'PO' ('primair onderwijs'), 'VO' ('voortgezet onderwijs')
 # TODO: there are more possible values, describe them!
 EDUCATION_SECTOR = 'VO'
 
-EXPORT_DIRECTORY = '/Users/justin/Desktop/scholen'
+EXPORT_DIRECTORY = '/Users/bart/Desktop/scholen'

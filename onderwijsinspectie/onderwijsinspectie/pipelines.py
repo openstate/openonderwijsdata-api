@@ -16,7 +16,6 @@ class OnderwijsinspectiePipeline(object):
         return item
 
     def spider_closed(self, spider):
-        f = open('%s/%s.json' % (settings['EXPORT_DIRECTORY'],
-            settings['EDUCATION_SECTOR']), 'w')
-        json.dump(self.organisations, f)
-        f.close()
+        with open('%s/%s.json' % (settings['EXPORT_DIRECTORY'],
+            settings['EDUCATION_SECTOR']), 'w') as f:
+            json.dump(self.organisations, f, indent=4, separators=(',', ': '))
