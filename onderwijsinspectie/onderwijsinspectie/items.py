@@ -14,3 +14,4 @@ class EducationalInstitution(Item):
     education_sector = Field()
     education_structure = Field()
     owinsp_url = Field()
+    owinsp_id = Field()

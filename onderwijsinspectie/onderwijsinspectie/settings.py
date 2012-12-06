@@ -19,6 +19,6 @@ ZIPCODES = '/Users/bart/Documents/Dispectu/onderwijsdata/'\
 # The education sector ('onderwijssector') to retrieve. Possbile values
 # are 'PO' ('primair onderwijs'), 'VO' ('voortgezet onderwijs')
 # TODO: there are more possible values, describe them!
-EDUCATION_SECTOR = 'VO'
+EDUCATION_SECTOR = 'PO'
 
 EXPORT_DIRECTORY = '/Users/bart/Desktop/scholen'

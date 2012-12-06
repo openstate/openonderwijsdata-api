@@ -1,5 +1,6 @@
 from datetime import datetime
 import re
+import urlparse
 
 from scrapy.conf import settings
 from scrapy.spider import BaseSpider
@@ -185,5 +186,14 @@ class OWINSPSpider(BaseSpider):
             organisation['education_structure'] = response.meta['item']
 
         organisation['owinsp_url'] = response.url
+
+        urlparams = urlparse.parse_qs(response.url)
+        owinsp_id = urlparams['sch_id'][0].split('.')[0]
+        try:
+            owinsp_id = int(owinsp_id)
+        except:
+            pass
+
+        organisation['owinsp_id'] = owinsp_id
 
         yield organisation
