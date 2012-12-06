@@ -42,6 +42,7 @@ class SchoolVOSpider(BaseSpider):
             request.meta['item'] = SchoolItem(
                 schoolvo_id=school['school_id'],
                 schoolvo_code=school['school_code'],
+                name=school['naam'].strip(),
                 address=school['adres'].strip(),
                 zip_code=school['postcode'],
                 city=school['woonplaats'],

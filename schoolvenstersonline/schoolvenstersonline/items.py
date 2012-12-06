@@ -7,6 +7,7 @@ class SchoolItem(Item):
 
     schoolvo_id = Field()  # `school_id`
     schoolvo_code = Field()  # `school_code`
+    name = Field()  # `naam`
     address = Field()  # `adres`
     zip_code = Field()  # `postcode`
     city = Field()  # `woonplaats`
