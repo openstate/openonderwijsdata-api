@@ -1,4 +1,3 @@
-import json
 import re
 
 import requests
@@ -37,6 +36,8 @@ class SchoolVOSpider(BaseSpider):
         requests = []
 
         for school in self.get_schools():
+            # Construct an Item for each school and start with
+            # requesting each school's overview pages.
             request = Request(school['schoolvo_detail_url'])
             request.meta['item'] = SchoolItem(
                 schoolvo_id=school['school_id'],
@@ -81,6 +82,8 @@ class SchoolVOSpider(BaseSpider):
         school['available_indicators'] = set(extract_indicators.keys())\
             & indicators
 
+        # Request the indicators that are both available and parseable
+        # for this schoool. Send the school Item along with each request.
         for indicator in school['available_indicators']:
             indicator_detail_url = '%(schoolvo_url)svensters/%(school_id)s'\
                 '/publish/%(indicator_id)s_leesmeer/%(indicator_id)s_leesmeer_'\
@@ -90,11 +93,15 @@ class SchoolVOSpider(BaseSpider):
                     'school_id': response.meta['item']['schoolvo_code']
                 }
 
-            return Request(indicator_detail_url, meta={'item': school},
+            yield Request(indicator_detail_url, meta={'item': school},
                 callback=extract_indicators[indicator])
 
     def extract_ind00(self, response):
+        """
+        Extraction of indicator 0: "Algemeen - Deze school"
+        """
         school = response.meta['item']
+
         hxs = HtmlXPathSelector(response)
 
         structures = hxs.select('//tr[td/div/text() = "Onderwijsaanbod:"]/td[2]'\
@@ -123,22 +130,39 @@ class SchoolVOSpider(BaseSpider):
             return school
 
     def extract_ind02(self, response):
+        """
+        Extraction of indicator 2: "Resultaten - Slaagpercentage"
+        """
         school = response.meta['item']
         hxs = HtmlXPathSelector(response)
 
         graduations_year = hxs.select('//td[@class="a76l"]/text()')\
             .re(r'.* (\d{4}-\d{4})')
         if graduations_year:
-            graduatins = {
-                'year': graduations_year
+            graduations = {
+                'year': graduations_year[0]
             }
 
             current_sector = None
-            for sector in hxs.select('//table[@class="a141"]//tr'):
-                cells = sector.select('.//td')
+            for row in hxs.select('//table[@class="a141"]//tr'):
+                sector = row.select('string(td[@class="a105cl"])').extract()
 
-                if cells[0].select('@class = "a105cl"'):
-                    print cells[0].extract()
+                if sector[0]:
+                    current_sector = sector[0]
+                    graduations[sector[0]] = {}
+                    continue
+
+                if current_sector:
+                    cells = row.select('./td')
+                    profile = cells[0].select('div/text()').extract()[0]
+                    graduations[current_sector][profile] = {
+                        'total': int(cells[1].select('div/text()').extract()[0]\
+                            .replace('<', '')),
+                        'successful': int(cells[2].select('div/text()')\
+                            .extract()[0].replace('<', ''))
+                    }
+
+            school['graduations'] = graduations
 
         school['available_indicators'].remove('ind02')
         if not school['available_indicators']:
