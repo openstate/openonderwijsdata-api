@@ -23,6 +23,9 @@ class OnderwijsscrapersPipeline(object):
             del item['available_indicators']
             doc_id = item['schoolvo_code']
 
+        if isinstance(item, items.OnderwijsInspectieItem):
+            doc_id = item['owinsp_id']
+
         self.exporters[spider.name].save(doc_id, dict(item))
 
         return item
