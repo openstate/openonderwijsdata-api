@@ -57,9 +57,9 @@ class SchoolVOSpider(BaseSpider):
                 schoolvo_status_id=school['venster_status_id'],
                 schoolkompas_status_id=school['schoolkompas_status_id'],
                 logo_img_url='%s%s' % (settings['SCHOOLVO_URL'],
-                    school['pad_logo']),
+                    school['pad_logo'][1:]),
                 building_img_url='%s%s' % (settings['SCHOOLVO_URL'],
-                    school['pad_gebouw']),
+                    school['pad_gebouw'][1:]),
             )
 
             requests.append(request)
