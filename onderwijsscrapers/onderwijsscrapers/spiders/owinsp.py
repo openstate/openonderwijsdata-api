@@ -7,10 +7,11 @@ from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-from onderwijsscrapers.items import VOSchool, POSchool
+from onderwijsscrapers.items import VOSchool
 
 SCHOOL_ID = re.compile(r'(sch_id=\d+)')
-PAGES = re.compile(r"^Pagina (\d+) van (\d+)$")
+PAGES = re.compile(r'^Pagina (\d+) van (\d+)$')
+ZIPCODE = re.compile(r'(\d{4}\s?\w{2}).+')
 
 
 class OWINSPSpider(BaseSpider):
@@ -69,69 +70,6 @@ class OWINSPSpider(BaseSpider):
 
     def parse_organisation_detail_page(self, response):
         raise NotImplementedError('Your spider should implement this method.')
-
-        # reports = hxs.select('//div[@class="blocknone"]//div[@class="report"]'
-        #     '//a')
-
-        if reports:
-            organisation['reports'] = []
-
-            for report in reports:
-                title = report.select('text()').extract()[0]
-                date, title = title.split(': ')
-                try:
-                    # Try to parse date
-                    date = datetime.strptime(date, '%d-%m-%Y')\
-                            .strftime('%Y-%m-%d')
-                except:
-                    print '=' * 80
-                    print date
-                    print
-                    pass
-
-                organisation['reports'].append({
-                    'url': 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
-                        % report.select('@href').extract()[0],
-                    'title': title.strip(),
-                    'date': date
-                })
-
-        rating_history = hxs.select('//div[@class="blocknone"]'
-            '//div[@class="report"]//li/text()').extract()
-        if rating_history:
-            organisation['rating_history'] = []
-
-            for ratingstring in rating_history:
-                date, rating = ratingstring.split(': ')
-                try:
-                    # Try to parse date
-                    date = datetime.strptime(date, '%d-%m-%Y')\
-                            .strftime('%Y-%m-%d')
-                except:
-                    pass
-
-                organisation['rating_history'].append({
-                    'rating': rating.strip(),
-                    'date': date
-                })
-
-        organisation['education_sector'] = settings['EDUCATION_SECTOR'].lower()
-
-        if 'item' in response.meta:
-            organisation['education_structure'] = response.meta['item']
-
-        organisation['owinsp_url'] = response.url
-
-        urlparams = urlparse.parse_qs(response.url)
-        owinsp_id = urlparams['sch_id'][0].split('.')[0]
-        try:
-            owinsp_id = int(owinsp_id)
-        except:
-            pass
-
-        organisation['owinsp_id'] = owinsp_id
-
-        yield organisation
 
 
 class VOSpider(OWINSPSpider):
@@ -270,6 +208,106 @@ class VOSpider(OWINSPSpider):
                     'title': title.strip(),
                     'date': date
                 })
+
+        rating_history = hxs.select('//table[@summary="Rapporten"]//'
+                                    'li[@class="arrref"]/text()').extract()
+
+        if rating_history:
+            organisation['rating_history'] = []
+
+            for ratingstring in rating_history:
+                date, rating = ratingstring.split(': ')
+                try:
+                    # Try to parse date
+                    date = datetime.strptime(date, '%d-%m-%Y')\
+                            .strftime('%Y-%m-%d')
+                except:
+                    pass
+
+                organisation['rating_history'].append({
+                    'rating': rating.strip(),
+                    'date': date
+                })
+
+        organisation['education_sector'] = 'vo'
+
+        if 'item' in response.meta:
+            organisation['education_structure'] = response.meta['item']
+
+        organisation['owinsp_url'] = response.url
+
+        urlparams = urlparse.parse_qs(response.url)
+        owinsp_id = urlparams['sch_id'][0].split('.')[0]
+        try:
+            owinsp_id = int(owinsp_id)
+        except:
+            pass
+
+        organisation['owinsp_id'] = owinsp_id
+
+        result_url = hxs.select('//ul[@class="opboor"]//a/@href').extract()
+        if result_url:
+            # Append '&p_navi=11111' in order to open all tabs
+            organisation['result_card_url'] = result_url[0] + '&p_navi=11111'
+            urlparams = urlparse.parse_qs(urlparse.urlparse(\
+                organisation['result_card_url']).query)
+            organisation['BRIN'] = urlparams['p_brin'][0]
+            organisation['branch_id'] = urlparams['p_vestnr']
+
+            request = Request(organisation['result_card_url'],\
+                self.parse_resultcard)
+            request.meta['organisation'] = organisation
+
+            return request
+
+        else:
+            return organisation
+
+    def parse_resultcard(self, response):
+        hxs = HtmlXPathSelector(response)
+        organisation = response.meta['organisation']
+
+        address_table = hxs.select('//table[@summary="Adresgegevens school"]')
+
+        organisation['board'] = address_table.select('tr[td/text() ='
+                                '"Bevoegd gezag"]/td[2]/text()').extract()[0]
+
+        board_id = address_table.select('tr[td/text() ='
+                                '"Bevoegd gezagnr."]/td[4]/text()').extract()[0]
+
+        try:
+            board_id = int(board_id)
+        except:
+            pass
+
+        organisation['board_id'] = board_id
+
+        organisation['address'] = address_table.select('tr[td/text() ='
+                                '"Adres"]/td[2]/text()').extract()[0]
+
+        organisation['address'] = address_table.select('tr[td/text() ='
+                                '"Adres"]/td[2]/text()').extract()[0]
+
+        branch_id = address_table.select('tr[td/text() ='
+                                '"Vestigingsnr."]/td[4]/text()').extract()[0]
+
+        try:
+            branch_id = int(branch_id)
+        except:
+            pass
+
+        organisation['branch_id']
+
+        place = address_table.select('tr[td/text() ="Plaats"]/td[2]/text()')\
+                                    .extract()[0].replace(u'\xa0', '')
+
+        zip_code = re.match(ZIPCODE, place)
+        if zip_code:
+            organisation['zip_code'] = zip_code.group(1)
+            city = re.sub(ZIPCODE, '', place)
+            organisation['city'] = city.strip()
+
+        return organisation
 
 
 class POSpider(OWINSPSpider):

@@ -45,10 +45,10 @@ class OnderwijsInspectieItem(SchoolItem):
 
 
 class VOSchool(OnderwijsInspectieItem):
-    brin = Field()  # BRIN-nummer
+    BRIN = Field()  # BRIN-nummer
     board_id = Field()  # Bevoegd gezagnummer
     branch_id = Field()  # Vestigingsnummer
-    result_card = Field()  # Opbrengstenkaart URL
+    result_card_url = Field()  # Opbrengstenkaart URL
 
 
 class POSchool(OnderwijsInspectieItem):
