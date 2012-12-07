@@ -49,7 +49,7 @@ class VOSchool(OnderwijsInspectieItem):
     board = Field()  # `Bestuur` or `Bevoegd gezag`
     board_id = Field()  # Bevoegd gezagnummer
     branch_id = Field()  # Vestigingsnummer
-    result_card = Field()  # Opbrengstenkaart URL
+    result_card_url = Field()  # Opbrengstenkaart URL
 
 
 class POSchool(OnderwijsInspectieItem):
