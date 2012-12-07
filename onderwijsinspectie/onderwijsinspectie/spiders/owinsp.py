@@ -249,9 +249,28 @@ class VOSpider(OWINSPSpider):
                              '[@class="icoon_pdf2"]]/span'
                              '[@class="icoon_download"]/a')
 
-        print
-        print
-        print reports
+        if reports:
+            organisation['reports'] = []
+
+            for report in reports:
+                title = report.select('text()').extract()[0]
+                date, title = title.split(': ')
+                try:
+                    # Try to parse date
+                    date = datetime.strptime(date, '%d-%m-%Y')\
+                            .strftime('%Y-%m-%d')
+                except:
+                    print '=' * 80
+                    print date
+                    print
+                    pass
+
+                organisation['reports'].append({
+                    'url': 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
+                        % report.select('@href').extract()[0],
+                    'title': title.strip(),
+                    'date': date
+                })
 
 
 class POSpider(OWINSPSpider):
