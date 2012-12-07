@@ -15,3 +15,15 @@ class EducationalInstitution(Item):
     education_structure = Field()
     owinsp_url = Field()
     owinsp_id = Field()
+
+
+class VOSchool(EducationalInstitution):
+    brin = Field()  # BRIN-nummer
+    board_id = Field()  # Bevoegd gezagnummer
+    board_name = Field()  # Bevoegd gezag
+    branch_id = Field()  # Vestigingsnummer
+    result_card = Field()  # Opbrengstenkaart URL
+
+
+class POSchool(EducationalInstitution):
+    pass
