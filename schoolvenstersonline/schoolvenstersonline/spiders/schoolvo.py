@@ -38,6 +38,7 @@ class SchoolVOSpider(BaseSpider):
         for school in self.get_schools():
             # Construct an Item for each school and start with
             # requesting each school's overview pages.
+
             request = Request(school['schoolvo_detail_url'])
             request.meta['item'] = SchoolItem(
                 schoolvo_id=school['school_id'],
@@ -56,11 +57,15 @@ class SchoolVOSpider(BaseSpider):
                 email=school['e_mail'],
                 schoolvo_status_id=school['venster_status_id'],
                 schoolkompas_status_id=school['schoolkompas_status_id'],
-                logo_img_url='%s%s' % (settings['SCHOOLVO_URL'],
-                    school['pad_logo'][1:]),
-                building_img_url='%s%s' % (settings['SCHOOLVO_URL'],
-                    school['pad_gebouw'][1:]),
             )
+
+            if school['pad_logo'] and school['pad_logo'].startswith('/'):
+                request.meta['item']['logo_img_url'] = '%s%s'\
+                    % (settings['SCHOOLVO_URL'], school['pad_logo'][1:])
+
+            if school['pad_gebouw'] and school['pad_gebouw'].startswith('/'):
+                request.meta['item']['building_img_url'] = '%s%s'\
+                    % (settings['SCHOOLVO_URL'], school['pad_gebouw'][1:]),
 
             requests.append(request)
 
@@ -143,6 +148,11 @@ class SchoolVOSpider(BaseSpider):
             graduations = {
                 'year': graduations_year[0]
             }
+
+            explanation = hxs.select('//div[div/span/text() = "Toelichting:"]'\
+                '/div[2]/span/text()').extract()
+            if explanation and len(explanation[0]) > 0:
+                graduations['explanation'] = explanation[0].strip()
 
             current_sector = None
             for row in hxs.select('//table[@class="a141"]//tr'):
