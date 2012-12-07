@@ -9,38 +9,39 @@ from scrapy.selector import HtmlXPathSelector
 
 from onderwijsinspectie.items import EducationalInstitution
 
+SCHOOL_ID = re.compile(r'(sch_id=\d+)')
+
 
 class OWINSPSpider(BaseSpider):
     name = 'toezichtkaart.owinsp.nl'
+    search_url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/'\
+                 'zoekresultaat?xl=0&p1=%%23&p2=maxpg&p3=-1&p1=%%23'\
+                 '&p2=hits&p3=-1&p1=sector&p2=%%3D'\
+                 '&p3=%(education_sector)s&p1=naam&p2=%%3D&p3=&p1=postcode'\
+                 '&p2=%%3D&p3=%(zipcode)s&p1=%%23&p2=submit&p3=Zoeken'\
+                 '&p1=%%23&p2=curpg&p3=1'
 
-    # The insane amount of form data that is send when searching for schools
-    search_form_data = [('xl', '0'), ('sector', '#'), ('sch_id', '-1'),
-        ('arr_id', '-1'), ('p1', '#'), ('p2', 'curpg'), ('p3', ),
-        ('p1', '#'), ('p2', 'maxpg'), ('p3', '0'), ('p1', '#'), ('p2', 'hits'),
-        ('p3', '0'), ('p1', 'sector'), ('p2', '='), ('p1', 'naam'),
-        ('p2', '='), ('p1', 'plaats'), ('p2', '='), ('p3', 'PO'), ('p3', ''),
-        ('p3', 'Rotterdam'), ('p1', '#'), ('p2', 'submit'), ('p3', 'Zoeken')]
+    def open_blocks(self, url):
+        """ Append '.22' to a matched school_id, in order to obtain urls to
+        pages where the content blocks are unfolded. """
+        def _open(match):
+            return '%s.22' % match.group(1)
 
-    def generate_search_url(self, zips=settings['ZIPCODES'],
+        return re.sub(SCHOOL_ID, _open, url)
+
+    def generate_search_urls(self, zips=settings['ZIPCODES'],
                     education_sector=settings['EDUCATION_SECTOR']):
-        search_urls = []
         with open(zips, 'r') as f:
-            for line in f:
-                # Generate the ridiculous search URL
-                search_urls.append('http://toezichtkaart.owinsp.nl/schoolwijzer/'\
-                     'zoekresultaat?xl=0&p1=%%23&p2=maxpg&p3=-1&p1=%%23'\
-                     '&p2=hits&p3=-1&p1=sector&p2=%%3D'\
-                     '&p3=%(education_sector)s&p1=naam&p2=%%3D&p3=&p1=postcode'\
-                     '&p2=%%3D&p3=%(zipcode)s&p1=%%23&p2=submit&p3=Zoeken'\
-                     '&p1=%%23&p2=curpg&p3=1'\
-                     % {'education_sector': education_sector, 'zipcode':\
-                        line.strip()})
+            search_urls = [self.search_url % {
+                                'education_sector': education_sector,
+                                'zipcode': line.strip()
+                            } for line in f]
 
         return search_urls
 
     def start_requests(self):
         return [Request(url, self.parse_search_results) for url in\
-                    self.generate_search_url()]
+                    self.generate_search_urls()]
 
     def parse_search_results(self, response):
         hxs = HtmlXPathSelector(response)
@@ -53,6 +54,8 @@ class OWINSPSpider(BaseSpider):
         for link in search_hits:
             url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
                 % link.extract()
+            # Find sch_id, and append '.22' to unfold content blocks
+            url = self.open_blocks(url)
 
             # First parse education strucure page if we are crawling 'VO'
             # ('voortgezet onderwijs') institutions
@@ -78,9 +81,16 @@ class OWINSPSpider(BaseSpider):
 
     def parse_education_structure_page(self, response):
         hxs = HtmlXPathSelector(response)
-        for structure in hxs.select('//li[@class="match"]/noscript/a'):
+        structures = hxs.select('//li[@class="match"]/noscript/a')
+
+        # If we end up at a school page directly, yield request immediately
+        if not structures:
+            yield Request(response.url, self.parse_organisation_detail_page)
+
+        for structure in structures:
             url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
                 % structure.select('@href').extract()[0]
+
             request = Request(url, self.parse_organisation_detail_page)
             request.meta['item'] = structure.select('text()').extract()[0]
 
@@ -136,8 +146,9 @@ class OWINSPSpider(BaseSpider):
         organisation['rating_date'] = '%s-%s-%s' % (r_date[-4:], r_date[3:5],
             r_date[0:2])
 
-        reports = hxs.select('//div[@class="blocknone"]//div[@class="report"]'
-            '//a')
+        # reports = hxs.select('//div[@class="blocknone"]//div[@class="report"]'
+        #     '//a')
+        reports = hxs.select('//span[@class="icoon_download"]/a')
         if reports:
             organisation['reports'] = []
 
@@ -197,3 +208,54 @@ class OWINSPSpider(BaseSpider):
         organisation['owinsp_id'] = owinsp_id
 
         yield organisation
+
+
+class VOSpider(OWINSPSpider):
+    name = 'vo.owinsp.nl'
+
+    def generate_search_urls(self, zips=settings['ZIPCODES']):
+        with open(zips, 'r') as f:
+            search_urls = [self.search_url % {
+                                'education_sector': 'vo',
+                                'zipcode': line.strip()
+                            } for line in f]
+
+        return search_urls
+
+    def parse_search_results(self, response):
+        hxs = HtmlXPathSelector(response)
+
+        # Extract the link to the detail page of each school
+        search_hits = hxs.select('//li[@class="match"]/noscript/a/@href')
+        if not search_hits:
+            return
+
+        for link in search_hits:
+            url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
+                % link.extract()
+            # Find sch_id, and append '.22' to unfold content blocks
+            url = self.open_blocks(url)
+
+            # First parse education structure page if we are crawling 'VO'
+            # ('voortgezet onderwijs') institutions
+            yield Request(url, self.parse_education_structure_page)
+
+        pages = hxs.select('//span[@class="pagnr"]/text()').extract()[0]\
+                            .strip()
+
+        current_page, total_pages = re.compile(r"^Pagina (\d+) van (\d+)$")\
+                                                .search(pages).groups()
+
+        if current_page != total_pages:
+            nav_urls = hxs.select('//span[@class="browse"]/noscript//a')
+            if len(nav_urls) > 1:
+                next_page = nav_urls[1].select('@href').extract()
+            else:
+                next_page = nav_urls[0].select('@href').extract()
+
+            yield Request('http://toezichtkaart.owinsp.nl/schoolwijzer/%s'
+                % next_page[0], self.parse_search_results)
+
+
+class POSpider(OWINSPSpider):
+    name = 'po.owinsp.nl'
