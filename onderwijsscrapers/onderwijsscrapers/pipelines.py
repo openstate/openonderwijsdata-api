@@ -12,7 +12,7 @@ class OnderwijsscrapersPipeline(object):
         # Initialize the required exporter if necessary
         if spider.name not in self.exporters:
             if settings['EXPORT_METHOD'] == 'elasticsearch':
-                essetup = settings['ELESTIC_SEARCH'][spider.name]
+                essetup = settings['ELASTIC_SEARCH'][spider.name]
                 self.exporters[spider.name] = exporters.ElasticSearchExporter(
                     essetup['url'], essetup['index'], essetup['doctype'])
             elif settings['EXPORT_METHOD'] == 'file':

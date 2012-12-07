@@ -15,7 +15,7 @@ AUTOTHROTTLE_DEBUG = True
 # Full filesystem path to the project
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-# Path to the file that holds all zipcodes (firs 4 digits!). This file
+# Path to the file that holds all zipcodes (first 4 digits!). This file
 # is used for searching in the toezichtkaart.owinsp.nl databse.
 ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
 
@@ -28,7 +28,7 @@ EXPORT_METHOD = 'file'
 # exporter is used).
 EXPORT_DIR = os.path.join(PROJECT_ROOT, 'export')
 
-ELESTIC_SEARCH = {
+ELASTIC_SEARCH = {
     'po.owinsp.nl': {
         'url': '',
         'index': '',
