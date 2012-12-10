@@ -35,9 +35,9 @@ ELASTIC_SEARCH = {
         'doctype': '',
     },
     'vo.owinsp.nl': {
-        'url': '',
-        'index': '',
-        'doctype': ''
+        'url': 'chimay.dispectu.com:9200',
+        'index': 'onderwijsinspectie',
+        'doctype': 'vo_school'
     },
     'schoolvo.nl': {
         'url': 'chimay.dispectu.com:9200',
