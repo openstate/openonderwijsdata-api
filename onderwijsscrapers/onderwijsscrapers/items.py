@@ -77,5 +77,9 @@ class DUOSchoolItem(SchoolItem):
     corop_area_code = Field()  # `COROP GEBIED CODE`
     education_area = Field()  # `ONDERWIJS GEBIED NAAM`
     education_area_code = Field()  # `ONDERWIJS GEBIED CODE`
-    rmc_area = Field()  # `RMC GEBIED NAAM`
-    rmc_area_code = Field()  # `RMC GEBIED CODE`
+    rmc_region = Field()  # `RMC REGIO NAAM`
+    rmc_region_code = Field()  # `RMC REGIO CODE`
+
+    # Contents of "02. Leerlingen per vestiging naar postcode leerling
+    # en leerjaar"
+    student_residences = Field()

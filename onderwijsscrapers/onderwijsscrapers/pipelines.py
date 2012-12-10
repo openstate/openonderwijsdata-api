@@ -26,6 +26,12 @@ class OnderwijsscrapersPipeline(object):
         if isinstance(item, items.OnderwijsInspectieItem):
             doc_id = item['owinsp_id']
 
+        if isinstance(item, items.DUOSchoolItem):
+            if 'brin' not in item:
+                print '*' * 200
+                return item
+            doc_id = '%s-%s' % (item['brin'], item['branch_id'])
+
         self.exporters[spider.name].save(doc_id, dict(item))
 
         return item
