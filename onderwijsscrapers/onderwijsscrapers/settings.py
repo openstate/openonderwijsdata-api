@@ -22,7 +22,7 @@ ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
 # Available methods are 'elasticsearch' and 'file'
-EXPORT_METHOD = 'file'
+EXPORT_METHOD = 'elasticsearch'
 
 # Directory to which scrape results should be saved (in case the file
 # exporter is used).
@@ -42,6 +42,11 @@ ELASTIC_SEARCH = {
     'schoolvo.nl': {
         'url': 'chimay.dispectu.com:9200',
         'index': 'schoolvo',
+        'doctype': 'school',
+    },
+    'data.duo.nl': {
+        'url': 'chimay.dispectu.com:9200',
+        'index': 'duo',
         'doctype': 'school',
     }
 }
