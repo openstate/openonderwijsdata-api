@@ -11,7 +11,7 @@ from onderwijsscrapers.items import VOSchool
 
 SCHOOL_ID = re.compile(r'(sch_id=\d+)')
 PAGES = re.compile(r'^Pagina (\d+) van (\d+)$')
-ZIPCODE = re.compile(r'(\d{4}\s?\w{2}).+')
+ZIPCODE = re.compile(r'(\d{4}\s?\w{2})')
 
 
 class OWINSPSpider(BaseSpider):
@@ -251,8 +251,8 @@ class VOSpider(OWINSPSpider):
             organisation['result_card_url'] = result_url[0] + '&p_navi=11111'
             urlparams = urlparse.parse_qs(urlparse.urlparse(\
                 organisation['result_card_url']).query)
-            organisation['BRIN'] = urlparams['p_brin'][0]
-            organisation['branch_id'] = urlparams['p_vestnr']
+            organisation['brin'] = urlparams['p_brin'][0]
+            organisation['branch_id'] = urlparams['p_vestnr'][0]
 
             request = Request(organisation['result_card_url'],\
                 self.parse_resultcard)
@@ -264,6 +264,9 @@ class VOSpider(OWINSPSpider):
             return organisation
 
     def parse_resultcard(self, response):
+        print
+        print
+        print
         hxs = HtmlXPathSelector(response)
         organisation = response.meta['organisation']
 
@@ -290,13 +293,12 @@ class VOSpider(OWINSPSpider):
 
         branch_id = address_table.select('tr[td/text() ='
                                 '"Vestigingsnr."]/td[4]/text()').extract()[0]
-
         try:
             branch_id = int(branch_id)
         except:
             pass
 
-        organisation['branch_id']
+        organisation['branch_id'] = branch_id
 
         place = address_table.select('tr[td/text() ="Plaats"]/td[2]/text()')\
                                     .extract()[0].replace(u'\xa0', '')
@@ -305,6 +307,7 @@ class VOSpider(OWINSPSpider):
         if zip_code:
             organisation['zip_code'] = zip_code.group(1)
             city = re.sub(ZIPCODE, '', place)
+            print city
             organisation['city'] = city.strip()
 
         return organisation
