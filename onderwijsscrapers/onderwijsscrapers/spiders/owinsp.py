@@ -188,6 +188,7 @@ class VOSpider(OWINSPSpider):
 
         if reports:
             organisation['reports'] = []
+            report_urls = []
 
             for report in reports:
                 title = report.select('text()').extract()[0]
@@ -202,12 +203,21 @@ class VOSpider(OWINSPSpider):
                     print
                     pass
 
+                url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
+                    % report.select('@href').extract()[0]
+
+                # Some pages contain the same reports multiple times, we
+                # only want to include them once.
+                if url in report_urls:
+                    continue
+
                 organisation['reports'].append({
-                    'url': 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
-                        % report.select('@href').extract()[0],
+                    'url': url,
                     'title': title.strip(),
                     'date': date
                 })
+
+                report_urls.append(url)
 
         rating_history = hxs.select('//table[@summary="Rapporten"]//'
                                     'li[@class="arrref"]/text()').extract()
@@ -264,9 +274,6 @@ class VOSpider(OWINSPSpider):
             return organisation
 
     def parse_resultcard(self, response):
-        print
-        print
-        print
         hxs = HtmlXPathSelector(response)
         organisation = response.meta['organisation']
 
