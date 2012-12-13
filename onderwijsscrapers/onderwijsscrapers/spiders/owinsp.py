@@ -176,9 +176,7 @@ class VOSpider(OWINSPSpider):
                 r_date = datetime.strptime(r_date, '%d-%m-%Y')
                 r_date = r_date.date().isoformat()
             except:
-                print
-                print
-                print r_date
+                pass
 
             organisation['rating_date'] = r_date
 
@@ -198,9 +196,6 @@ class VOSpider(OWINSPSpider):
                     date = datetime.strptime(date, '%d-%m-%Y')\
                             .strftime('%Y-%m-%d')
                 except:
-                    print '=' * 80
-                    print date
-                    print
                     pass
 
                 url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
@@ -279,6 +274,10 @@ class VOSpider(OWINSPSpider):
 
         address_table = hxs.select('//table[@summary="Adresgegevens school"]')
 
+        if not address_table:
+            # Some pages are empty, so just return organisation here
+            return organisation
+
         organisation['board'] = address_table.select('tr[td/text() ='
                                 '"Bevoegd gezag"]/td[2]/text()').extract()[0]
 
@@ -314,7 +313,6 @@ class VOSpider(OWINSPSpider):
         if zip_code:
             organisation['zip_code'] = zip_code.group(1)
             city = re.sub(ZIPCODE, '', place)
-            print city
             organisation['city'] = city.strip()
 
         return organisation
