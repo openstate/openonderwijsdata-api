@@ -260,11 +260,7 @@ class VOSpider(OWINSPSpider):
             try:
                 branch_id = int(urlparams['p_vestnr'][0])
             except:
-                print
-                print
-                print '*' * 80
-                branch_id = urlparams['p_vestnr'][0]
-                print branch_id
+                pass
 
             organisation['branch_id'] = branch_id
 
