@@ -257,7 +257,16 @@ class VOSpider(OWINSPSpider):
             urlparams = urlparse.parse_qs(urlparse.urlparse(\
                 organisation['result_card_url']).query)
             organisation['brin'] = urlparams['p_brin'][0]
-            organisation['branch_id'] = urlparams['p_vestnr'][0]
+            try:
+                branch_id = int(urlparams['p_vestnr'][0])
+            except:
+                print
+                print
+                print '*' * 80
+                branch_id = urlparams['p_vestnr'][0]
+                print branch_id
+
+            organisation['branch_id'] = branch_id
 
             request = Request(organisation['result_card_url'],\
                 self.parse_resultcard)
