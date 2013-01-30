@@ -20,8 +20,8 @@ class DUOSpider(BaseSpider):
             Request('http://duo.nl/organisatie/open_onderwijsdata/'\
                 'Voortgezet_onderwijs/datasets/adressen/Adressen/'\
                 '02allevestigingen.asp', self.parse_branches),
-            Request('http://duo.nl/organisatie/open_onderwijsdata/'\
-                'Voortgezet_onderwijs/datasets/leerlingen/Leerlingen/'\
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+                'databestanden/Voortgezet_onderwijs/leerlingen/Leerlingen/'\
                 'vo_leerlingen2.asp', self.parse_student_residences)
         ]
 
@@ -153,25 +153,21 @@ class DUOSpider(BaseSpider):
         for row in csv_file:
             school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
                 row['VESTIGINGSNUMMER'].strip().zfill(2))
+            if school_id not in student_residences:
+                student_residences[school_id] = []
 
-            data = {
-                row['POSTCODE LEERLING'].strip(): {
-                   'city': row['PLAATSNAAM LEERLING'].strip().capitalize(),
-                   'municipality': row['GEMEENTENAAM LEERLING'].strip(),
-                   'municipality_id': int(row['GEMEENTENUMMER LEERLING'].strip()),
-                   'year_1': int(row['LEER- OF VERBLIJFSJAAR 1']),
-                   'year_2': int(row['LEER- OF VERBLIJFSJAAR 2']),
-                   'year_3': int(row['LEER- OF VERBLIJFSJAAR 3']),
-                   'year_4': int(row['LEER- OF VERBLIJFSJAAR 4']),
-                   'year_5': int(row['LEER- OF VERBLIJFSJAAR 5']),
-                   'year_6': int(row['LEER- OF VERBLIJFSJAAR 6'])
-                }
-            }
-
-            if school_id in student_residences:
-                student_residences[school_id].update(data)
-            else:
-                student_residences[school_id] = data
+            student_residences[school_id].append({
+                'zip_code': row['POSTCODE LEERLING'].strip(),
+                'city': row['PLAATSNAAM LEERLING'].strip().capitalize(),
+                'municipality': row['GEMEENTENAAM LEERLING'].strip(),
+                'municipality_id': int(row['GEMEENTENUMMER LEERLING'].strip()),
+                'year_1': int(row['LEER- OF VERBLIJFSJAAR 1']),
+                'year_2': int(row['LEER- OF VERBLIJFSJAAR 2']),
+                'year_3': int(row['LEER- OF VERBLIJFSJAAR 3']),
+                'year_4': int(row['LEER- OF VERBLIJFSJAAR 4']),
+                'year_5': int(row['LEER- OF VERBLIJFSJAAR 5']),
+                'year_6': int(row['LEER- OF VERBLIJFSJAAR 6'])
+            })
 
         for school_id, residence in student_residences.iteritems():
             if school_id in self.schools:
