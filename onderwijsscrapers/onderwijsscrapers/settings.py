@@ -4,7 +4,7 @@ BOT_NAME = 'onderwijsscrapers'
 BOT_VERSION = '1.0'
 
 SPIDER_MODULES = ['onderwijsscrapers.spiders']
-ITEM_PIPELINES = ['onderwijsscrapers.pipelines.OnderwijsscrapersPipeline']
+# ITEM_PIPELINES = ['onderwijsscrapers.pipelines.OnderwijsscrapersPipeline']
 NEWSPIDER_MODULE = 'onderwijsscrapers.spiders'
 USER_AGENT = '%s/%s' % (BOT_NAME, BOT_VERSION)
 
@@ -21,8 +21,28 @@ ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
 
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
+# Mapping of SchoolVO.nl JSON attribute names to the SchoolVOItem fields
+SCHOOLVO_FIELD_MAPPING = {
+    'schoolvo_id': 'school_id',
+    'schoolvo_code': 'school_code',
+    'name': 'naam',
+    'address': 'adres',
+    'zip_code': 'postcode',
+    'city': 'woonplaats',
+    'municipality': 'gemeente',
+    'municipality_code': 'gemeente_code',
+    'province': 'provincie',
+    'longitude': 'longitude',
+    'latitude': 'latitude',
+    'phone': 'telefoon',
+    'website': 'homepage',
+    'email': 'e_mail',
+    'schoolvo_status_id': 'venster_status_id',
+    'schoolkompas_status_id': 'schoolkompas_status_id'
+}
+
 # Available methods are 'elasticsearch' and 'file'
-EXPORT_METHOD = 'elasticsearch'
+EXPORT_METHOD = 'file'
 
 # Directory to which scrape results should be saved (in case the file
 # exporter is used).
