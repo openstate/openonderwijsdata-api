@@ -22,7 +22,7 @@ ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
 # Available methods are 'elasticsearch' and 'file'
-EXPORT_METHOD = 'elasticsearch'
+EXPORT_METHOD = 'file'
 
 # Directory to which scrape results should be saved (in case the file
 # exporter is used).
