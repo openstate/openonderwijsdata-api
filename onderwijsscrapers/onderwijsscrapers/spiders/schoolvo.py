@@ -24,7 +24,7 @@ class SchoolVOSpider(BaseSpider):
             % settings['SCHOOLVO_URL'])
 
         schools = []
-        for school in resp.json['d']['SchoolSet']:
+        for school in resp.json()['d']['SchoolSet']:
             school['schoolvo_detail_url'] = '%s?p_schoolcode=%s'\
                 % (settings['SCHOOLVO_URL'], school['school_code'])
 
@@ -38,26 +38,21 @@ class SchoolVOSpider(BaseSpider):
         for school in self.get_schools():
             # Construct an Item for each school and start with
             # requesting each school's overview pages.
-
             request = Request(school['schoolvo_detail_url'])
-            request.meta['item'] = SchoolVOItem(
-                schoolvo_id=school['school_id'],
-                schoolvo_code=school['school_code'],
-                name=school['naam'].strip(),
-                address=school['adres'].strip(),
-                zip_code=school['postcode'],
-                city=school['woonplaats'],
-                municipality=school['gemeente'],
-                municipality_code=school['gemeente_code'],
-                province=school['provincie'],
-                longitude=school['longitude'],
-                latitude=school['latitude'],
-                phone=school['telefoon'],
-                website=school['homepage'],
-                email=school['e_mail'],
-                schoolvo_status_id=school['venster_status_id'],
-                schoolkompas_status_id=school['schoolkompas_status_id'],
-            )
+
+            item = {}
+            for field, value in settings.get('SCHOOLVO_FIELD_MAPPING')\
+                                    .iteritems():
+                schoolvo_value = school.get(value, None)
+
+                # If there is a string value in de SchoolVO data, it is
+                # probably entered by a human, so strip trailing/leading
+                # whitespaces
+                if schoolvo_value and type(schoolvo_value) == unicode:
+                    schoolvo_value = schoolvo_value.strip()
+                item[field] = schoolvo_value
+
+            request.meta['item'] = SchoolVOItem(item)
 
             if school['pad_logo'] and school['pad_logo'].startswith('/'):
                 request.meta['item']['logo_img_url'] = '%s%s'\
@@ -141,39 +136,66 @@ class SchoolVOSpider(BaseSpider):
         """
         school = response.meta['item']
         hxs = HtmlXPathSelector(response)
+        graduations = []
 
         graduations_year = hxs.select('//td[@class="a76l"]/text()')\
             .re(r'.* (\d{4}-\d{4})')
         if graduations_year:
-            graduations = {
-                'year': graduations_year[0]
-            }
+            # graduations = {
+            #     'year': graduations_year[0]
+            # }
 
-            explanation = hxs.select('//div[div/span/text() = "Toelichting:"]'\
-                '/div[2]/span/text()').extract()
-            if explanation and len(explanation[0]) > 0:
-                graduations['explanation'] = explanation[0].strip()
+            # explanation = hxs.select('//div[div/span/text() = "Toelichting:"]'\
+            #     '/div[2]/span/text()').extract()
+            # if explanation and len(explanation[0]) > 0:
+            #     graduations['explanation'] = explanation[0].strip()
 
             current_sector = None
-            for row in hxs.select('//table[@class="a141"]//tr'):
+            graduation = None
+
+            for row in hxs.select('//table[@class="a141"]//tr[@valign="top"]'):
                 sector = row.select('string(td[@class="a105cl"])').extract()
 
                 if sector[0]:
-                    current_sector = sector[0]
-                    graduations[sector[0]] = {}
+                    if graduation:
+                        graduations.append(graduation)
+                    current_sector = sector[0].strip()
+
+                    total = int(row.select('.//td[@class="a109c"]/div/text()')[0].extract().replace('<', ''))
+                    passed = int(row.select('.//td[@class="a113c"]/div/text()')[0].extract().replace('<', ''))
+
+                    graduation = {
+                        'education_structure': current_sector,
+                        'total': total,
+                        'passed': passed,
+                        'failed': total - passed,
+                        'profiles': []
+                    }
+
+                    # Go to next iteration of loop
                     continue
 
                 if current_sector:
                     cells = row.select('./td')
-                    profile = cells[0].select('div/text()').extract()[0]
-                    graduations[current_sector][profile] = {
-                        'total': int(cells[1].select('div/text()').extract()[0]\
-                            .replace('<', '')),
-                        'successful': int(cells[2].select('div/text()')\
-                            .extract()[0].replace('<', ''))
-                    }
 
-            school['graduations'] = graduations
+                    profile = cells[0].select('div/text()').extract()[0].strip()
+
+                    profile_total = int(cells[1].select('div/text()').extract()[0]\
+                        .replace('<', ''))
+                    profile_passed = int(cells[2].select('div/text()')\
+                        .extract()[0].replace('<', ''))
+
+                    graduation['profiles'].append({
+                        'profile': profile,
+                        'total': profile_total,
+                        'passed': profile_passed,
+                        'failed': profile_total - profile_passed
+                    })
+
+            # Append last graduation dict
+            graduations.append(graduation)
+
+        school['graduations'] = graduations
 
         school['available_indicators'].remove('ind02')
         if not school['available_indicators']:
