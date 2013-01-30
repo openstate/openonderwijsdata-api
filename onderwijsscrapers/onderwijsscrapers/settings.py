@@ -4,7 +4,7 @@ BOT_NAME = 'onderwijsscrapers'
 BOT_VERSION = '1.0'
 
 SPIDER_MODULES = ['onderwijsscrapers.spiders']
-# ITEM_PIPELINES = ['onderwijsscrapers.pipelines.OnderwijsscrapersPipeline']
+ITEM_PIPELINES = ['onderwijsscrapers.pipelines.OnderwijsscrapersPipeline']
 NEWSPIDER_MODULE = 'onderwijsscrapers.spiders'
 USER_AGENT = '%s/%s' % (BOT_NAME, BOT_VERSION)
 

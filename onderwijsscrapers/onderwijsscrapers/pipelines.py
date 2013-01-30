@@ -1,4 +1,5 @@
 import os
+import uuid
 from scrapy.conf import settings
 from onderwijsscrapers import exporters
 from onderwijsscrapers import items
@@ -24,7 +25,7 @@ class OnderwijsscrapersPipeline(object):
             doc_id = item['schoolvo_code']
 
         if isinstance(item, items.OnderwijsInspectieItem):
-            doc_id = item['owinsp_id']
+            doc_id = str(uuid.uuid1())
 
         if isinstance(item, items.DUOSchoolItem):
             if 'brin' not in item:
