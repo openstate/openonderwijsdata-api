@@ -177,10 +177,6 @@ class SchoolVOSpider(BaseSpider):
 
                 if current_sector:
                     cells = row.select('./td')
-                    print
-                    print
-                    print cells
-                    print
 
                     profile = cells[0].select('div/text()').extract()[0].strip()
 
