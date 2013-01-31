@@ -8,7 +8,7 @@ class SchoolItem(Item):
     city = Field()  # `woonplaats`
     website = Field()  # `website` or `homepage`
     denomination = Field()  # `denominatie`
-    education_structure = Field()  # `Onderwijsaanbod`
+    education_structures = Field()  # `Onderwijsaanbod`
 
 
 class SchoolVOItem(SchoolItem):
@@ -40,8 +40,6 @@ class OnderwijsInspectieItem(SchoolItem):
     rating_history = Field()
     reports = Field()
     education_sector = Field()
-    owinsp_url = Field()
-    owinsp_id = Field()
 
 
 class VOSchool(OnderwijsInspectieItem):
@@ -50,6 +48,10 @@ class VOSchool(OnderwijsInspectieItem):
     board_id = Field()  # Bevoegd gezagnummer
     branch_id = Field()  # Vestigingsnummer
     result_card_url = Field()  # Opbrengstenkaart URL
+
+    # Field used to merge all sectors of a singel school into one item.
+    # This field is not stored.
+    education_structures_to_scrape = Field()
 
 
 class POSchool(OnderwijsInspectieItem):

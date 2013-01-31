@@ -124,68 +124,100 @@ class VOSpider(OWINSPSpider):
         hxs = HtmlXPathSelector(response)
         structures = hxs.select('//li[@class="match"]/noscript/a')
 
-        # If we end up at a school page directly, yield request immediately
-        if not structures:
-            yield Request(response.url, self.parse_organisation_detail_page)
+        # The VOSchool item to be populated
+        organisation = VOSchool()
+        organisation['education_structures_to_scrape'] = set()
 
+        # If we end up at the schools page directly, immediately yield request
+        if not structures:
+            request = Request(response.url, self.parse_organisation_detail_page)
+            request.meta['item'] = organisation
+            yield request
+
+        organisation['name'] = hxs.select('//h1[@class="stitle"]/text()').extract()[0].strip()
+
+        crawl_structures = {}
         for structure in structures:
             url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
                 % structure.select('@href').extract()[0]
             url = self.open_blocks(url)
+            crawl_structures[url] = structure.select('text()').extract()[0]
+            organisation['education_structures_to_scrape'].add(url)
 
+        for url, structure in crawl_structures.iteritems():
             request = Request(url, self.parse_organisation_detail_page)
-            request.meta['item'] = structure.select('text()').extract()[0]
-
+            request.meta['item'] = organisation
+            request.meta['structure'] = structure
             yield request
 
     def parse_organisation_detail_page(self, response):
+        organisation = response.meta['item']
+        structure = response.meta['structure']
+
         hxs = HtmlXPathSelector(response)
-
-        organisation = VOSchool()
-
         h_content = hxs.select('//div[@id="hoofd_content"]')
-        organisation['name'] = h_content.select('h1[@class="stitle"]/text()')\
-                            .extract()[0].strip()
-
         address = h_content.select('./p[@class="detpag"]/text()').extract()
         address = ', '.join([x.strip() for x in address])
         organisation['address'] = address.replace(u'\xa0\xa0', u' ')
         website = h_content.select('ul/li[@class="actlink"]/a/@href').extract()
         if website:
             organisation['website'] = website[0]
+        else:
+            organisation['website'] = None
 
         organisation['denomination'] = h_content.select('p/em/text()')\
                             .extract()[0].strip()
-        organisation['rating_excerpt'] = h_content.select('p[3]/text()')\
-                            .extract()[1].strip()
+
+        if 'education_structures' not in organisation:
+            organisation['education_structures'] = []
+
+        rating_excerpt = h_content.select('p[3]/text()').extract()[1].strip()
 
         # Wait... what? Are we going to use an element's top-padding to
         # get the div we are interested in? Yes we are :(.
         tzk_rating = hxs.select('//div[@class="content_main wide" and '
                          '@style="padding-top:0px"]/div[@class="tzk"]')
-
         rating = tzk_rating.select('div/text()').extract()
         if rating:
             # There are schools without ratings, such as new schools
-            organisation['rating'] = rating[0]
+            current_rating = rating[0]
+            rating_valid_since = tzk_rating.select('h3/div/text()')\
+                .extract()[0].replace('\n', ' ').strip()[-10:]
 
-            r_date = tzk_rating.select('h3/div/text()')\
-                                .extract()[0].replace('\n', ' ').strip()[-10:]
-
+            # Try to parse the date
             try:
-                r_date = datetime.strptime(r_date, '%d-%m-%Y')
-                r_date = r_date.date().isoformat()
+                rating_valid_since = datetime.strptime(rating_valid_since,
+                    '%d-%m-%Y')
+                rating_valid_since = rating_valid_since.date().isoformat()
             except:
-                pass
+                rating_valid_since = None
+        else:
+            current_rating = None
+            rating_valid_since = None
 
-            organisation['rating_date'] = r_date
+        urlparams = urlparse.parse_qs(response.url)
+        owinsp_id = urlparams['sch_id'][0].split('.')[0]
+        try:
+            owinsp_id = int(owinsp_id)
+        except:
+            owinsp_id = None
+
+        organisation['education_structures'].append({
+            'owinsp_id': owinsp_id,
+            'owinsp_url': response.url,
+            'education_structure': structure,
+            'current_rating': current_rating,
+            'rating_valid_since': rating_valid_since,
+            'rating_excerpt': rating_excerpt
+        })
+
+        if 'reports' not in organisation:
+            organisation['reports'] = []
 
         reports = hxs.select('//div[@class="report" and span'
                              '[@class="icoon_pdf2"]]/span'
                              '[@class="icoon_download"]/a')
-
         if reports:
-            organisation['reports'] = []
             report_urls = []
 
             for report in reports:
@@ -207,6 +239,7 @@ class VOSpider(OWINSPSpider):
                     continue
 
                 organisation['reports'].append({
+                    'education_structure': structure,
                     'url': url,
                     'title': title.strip(),
                     'date': date
@@ -214,12 +247,12 @@ class VOSpider(OWINSPSpider):
 
                 report_urls.append(url)
 
-        rating_history = hxs.select('//table[@summary="Rapporten"]//'
-                                    'li[@class="arrref"]/text()').extract()
-
-        if rating_history:
+        if 'rating_history' not in organisation:
             organisation['rating_history'] = []
 
+        rating_history = hxs.select('//table[@summary="Rapporten"]//'
+                                    'li[@class="arrref"]/text()').extract()
+        if rating_history:
             for ratingstring in rating_history:
                 date, rating = ratingstring.split(': ')
                 try:
@@ -230,48 +263,42 @@ class VOSpider(OWINSPSpider):
                     pass
 
                 organisation['rating_history'].append({
+                    'education_structure': structure,
                     'rating': rating.strip(),
                     'date': date
                 })
 
         organisation['education_sector'] = 'vo'
 
-        if 'item' in response.meta:
-            organisation['education_structure'] = response.meta['item']
+        # Remove this structure from education_sectors_to_scrape
+        organisation['education_structures_to_scrape'].remove(response.url)
 
-        organisation['owinsp_url'] = response.url
+        # If all structures are scraped, either return the item or crawl
+        # the 'Opbrengstenoordeel'
+        if not organisation['education_structures_to_scrape']:
+            del organisation['education_structures_to_scrape']
+            result_url = hxs.select('//ul[@class="opboor"]//a/@href').extract()
 
-        urlparams = urlparse.parse_qs(response.url)
-        owinsp_id = urlparams['sch_id'][0].split('.')[0]
-        try:
-            owinsp_id = int(owinsp_id)
-        except:
-            pass
+            if not result_url:
+                yield organisation
+            else:
+                # Append '&p_navi=11111' in order to open all tabs
+                organisation['result_card_url'] = result_url[0] + '&p_navi=11111'
+                urlparams = urlparse.parse_qs(urlparse.urlparse(\
+                    organisation['result_card_url']).query)
+                organisation['brin'] = urlparams['p_brin'][0]
+                try:
+                    branch_id = int(urlparams['p_vestnr'][0])
+                except:
+                    pass
 
-        organisation['owinsp_id'] = owinsp_id
+                organisation['branch_id'] = branch_id
 
-        result_url = hxs.select('//ul[@class="opboor"]//a/@href').extract()
-        if result_url:
-            # Append '&p_navi=11111' in order to open all tabs
-            organisation['result_card_url'] = result_url[0] + '&p_navi=11111'
-            urlparams = urlparse.parse_qs(urlparse.urlparse(\
-                organisation['result_card_url']).query)
-            organisation['brin'] = urlparams['p_brin'][0]
-            try:
-                branch_id = int(urlparams['p_vestnr'][0])
-            except:
-                pass
+                request = Request(organisation['result_card_url'],\
+                    self.parse_resultcard)
+                request.meta['organisation'] = organisation
 
-            organisation['branch_id'] = branch_id
-
-            request = Request(organisation['result_card_url'],\
-                self.parse_resultcard)
-            request.meta['organisation'] = organisation
-
-            return request
-
-        else:
-            return organisation
+                yield request
 
     def parse_resultcard(self, response):
         hxs = HtmlXPathSelector(response)
