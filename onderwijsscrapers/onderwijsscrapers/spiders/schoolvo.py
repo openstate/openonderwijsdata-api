@@ -73,7 +73,8 @@ class SchoolVOSpider(BaseSpider):
         # function used to do the extraction for that indicator
         extract_indicators = {
             'ind00': self.extract_ind00,
-            'ind02': self.extract_ind02
+            'ind02': self.extract_ind02,
+            'ind11': self.extract_ind11
         }
 
         # Extract the 'indicatoren' that are available for this school
@@ -127,8 +128,8 @@ class SchoolVOSpider(BaseSpider):
                 u' ')
 
         school['available_indicators'].remove('ind00')
-        if not school['available_indicators']:
-            return school
+        # if not school['available_indicators']:
+        #     return school
 
     def extract_ind02(self, response):
         """
@@ -198,5 +199,22 @@ class SchoolVOSpider(BaseSpider):
         school['graduations'] = graduations
 
         school['available_indicators'].remove('ind02')
-        if not school['available_indicators']:
-            return school
+        # if not school['available_indicators']:
+        #     return school
+
+    def extract_ind11(self, response):
+        """
+        Extraction of indicator 11: "Kwaliteit - Tevredenheid leerlingen"
+        """
+        school = response.meta['item']
+        hxs = HtmlXPathSelector(response)
+
+        graduations_year = hxs.select('//span[@class="a22"]/text()')\
+            .re(r'.* (\d{4}-\d{4})')
+
+        if not graduations_year:
+            print response.url
+
+        school['available_indicators'].remove('ind11')
+        # if not school['available_indicators']:
+        #     return school
