@@ -60,7 +60,7 @@ class SchoolVOSpider(BaseSpider):
 
             if school['pad_gebouw'] and school['pad_gebouw'].startswith('/'):
                 request.meta['item']['building_img_url'] = '%s%s'\
-                    % (settings['SCHOOLVO_URL'], school['pad_gebouw'][1:]),
+                    % (settings['SCHOOLVO_URL'], school['pad_gebouw'][1:])
 
             requests.append(request)
 
@@ -85,7 +85,7 @@ class SchoolVOSpider(BaseSpider):
             & indicators
 
         # Request the indicators that are both available and parseable
-        # for this schoool. Send the school Item along with each request.
+        # for this school. Send the school Item along with each request.
         for indicator in school['available_indicators']:
             indicator_detail_url = '%(schoolvo_url)svensters/%(school_id)s'\
                 '/publish/%(indicator_id)s_leesmeer/%(indicator_id)s_leesmeer_'\
@@ -109,7 +109,7 @@ class SchoolVOSpider(BaseSpider):
         structures = hxs.select('//tr[td/div/text() = "Onderwijsaanbod:"]/td[2]'\
             '/div/text()')
         if structures:
-            school['education_structure'] = structures.extract()[0].split(' ')
+            school['education_structures'] = structures.extract()[0].split(' ')
 
         denomination = hxs.select('//tr[td/div/text() = "Denominatie:"]/td[2]'\
             '/div/text()')
@@ -128,8 +128,8 @@ class SchoolVOSpider(BaseSpider):
                 u' ')
 
         school['available_indicators'].remove('ind00')
-        # if not school['available_indicators']:
-        #     return school
+        if not school['available_indicators']:
+            return school
 
     def extract_ind02(self, response):
         """
@@ -199,8 +199,8 @@ class SchoolVOSpider(BaseSpider):
         school['graduations'] = graduations
 
         school['available_indicators'].remove('ind02')
-        # if not school['available_indicators']:
-        #     return school
+        if not school['available_indicators']:
+            return school
 
     def extract_ind11(self, response):
         """
@@ -209,12 +209,97 @@ class SchoolVOSpider(BaseSpider):
         school = response.meta['item']
         hxs = HtmlXPathSelector(response)
 
-        graduations_year = hxs.select('//span[@class="a22"]/text()')\
+        satisfaction_year = hxs.select('//span[@class="a22"]/text()')\
             .re(r'.* (\d{4}-\d{4})')
 
-        if not graduations_year:
-            print response.url
+        student_satisfactions = []
+
+        if satisfaction_year:
+            struct = None
+            student_satisfaction = None
+
+            # general
+            for row in hxs.select('//table[@class="a94"]//tr[@valign="top"]'):
+                general = row.select('td[@class="a57c"]//span/text()').extract()
+
+                if general:
+                    if student_satisfaction:
+                        student_satisfactions.append(student_satisfaction)
+
+                    struct = 'school'
+                    school_grade = float(row.select('td[@class="a63c"]/div/text()')[0]\
+                        .extract().replace(',', '.'))
+                    national_grade = row.select('td[@class="a63c"]/div/text()')\
+                        .extract()
+
+                    if national_grade:
+                        national_grade = float(national_grade[0]\
+                            .replace(',', '.'))
+                    else:
+                        # Sometimes grades for this year are not available yet
+                        national_grade = None
+
+                    student_satisfaction = {
+                        'education_structure': struct,
+                        'grade': school_grade,
+                        'national_grade': national_grade,
+                        'indicators': []
+                    }
+
+                    continue
+
+                if struct:
+                    indicator = {
+                        'indicator': row.select('td[@class="a77cl"]/div/text()')\
+                        .extract()[0].strip(),
+                        'grade': float(row.select('td[@class="a82c"]/div/text()')\
+                            .extract()[0].replace(',', '.'))
+                    }
+                    student_satisfaction['indicators'].append(indicator)
+
+            struct = None
+            # education structure specific
+            for row in hxs.select('//table[@class="a170"]//tr[@valign="top"]'):
+                structure = row.select('td[@class="a130c"]//span/text()')
+
+                if structure:
+                    if student_satisfaction:
+                        student_satisfactions.append(student_satisfaction)
+                    struct = structure[0].extract().strip()
+                    grade = float(row.select('td[@class="a139c"]/div/text()')[0]\
+                        .extract().replace(',', '.'))
+                    national_grade = row.select('td[@class="a143c"]/div/text()')\
+                        .extract()
+
+                    if national_grade:
+                        national_grade = float(national_grade[0]\
+                            .replace(',', '.'))
+                    else:
+                        national_grade = None
+
+                    student_satisfaction = {
+                        'education_structure': struct,
+                        'grade': grade,
+                        'national_grade': national_grade,
+                        'indicators': []
+                    }
+
+                    continue
+
+                if struct:
+                    indicator = {
+                        'indicator': row.select('td[@class="a153cl"]/div/text()')\
+                            .extract()[0].strip(),
+                        'grade': float(row.select('td[@class="a158c"]/div/text()')\
+                            .extract()[0].replace(',', '.'))
+                    }
+                    student_satisfaction['indicators'].append(indicator)
+
+            # Append last satisfaction
+            student_satisfactions.append(student_satisfaction)
+
+        school['student_satisfaction'] = student_satisfactions
 
         school['available_indicators'].remove('ind11')
-        # if not school['available_indicators']:
-        #     return school
+        if not school['available_indicators']:
+            return school
