@@ -32,6 +32,7 @@ class SchoolVOItem(SchoolItem):
     building_img_url = Field()  # `pad_gebouw`
     profile = Field()  # `Profiel`
     graduations = Field()  # `Slaagpercentage`
+    student_satisfaction = Field() # `Tevredenheid leerlingen`
 
 
 class OnderwijsInspectieItem(SchoolItem):
