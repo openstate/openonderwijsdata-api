@@ -3,13 +3,14 @@ from scrapy.item import Item, Field
 
 class SchoolItem(Item):
     name = Field()  # `naam`
+    brin = Field()  # `BRIN-nummer`
+    branch_id = Field()  # Vestigingsnummer
     address = Field()  # `adres`
     zip_code = Field()  # `postcode`
     city = Field()  # `woonplaats`
     website = Field()  # `website` or `homepage`
     denomination = Field()  # `denominatie`
     education_structures = Field()  # `Onderwijsaanbod`
-    education_structure = Field()
 
 
 class SchoolVOItem(SchoolItem):
@@ -32,7 +33,7 @@ class SchoolVOItem(SchoolItem):
     building_img_url = Field()  # `pad_gebouw`
     profile = Field()  # `Profiel`
     graduations = Field()  # `Slaagpercentage`
-    student_satisfaction = Field() # `Tevredenheid leerlingen`
+    student_satisfaction = Field()  # `Tevredenheid leerlingen`
 
 
 class OnderwijsInspectieItem(SchoolItem):
@@ -45,10 +46,8 @@ class OnderwijsInspectieItem(SchoolItem):
 
 
 class VOSchool(OnderwijsInspectieItem):
-    brin = Field()  # BRIN-nummer
     board = Field()  # `Bestuur` or `Bevoegd gezag`
     board_id = Field()  # Bevoegd gezagnummer
-    branch_id = Field()  # Vestigingsnummer
     result_card_url = Field()  # Opbrengstenkaart URL
 
     # Field used to merge all sectors of a singel school into one item.
@@ -63,8 +62,6 @@ class POSchool(OnderwijsInspectieItem):
 class DUOSchoolItem(SchoolItem):
     province = Field()  # `provincie`
     board_id = Field()  # Bevoegd gezagnummer
-    brin = Field()  # BRIN-nummer
-    branch_id = Field()  # Vestigingsnummer
     municipality = Field()  # `Gemeente naam`
     municipality_code = Field()  # `Gemeente nummer`
     phone = Field()  # `telefoonnummer`

@@ -59,7 +59,7 @@ class DUOSpider(BaseSpider):
                 school['denomination'] = row['DENOMINATIE'].strip()
 
             if row['ONDERWIJSSTRUCTUUR'].strip():
-                school['education_structure'] = row['ONDERWIJSSTRUCTUUR']\
+                school['education_structures'] = row['ONDERWIJSSTRUCTUUR']\
                     .strip().split('/')
 
             if row['PROVINCIE'].strip():
