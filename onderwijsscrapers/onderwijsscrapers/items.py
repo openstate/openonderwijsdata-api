@@ -9,6 +9,7 @@ class SchoolItem(Item):
     website = Field()  # `website` or `homepage`
     denomination = Field()  # `denominatie`
     education_structures = Field()  # `Onderwijsaanbod`
+    education_structure = Field()
 
 
 class SchoolVOItem(SchoolItem):
