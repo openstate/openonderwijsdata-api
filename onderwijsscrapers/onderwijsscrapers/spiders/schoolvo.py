@@ -116,7 +116,7 @@ class SchoolVOSpider(BaseSpider):
         # function used to do the extraction for that indicator
         extract_indicators = {
             'ind00': self.extract_ind00,
-            'ind02': self.extract_ind02,
+            # 'ind02': self.extract_ind02,
             'ind11': self.extract_ind11_12,
             'ind12': self.extract_ind11_12
         }
