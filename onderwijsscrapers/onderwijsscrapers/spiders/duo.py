@@ -1,6 +1,7 @@
 import csv
 import cStringIO
 import time
+import re
 
 import requests
 from scrapy.spider import BaseSpider
@@ -12,17 +13,18 @@ from onderwijsscrapers.items import DUOSchoolItem
 
 class DUOSpider(BaseSpider):
     name = 'data.duo.nl'
-    available_parsers = set(['branches', 'student_residences'])
-    schools = {}
 
     def start_requests(self):
         return [
-            Request('http://duo.nl/organisatie/open_onderwijsdata/'\
-                'Voortgezet_onderwijs/datasets/adressen/Adressen/'\
-                '02allevestigingen.asp', self.parse_branches),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/Voortgezet_onderwijs/leerlingen/Leerlingen/'\
-                'vo_leerlingen2.asp', self.parse_student_residences)
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+            #     'databestanden/vo/adressen/Adressen/vestigingen.asp',
+            #     self.parse_branches),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+            #     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp',
+            #     self.parse_student_residences),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+            #     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp',
+            #     self.parse_students_per_branch)
         ]
 
     def parse_branches(self, response):
@@ -30,153 +32,335 @@ class DUOSpider(BaseSpider):
         Parse "02. Adressen alle vestigingen"
         """
         hxs = HtmlXPathSelector(response)
-        csv_url = hxs.select('//tr[td/text() = "Definitief"]//a/@href')\
-            .re(r'(.*\.csv)')
-        csv_file = requests.get('http://duo.nl%s' % csv_url[0])
-        csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content.decode('cp1252').encode('utf8')),
-            delimiter=';')
 
-        for row in csv_file:
-            school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
-                row['VESTIGINGSNUMMER'].strip().replace(row['BRIN NUMMER'], ''))
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            year = csv_file.select('./td[1]/span/text()').extract()
+            year = re.search(r'\d+ \w+ (\d{4})', year[0]).groups()
+            year = int(year[0])
 
-            if school_id in self.schools:
-                school = self.schools[school_id]
-            else:
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = year
+
+        for csv_url, publication_year in available_csvs.iteritems():
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                .decode('cp1252').encode('utf8')), delimiter=';')
+
+            for row in csv_file:
                 school = DUOSchoolItem()
-                self.schools[school_id] = school
 
-            school['name'] = row['VESTIGINGSNAAM'].strip()
-            school['address'] = '%s %s' % (row['STRAATNAAM'].strip(),
-                row['HUISNUMMER-TOEVOEGING'].strip())
-            school['zip_code'] = row['POSTCODE'].strip()
-            school['city'] = row['PLAATSNAAM'].strip()
+                school['publication_year'] = publication_year
+                school['name'] = row['VESTIGINGSNAAM'].strip()
+                school['address'] = '%s %s' % (row['STRAATNAAM'].strip(),
+                    row['HUISNUMMER-TOEVOEGING'].strip())
+                school['zip_code'] = row['POSTCODE'].strip()
+                school['city'] = row['PLAATSNAAM'].strip()
 
-            if row['INTERNETADRES'].strip():
-                school['website'] = row['INTERNETADRES'].strip()
+                if row['INTERNETADRES'].strip():
+                    school['website'] = row['INTERNETADRES'].strip()
+                else:
+                    school['website'] = None
 
-            if row['DENOMINATIE'].strip():
-                school['denomination'] = row['DENOMINATIE'].strip()
+                if row['DENOMINATIE'].strip():
+                    school['denomination'] = row['DENOMINATIE'].strip()
+                else:
+                    school['denomination'] = None
 
-            if row['ONDERWIJSSTRUCTUUR'].strip():
-                school['education_structures'] = row['ONDERWIJSSTRUCTUUR']\
-                    .strip().split('/')
+                if row['ONDERWIJSSTRUCTUUR'].strip():
+                    school['education_structures'] = row['ONDERWIJSSTRUCTUUR']\
+                        .strip().split('/')
+                else:
+                    school['education_structures'] = None
 
-            if row['PROVINCIE'].strip():
-                school['province'] = row['PROVINCIE'].strip()
+                if row['PROVINCIE'].strip():
+                    school['province'] = row['PROVINCIE'].strip()
+                else:
+                    school['province'] = None
 
-            if row['BEVOEGD GEZAG NUMMER'].strip():
-                school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'].strip())
+                if row['BEVOEGD GEZAG NUMMER'].strip():
+                    school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'].strip())
+                else:
+                    school['board_id'] = None
 
-            if row['BRIN NUMMER'].strip():
-                school['brin'] = row['BRIN NUMMER'].strip()
+                if row['BRIN NUMMER'].strip():
+                    school['brin'] = row['BRIN NUMMER'].strip()
 
-            if row['VESTIGINGSNUMMER'].strip():
-                school['branch_id'] = int(row['VESTIGINGSNUMMER'].strip()\
-                    .replace(row['BRIN NUMMER'], ''))
+                if row['VESTIGINGSNUMMER'].strip():
+                    school['branch_id'] = int(row['VESTIGINGSNUMMER'].strip()\
+                        .replace(row['BRIN NUMMER'], ''))
 
-            if row['GEMEENTENAAM'].strip():
-                school['municipality'] = row['GEMEENTENAAM'].strip()
+                if row['GEMEENTENAAM'].strip():
+                    school['municipality'] = row['GEMEENTENAAM'].strip()
+                else:
+                    school['municipality'] = None
 
-            if row['GEMEENTENUMMER'].strip():
-                school['municipality_code'] = int(row['GEMEENTENUMMER'].strip())
+                if row['GEMEENTENUMMER'].strip():
+                    school['municipality_code'] = int(row['GEMEENTENUMMER'].strip())
+                else:
+                    school['municipality_code'] = None
 
-            if row['TELEFOONNUMMER'].strip():
-                school['phone'] = row['TELEFOONNUMMER'].strip()
+                if row['TELEFOONNUMMER'].strip():
+                    school['phone'] = row['TELEFOONNUMMER'].strip()
+                else:
+                    school['phone'] = None
 
-            if row['STRAATNAAM CORRESPONDENTIEADRES'].strip():
-                school['correspondence_address'] = '%s %s'\
-                    % (row['STRAATNAAM CORRESPONDENTIEADRES'].strip(),
-                       row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'].strip())
+                if row['STRAATNAAM CORRESPONDENTIEADRES'].strip():
+                    school['correspondence_address'] = '%s %s'\
+                        % (row['STRAATNAAM CORRESPONDENTIEADRES'].strip(),
+                           row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'].strip())
+                else:
+                    school['correspondence_address'] = None
 
-            if row['POSTCODE CORRESPONDENTIEADRES'].strip():
-                school['correspondence_zip'] = row['POSTCODE '\
-                    'CORRESPONDENTIEADRES'].strip()
+                if row['POSTCODE CORRESPONDENTIEADRES'].strip():
+                    school['correspondence_zip'] = row['POSTCODE '\
+                        'CORRESPONDENTIEADRES'].strip()
+                else:
+                    school['correspondence_zip'] = None
 
-            if row['NODAAL GEBIED NAAM'].strip():
-                school['nodal_area'] = row['NODAAL GEBIED NAAM'].strip()
+                if row['NODAAL GEBIED NAAM'].strip():
+                    school['nodal_area'] = row['NODAAL GEBIED NAAM'].strip()
+                else:
+                    school['nodal_area'] = None
 
-            if row['NODAAL GEBIED CODE'].strip():
-                school['nodal_area_code'] = int(row['NODAAL GEBIED CODE']\
-                    .strip())
+                if row['NODAAL GEBIED CODE'].strip():
+                    school['nodal_area_code'] = int(row['NODAAL GEBIED CODE']\
+                        .strip())
+                else:
+                    school['nodal_area_code'] = None
 
-            if row['RPA-GEBIED NAAM'].strip():
-                school['rpa_area'] = row['RPA-GEBIED NAAM'].strip()
+                if row['RPA-GEBIED NAAM'].strip():
+                    school['rpa_area'] = row['RPA-GEBIED NAAM'].strip()
+                else:
+                    school['rpa_area'] = None
 
-            if row['RPA-GEBIED CODE'].strip():
-                school['rpa_area_code'] = int(row['RPA-GEBIED CODE'].strip())
+                if row['RPA-GEBIED CODE'].strip():
+                    school['rpa_area_code'] = int(row['RPA-GEBIED CODE'].strip())
+                else:
+                    school['rpa_area_code'] = None
 
-            if row['WGR-GEBIED NAAM'].strip():
-                school['wgr_area'] = row['WGR-GEBIED NAAM'].strip()
+                if row['WGR-GEBIED NAAM'].strip():
+                    school['wgr_area'] = row['WGR-GEBIED NAAM'].strip()
+                else:
+                    school['wgr_area'] = None
 
-            if row['WGR-GEBIED CODE'].strip():
-                school['wgr_area_code'] = int(row['WGR-GEBIED CODE'].strip())
+                if row['WGR-GEBIED CODE'].strip():
+                    school['wgr_area_code'] = int(row['WGR-GEBIED CODE'].strip())
+                else:
+                    school['wgr_area_code'] = None
 
-            if row['COROPGEBIED NAAM'].strip():
-                school['corop_area'] = row['COROPGEBIED NAAM'].strip()
+                if row['COROPGEBIED NAAM'].strip():
+                    school['corop_area'] = row['COROPGEBIED NAAM'].strip()
+                else:
+                    school['corop_area'] = None
 
-            if row['COROPGEBIED CODE'].strip():
-                school['corop_area_code'] = int(row['COROPGEBIED CODE'].strip())
+                if row['COROPGEBIED CODE'].strip():
+                    school['corop_area_code'] = int(row['COROPGEBIED CODE'].strip())
+                else:
+                    school['corop_area_code'] = None
 
-            if row['ONDERWIJSGEBIED NAAM'].strip():
-                school['education_area'] = row['ONDERWIJSGEBIED NAAM'].strip()
+                if row['ONDERWIJSGEBIED NAAM'].strip():
+                    school['education_area'] = row['ONDERWIJSGEBIED NAAM'].strip()
+                else:
+                    school['education_area'] = None
 
-            if row['ONDERWIJSGEBIED CODE'].strip():
-                school['education_area_code'] = int(row['ONDERWIJSGEBIED CODE']\
-                    .strip())
+                if row['ONDERWIJSGEBIED CODE'].strip():
+                    school['education_area_code'] = int(row['ONDERWIJSGEBIED CODE']\
+                        .strip())
+                else:
+                    school['education_area_code'] = None
 
-            if row['RMC-REGIO NAAM'].strip():
-                school['rmc_region'] = row['RMC-REGIO NAAM'].strip()
+                if row['RMC-REGIO NAAM'].strip():
+                    school['rmc_region'] = row['RMC-REGIO NAAM'].strip()
+                else:
+                    school['rmc_region'] = None
 
-            if row['RMC-REGIO CODE'].strip():
-                school['rmc_region_code'] = int(row['RMC-REGIO CODE'].strip())
+                if row['RMC-REGIO CODE'].strip():
+                    school['rmc_region_code'] = int(row['RMC-REGIO CODE'].strip())
+                else:
+                    school['rmc_region_code'] = None
 
-        self.available_parsers.remove('branches')
-        if not self.available_parsers:
-            for school in self.schools:
-                yield self.schools[school]
+                yield school
+
+    def get_boards(self):
+        pass
+
+    def parse_students_per_branch(self, response):
+        """
+        Parse "01. Leerlingen per vestiging naar onderwijstype, lwoo
+        indicatie, sector, afdeling, opleiding"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            print csv_file
+            year = csv_file.select('./td[1]/span/text()').extract()
+            year = re.search(r'\d+ \w+ (\d{4})', year[0]).groups()
+            year = int(year[0])
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = year
+
+        for csv_url, publication_year in available_csvs.iteritems():
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                .decode('cp1252').encode('utf8')), delimiter=';')
+
+            student_educations = {}
+            school_ids = {}
+
+            for row in csv_file:
+                school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
+                    row['VESTIGINGSNUMMER'].strip().zfill(2))
+
+                school_ids[school_id] = {
+                    'brin': row['BRIN NUMMER'].strip(),
+                    'branch_id': int(row['VESTIGINGSNUMMER'].strip()\
+                        .replace(row['BRIN NUMMER'], ''))
+                }
+
+                if school_id not in student_educations:
+                    student_educations[school_id] = []
+
+                education_type = {}
+
+                department = row['AFDELING'].strip()
+                if department:
+                    education_type['department'] = department
+                    if education_type['department'].lower() == 'n.v.t.':
+                        education_type['department'] = False
+                else:
+                    education_type['department'] = None
+
+                if row['ELEMENTCODE'].strip():
+                    education_type['elementcode'] = int(row['ELEMENTCODE']\
+                        .strip())
+                else:
+                    education_type['elementcode'] = None
+
+                lwoo = row['LWOO INDICATIE'].strip().lower()
+                if lwoo:
+                    if lwoo == 'j':
+                        education_type['lwoo'] = True
+                    elif lwoo == 'n':
+                        education_type['lwoo'] = False
+                    else:
+                        education_type['lwoo'] = None
+                else:
+                    education_type['lwoo'] = None
+
+                vmbo_sector = row['VMBO SECTOR'].strip()
+                if vmbo_sector:
+                    if vmbo_sector.lower() == 'n.v.t.':
+                        education_type['vmbo_sector'] = False
+                    else:
+                        education_type['vmbo_sector'] = vmbo_sector
+                else:
+                    education_type['vmbo_sector'] = None
+
+                naam = row['OPLEIDINGSNAAM'].strip()
+                if naam:
+                    education_type['education_name'] = naam
+                else:
+                    education_type['education_name'] = None
+
+                otype = row['ONDERWIJSTYPE VO EN LEER- OF VERBLIJFSJAAR'].strip()
+                if otype:
+                    education_type['education_structure'] = otype
+                else:
+                    education_type['education_structure'] = None
+
+                for available_year in range(1, 7):
+                    male = int(row['LEER- OF VERBLIJFSJAAR %s - MAN'
+                        % available_year])
+                    female = int(row['LEER- OF VERBLIJFSJAAR %s - VROUW'
+                        % available_year])
+
+                    education_type['year_%s' % available_year] = {
+                        'male': male,
+                        'female': female,
+                        'total': male + female
+                    }
+
+                student_educations[school_id].append(education_type)
+
+            for school_id, s_by_structure in student_educations.iteritems():
+                school = DUOSchoolItem(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    publication_year=publication_year,
+                    students_by_structure=s_by_structure
+                )
+
+                yield school
+
 
     def parse_student_residences(self, response):
         """
-        Parse "02. Leerlingen per vestiging naar postcode leerling en leerjaar"
+        Parse "02. Leerlingen per vestiging naar postcode leerling en
+        leerjaar"
         """
         hxs = HtmlXPathSelector(response)
-        csv_url = hxs.select('//tr[td/text() = "Definitief"]//a/@href')\
-            .re(r'(.*\.csv)')
-        csv_file = requests.get('http://duo.nl%s' % csv_url[0])
-        print csv_file.encoding
-        csv_file.encoding = 'cp1252'
-        csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-            .decode('cp1252').encode('utf8')), delimiter=';')
 
-        student_residences = {}
-        for row in csv_file:
-            school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
-                row['VESTIGINGSNUMMER'].strip().zfill(2))
-            if school_id not in student_residences:
-                student_residences[school_id] = []
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            print csv_file
+            year = csv_file.select('./td[1]/span/text()').extract()
+            year = re.search(r'\d+ \w+ (\d{4})', year[0]).groups()
+            year = int(year[0])
 
-            student_residences[school_id].append({
-                'zip_code': row['POSTCODE LEERLING'].strip(),
-                'city': row['PLAATSNAAM LEERLING'].strip().capitalize(),
-                'municipality': row['GEMEENTENAAM LEERLING'].strip(),
-                'municipality_id': int(row['GEMEENTENUMMER LEERLING'].strip()),
-                'year_1': int(row['LEER- OF VERBLIJFSJAAR 1']),
-                'year_2': int(row['LEER- OF VERBLIJFSJAAR 2']),
-                'year_3': int(row['LEER- OF VERBLIJFSJAAR 3']),
-                'year_4': int(row['LEER- OF VERBLIJFSJAAR 4']),
-                'year_5': int(row['LEER- OF VERBLIJFSJAAR 5']),
-                'year_6': int(row['LEER- OF VERBLIJFSJAAR 6'])
-            })
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
 
-        for school_id, residence in student_residences.iteritems():
-            if school_id in self.schools:
-                self.schools[school_id]['student_residences'] = residence
-            else:
-                self.schools[school_id] = DUOSchoolItem(
-                    student_residences=residence)
+            available_csvs['http://duo.nl%s' % csv_url] = year
 
-        self.available_parsers.remove('student_residences')
-        if not self.available_parsers:
-            for school in self.schools:
-                yield self.schools[school]
+        for csv_url, publication_year in available_csvs.iteritems():
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                .decode('cp1252').encode('utf8')), delimiter=';')
+
+            student_residences = {}
+            school_ids = {}
+            for row in csv_file:
+                school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
+                    row['VESTIGINGSNUMMER'].strip().zfill(2))
+
+                school_ids[school_id] = {
+                    'brin': row['BRIN NUMMER'].strip(),
+                    'branch_id': int(row['VESTIGINGSNUMMER'].strip()\
+                        .replace(row['BRIN NUMMER'], ''))
+                }
+
+                if school_id not in student_residences:
+                    student_residences[school_id] = []
+
+                student_residences[school_id].append({
+                    'zip_code': row['POSTCODE LEERLING'].strip(),
+                    'city': row['PLAATSNAAM LEERLING'].strip().capitalize(),
+                    'municipality': row['GEMEENTENAAM LEERLING'].strip(),
+                    'municipality_id': int(row['GEMEENTENUMMER LEERLING'].strip()),
+                    'year_1': int(row['LEER- OF VERBLIJFSJAAR 1']),
+                    'year_2': int(row['LEER- OF VERBLIJFSJAAR 2']),
+                    'year_3': int(row['LEER- OF VERBLIJFSJAAR 3']),
+                    'year_4': int(row['LEER- OF VERBLIJFSJAAR 4']),
+                    'year_5': int(row['LEER- OF VERBLIJFSJAAR 5']),
+                    'year_6': int(row['LEER- OF VERBLIJFSJAAR 6'])
+                })
+
+            for school_id, residence in student_residences.iteritems():
+                school = DUOSchoolItem(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    publication_year=publication_year,
+                    student_residences=residence
+                )
+
+                yield school

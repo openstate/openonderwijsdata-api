@@ -60,6 +60,7 @@ class POSchool(OnderwijsInspectieItem):
 
 
 class DUOSchoolItem(SchoolItem):
+    publication_year = Field()  # year in which the file was published by DUO
     province = Field()  # `provincie`
     board_id = Field()  # Bevoegd gezagnummer
     municipality = Field()  # `Gemeente naam`
@@ -84,3 +85,7 @@ class DUOSchoolItem(SchoolItem):
     # Contents of "02. Leerlingen per vestiging naar postcode leerling
     # en leerjaar"
     student_residences = Field()
+
+    #01. Leerlingen per vestiging naar onderwijstype, lwoo
+    # indicatie, sector, afdeling, opleiding"
+    students_by_structure = Field()
