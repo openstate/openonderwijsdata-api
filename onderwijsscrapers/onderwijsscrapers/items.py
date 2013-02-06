@@ -88,6 +88,9 @@ class DUOSchoolItem(SchoolItem):
     # en leerjaar"
     student_residences = Field()
 
-    #01. Leerlingen per vestiging naar onderwijstype, lwoo
+    # Contents of "01. Leerlingen per vestiging naar onderwijstype, lwoo
     # indicatie, sector, afdeling, opleiding"
     students_by_structure = Field()
+
+    # Content of "06. Examenkandidaten en geslaagden"
+    graduations = Field()
