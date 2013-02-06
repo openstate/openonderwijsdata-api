@@ -17,6 +17,7 @@ class SchoolVOItem(SchoolItem):
     # Holds the indicators that are available for this school
     available_indicators = Field()
 
+    board_id = Field()  # Bevoegd gezagnummer
     schoolvo_id = Field()  # `school_id`
     schoolvo_code = Field()  # `school_code`
     municipality = Field()  # `gemeente`
@@ -34,6 +35,7 @@ class SchoolVOItem(SchoolItem):
     profile = Field()  # `Profiel`
     graduations = Field()  # `Slaagpercentage`
     student_satisfaction = Field()  # `Tevredenheid leerlingen`
+    parent_satisfaction = Field()  # `Tevredenheid ouders`
 
 
 class OnderwijsInspectieItem(SchoolItem):
@@ -50,7 +52,7 @@ class VOSchool(OnderwijsInspectieItem):
     board_id = Field()  # Bevoegd gezagnummer
     result_card_url = Field()  # Opbrengstenkaart URL
 
-    # Field used to merge all sectors of a singel school into one item.
+    # Field used to merge all sectors of a single school into one item.
     # This field is not stored.
     education_structures_to_scrape = Field()
 

@@ -8,6 +8,47 @@ from scrapy.selector import HtmlXPathSelector
 
 from onderwijsscrapers.items import SchoolVOItem
 
+# Depending on whether there is an explanation present in indicators 11 and 12,
+# the classes of elements differ. Also, XPaths for both indicators are the same,
+# so we process them using the same function.
+IND11_12_XPATHS = {
+    'with_explanation': {
+        'general_table': '//table[@class="a94"]//tr[@valign="top"]',
+        'general': 'td[@class="a57c"]//span/text()',
+        'school_grade': 'td[@class="a63c"]/div/text()',
+        'national_grade': 'td[@class="a67c"]/div/text()',
+        'general_indicator': 'td[@class="a77cl"]/div/text()',
+        'general_ind_grade': 'td[@class="a82c"]/div/text()',
+        'edu_struct_table': '//table[@class="a170"]//tr[@valign="top"]',
+        'edu_struct': 'td[@class="a130c"]//span/text()',
+        'edu_grade': 'td[@class="a139c"]/div/text()',
+        'edu_nat_grade': 'td[@class="a143c"]/div/text()',
+        'edu_source': 'td[@class="a135c"]/div/text()',
+        'edu_indicator': 'td[@class="a153cl"]/div/text()',
+        'edu_ind_grade': 'td[@class="a158c"]/div/text()'
+    },
+    'without_explanation': {
+        'general_table': '//table[@class="a93"]//tr[@valign="top"]',
+        'general': 'td[@class="a56c"]//span/text()',
+        'school_grade': 'td[@class="a62c"]/div/text()',
+        'national_grade': 'td[@class="a66c"]/div/text()',
+        'general_indicator': 'td[@class="a76cl"]/div/text()',
+        'general_ind_grade': 'td[@class="a81c"]/div/text()',
+        'edu_struct_table': '//table[@class="a169"]//tr[@valign="top"]',
+        'edu_struct': 'td[@class="a129c"]//span/text()',
+        'edu_grade': 'td[@class="a138c"]/div/text()',
+        'edu_nat_grade': 'td[@class="a142c"]/div/text()',
+        'edu_source': 'td[@class="a134c"]/div/text()',
+        'edu_indicator': 'td[@class="a152cl"]/div/text()',
+        'edu_ind_grade': 'td[@class="a157c"]/div/text()'
+    }
+}
+
+LABELS = {
+    'ind11': 'student_satisfaction',
+    'ind12': 'parent_satisfaction'
+}
+
 
 class SchoolVOSpider(BaseSpider):
     name = 'schoolvo.nl'
@@ -52,6 +93,8 @@ class SchoolVOSpider(BaseSpider):
                     schoolvo_value = schoolvo_value.strip()
                 item[field] = schoolvo_value
 
+            item['board_id'], item['brin'], item['branch_id'] =\
+                                item['schoolvo_code'].strip().split('-')
             request.meta['item'] = SchoolVOItem(item)
 
             if school['pad_logo'] and school['pad_logo'].startswith('/'):
@@ -74,7 +117,8 @@ class SchoolVOSpider(BaseSpider):
         extract_indicators = {
             'ind00': self.extract_ind00,
             'ind02': self.extract_ind02,
-            'ind11': self.extract_ind11
+            'ind11': self.extract_ind11_12,
+            'ind12': self.extract_ind11_12
         }
 
         # Extract the 'indicatoren' that are available for this school
@@ -95,8 +139,8 @@ class SchoolVOSpider(BaseSpider):
                     'school_id': response.meta['item']['schoolvo_code']
                 }
 
-            yield Request(indicator_detail_url, meta={'item': school},
-                callback=extract_indicators[indicator])
+            yield Request(indicator_detail_url, meta={'item': school,
+                'indicator': indicator}, callback=extract_indicators[indicator])
 
     def extract_ind00(self, response):
         """
@@ -202,104 +246,117 @@ class SchoolVOSpider(BaseSpider):
         if not school['available_indicators']:
             return school
 
-    def extract_ind11(self, response):
+    def extract_ind11_12(self, response):
         """
         Extraction of indicator 11: "Kwaliteit - Tevredenheid leerlingen"
+        Extraction of indicator 12: "Kwaliteit - Tevredenheid ouders"
         """
         school = response.meta['item']
         hxs = HtmlXPathSelector(response)
 
-        satisfaction_year = hxs.select('//span[@class="a22"]/text()')\
-            .re(r'.* (\d{4}-\d{4})')
+        # Element classes are different if an explanation is present. Select
+        # the appropriate XPath expressions to use here.
+        # However, this is not true for ALL schools, so that's why this ugly,
+        # enormous conditional is here.
+        explanation = hxs.select('//span[@class="a13"]/text()')
+        if explanation:
+            xpaths = IND11_12_XPATHS.get('with_explanation')
+            general_table = hxs.select(xpaths['general_table'])
+            if not general_table:
+                xpaths = IND11_12_XPATHS.get('without_explanation')
+        else:
+            xpaths = IND11_12_XPATHS.get('without_explanation')
+            general_table = hxs.select(xpaths['general_table'])
+            if not general_table:
+                xpaths = IND11_12_XPATHS.get('with_explanation')
 
-        student_satisfactions = []
+        struct = None
+        satisfaction = None
+        satisfactions = []
 
-        if satisfaction_year:
-            struct = None
-            student_satisfaction = None
+        for row in hxs.select(xpaths['general_table']):
+            general = row.select(xpaths['general'])
 
-            # general
-            for row in hxs.select('//table[@class="a94"]//tr[@valign="top"]'):
-                general = row.select('td[@class="a57c"]//span/text()').extract()
+            if general:
+                if satisfaction:
+                    satisfactions.append(satisfaction)
 
-                if general:
-                    if student_satisfaction:
-                        student_satisfactions.append(student_satisfaction)
+                struct = u'school'
+                school_grade = float(row.select(xpaths['school_grade'])\
+                                        .extract()[0].replace(',', '.'))
+                national_grade = row.select(xpaths['national_grade']).extract()
 
-                    struct = 'school'
-                    school_grade = float(row.select('td[@class="a63c"]/div/text()')[0]\
-                        .extract().replace(',', '.'))
-                    national_grade = row.select('td[@class="a63c"]/div/text()')\
-                        .extract()
+                if national_grade:
+                    national_grade = float(national_grade[0].replace(',', '.'))
+                else:
+                    national_grade = None
 
-                    if national_grade:
-                        national_grade = float(national_grade[0]\
-                            .replace(',', '.'))
-                    else:
-                        # Sometimes grades for this year are not available yet
-                        national_grade = None
-
-                    student_satisfaction = {
+                satisfaction = {
                         'education_structure': struct,
                         'grade': school_grade,
                         'national_grade': national_grade,
                         'indicators': []
                     }
 
-                    continue
+                continue
 
-                if struct:
-                    indicator = {
-                        'indicator': row.select('td[@class="a77cl"]/div/text()')\
-                        .extract()[0].strip(),
-                        'grade': float(row.select('td[@class="a82c"]/div/text()')\
-                            .extract()[0].replace(',', '.'))
-                    }
-                    student_satisfaction['indicators'].append(indicator)
+            if struct:
+                indicator = {
+                    'indicator': row.select(xpaths['general_indicator'])\
+                                    .extract()[0].strip(),
+                    'grade': float(row.select(xpaths['general_ind_grade'])\
+                                    .extract()[0].replace(',', '.'))
+                }
+                satisfaction['indicators'].append(indicator)
 
-            struct = None
-            # education structure specific
-            for row in hxs.select('//table[@class="a170"]//tr[@valign="top"]'):
-                structure = row.select('td[@class="a130c"]//span/text()')
+        # education structures
+        struct = None
+        for row in hxs.select(xpaths['edu_struct_table']):
+            structure = row.select(xpaths['edu_struct'])
 
-                if structure:
-                    if student_satisfaction:
-                        student_satisfactions.append(student_satisfaction)
-                    struct = structure[0].extract().strip()
-                    grade = float(row.select('td[@class="a139c"]/div/text()')[0]\
-                        .extract().replace(',', '.'))
-                    national_grade = row.select('td[@class="a143c"]/div/text()')\
-                        .extract()
+            if structure:
+                if satisfaction:
+                    satisfactions.append(satisfaction)
 
-                    if national_grade:
-                        national_grade = float(national_grade[0]\
-                            .replace(',', '.'))
-                    else:
-                        national_grade = None
+                struct = structure[0].extract().strip()
+                grade = float(row.select(xpaths['edu_grade'])[0].extract()\
+                                .replace(',', '.'))
+                national_grade = row.select(xpaths['edu_nat_grade']).extract()
+                source = row.select(xpaths['edu_source'])[0].extract()\
+                            .replace('Bron: ', '')
 
-                    student_satisfaction = {
-                        'education_structure': struct,
-                        'grade': grade,
-                        'national_grade': national_grade,
-                        'indicators': []
-                    }
+                if national_grade:
+                    national_grade = float(national_grade[0].replace(',', '.'))
+                else:
+                    national_grade = None
 
-                    continue
+                satisfaction = {
+                    'education_structure': struct,
+                    'grade': grade,
+                    'national_grade': national_grade,
+                    'source': source,
+                    'indicators': []
+                }
 
-                if struct:
-                    indicator = {
-                        'indicator': row.select('td[@class="a153cl"]/div/text()')\
-                            .extract()[0].strip(),
-                        'grade': float(row.select('td[@class="a158c"]/div/text()')\
-                            .extract()[0].replace(',', '.'))
-                    }
-                    student_satisfaction['indicators'].append(indicator)
+                continue
 
-            # Append last satisfaction
-            student_satisfactions.append(student_satisfaction)
+            if struct:
+                indicator = {
+                    'indicator': row.select(xpaths['edu_indicator'])[0]\
+                                    .extract().strip(),
+                    'grade': float(row.select(xpaths['edu_ind_grade'])\
+                                    .extract()[0].replace(',', '.'))
+                }
+                satisfaction['indicators'].append(indicator)
 
-        school['student_satisfaction'] = student_satisfactions
+        # Append last satisfaction, if satisfacion exists
+        if satisfaction:
+            satisfactions.append(satisfaction)
 
-        school['available_indicators'].remove('ind11')
+        indicator = response.meta['indicator']
+
+        school[LABELS[indicator]] = satisfactions
+
+        school['available_indicators'].remove(indicator)
         if not school['available_indicators']:
             return school
