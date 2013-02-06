@@ -93,8 +93,11 @@ class SchoolVOSpider(BaseSpider):
                     schoolvo_value = schoolvo_value.strip()
                 item[field] = schoolvo_value
 
-            item['board_id'], item['brin'], item['branch_id'] =\
-                                item['schoolvo_code'].strip().split('-')
+            identifiers = item['schoolvo_code'].strip().split('-')
+            item['board_id'] = int(identifiers[0])
+            item['brin'] = identifiers[1]
+            item['branch_id'] = int(identifiers[2])
+
             request.meta['item'] = SchoolVOItem(item)
 
             if school['pad_logo'] and school['pad_logo'].startswith('/'):
@@ -118,7 +121,8 @@ class SchoolVOSpider(BaseSpider):
             'ind00': self.extract_ind00,
             # 'ind02': self.extract_ind02,
             'ind11': self.extract_ind11_12,
-            'ind12': self.extract_ind11_12
+            'ind12': self.extract_ind11_12,
+            # 'ind13': self.extract_ind13
         }
 
         # Extract the 'indicatoren' that are available for this school
@@ -173,6 +177,7 @@ class SchoolVOSpider(BaseSpider):
 
         school['available_indicators'].remove('ind00')
         if not school['available_indicators']:
+            school.pop('available_indicators')
             return school
 
     def extract_ind02(self, response):
@@ -243,7 +248,9 @@ class SchoolVOSpider(BaseSpider):
         school['graduations'] = graduations
 
         school['available_indicators'].remove('ind02')
+
         if not school['available_indicators']:
+            school.pop('available_indicators')
             return school
 
     def extract_ind11_12(self, response):
@@ -359,4 +366,5 @@ class SchoolVOSpider(BaseSpider):
 
         school['available_indicators'].remove(indicator)
         if not school['available_indicators']:
+            school.pop('available_indicators')
             return school
