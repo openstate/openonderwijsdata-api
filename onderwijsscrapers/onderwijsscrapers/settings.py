@@ -68,6 +68,7 @@ ELASTIC_SEARCH = {
         'url': 'chimay.dispectu.com:9200',
         'index': 'schoolvo',
         'doctype': 'school',
+        'id_fields': ['brin', 'branch_id']
     },
     'data.duo.nl': {
         'url': 'chimay.dispectu.com:9200',
