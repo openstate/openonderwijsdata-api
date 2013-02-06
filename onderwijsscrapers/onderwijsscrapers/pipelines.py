@@ -1,38 +1,44 @@
 import os
-import uuid
+
 from scrapy.conf import settings
+from scrapy.exceptions import DropItem
+from scrapy import log
+
 from onderwijsscrapers import exporters
-from onderwijsscrapers import items
 
 
 class OnderwijsscrapersPipeline(object):
     def __init__(self):
-        self.exporters = {}
+        self.items = {}
 
     def process_item(self, item, spider):
-        # Initialize the required exporter if necessary
-        if spider.name not in self.exporters:
-            if settings['EXPORT_METHOD'] == 'elasticsearch':
-                essetup = settings['ELASTIC_SEARCH'][spider.name]
-                self.exporters[spider.name] = exporters.ElasticSearchExporter(
-                    essetup['url'], essetup['index'], essetup['doctype'])
-            elif settings['EXPORT_METHOD'] == 'file':
-                self.exporters[spider.name] = exporters.FileExporter(
-                    os.path.join(settings['EXPORT_DIR'], spider.name))
+        # Check if the fields that identify the item are present. If not,
+        # log and drop the item.
+        id_fields = settings['ELASTIC_SEARCH'][spider.name]['id_fields']
+        if not all(field in item for field in id_fields):
+            log.msg('Dropped item, not all required fields are present. %s' % item,
+                level=log.WARNING, spider=spider)
+            raise DropItem
+            return
 
-        if isinstance(item, items.SchoolVOItem):
-            del item['available_indicators']
-            doc_id = item['schoolvo_code']
-
-        if isinstance(item, items.OnderwijsInspectieItem):
-            doc_id = str(uuid.uuid1())
-
-        if isinstance(item, items.DUOSchoolItem):
-            if 'brin' not in item:
-                print '*' * 200
-                return item
-            doc_id = '%s-%s' % (item['brin'], item['branch_id'])
-
-        self.exporters[spider.name].save(doc_id, dict(item))
+        item_id = '-'.join([str(item[field]) for field in id_fields])
+        if item_id not in self.items:
+            self.items[item_id] = dict(item)
+        else:
+            self.items[item_id].update(dict(item))
 
         return item
+
+    def close_spider(self, spider):
+        print '*' * 200
+        print len(self.items)
+        print '=' * 200
+        # Setup the exporter
+        if settings['EXPORT_METHOD'] == 'elasticsearch':
+            pass
+        elif settings['EXPORT_METHOD'] == 'file':
+            exporter = exporters.FileExporter(os.path.join(
+                settings['EXPORT_DIR'], spider.name))
+
+        for item_id, item in self.items.iteritems():
+            exporter.save(item_id, item)

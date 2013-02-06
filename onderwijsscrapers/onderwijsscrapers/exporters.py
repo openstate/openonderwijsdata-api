@@ -30,5 +30,5 @@ class FileExporter(object):
 
     def save(self, doc_id, item):
         f = open(os.path.join(self.path, '%s.json' % doc_id), 'w')
-        json.dump(dict(item), f)
+        json.dump(item, f, indent=4, separators=(',', ': '))
         f.close()
