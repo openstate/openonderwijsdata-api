@@ -293,7 +293,7 @@ class SchoolVOSpider(BaseSpider):
 
                 satisfaction = {
                         'education_structure': struct,
-                        'grade': school_grade,
+                        'average_grade': school_grade,
                         'national_grade': national_grade,
                         'indicators': []
                     }
@@ -332,7 +332,7 @@ class SchoolVOSpider(BaseSpider):
 
                 satisfaction = {
                     'education_structure': struct,
-                    'grade': grade,
+                    'average_grade': grade,
                     'national_grade': national_grade,
                     'source': source,
                     'indicators': []
