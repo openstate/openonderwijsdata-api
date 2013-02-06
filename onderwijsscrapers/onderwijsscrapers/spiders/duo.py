@@ -430,6 +430,7 @@ class DUOSpider(BaseSpider):
 
                 for year, y_normal in years.iteritems():
                     if y_normal not in graduations_school_year[school_id]:
+                        # Graduation info of a single school year
                         graduations_school_year[school_id][y_normal] = {
                             'year': y_normal,
                             'failed': 0,
@@ -438,6 +439,8 @@ class DUOSpider(BaseSpider):
                             'per_department': []
                         }
 
+                    # Total number of candidates (not always present for
+                    # every year)
                     try:
                         candidates = row['EXAMENKANDIDATEN %s TOTAAL' % year]
                         if candidates:
@@ -448,6 +451,7 @@ class DUOSpider(BaseSpider):
                         candidates = 0
                     graduations_school_year[school_id][y_normal]['candidates'] += candidates
 
+                    # Total number of successful graduations
                     try:
                         passed = int(row['GESLAAGDEN %s TOTAAL' % year])
                     except KeyError:
@@ -456,6 +460,7 @@ class DUOSpider(BaseSpider):
 
                     graduations_school_year[school_id][y_normal]['failed'] += (candidates - passed)
 
+                    # Graduations for a singel department, by gender
                     department = {
                         'education_structure': row['ONDERWIJSTYPE VO'],
                         'department': row['OPLEIDINGSNAAM'],
