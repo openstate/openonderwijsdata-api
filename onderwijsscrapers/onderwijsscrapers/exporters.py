@@ -1,8 +1,6 @@
-from datetime import datetime
 import os
 import json
 
-import time
 import rawes
 
 
@@ -14,11 +12,7 @@ class ElasticSearchExporter(object):
         self.es = rawes.Elastic(url)
 
     def save(self, doc_id, item):
-        print '=' * 20
-        print datetime.now()
         self.es.put('%s/%s/%s' % (self.index, self.doctype, doc_id), data=item)
-        time.sleep(1)
-        print datetime.now()
 
 
 class FileExporter(object):

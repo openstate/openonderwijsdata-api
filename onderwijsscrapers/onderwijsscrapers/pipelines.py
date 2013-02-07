@@ -30,12 +30,14 @@ class OnderwijsscrapersPipeline(object):
         return item
 
     def close_spider(self, spider):
-        print '*' * 200
-        print len(self.items)
-        print '=' * 200
         # Setup the exporter
         if settings['EXPORT_METHOD'] == 'elasticsearch':
-            pass
+            exporter = exporters.ElasticSearchExporter(
+                url=settings['ELASTIC_SEARCH'][spider.name]['url'],
+                index=settings['ELASTIC_SEARCH'][spider.name]['index'],
+                doctype=settings['ELASTIC_SEARCH'][spider.name]['doctype']
+            )
+
         elif settings['EXPORT_METHOD'] == 'file':
             exporter = exporters.FileExporter(os.path.join(
                 settings['EXPORT_DIR'], spider.name))
