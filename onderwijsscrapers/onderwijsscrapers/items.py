@@ -36,6 +36,7 @@ class SchoolVOItem(SchoolItem):
     graduations = Field()  # `Slaagpercentage`
     student_satisfaction = Field()  # `Tevredenheid leerlingen`
     parent_satisfaction = Field()  # `Tevredenheid ouders`
+    costs = Field()  # `Schoolkosten`
 
 
 class OnderwijsInspectieItem(SchoolItem):
