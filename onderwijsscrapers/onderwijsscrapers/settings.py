@@ -60,18 +60,18 @@ ELASTIC_SEARCH = {
         'doctype': '',
     },
     'vo.owinsp.nl': {
-        'url': 'chimay.dispectu.com:9200',
+        'url': '127.0.0.1:9200',
         'index': 'onderwijsinspectie',
         'doctype': 'vo_school'
     },
     'schoolvo.nl': {
-        'url': 'chimay.dispectu.com:9200',
+        'url': '127.0.0.1:9200',
         'index': 'schoolvo',
         'doctype': 'school',
         'id_fields': ['brin', 'branch_id']
     },
     'data.duo.nl': {
-        'url': 'chimay.dispectu.com:9200',
+        'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'school',
         'id_fields': ['publication_year', 'brin', 'branch_id']
