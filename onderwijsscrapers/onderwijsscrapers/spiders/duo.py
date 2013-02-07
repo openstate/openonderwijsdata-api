@@ -24,7 +24,10 @@ class DUOSpider(BaseSpider):
             #     self.parse_student_residences),
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
             #     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp',
-            #     self.parse_students_per_branch)
+            #     self.parse_students_per_branch),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp',
+                self.student_graduations)
         ]
 
     def parse_branches(self, response):
@@ -301,7 +304,6 @@ class DUOSpider(BaseSpider):
 
                 yield school
 
-
     def parse_student_residences(self, response):
         """
         Parse "02. Leerlingen per vestiging naar postcode leerling en
@@ -361,6 +363,139 @@ class DUOSpider(BaseSpider):
                     branch_id=school_ids[school_id]['branch_id'],
                     publication_year=publication_year,
                     student_residences=residence
+                )
+
+                yield school
+
+    def student_graduations(self, response):
+        """
+        Parse "06. Examenkandidaten en geslaagden"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            year = csv_file.select('./td[1]/span/text()').extract()
+            year = re.search(r'\d+ \w+ (\d{4})', year[0]).groups()
+            year = int(year[0])
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = year
+
+        for csv_url, publication_year in available_csvs.iteritems():
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                .decode('cp1252').encode('utf8')), delimiter=';')
+
+            school_ids = {}
+            graduations_school_year = {}
+            for row in csv_file:
+                # Remove newline chars and strip leading and trailing
+                # whitespace.
+                for key in row.keys():
+                    row[key.replace('\n', '')] = row[key].strip()
+                    del row[key]
+
+                brin = row['BRIN NUMMER']
+                branch_id = int(row['VESTIGINGSNUMMER'].replace(brin, ''))
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                if school_id not in graduations_school_year:
+                    graduations_school_year[school_id] = {}
+
+                # The years present in the CVS file (keys) and the
+                # normalized form we will use (values)
+                years = {
+                    'SCHOOLJAAR 2007-2008': '2007-2008',
+                    'SCHOOLJAAR 2008-2009': '2008-2009',
+                    'SCHOOLJAAR 2009-2010': '2009-2010',
+                    'SCHOOLJAAR 2010-2011': '2010-2011',
+                    'SCHOOLJAAR 2011-2012': '2011-2012',
+                }
+
+                # Available breakdowns and their normalized form
+                breakdown = {
+                    'MAN': 'male',
+                    'VROUW': 'female',
+                    'ONBEKEND': 'unknown'
+                }
+
+                for year, y_normal in years.iteritems():
+                    if y_normal not in graduations_school_year[school_id]:
+                        graduations_school_year[school_id][y_normal] = {
+                            'year': y_normal,
+                            'failed': 0,
+                            'passed': 0,
+                            'candidates': 0,
+                            'per_department': []
+                        }
+
+                    try:
+                        candidates = row['EXAMENKANDIDATEN %s TOTAAL' % year]
+                        if candidates:
+                            candidates = int(candidates)
+                        else:
+                            continue
+                    except KeyError:
+                        candidates = 0
+                    graduations_school_year[school_id][y_normal]['candidates'] += candidates
+
+                    try:
+                        passed = int(row['GESLAAGDEN %s TOTAAL' % year])
+                    except KeyError:
+                        passed = 0
+                    graduations_school_year[school_id][y_normal]['passed'] += passed
+
+                    graduations_school_year[school_id][y_normal]['failed'] += (candidates - passed)
+
+                    department = {
+                        'education_structure': row['ONDERWIJSTYPE VO'],
+                        'department': row['OPLEIDINGSNAAM'],
+                        'inspectioncode': row['INSPECTIECODE'],
+                        'passed': {},
+                        'failed': {},
+                        'candidates': {},
+                    }
+
+                    for gender, gender_normal in breakdown.iteritems():
+                        try:
+                            candidates = row['EXAMENKANDIDATEN %s %s' % (year,
+                                gender)]
+                        except KeyError:
+                            continue
+
+                        # Skip gender if no value
+                        if not candidates:
+                            continue
+
+                        candidates = int(candidates)
+                        department['candidates'][gender_normal] = candidates
+
+                        try:
+                            passed = int(row['GESLAAGDEN %s %s' % (year, gender)])
+                        except KeyError:
+                            continue
+                        department['passed'][gender_normal] = passed
+
+                        failed = candidates - passed
+                        department['failed'][gender_normal] = failed
+
+                    graduations_school_year[school_id][y_normal]['per_department'].append(department)
+
+            for school_id, graduations in graduations_school_year.iteritems():
+                school = DUOSchoolItem(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    publication_year=publication_year,
+                    graduations=[graduations[year] for year in graduations]
                 )
 
                 yield school
