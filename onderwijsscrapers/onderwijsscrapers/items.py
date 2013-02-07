@@ -62,7 +62,7 @@ class POSchool(OnderwijsInspectieItem):
 
 
 class DUOSchoolItem(SchoolItem):
-    publication_year = Field()  # year in which the file was published by DUO
+    reference_year = Field()  # peiljaar
     province = Field()  # `provincie`
     board_id = Field()  # Bevoegd gezagnummer
     municipality = Field()  # `Gemeente naam`
@@ -92,5 +92,49 @@ class DUOSchoolItem(SchoolItem):
     # indicatie, sector, afdeling, opleiding"
     students_by_structure = Field()
 
-    # Content of "06. Examenkandidaten en geslaagden"
+    # Contents of "06. Examenkandidaten en geslaagden"
     graduations = Field()
+
+
+class DuoVoSchool(SchoolItem):
+    reference_year = Field()  # peiljaar
+    province = Field()  # `provincie`
+    board_id = Field()  # Bevoegd gezagnummer
+    municipality = Field()  # `Gemeente naam`
+    municipality_code = Field()  # `Gemeente nummer`
+    phone = Field()  # `telefoonnummer`
+    correspondence_address = Field()  # `Straatnaam correspondentieadres`
+    correspondence_zip = Field()  # `POSTCODE CORRESPONDENTIEADRES`
+    correspondence_city = Field()  # `PLAATSNAAM CORRESPONDENTIEADRES`
+    nodal_area = Field()  # `NODAAL GEBIED NAAM`
+    nodal_area_code = Field()  # `NODAAL GEBIED CODE`
+    rpa_area = Field()  # `RPA GEBIED NAAM`
+    rpa_area_code = Field()  # `RPA GEBIED CODE`
+    wgr_area = Field()  # `WGR GEBIED NAAM`
+    wgr_area_code = Field()  # `WGR GEBIED CODE`
+    corop_area = Field()  # `COROP GEBIED NAAM`
+    corop_area_code = Field()  # `COROP GEBIED CODE`
+    education_area = Field()  # `ONDERWIJS GEBIED NAAM`
+    education_area_code = Field()  # `ONDERWIJS GEBIED CODE`
+    rmc_region = Field()  # `RMC REGIO NAAM`
+    rmc_region_code = Field()  # `RMC REGIO CODE`
+
+
+class DuoVoBoard(Item):
+    board_id = Field()  # `Bevoegd gezagnummer`
+    name = Field()  # `BEVOEGD GEZAG NAAM`
+    address = Field()  # `adres`
+    zip_code = Field()  # `postcode`
+    city = Field()  # `woonplaats`
+    correspondence_address = Field()  # `Straatnaam correspondentieadres`
+    correspondence_zip = Field()  # `POSTCODE CORRESPONDENTIEADRES`
+    correspondence_city = Field()  # `PLAATSNAAM CORRESPONDENTIEADRES`
+    municipality = Field()  # `Gemeente naam`
+    municipality_code = Field()  # `Gemeente nummer`
+    phone = Field()  # `telefoonnummer`
+    website = Field()  # `website` or `homepage`
+    denomination = Field()  # `denominatie`
+    administrative_office_id = Field()  # `ADMINISTRATIEKANTOORNUMMER`
+
+    # Contents of "15. Kengetallen"
+    financial_key_indicators = Field()
