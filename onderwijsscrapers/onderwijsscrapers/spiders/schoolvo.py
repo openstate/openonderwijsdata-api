@@ -86,6 +86,9 @@ class SchoolVOSpider(BaseSpider):
                                     .iteritems():
                 schoolvo_value = school.get(value, None)
 
+                if schoolvo_value and field == 'city':
+                    schoolvo_value = schoolvo_value.capitalize()
+
                 # If there is a string value in de SchoolVO data, it is
                 # probably entered by a human, so strip trailing/leading
                 # whitespaces
@@ -122,11 +125,12 @@ class SchoolVOSpider(BaseSpider):
             # 'ind02': self.extract_ind02,
             'ind11': self.extract_ind11_12,
             'ind12': self.extract_ind11_12,
-            # 'ind13': self.extract_ind13
+            'ind17': self.extract_ind17,
+            'ind19b': self.extract_ind19b
         }
 
         # Extract the 'indicatoren' that are available for this school
-        indicators = set(re.findall(r'"(ind\d{2})_leesmeer"', response.body))
+        indicators = set(re.findall(r'"(ind\d{2}\w?)_leesmeer"', response.body))
 
         # Include the extractable indicatiors in the school's item
         school['available_indicators'] = set(extract_indicators.keys())\
@@ -190,16 +194,8 @@ class SchoolVOSpider(BaseSpider):
 
         graduations_year = hxs.select('//td[@class="a76l"]/text()')\
             .re(r'.* (\d{4}-\d{4})')
+        # Check whether data is present for this indicator
         if graduations_year:
-            # graduations = {
-            #     'year': graduations_year[0]
-            # }
-
-            # explanation = hxs.select('//div[div/span/text() = "Toelichting:"]'\
-            #     '/div[2]/span/text()').extract()
-            # if explanation and len(explanation[0]) > 0:
-            #     graduations['explanation'] = explanation[0].strip()
-
             current_sector = None
             graduation = None
 
@@ -362,9 +358,157 @@ class SchoolVOSpider(BaseSpider):
 
         indicator = response.meta['indicator']
 
-        school[LABELS[indicator]] = satisfactions
+        school[LABELS[indicator]] = {
+            'url': response.url,
+            'satisfaction': satisfactions
+        }
 
         school['available_indicators'].remove(indicator)
+        if not school['available_indicators']:
+            school.pop('available_indicators')
+            return school
+
+    def extract_ind17(self, response):
+        """
+        Extraction of indicator 17: "Onderwijsbeleid - Onderwijstijd"
+        """
+        school = response.meta['item']
+        hxs = HtmlXPathSelector(response)
+
+        per_year = []
+
+        edutime_year = hxs.select('//td[@class="a16l" or @class="a17l"]')
+        # Check whether data is present for this indicator
+        if edutime_year:
+            year = None
+            table = hxs.select('//table[@class="a83" or @class="a84"]')
+            for row in table.select('.//tr[@valign="top"]'):
+                edu_year = row.select('./td[@class="a47c" or @class="a48c"]')
+                if edu_year:
+                    if year:
+                        per_year.append(year)
+
+                    planned = int(row.select('./td[@class="a51c" or @class="a52c"]//text()')\
+                                        .extract()[0].strip().replace('.', ''))
+                    realised = int(row.select('./td[@class="a55c" or @class="a56c"]//text()')\
+                                        .extract()[0].strip().replace('.', ''))
+
+                    year = {
+                        'year': edu_year.select('.//text()').extract()[0].strip(),
+                        'planned': planned,
+                        'realised': realised,
+                        'per_structure': []
+                    }
+
+                    continue
+
+                if year:
+                    planned = int(row.select('./td[@class="a68c" or @class="a69c"]//text()')\
+                                        .extract()[0].strip().replace('.', ''))
+                    realised = int(row.select('./td[@class="a72c" or @class="a73c"]//text()')\
+                                        .extract()[0].strip().replace('.', ''))
+                    struct = {
+                        'structure': row.select('./td[@class="a64cl" or @class="a65cl"]//text()')\
+                                        .extract()[0].strip(),
+                        'planned': planned,
+                        'realised': realised
+                    }
+                    year['per_structure'].append(struct)
+
+            # Append last year
+            per_year.append(year)
+
+        school['avg_hours_per_student'] = {
+            'url': response.url,
+            'per_year': per_year
+        }
+
+        school['available_indicators'].remove(response.meta['indicator'])
+        if not school['available_indicators']:
+            school.pop('available_indicators')
+            return school
+
+    def extract_ind19b(self, response):
+        """
+        Extraction of indicator 19b: "Bedrijfsvoering - Schoolkosten"
+        """
+        school = response.meta['item']
+        hxs = HtmlXPathSelector(response)
+
+        costs_year = hxs.select('//td[@class="a15l" or @class="a16l"]/text()')
+
+        per_year = []
+        explanation = None
+        signed_code_of_conduct = False
+        documents = []
+
+        # Check whether data is present for this indicator
+        if costs_year:
+            table = hxs.select('//table[@class="a65" or @class="a66" or\
+                                @class="a73"]')
+            if table:
+                for row in table.select('.//tr[@valign="top"]'):
+                    cells = row.select('.//td')
+                    year = cells[0].select('.//text()').extract()[0]
+                    if year and year != u'\xa0':
+                        amount = cells[1].select('.//text()').extract()[0]
+                        try:
+                            amount = float(amount.replace(u'\u20ac', u'')\
+                                                .replace(',', '.').strip())
+                        except:
+                            # If something weird happens, just use the value as
+                            # found on SchoolVO
+                            amount = amount.strip()
+
+                        other_costs = cells[2].select('.//text()').extract()[0]
+                        cost_per_year = {
+                            'year': year.strip(),
+                            'amount': amount,
+                            'other_costs': other_costs.strip(),
+                            'explanation': '',
+                            'link': ''
+                        }
+
+                        expl = cells[3].select('.//text()').extract()[0]
+                        if expl:
+                            cost_per_year['explanation'] = expl.strip()
+
+                        if len(cells) > 4:
+                            link = cells[4].select('.//text()').extract()[0]
+                            if link:
+                                cost_per_year['link'] = link.strip()
+
+                        per_year.append(cost_per_year)
+
+            signed = hxs.select('//td[@class="a80c" or @class="a79c" or @class="a87c"]')
+
+            if signed:
+                signed_code_of_conduct = True
+
+            explanation = hxs.select('//div[@class="a10" or @class="a9"]/span/text()')
+            if explanation:
+                explanation = u' '.join([unicode(exp.encode('utf8')
+                                        .replace('\xc2\xa0', '').strip(), 'utf8')
+                                        for exp in explanation.extract() if exp])
+
+            docs = hxs.select('//a[contains(@href, ".pdf")]')
+            if docs:
+                root_url = 'http://%s' % '/'.join(response.url.split('/')[2:-1])
+                for doc in docs:
+                    doc = doc.select('./@href').re(r'window\.open\(\''\
+                                                        '(.*?)\',\'')[0]
+                    doc_url = '%s/%s' % (root_url, doc)
+                    documents.append(doc_url)
+
+        school['costs'] = {
+            'url': response.url,
+            'explanation': explanation,
+            'per_year': per_year,
+            'documents': documents,
+            'signed_code_of_conduct': signed_code_of_conduct
+        }
+
+        school['available_indicators'].remove(response.meta['indicator'])
         if not school['available_indicators']:
             school.pop('available_indicators')
             return school

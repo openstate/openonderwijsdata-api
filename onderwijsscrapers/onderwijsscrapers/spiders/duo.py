@@ -1,6 +1,5 @@
 import csv
 import cStringIO
-import time
 import re
 
 import requests
@@ -8,23 +7,280 @@ from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-from onderwijsscrapers.items import DUOSchoolItem
+from onderwijsscrapers.items import DUOSchoolItem, DuoVoBoard
 
 
-class DUOSpider(BaseSpider):
-    name = 'data.duo.nl'
+class DuoVoBoards(BaseSpider):
+    name = 'duo_vo_boards'
+
+    def start_requests(self):
+        return [
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+                'databestanden/vo/adressen/Adressen/besturen.asp',
+                self.parse_boards),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                'test/vo/Financien/Financien/Kengetallen.asp',
+                self.parse_financial_key_indicators)
+        ]
+
+    def parse_boards(self, response):
+        """
+        Parse "03. Adressen bevoegde gezagen"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            year = csv_file.select('./td[1]/span/text()').extract()
+            year = re.search(r'\d+ \w+ (\d{4})', year[0]).groups()
+            year = int(year[0])
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = year
+
+        for csv_url, reference_year in available_csvs.iteritems():
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                .decode('cp1252').encode('utf8')), delimiter=';')
+
+            for row in csv_file:
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                board = DuoVoBoard()
+                board['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
+                board['name'] = row['BEVOEGD GEZAG NAAM']
+                board['address'] = '%s %s' % (row['STRAATNAAM'],
+                    row['HUISNUMMER-TOEVOEGING'])
+                board['zip_code'] = row['POSTCODE']
+                board['city'] = row['PLAATSNAAM']
+
+                if row['STRAATNAAM CORRESPONDENTIEADRES']:
+                    board['correspondence_address'] = '%s %s'\
+                        % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                           row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'])
+                else:
+                    board['correspondence_address'] = None
+
+                if row['POSTCODE CORRESPONDENTIEADRES']:
+                    board['correspondence_zip'] = row['POSTCODE '\
+                        'CORRESPONDENTIEADRES']
+                else:
+                    board['correspondence_zip'] = None
+
+                if row['PLAATSNAAM CORRESPONDENTIEADRES']:
+                    board['correspondence_city'] = row['PLAATSNAAM '\
+                        'CORRESPONDENTIEADRES']
+                else:
+                    board['correspondence_city'] = None
+
+                if row['GEMEENTENAAM']:
+                    board['municipality'] = row['GEMEENTENAAM']
+                else:
+                    board['municipality'] = None
+
+                if row['GEMEENTENUMMER']:
+                    board['municipality_code'] = int(row['GEMEENTENUMMER'])
+                else:
+                    board['municipality_code'] = None
+
+                if row['TELEFOONNUMMER']:
+                    board['phone'] = row['TELEFOONNUMMER']
+                else:
+                    board['phone'] = None
+
+                if row['INTERNETADRES']:
+                    board['website'] = row['INTERNETADRES']
+                else:
+                    board['website'] = None
+
+                if row['DENOMINATIE']:
+                    board['denomination'] = row['DENOMINATIE']
+                else:
+                    board['denomination'] = None
+
+                if row['ADMINISTRATIEKANTOORNUMMER']:
+                    board['administrative_office_id'] = \
+                        int(row['ADMINISTRATIEKANTOORNUMMER'])
+                else:
+                    board['administrative_office_id'] = None
+
+                yield board
+
+    def parse_financial_key_indicators(self, response):
+        """
+        Parse "15. Kengetallen"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            year = csv_file.select('./td[1]/span/text()').extract()
+            year = re.search(r'\d+ \w+ (\d{4})', year[0]).groups()
+            year = int(year[0])
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = year
+
+        indicators_mapping = {
+            'LIQUIDITEIT (CURRENT RATIO)': 'liquidity_current_ratio',
+            'RENTABILITEIT': 'profitability',
+            'SOLVABILITEIT 1': 'solvency_1',
+            'SOLVABILITEIT 2': 'solvency_2',
+            'ALGEMENE RESERVE / TOTALE BATEN': 'general_reserve_div_total_income',
+            'BELEGGINGEN (T.O.V. EV)': 'investments_relative_to_equity',
+            'CONTRACTACTIVITEITEN / RIJKSBIJDRAGE': 'contractactivities_div_gov_funding',
+            'CONTRACTACTIVITEITEN / TOTALE BATEN': 'contractactivities_div_total_profits',
+            'EIGEN VERMOGEN / TOTALE BATEN': 'equity_div_total_profits',
+            'INVESTERING HUISVESTING / TOTALE BATEN': 'housing_investment_div_total_profits',
+            'INVESTERINGEN (INVENT.+APP.) / TOTALE BATEN': 'investments_div_total_profits',
+            'KAPITALISATIEFACTOR': 'capitalization_ratio',
+            'LIQUIDITEIT (QUICK RATIO)': 'liquidity_quick_ratio',
+            'OV. OVERHEIDSBIJDRAGEN / TOT. BATEN': 'other_gov_funding_div_total_profits',
+            'PERSONEEL / RIJKSBIJDRAGEN': 'staff_costs_div_gov_funding',
+            'PERSONELE LASTEN / TOTALE LASTEN': 'staff_expenses_div_total_expenses',
+            'RIJKSBIJDRAGEN / TOTALE BATEN': 'gov_funding_div_total_profits',
+            'VOORZIENINGEN /TOTALE BATEN': 'facilities_div_total_profits',
+            #'WEERSTANDSVERMOGEN (-/- MVA)': '',
+            #'WEERSTANDSVERMOGEN VO TOTALE BN.': '',
+            'WERKKAPITAAL / TOTALE BATEN': 'operating_capital_div_total_profits',
+            'HUISVESTINGSLASTEN / TOTALE LASTEN': 'housing_expenses_div_total_expenses',
+            'WERKKAPITAAL': 'operating_captial',
+        }
+
+        for csv_url, reference_year in available_csvs.iteritems():
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                .decode('cp1252').encode('utf8')), delimiter=';')
+
+            indicators_per_board = {}
+            for row in csv_file:
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                board_id = int(row['BEVOEGD GEZAG NUMMER'])
+                if board_id not in indicators_per_board:
+                    indicators_per_board[board_id] = []
+
+                indicators = {}
+                indicators['year'] = int(row['JAAR'])
+                indicators['group'] = row['GROEPERING']
+
+                for ind, ind_norm in indicators_mapping.iteritems():
+                    indicators[ind_norm] = float(row[ind].replace('.', '')\
+                        .replace(',', '.'))
+
+                indicators_per_board[board_id].append(indicators)
+
+            for board_id, indicators in indicators_per_board.iteritems():
+                board = DuoVoBoard(
+                    board_id=board_id,
+                    financial_key_indicators=indicators
+                )
+
+                yield board
+
+
+class DuoVoSchools(BaseSpider):
+    name = 'duo_vo_schools'
+
+    def start_requests(self):
+        return [
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+                'databestanden/vo/adressen/Adressen/hoofdvestigingen.asp',
+                self.parse_schools)
+        ]
+
+    def parse_schools(self, response):
+        """
+        Parse: "15. Kengetallen"
+        """
+        hxs = HtmlXPathSelector(response)
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            year = csv_file.select('./td[1]/span/text()').extract()
+            year = re.search(r'\d+ \w+ (\d{4})', year[0]).groups()
+            year = int(year[0])
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = year
+
+        # Fields that do not need additonal processing
+        school_fields = {
+            'BRIN NUMMER': 'brin',
+            'PROVINCIE': 'province',
+            'INSTELLINGSNAAM': 'name',
+            'POSTCODE': 'zip_code',
+            'PLAATSNAAM': 'city',
+            'GEMEENTENAAM': 'municipality',
+            'DENOMINATIE': 'denomination',
+            'INTERNETADRES': 'website',
+            'TELEFOONNUMMER': 'phone',
+            'POSTCODE CORRESPONDENTIEADRES': 'correspondence_zip',
+            'PLAATSNAAM CORRESPONDENTIEADRES': 'correspondence_city',
+            'NODAAL GEBIED NAAM': 'nodal_area',
+            'RPA-GEBIED NAAM': 'rpa_area',
+            'WGR-GEBIED NAAM': 'wgr_area',
+            'COROPGEBIED NAAM': 'corop_area'
+        }
+
+        for csv_url, reference_year in available_csvs.iteritems():
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                .decode('cp1252').encode('utf8')), delimiter=';')
+
+            for row in csv_file:
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                school = DUOSchoolItem()
+                school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
+                school['address'] = '%s %s' % (row['STRAATNAAM'],
+                    row['HUISNUMMER-TOEVOEGING'])
+                school['municipality_code'] = int(row['GEMEENTENUMMER'])
+                school['education_structures'] = row['ONDERWIJSSTRUCTUUR']\
+                    .split('/')
+                school['correspondence_address'] = '%s %s'\
+                    % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                       row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'])
+                school['nodal_area_code'] = int(row['NODAAL GEBIED CODE'])
+                school['rpa_area_code'] = int(row['RPA-GEBIED CODE'])
+                school['wgr_area_code'] = int(row['WGR-GEBIED CODE'])
+                school['education_area_code'] = int(row['ONDERWIJSGEBIED CODE'])
+                school['rmc_region_code'] = int(row['RMC-REGIO CODE'])
+
+                for field, field_norm in school_fields.iteritems():
+                    school[field_norm] = row[field]
+
+                yield school
+
+
+class DuoVoBranchesSpider(BaseSpider):
+    name = 'duo_vo_branches'
 
     def start_requests(self):
         return [
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
             #     'databestanden/vo/adressen/Adressen/vestigingen.asp',
             #     self.parse_branches),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-            #     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp',
-            #     self.parse_student_residences),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-            #     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp',
-            #     self.parse_students_per_branch),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp',
+                self.parse_student_residences),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp',
+                 self.parse_students_per_branch),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
                 'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp',
                 self.student_graduations)
@@ -47,7 +303,7 @@ class DUOSpider(BaseSpider):
 
             available_csvs['http://duo.nl%s' % csv_url] = year
 
-        for csv_url, publication_year in available_csvs.iteritems():
+        for csv_url, reference_year in available_csvs.iteritems():
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
             csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
@@ -56,7 +312,7 @@ class DUOSpider(BaseSpider):
             for row in csv_file:
                 school = DUOSchoolItem()
 
-                school['publication_year'] = publication_year
+                school['reference_year'] = reference_year
                 school['name'] = row['VESTIGINGSNAAM'].strip()
                 school['address'] = '%s %s' % (row['STRAATNAAM'].strip(),
                     row['HUISNUMMER-TOEVOEGING'].strip())
@@ -201,7 +457,6 @@ class DUOSpider(BaseSpider):
         available_csvs = {}
         csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
         for csv_file in csvs:
-            print csv_file
             year = csv_file.select('./td[1]/span/text()').extract()
             year = re.search(r'\d+ \w+ (\d{4})', year[0]).groups()
             year = int(year[0])
@@ -210,7 +465,7 @@ class DUOSpider(BaseSpider):
 
             available_csvs['http://duo.nl%s' % csv_url] = year
 
-        for csv_url, publication_year in available_csvs.iteritems():
+        for csv_url, reference_year in available_csvs.iteritems():
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
             csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
@@ -298,7 +553,7 @@ class DUOSpider(BaseSpider):
                 school = DUOSchoolItem(
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
-                    publication_year=publication_year,
+                    reference_year=reference_year,
                     students_by_structure=s_by_structure
                 )
 
@@ -314,7 +569,6 @@ class DUOSpider(BaseSpider):
         available_csvs = {}
         csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
         for csv_file in csvs:
-            print csv_file
             year = csv_file.select('./td[1]/span/text()').extract()
             year = re.search(r'\d+ \w+ (\d{4})', year[0]).groups()
             year = int(year[0])
@@ -323,7 +577,7 @@ class DUOSpider(BaseSpider):
 
             available_csvs['http://duo.nl%s' % csv_url] = year
 
-        for csv_url, publication_year in available_csvs.iteritems():
+        for csv_url, reference_year in available_csvs.iteritems():
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
             csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
@@ -361,7 +615,7 @@ class DUOSpider(BaseSpider):
                 school = DUOSchoolItem(
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
-                    publication_year=publication_year,
+                    reference_year=reference_year,
                     student_residences=residence
                 )
 
@@ -384,7 +638,7 @@ class DUOSpider(BaseSpider):
 
             available_csvs['http://duo.nl%s' % csv_url] = year
 
-        for csv_url, publication_year in available_csvs.iteritems():
+        for csv_url, reference_year in available_csvs.iteritems():
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
             csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
@@ -499,7 +753,7 @@ class DUOSpider(BaseSpider):
                 school = DUOSchoolItem(
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
-                    publication_year=publication_year,
+                    reference_year=reference_year,
                     graduations=[graduations[year] for year in graduations]
                 )
 
