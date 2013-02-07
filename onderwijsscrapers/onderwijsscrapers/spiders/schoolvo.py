@@ -86,6 +86,9 @@ class SchoolVOSpider(BaseSpider):
                                     .iteritems():
                 schoolvo_value = school.get(value, None)
 
+                if schoolvo_value and field == 'city':
+                    schoolvo_value = schoolvo_value.capitalize()
+
                 # If there is a string value in de SchoolVO data, it is
                 # probably entered by a human, so strip trailing/leading
                 # whitespaces
@@ -122,6 +125,7 @@ class SchoolVOSpider(BaseSpider):
             # 'ind02': self.extract_ind02,
             'ind11': self.extract_ind11_12,
             'ind12': self.extract_ind11_12,
+            'ind17': self.extract_ind17,
             'ind19b': self.extract_ind19b
         }
 
@@ -190,6 +194,7 @@ class SchoolVOSpider(BaseSpider):
 
         graduations_year = hxs.select('//td[@class="a76l"]/text()')\
             .re(r'.* (\d{4}-\d{4})')
+        # Check whether data is present for this indicator
         if graduations_year:
             current_sector = None
             graduation = None
@@ -353,9 +358,72 @@ class SchoolVOSpider(BaseSpider):
 
         indicator = response.meta['indicator']
 
-        school[LABELS[indicator]] = satisfactions
+        school[LABELS[indicator]] = {
+            'url': response.url,
+            'satisfaction': satisfactions
+        }
 
         school['available_indicators'].remove(indicator)
+        if not school['available_indicators']:
+            school.pop('available_indicators')
+            return school
+
+    def extract_ind17(self, response):
+        """
+        Extraction of indicator 17: "Onderwijsbeleid - Onderwijstijd"
+        """
+        school = response.meta['item']
+        hxs = HtmlXPathSelector(response)
+
+        per_year = []
+
+        edutime_year = hxs.select('//td[@class="a16l" or @class="a17l"]')
+        # Check whether data is present for this indicator
+        if edutime_year:
+            year = None
+            table = hxs.select('//table[@class="a83" or @class="a84"]')
+            for row in table.select('.//tr[@valign="top"]'):
+                edu_year = row.select('./td[@class="a47c" or @class="a48c"]')
+                if edu_year:
+                    if year:
+                        per_year.append(year)
+
+                    planned = int(row.select('./td[@class="a51c" or @class="a52c"]//text()')\
+                                        .extract()[0].strip().replace('.', ''))
+                    realised = int(row.select('./td[@class="a55c" or @class="a56c"]//text()')\
+                                        .extract()[0].strip().replace('.', ''))
+
+                    year = {
+                        'year': edu_year.select('.//text()').extract()[0].strip(),
+                        'planned': planned,
+                        'realised': realised,
+                        'per_structure': []
+                    }
+
+                    continue
+
+                if year:
+                    planned = int(row.select('./td[@class="a68c" or @class="a69c"]//text()')\
+                                        .extract()[0].strip().replace('.', ''))
+                    realised = int(row.select('./td[@class="a72c" or @class="a73c"]//text()')\
+                                        .extract()[0].strip().replace('.', ''))
+                    struct = {
+                        'structure': row.select('./td[@class="a64cl" or @class="a65cl"]//text()')\
+                                        .extract()[0].strip(),
+                        'planned': planned,
+                        'realised': realised
+                    }
+                    year['per_structure'].append(struct)
+
+            # Append last year
+            per_year.append(year)
+
+        school['avg_hours_per_student'] = {
+            'url': response.url,
+            'per_year': per_year
+        }
+
+        school['available_indicators'].remove(response.meta['indicator'])
         if not school['available_indicators']:
             school.pop('available_indicators')
             return school
@@ -374,6 +442,7 @@ class SchoolVOSpider(BaseSpider):
         signed_code_of_conduct = False
         documents = []
 
+        # Check whether data is present for this indicator
         if costs_year:
             table = hxs.select('//table[@class="a65" or @class="a66" or\
                                 @class="a73"]')
@@ -383,10 +452,18 @@ class SchoolVOSpider(BaseSpider):
                     year = cells[0].select('.//text()').extract()[0]
                     if year and year != u'\xa0':
                         amount = cells[1].select('.//text()').extract()[0]
+                        try:
+                            amount = float(amount.replace(u'\u20ac', u'')\
+                                                .replace(',', '.').strip())
+                        except:
+                            # If something weird happens, just use the value as
+                            # found on SchoolVO
+                            amount = amount.strip()
+
                         other_costs = cells[2].select('.//text()').extract()[0]
                         cost_per_year = {
                             'year': year.strip(),
-                            'amount': amount.strip(),
+                            'amount': amount,
                             'other_costs': other_costs.strip(),
                             'explanation': '',
                             'link': ''
@@ -424,6 +501,7 @@ class SchoolVOSpider(BaseSpider):
                     documents.append(doc_url)
 
         school['costs'] = {
+            'url': response.url,
             'explanation': explanation,
             'per_year': per_year,
             'documents': documents,
