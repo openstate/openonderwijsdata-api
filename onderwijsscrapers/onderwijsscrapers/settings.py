@@ -70,10 +70,16 @@ ELASTIC_SEARCH = {
         'doctype': 'school',
         'id_fields': ['brin', 'branch_id']
     },
-    'data.duo.nl': {
+    'duo_vo_branches': {
         'url': 'chimay.dispectu.com:9200',
         'index': 'duo',
-        'doctype': 'school',
+        'doctype': 'branch',
         'id_fields': ['publication_year', 'brin', 'branch_id']
+    },
+    'duo_vo_boards': {
+        'url': 'chimay.dispectu.com:9200',
+        'index': 'duo',
+        'doctype': 'board',
+        'id_fields': ['board_id']
     }
 }
