@@ -358,10 +358,8 @@ class SchoolVOSpider(BaseSpider):
 
         indicator = response.meta['indicator']
 
-        school[LABELS[indicator]] = {
-            'url': response.url,
-            'satisfaction': satisfactions
-        }
+        school[LABELS[indicator]] = satisfactions
+        school['%s_url' % (LABELS[indicator])] = response.url
 
         school['available_indicators'].remove(indicator)
         if not school['available_indicators']:
@@ -418,10 +416,8 @@ class SchoolVOSpider(BaseSpider):
             # Append last year
             per_year.append(year)
 
-        school['avg_hours_per_student'] = {
-            'url': response.url,
-            'per_year': per_year
-        }
+        school['avg_education_hours_per_student'] = per_year
+        school['avg_education_hours_per_student_url'] = response.url
 
         school['available_indicators'].remove(response.meta['indicator'])
         if not school['available_indicators']:

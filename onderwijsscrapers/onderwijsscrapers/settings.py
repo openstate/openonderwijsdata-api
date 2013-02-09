@@ -47,7 +47,7 @@ SCHOOLVO_FIELD_MAPPING = {
 }
 
 # Available methods are 'elasticsearch' and 'file'
-EXPORT_METHOD = 'file'
+EXPORT_METHOD = 'elasticsearch'
 
 # Directory to which scrape results should be saved (in case the file
 # exporter is used).
@@ -62,7 +62,8 @@ ELASTIC_SEARCH = {
     'vo.owinsp.nl': {
         'url': '127.0.0.1:9200',
         'index': 'onderwijsinspectie',
-        'doctype': 'vo_school'
+        'doctype': 'vo_school',
+        'id_fields': ['brin', 'branch_id']
     },
     'schoolvo.nl': {
         'url': '127.0.0.1:9200',

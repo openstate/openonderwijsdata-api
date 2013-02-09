@@ -33,11 +33,19 @@ class SchoolVOItem(SchoolItem):
     logo_img_url = Field()  # `pad_logo`
     building_img_url = Field()  # `pad_gebouw`
     profile = Field()  # `Profiel`
-    graduations = Field()  # `Slaagpercentage`
+    # graduations = Field()  # `Slaagpercentage`
+
     student_satisfaction = Field()  # `Tevredenheid leerlingen`
+    student_satisfaction_url = Field()  # `Tevredenheid leerlingen` url
+
     parent_satisfaction = Field()  # `Tevredenheid ouders`
+    parent_satisfaction_url = Field()  # `Tevredenheid ouders` url
+
     costs = Field()  # `Schoolkosten`
-    avg_hours_per_student = Field()  # `Onderwijstijd`
+    costs_url = Field()  # `Schoolkosten` url
+
+    avg_education_hours_per_student = Field()  # `Onderwijstijd`
+    avg_education_hours_per_student_url = Field  # `Onderwijstijd` url
 
 
 class OnderwijsInspectieItem(SchoolItem):
