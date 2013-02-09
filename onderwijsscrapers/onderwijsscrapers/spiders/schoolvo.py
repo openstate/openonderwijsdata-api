@@ -94,6 +94,10 @@ class SchoolVOSpider(BaseSpider):
                 # whitespaces
                 if schoolvo_value and type(schoolvo_value) == unicode:
                     schoolvo_value = schoolvo_value.strip()
+                    try:
+                        schoolvo_value = int(schoolvo_value)
+                    except:
+                        pass
                 item[field] = schoolvo_value
 
             identifiers = item['schoolvo_code'].strip().split('-')

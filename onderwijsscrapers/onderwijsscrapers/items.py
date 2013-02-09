@@ -42,10 +42,10 @@ class SchoolVOItem(SchoolItem):
     parent_satisfaction_url = Field()  # `Tevredenheid ouders` url
 
     costs = Field()  # `Schoolkosten`
-    costs_url = Field()  # `Schoolkosten` url
+    # costs_url = Field()  # `Schoolkosten` url
 
     avg_education_hours_per_student = Field()  # `Onderwijstijd`
-    avg_education_hours_per_student_url = Field  # `Onderwijstijd` url
+    avg_education_hours_per_student_url = Field()  # `Onderwijstijd` url
 
 
 class OnderwijsInspectieItem(SchoolItem):
