@@ -63,7 +63,8 @@ class OnderwijsscrapersPipeline(object):
             universal_item = 'None-%s' % '-'.join([str(item[field]) for field in \
                 id_fields[1:]])
             if universal_item in self.universal_items:
-		universal_item = self.universal_items[universal_item]
-		del universal_item['reference_year']
+                universal_item = self.universal_items[universal_item]
+                del universal_item['reference_year']
                 item.update(universal_item)
+
             exporter.save(item_id, item)
