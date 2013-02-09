@@ -44,7 +44,7 @@ class SchoolVOItem(SchoolItem):
     costs = Field()  # `Schoolkosten`
     costs_url = Field()  # `Schoolkosten` url
 
-    avg_hours_per_student = Field()  # `Onderwijstijd`
+    avg_education_hours_per_student = Field()  # `Onderwijstijd`
     avg_education_hours_per_student_url = Field  # `Onderwijstijd` url
 
 
