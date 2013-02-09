@@ -12,7 +12,7 @@ class ElasticSearchExporter(object):
         self.es = rawes.Elastic(url)
 
     def save(self, doc_id, item):
-        self.es.put('%s/%s/%s' % (self.index, self.doctype, doc_id), data=item)
+        self.es.put('%s/%s/%s' % (self.index, self.doctype, doc_id), data=json.dumps(item, sort_keys=True))
 
 
 class FileExporter(object):
