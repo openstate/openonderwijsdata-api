@@ -71,7 +71,8 @@ class POSchool(OnderwijsInspectieItem):
     pass
 
 
-class DUOSchoolItem(SchoolItem):
+class DuoVoBranch(SchoolItem):
+    ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     province = Field()  # `provincie`
     board_id = Field()  # Bevoegd gezagnummer
@@ -96,17 +97,21 @@ class DUOSchoolItem(SchoolItem):
 
     # Contents of "02. Leerlingen per vestiging naar postcode leerling
     # en leerjaar"
+    student_residences_reference_date = Field()
     student_residences = Field()
 
     # Contents of "01. Leerlingen per vestiging naar onderwijstype, lwoo
     # indicatie, sector, afdeling, opleiding"
+    students_by_structure_reference_date = Field()
     students_by_structure = Field()
 
     # Contents of "06. Examenkandidaten en geslaagden"
+    graduations_reference_date = Field()
     graduations = Field()
 
 
 class DuoVoSchool(SchoolItem):
+    ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     province = Field()  # `provincie`
     board_id = Field()  # Bevoegd gezagnummer
@@ -129,8 +134,14 @@ class DuoVoSchool(SchoolItem):
     rmc_region = Field()  # `RMC REGIO NAAM`
     rmc_region_code = Field()  # `RMC REGIO CODE`
 
+    # Contents of "02. Vsv in het voortgezet onderwijs per vo instelling"
+    dropouts_reference_date = Field()
+    dropouts = Field()
+
 
 class DuoVoBoard(Item):
+    ignore_id_fields = Field()
+    reference_year = Field()  # peiljaar
     board_id = Field()  # `Bevoegd gezagnummer`
     name = Field()  # `BEVOEGD GEZAG NAAM`
     address = Field()  # `adres`
@@ -147,4 +158,5 @@ class DuoVoBoard(Item):
     administrative_office_id = Field()  # `ADMINISTRATIEKANTOORNUMMER`
 
     # Contents of "15. Kengetallen"
+    financial_key_indicators_reference_date = Field()
     financial_key_indicators = Field()
