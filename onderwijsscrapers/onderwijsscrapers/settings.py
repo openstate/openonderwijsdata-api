@@ -74,18 +74,18 @@ ELASTIC_SEARCH = {
         'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'vo_branch',
-        'id_fields': ['publication_year', 'brin', 'branch_id']
+        'id_fields': ['reference_year', 'brin', 'branch_id']
     },
     'duo_vo_boards': {
         'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'vo_board',
-        'id_fields': ['board_id']
+        'id_fields': ['reference_year', 'board_id']
     },
     'duo_vo_schools': {
         'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'vo_school',
-        'id_fields': ['board_id']
+        'id_fields': ['reference_year', 'brin']
     }
 }
