@@ -1,3 +1,6 @@
+import glob
+import json
+
 from colander import (MappingSchema, SequenceSchema, SchemaNode, String, Int,
                       Float, Boolean, Length, Range, Date, Email, url, Invalid,
                       OneOf)
@@ -25,7 +28,7 @@ class PlannedRealisedHours(MappingSchema):
 
 
 class PlannedRealisedHoursPerStructure(PlannedRealisedHours):
-    structure = SchemaNode(String(), validator=Length(min=3, max=75))
+    structure = SchemaNode(String(), validator=Length(min=1, max=75))
 
 
 class AverageEducationHoursPerStructure(SequenceSchema):
@@ -49,7 +52,7 @@ class CostPerYear(MappingSchema):
     amount_euro = SchemaNode(Int(), validator=Range(min=0, max=1000))
     explanation = SchemaNode(String())
     link = SchemaNode(String())
-    other_costs = SchemaNode(String, validator=OneOf(['Ja', 'Nee']))
+    other_costs = SchemaNode(String(), validator=OneOf(['Ja', 'Nee']))
     # Year can be a bunch of things ("Leerjaar 1", "alle jaren", ...)
     year = SchemaNode(String(), validator=Length(min=3, max=75))
 
@@ -95,9 +98,8 @@ class Satisfactions(SequenceSchema):
 
 class SchoolVOSchool(MappingSchema):
     address = SchoolVOAddress()
-    average_education_hours_per_student = AverageEducationHours()
-    average_education_hours_per_student_url = SchemaNode(String(),\
-        validator=url)
+    avg_education_hours_per_student = AverageEducationHours()
+    avg_education_hours_per_student_url = SchemaNode(String(), validator=url)
     board = SchemaNode(String(), validator=Length(min=3, max=100))
     board_id = general_rules.board_id
     branch_id = general_rules.branch_id
@@ -110,12 +112,12 @@ class SchoolVOSchool(MappingSchema):
     email = SchemaNode(String(), validator=Email)
     logo_img_url = SchemaNode(String(), validator=url)
     municipality = general_rules.municipality
-    municipality_id = general_rules.municipality_id
+    municipality_id = general_rules.municipality_code
     name = general_rules.name
     parent_satisfaction = Satisfactions()
     parent_satisfaction_url = SchemaNode(String(), validator=url)
     phone = general_rules.phone
-    profile = SchemaNode(String(), validator=Length(min=3, max=200))
+    profile = SchemaNode(String(), validator=Length(min=3, max=500))
     province = general_rules.province
     schoolkompas_status_id = SchemaNode(Int(), validator=Range(min=0,\
         max=1000))
@@ -123,3 +125,16 @@ class SchoolVOSchool(MappingSchema):
     student_satisfaction = Satisfactions()
     student_satisfaction_url = SchemaNode(String(), validator=url)
     website = general_rules.website
+
+
+if __name__ == '__main__':
+    schema = SchoolVOSchool()
+
+    for path in glob.glob('../export/schoolvo.nl/*.json'):
+        # print path
+        data = json.load(open(path, 'r'))
+        try:
+            schema.deserialize(data)
+        except Invalid, e:
+            errors = e.asdict()
+            print errors, path
