@@ -142,12 +142,12 @@ class SchoolVOSpider(BaseSpider):
             if school['pad_logo'] and school['pad_logo'].startswith('/'):
                 request.meta['item']['logo_img_url'] = '%s%s'\
                     % (settings['SCHOOLVO_URL'], urllib.quote(\
-                        school['pad_logo'][1:]))
+                        school['pad_logo'][1:].encode('utf8')))
 
             if school['pad_gebouw'] and school['pad_gebouw'].startswith('/'):
                 request.meta['item']['building_img_url'] = '%s%s'\
                     % (settings['SCHOOLVO_URL'], urllib.quote(\
-                        school['pad_gebouw'][1:]))
+                        school['pad_gebouw'][1:].encode('utf8')))
 
             requests.append(request)
 
