@@ -1,4 +1,5 @@
-from colander import MappingSchema, SequenceSchema, SchemaNode, String, Length, Int, url
+from datetime import datetime
+from colander import MappingSchema, SequenceSchema, SchemaNode, String, Length, Int, url, Range
 
 board_id = SchemaNode(Int())
 brin = SchemaNode(String(), validator=Length(min=4, max=4))
@@ -9,6 +10,11 @@ municipality = SchemaNode(String(), validator=Length(min=3, max=300))
 municipality_code = SchemaNode(Int())
 province = SchemaNode(String(), validator=Length(min=5, max=100))
 website = SchemaNode(String(), validator=url)
+education_structure = SchemaNode(String(), validator=Length(min=3, max=75))
+reference_year = SchemaNode(Int(), validator=Range(min=1990,
+    max=datetime.now().year))
+year = SchemaNode(Int(), validator=Range(min=1990, max=datetime.now().year))
+
 
 class Address(MappingSchema):
     street = SchemaNode(String(), validator=Length(min=4, max=300))
