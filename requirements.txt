@@ -1,3 +1,4 @@
+colander
 scrapy
 scrapy-sentry
 rawes
