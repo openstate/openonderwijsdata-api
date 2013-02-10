@@ -1,7 +1,7 @@
 from colander import (MappingSchema, SequenceSchema, SchemaNode, String, Int,
-                      Float, Length, Range, Date, url, Invalid)
+                      Float, Boolean, Length, Range, Date, Email, url, Invalid)
 
-from general_rules import Address
+import general_rules
 
 
 class Coordinates(MappingSchema):
@@ -10,7 +10,7 @@ class Coordinates(MappingSchema):
 
 
 # Extension of default address format with geo-coordinates
-class SchoolVOAddress(Address):
+class SchoolVOAddress(general_rules.Address):
     geo_location = Coordinates()
 
 
@@ -39,3 +39,72 @@ class PlannedRealisedHoursPerYear(PlannedRealisedHours):
 
 class AverageEducationHours(SequenceSchema):
     average_hour = PlannedRealisedHoursPerYear()
+
+
+####################################
+#               Costs              #
+####################################
+class Documents(SequenceSchema):
+    document = SchemaNode(String(), validator=url)
+
+
+class Costs(MappingSchema):
+    explanation = SchemaNode(String(), validator=Length(min=3, max=5000))
+    documents = Documents()
+    signed_code_of_conduct = SchemaNode(Boolean())
+
+
+####################################
+#   Parent/student satisfactions   #
+####################################
+class Indicator(MappingSchema):
+    grade = SchemaNode(Float(), validator=Range(min=0.0, max=10.0))
+    indicator = SchemaNode(String(), validator=Length(min=10, max=200))
+
+
+class Indicators(SequenceSchema):
+    indicator = Indicator()
+
+
+class Satisfaction(MappingSchema):
+    average_grade = SchemaNode(Float(), validator=Range(min=0.0, max=10.0))
+    national_grade = SchemaNode(Float(), validator=Range(min=0.0, max=10.0))
+    education_structure = SchemaNode(String(), validator=Length(min=3,\
+        max=15))
+    indicators = Indicators()
+
+
+class Satisfactions(SequenceSchema):
+    satisfaction = Satisfaction()
+
+
+class SchoolVOSchool(MappingSchema):
+    address = SchoolVOAddress()
+    average_education_hours_per_student = AverageEducationHours()
+    average_education_hours_per_student_url = SchemaNode(String(),\
+        validator=url)
+    board = SchemaNode(String(), validator=Length(min=3, max=100))
+    board_id = general_rules.board_id
+    branch_id = general_rules.branch_id
+    brin = general_rules.brin
+    building_img_url = SchemaNode(String(), validator=url)
+    costs = Costs()
+    costs_url = SchemaNode(String(), validator=url)
+    denomination = general_rules.denomination
+    education_structures = general_rules.EducationStructures()
+    email = SchemaNode(String(), validator=Email)
+    logo_img_url = SchemaNode(String(), validator=url)
+    municipality = general_rules.municipality
+    municipality_id = general_rules.municipality_id
+    name = general_rules.name
+    parent_satisfaction = Satisfactions()
+    parent_satisfaction_url = SchemaNode(String(), validator=url)
+    phone = general_rules.phone
+    profile = SchemaNode(String(), validator=Length(min=3, max=200))
+    province = general_rules.province
+    schoolkompas_status_id = SchemaNode(Int(), validator=Range(min=0,\
+        max=1000))
+    schoolvo_code = SchemaNode(String(), validator=Length(min=14, max=14))
+    student_satisfaction = Satisfactions()
+    student_satisfaction_url = SchemaNode(String(), validator=url)
+    website = general_rules.website
