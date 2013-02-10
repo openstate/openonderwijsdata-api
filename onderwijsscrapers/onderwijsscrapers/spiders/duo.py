@@ -11,7 +11,7 @@ from scrapy.selector import HtmlXPathSelector
 
 from onderwijsscrapers.items import DuoVoBoard, DuoVoSchool, DuoVoBranch
 
-locale.setlocale(locale.LC_ALL, 'nl_NL')
+locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
 
 class DuoVoBoards(BaseSpider):
