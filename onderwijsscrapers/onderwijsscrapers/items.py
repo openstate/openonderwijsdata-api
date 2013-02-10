@@ -47,7 +47,7 @@ class SchoolVOItem(SchoolItem):
 
 
 class OnderwijsInspectieItem(SchoolItem):
-    rating = Field()
+    ratings = Field()
     rating_date = Field()
     rating_excerpt = Field()
     rating_history = Field()

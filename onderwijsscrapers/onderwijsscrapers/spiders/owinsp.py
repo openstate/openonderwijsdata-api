@@ -202,10 +202,10 @@ class VOSpider(OWINSPSpider):
         except:
             owinsp_id = None
 
-        organisation['education_structures'].append({
+        organisation['education_structures'].append(structure)
+        organisation['ratings'].append({
             'owinsp_id': owinsp_id,
             'owinsp_url': response.url,
-            'education_structure': structure,
             'current_rating': current_rating,
             'rating_valid_since': rating_valid_since,
             'rating_excerpt': rating_excerpt
@@ -267,8 +267,6 @@ class VOSpider(OWINSPSpider):
                     'rating': rating.strip(),
                     'date': date
                 })
-
-        organisation['education_sector'] = 'vo'
 
         # Remove this structure from education_sectors_to_scrape
         organisation['education_structures_to_scrape'].remove(response.url)
