@@ -6,8 +6,6 @@ class SchoolItem(Item):
     brin = Field()  # `BRIN-nummer`
     branch_id = Field()  # Vestigingsnummer
     address = Field()  # `adres`
-    zip_code = Field()  # `postcode`
-    city = Field()  # `woonplaats`
     website = Field()  # `website` or `homepage`
     denomination = Field()  # `denominatie`
     education_structures = Field()  # `Onderwijsaanbod`
@@ -79,9 +77,7 @@ class DuoVoBranch(SchoolItem):
     municipality = Field()  # `Gemeente naam`
     municipality_code = Field()  # `Gemeente nummer`
     phone = Field()  # `telefoonnummer`
-    correspondence_address = Field()  # `Straatnaam correspondentieadres`
-    correspondence_zip = Field()  # `POSTCODE CORRESPONDENTIEADRES`
-    correspondence_city = Field()  # `PLAATSNAAM CORRESPONDENTIEADRES`
+    correspondence_address = Field()
     nodal_area = Field()  # `NODAAL GEBIED NAAM`
     nodal_area_code = Field()  # `NODAAL GEBIED CODE`
     rpa_area = Field()  # `RPA GEBIED NAAM`
@@ -118,9 +114,7 @@ class DuoVoSchool(SchoolItem):
     municipality = Field()  # `Gemeente naam`
     municipality_code = Field()  # `Gemeente nummer`
     phone = Field()  # `telefoonnummer`
-    correspondence_address = Field()  # `Straatnaam correspondentieadres`
-    correspondence_zip = Field()  # `POSTCODE CORRESPONDENTIEADRES`
-    correspondence_city = Field()  # `PLAATSNAAM CORRESPONDENTIEADRES`
+    correspondence_address = Field()
     nodal_area = Field()  # `NODAAL GEBIED NAAM`
     nodal_area_code = Field()  # `NODAAL GEBIED CODE`
     rpa_area = Field()  # `RPA GEBIED NAAM`
@@ -147,9 +141,7 @@ class DuoVoBoard(Item):
     address = Field()  # `adres`
     zip_code = Field()  # `postcode`
     city = Field()  # `woonplaats`
-    correspondence_address = Field()  # `Straatnaam correspondentieadres`
-    correspondence_zip = Field()  # `POSTCODE CORRESPONDENTIEADRES`
-    correspondence_city = Field()  # `PLAATSNAAM CORRESPONDENTIEADRES`
+    correspondence_address = Field()
     municipality = Field()  # `Gemeente naam`
     municipality_code = Field()  # `Gemeente nummer`
     phone = Field()  # `telefoonnummer`

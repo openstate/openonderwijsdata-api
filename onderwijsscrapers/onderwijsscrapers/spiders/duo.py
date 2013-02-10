@@ -60,29 +60,32 @@ class DuoVoBoards(BaseSpider):
                 board = DuoVoBoard()
                 board['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
                 board['name'] = row['BEVOEGD GEZAG NAAM']
-                board['address'] = '%s %s' % (row['STRAATNAAM'],
-                    row['HUISNUMMER-TOEVOEGING'])
-                board['zip_code'] = row['POSTCODE']
-                board['city'] = row['PLAATSNAAM']
+                board['address'] = {
+                    'street': '%s %s' % (row['STRAATNAAM'],
+                        row['HUISNUMMER-TOEVOEGING']),
+                    'zip_code': row['POSTCODE'].replace(' ', ''),
+                    'city': row['PLAATSNAAM']
+                }
 
+                board['correspondence_address'] = {}
                 if row['STRAATNAAM CORRESPONDENTIEADRES']:
-                    board['correspondence_address'] = '%s %s'\
+                    board['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'])
                 else:
-                    board['correspondence_address'] = None
+                    board['correspondence_address']['street'] = None
 
                 if row['POSTCODE CORRESPONDENTIEADRES']:
-                    board['correspondence_zip'] = row['POSTCODE '\
+                    board['correspondence_address']['zip_code'] = row['POSTCODE '\
                         'CORRESPONDENTIEADRES']
                 else:
-                    board['correspondence_zip'] = None
+                    board['correspondence_address']['zip_code'] = None
 
                 if row['PLAATSNAAM CORRESPONDENTIEADRES']:
-                    board['correspondence_city'] = row['PLAATSNAAM '\
+                    board['correspondence_address']['city'] = row['PLAATSNAAM '\
                         'CORRESPONDENTIEADRES']
                 else:
-                    board['correspondence_city'] = None
+                    board['correspondence_address']['city'] = None
 
                 if row['GEMEENTENAAM']:
                     board['municipality'] = row['GEMEENTENAAM']
@@ -234,14 +237,10 @@ class DuoVoSchools(BaseSpider):
             'BRIN NUMMER': 'brin',
             'PROVINCIE': 'province',
             'INSTELLINGSNAAM': 'name',
-            'POSTCODE': 'zip_code',
-            'PLAATSNAAM': 'city',
             'GEMEENTENAAM': 'municipality',
             'DENOMINATIE': 'denomination',
             'INTERNETADRES': 'website',
             'TELEFOONNUMMER': 'phone',
-            'POSTCODE CORRESPONDENTIEADRES': 'correspondence_zip',
-            'PLAATSNAAM CORRESPONDENTIEADRES': 'correspondence_city',
             'ONDERWIJSGEBIED NAAM': 'education_area',
             'NODAAL GEBIED NAAM': 'nodal_area',
             'RPA-GEBIED NAAM': 'rpa_area',
@@ -270,14 +269,23 @@ class DuoVoSchools(BaseSpider):
 
                 school = DuoVoSchool()
                 school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
-                school['address'] = '%s %s' % (row['STRAATNAAM'],
-                    row['HUISNUMMER-TOEVOEGING'])
+                school['address'] = {
+                    'street': '%s %s' % (row['STRAATNAAM'],
+                        row['HUISNUMMER-TOEVOEGING']),
+                    'city': row['PLAATSNAAM'],
+                    'zip_code': row['POSTCODE'].replace(' ', '')
+                }
+
+                school['correspondence_address'] = {
+                    'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                       row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                    'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
+                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
+                }
+
                 school['municipality_code'] = int(row['GEMEENTENUMMER'])
                 school['education_structures'] = row['ONDERWIJSSTRUCTUUR']\
                     .split('/')
-                school['correspondence_address'] = '%s %s'\
-                    % (row['STRAATNAAM CORRESPONDENTIEADRES'],
-                       row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'])
 
                 if row['COROPGEBIED CODE']:
                     school['corop_area_code'] = int(row['COROPGEBIED CODE'])
@@ -430,10 +438,12 @@ class DuoVoBranchesSpider(BaseSpider):
                 school['reference_year'] = reference_year
                 school['ignore_id_fields'] = ['reference_year']
                 school['name'] = row['VESTIGINGSNAAM'].strip()
-                school['address'] = '%s %s' % (row['STRAATNAAM'].strip(),
-                    row['HUISNUMMER-TOEVOEGING'].strip())
-                school['zip_code'] = row['POSTCODE'].strip()
-                school['city'] = row['PLAATSNAAM'].strip()
+                school['address'] = {
+                    'street': '%s %s' % (row['STRAATNAAM'].strip(),
+                        row['HUISNUMMER-TOEVOEGING'].strip()),
+                    'city': row['PLAATSNAAM'].strip(),
+                    'zip_code': row['POSTCODE'].strip().replace(' ', '')
+                }
 
                 if row['INTERNETADRES'].strip():
                     school['website'] = row['INTERNETADRES'].strip()
@@ -483,18 +493,25 @@ class DuoVoBranchesSpider(BaseSpider):
                 else:
                     school['phone'] = None
 
+                school['correspondence_address'] = {}
                 if row['STRAATNAAM CORRESPONDENTIEADRES'].strip():
-                    school['correspondence_address'] = '%s %s'\
+                    school['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'].strip(),
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'].strip())
                 else:
-                    school['correspondence_address'] = None
+                    school['correspondence_address']['street'] = None
 
                 if row['POSTCODE CORRESPONDENTIEADRES'].strip():
-                    school['correspondence_zip'] = row['POSTCODE '\
+                    school['correspondence_address']['zip_code'] = row['POSTCODE '\
+                        'CORRESPONDENTIEADRES'].strip().replace(' ', '')
+                else:
+                    school['correspondence_address']['zip_code'] = None
+
+                if row['PLAATSNAAM CORRESPONDENTIEADRES'].strip():
+                    school['correspondence_address']['city'] = row['PLAATSNAAM '\
                         'CORRESPONDENTIEADRES'].strip()
                 else:
-                    school['correspondence_zip'] = None
+                    school['correspondence_address']['city'] = None
 
                 if row['NODAAL GEBIED NAAM'].strip():
                     school['nodal_area'] = row['NODAAL GEBIED NAAM'].strip()
