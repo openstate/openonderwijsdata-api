@@ -1,4 +1,5 @@
 import re
+import urllib
 
 import requests
 from scrapy.conf import settings
@@ -49,6 +50,21 @@ LABELS = {
     'ind12': 'parent_satisfaction'
 }
 
+# Mapping of SchoolVO.nl JSON attribute names to the SchoolVOItem fields
+SCHOOLVO_FIELD_MAPPING = {
+    'schoolvo_id': 'school_id',
+    'schoolvo_code': 'school_code',
+    'name': 'naam',
+    'municipality': 'gemeente',
+    'municipality_code': 'gemeente_code',
+    'province': 'provincie',
+    'phone': 'telefoon',
+    'website': 'homepage',
+    'email': 'e_mail',
+    'schoolvo_status_id': 'venster_status_id',
+    'schoolkompas_status_id': 'schoolkompas_status_id'
+}
+
 
 class SchoolVOSpider(BaseSpider):
     name = 'schoolvo.nl'
@@ -82,23 +98,39 @@ class SchoolVOSpider(BaseSpider):
             request = Request(school['schoolvo_detail_url'])
 
             item = {}
-            for field, value in settings.get('SCHOOLVO_FIELD_MAPPING')\
-                                    .iteritems():
+            for field, value in SCHOOLVO_FIELD_MAPPING.iteritems():
                 schoolvo_value = school.get(value, None)
-
-                if schoolvo_value and field == 'city':
-                    schoolvo_value = schoolvo_value.capitalize()
-
                 # If there is a string value in de SchoolVO data, it is
                 # probably entered by a human, so strip trailing/leading
                 # whitespaces
-                if schoolvo_value and type(schoolvo_value) == unicode:
+                if schoolvo_value\
+                        and type(schoolvo_value) == unicode\
+                        and field != 'phone':
                     schoolvo_value = schoolvo_value.strip()
                     try:
                         schoolvo_value = int(schoolvo_value)
                     except:
                         pass
                 item[field] = schoolvo_value
+
+            address = {
+                'street': school.get('adres', None),
+                'city': school.get('woonplaats', None),
+                'zip_code': school.get('postcode', None),
+            }
+
+            for k, v in address.items():
+                if v:
+                    if k == 'zip_code':
+                        v = v.replace(' ', '')
+                    address[k] = v.strip()
+
+            address['geo_location'] = {
+                'lat': school.get('latitude', None),
+                'lon': school.get('longitude', None)
+            }
+
+            item['address'] = address
 
             identifiers = item['schoolvo_code'].strip().split('-')
             item['board_id'] = int(identifiers[0])
@@ -109,11 +141,13 @@ class SchoolVOSpider(BaseSpider):
 
             if school['pad_logo'] and school['pad_logo'].startswith('/'):
                 request.meta['item']['logo_img_url'] = '%s%s'\
-                    % (settings['SCHOOLVO_URL'], school['pad_logo'][1:])
+                    % (settings['SCHOOLVO_URL'], urllib.quote(\
+                        school['pad_logo'][1:]))
 
             if school['pad_gebouw'] and school['pad_gebouw'].startswith('/'):
                 request.meta['item']['building_img_url'] = '%s%s'\
-                    % (settings['SCHOOLVO_URL'], school['pad_gebouw'][1:])
+                    % (settings['SCHOOLVO_URL'], urllib.quote(\
+                        school['pad_gebouw'][1:]))
 
             requests.append(request)
 
@@ -397,8 +431,8 @@ class SchoolVOSpider(BaseSpider):
 
                     year = {
                         'year': edu_year.select('.//text()').extract()[0].strip(),
-                        'planned': planned,
-                        'realised': realised,
+                        'hours_planned': planned,
+                        'hours_realised': realised,
                         'per_structure': []
                     }
 
@@ -412,8 +446,8 @@ class SchoolVOSpider(BaseSpider):
                     struct = {
                         'structure': row.select('./td[@class="a64cl" or @class="a65cl"]//text()')\
                                         .extract()[0].strip(),
-                        'planned': planned,
-                        'realised': realised
+                        'hours_planned': planned,
+                        'hours_realised': realised
                     }
                     year['per_structure'].append(struct)
 
@@ -463,7 +497,7 @@ class SchoolVOSpider(BaseSpider):
                         other_costs = cells[2].select('.//text()').extract()[0]
                         cost_per_year = {
                             'year': year.strip(),
-                            'amount': amount,
+                            'amount_euro': amount,
                             'other_costs': other_costs.strip(),
                             'explanation': '',
                             'link': ''
@@ -501,12 +535,12 @@ class SchoolVOSpider(BaseSpider):
                     documents.append(doc_url)
 
         school['costs'] = {
-            'url': response.url,
             'explanation': explanation,
             'per_year': per_year,
             'documents': documents,
             'signed_code_of_conduct': signed_code_of_conduct
         }
+        school['costs_url'] = response.url
 
         school['available_indicators'].remove(response.meta['indicator'])
         if not school['available_indicators']:
