@@ -1,6 +1,7 @@
-from colander import MappingSchema, SequenceSchema, SchemaNode, String, Length, Int, url
+from colander import MappingSchema, SequenceSchema, SchemaNode, String, Length, Range, Int, url
 
 board_id = SchemaNode(Int())
+branch_id = SchemaNode(Int(), validator=Range(min=0, max=1000))
 brin = SchemaNode(String(), validator=Length(min=4, max=4))
 name = SchemaNode(String(), validator=Length(min=4, max=300))
 phone = SchemaNode(String(), validator=Length(min=10, max=15))
@@ -9,6 +10,7 @@ municipality = SchemaNode(String(), validator=Length(min=3, max=300))
 municipality_code = SchemaNode(Int())
 province = SchemaNode(String(), validator=Length(min=5, max=100))
 website = SchemaNode(String(), validator=url)
+
 
 class Address(MappingSchema):
     street = SchemaNode(String(), validator=Length(min=4, max=300))
