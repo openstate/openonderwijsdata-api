@@ -158,7 +158,12 @@ class VOSpider(OWINSPSpider):
         h_content = hxs.select('//div[@id="hoofd_content"]')
         address = h_content.select('./p[@class="detpag"]/text()').extract()
         address = ', '.join([x.strip() for x in address])
-        organisation['address'] = address.replace(u'\xa0\xa0', u' ')
+        organisation['address'] = {
+            'street': address.replace(u'\xa0\xa0', u' '),
+            'city': None,
+            'zip_code': None
+        }
+
         website = h_content.select('ul/li[@class="actlink"]/a/@href').extract()
         if website:
             organisation['website'] = website[0]
@@ -321,10 +326,9 @@ class VOSpider(OWINSPSpider):
 
         organisation['board_id'] = board_id
 
-        organisation['address'] = address_table.select('tr[td/text() ='
-                                '"Adres"]/td[2]/text()').extract()[0]
+        organisation['address'].update({'city': None, 'zip_code': None})
 
-        organisation['address'] = address_table.select('tr[td/text() ='
+        organisation['address']['street'] = address_table.select('tr[td/text() ='
                                 '"Adres"]/td[2]/text()').extract()[0]
 
         branch_id = address_table.select('tr[td/text() ='
@@ -341,9 +345,9 @@ class VOSpider(OWINSPSpider):
 
         zip_code = re.match(ZIPCODE, place)
         if zip_code:
-            organisation['zip_code'] = zip_code.group(1)
+            organisation['address']['zip_code'] = zip_code.group(1)
             city = re.sub(ZIPCODE, '', place)
-            organisation['city'] = city.strip()
+            organisation['address']['city'] = city.strip()
 
         return organisation
 
