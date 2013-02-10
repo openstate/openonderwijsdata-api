@@ -1,5 +1,6 @@
 from colander import (MappingSchema, SequenceSchema, SchemaNode, String, Int,
-                      Float, Boolean, Length, Range, Date, Email, url, Invalid)
+                      Float, Boolean, Length, Range, Date, Email, url, Invalid,
+                      OneOf)
 
 import general_rules
 
@@ -44,6 +45,19 @@ class AverageEducationHours(SequenceSchema):
 ####################################
 #               Costs              #
 ####################################
+class CostPerYear(MappingSchema):
+    amount_euro = SchemaNode(Int(), validator=Range(min=0, max=1000))
+    explanation = SchemaNode(String())
+    link = SchemaNode(String())
+    other_costs = SchemaNode(String, validator=OneOf(['Ja', 'Nee']))
+    # Year can be a bunch of things ("Leerjaar 1", "alle jaren", ...)
+    year = SchemaNode(String(), validator=Length(min=3, max=75))
+
+
+class CostsPerYear(SequenceSchema):
+    cost_per_year = CostPerYear()
+
+
 class Documents(SequenceSchema):
     document = SchemaNode(String(), validator=url)
 
@@ -52,6 +66,7 @@ class Costs(MappingSchema):
     explanation = SchemaNode(String(), validator=Length(min=3, max=5000))
     documents = Documents()
     signed_code_of_conduct = SchemaNode(Boolean())
+    per_year = CostsPerYear()
 
 
 ####################################
