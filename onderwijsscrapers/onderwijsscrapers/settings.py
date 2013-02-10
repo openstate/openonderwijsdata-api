@@ -62,13 +62,13 @@ ELASTIC_SEARCH = {
     'vo.owinsp.nl': {
         'url': '127.0.0.1:9200',
         'index': 'onderwijsinspectie',
-        'doctype': 'vo_school',
+        'doctype': 'vo_branch',
         'id_fields': ['brin', 'branch_id']
     },
     'schoolvo.nl': {
         'url': '127.0.0.1:9200',
         'index': 'schoolvo',
-        'doctype': 'school',
+        'doctype': 'vo_branch',
         'id_fields': ['brin', 'branch_id']
     },
     'duo_vo_branches': {
