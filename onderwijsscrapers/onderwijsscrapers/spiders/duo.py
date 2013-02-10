@@ -145,7 +145,7 @@ class DuoVoBoards(BaseSpider):
             'SOLVABILITEIT 2': 'solvency_2',
             'ALGEMENE RESERVE / TOTALE BATEN': 'general_reserve_div_total_income',
             'BELEGGINGEN (T.O.V. EV)': 'investments_relative_to_equity',
-            'CONTRACTACTIVITEITEN / RIJKSBIJDRAGE': 'contractactivities_div_gov_funding',
+            'CONTRACTACTIVITEITEN / RIJKSBIJDRAGE': 'contract_activities_div_gov_funding',
             'CONTRACTACTIVITEITEN / TOTALE BATEN': 'contractactivities_div_total_profits',
             'EIGEN VERMOGEN / TOTALE BATEN': 'equity_div_total_profits',
             'INVESTERING HUISVESTING / TOTALE BATEN': 'housing_investment_div_total_profits',
@@ -197,8 +197,9 @@ class DuoVoBoards(BaseSpider):
                 board = DuoVoBoard(
                     board_id=board_id,
                     reference_year=reference_year,
-                    financial_key_indicators_reference_date=reference_date,
-                    financial_key_indicators=indicators
+                    financial_key_indicators_per_year_url=csv_url,
+                    financial_key_indicators_per_year_reference_date=reference_date,
+                    financial_key_indicators_per_year=indicators
                 )
 
                 yield board
@@ -380,8 +381,9 @@ class DuoVoSchools(BaseSpider):
             for brin, dropouts in dropouts_per_school.iteritems():
                 school = DuoVoSchool(
                     brin=brin,
-                    dropouts=dropouts,
-                    dropouts_reference_date=reference_date,
+                    dropouts_per_year_url=csv_url,
+                    dropouts_per_year=dropouts,
+                    dropouts_per_year_reference_date=reference_date,
                     reference_year=reference_year,
                 )
 
@@ -625,7 +627,7 @@ class DuoVoBranchesSpider(BaseSpider):
                 if department:
                     education_type['department'] = department
                     if education_type['department'].lower() == 'n.v.t.':
-                        education_type['department'] = False
+                        education_type['department'] = None
                 else:
                     education_type['department'] = None
 
@@ -649,7 +651,7 @@ class DuoVoBranchesSpider(BaseSpider):
                 vmbo_sector = row['VMBO SECTOR'].strip()
                 if vmbo_sector:
                     if vmbo_sector.lower() == 'n.v.t.':
-                        education_type['vmbo_sector'] = False
+                        education_type['vmbo_sector'] = None
                     else:
                         education_type['vmbo_sector'] = vmbo_sector
                 else:
@@ -686,6 +688,7 @@ class DuoVoBranchesSpider(BaseSpider):
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
+                    students_by_structure_url=csv_url,
                     students_by_structure_reference_date=reference_date,
                     students_by_structure=s_by_structure
                 )
@@ -751,6 +754,7 @@ class DuoVoBranchesSpider(BaseSpider):
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
+                    student_residences_url=csv_url,
                     student_residences_reference_date=reference_date,
                     student_residences=residence
                 )
@@ -892,6 +896,7 @@ class DuoVoBranchesSpider(BaseSpider):
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
+                    graduations_reference_url=csv_url,
                     graduations_reference_date=reference_date,
                     graduations=[graduations[year] for year in graduations]
                 )
