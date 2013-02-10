@@ -77,7 +77,7 @@ class DuoVoBoards(BaseSpider):
 
                 if row['POSTCODE CORRESPONDENTIEADRES']:
                     board['correspondence_address']['zip_code'] = row['POSTCODE '\
-                        'CORRESPONDENTIEADRES']
+                        'CORRESPONDENTIEADRES'].replace(' ', '')
                 else:
                     board['correspondence_address']['zip_code'] = None
 
