@@ -1,5 +1,6 @@
 colander
 scrapy
 scrapy-sentry
+Sphinx
 rawes
 requests
