@@ -109,7 +109,7 @@ class SchoolVOBranch(MappingSchema):
     costs_url = SchemaNode(String(), validator=url)
     denomination = general_rules.denomination
     education_structures = general_rules.EducationStructures()
-    email = SchemaNode(String(), validator=Email)
+    email = SchemaNode(String(), validator=Email())
     logo_img_url = SchemaNode(String(), validator=url)
     municipality = general_rules.municipality
     municipality_id = general_rules.municipality_code
