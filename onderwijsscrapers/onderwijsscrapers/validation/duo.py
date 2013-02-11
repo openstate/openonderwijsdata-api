@@ -1,7 +1,7 @@
 from glob import glob
 import json
 from colander import (MappingSchema, SequenceSchema, SchemaNode, String, Int,
-                      Length, Range, Date, url, Invalid, Float, Boolean)
+                      Length, Range, Date, Invalid, Float, Boolean)
 
 import general_rules
 
@@ -85,7 +85,7 @@ class Graduations(SequenceSchema):
 
 class StudentResidence(MappingSchema):
     municipality = general_rules.municipality
-    municipality_id = general_rules.municipality_code
+    municipality_code = general_rules.municipality_code
     city = general_rules.city
     zip_code = SchemaNode(String(), validator=Length(min=4, max=4))
     year_1 = SchemaNode(Int(), validator=Range(min=0))
@@ -206,8 +206,8 @@ class DuoVoSchool(MappingSchema):
     wgr_area = general_rules.wgr_area
     wgr_area_code = general_rules.wgr_area_code
 
-
-if __name__ == '__main__':
+errors = []
+def validate():
     schema = DuoVoBranch()
 
     for path in glob('../export/duo_vo_branches/*.json'):
@@ -216,6 +216,5 @@ if __name__ == '__main__':
         try:
             schema.deserialize(data)
         except Invalid, e:
-            errors = e.asdict()
-            print errors
-
+            errors.append(e)
+            print e.asdict()

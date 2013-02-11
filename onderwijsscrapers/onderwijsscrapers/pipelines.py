@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+import pytz
 
 from scrapy.conf import settings
 from scrapy.exceptions import DropItem
@@ -9,6 +11,8 @@ from onderwijsscrapers import exporters
 
 class OnderwijsscrapersPipeline(object):
     def __init__(self):
+        self.scrape_started = datetime.utcnow().replace(tzinfo=pytz.utc)\
+            .strftime('%Y-%m-%dT%H:%M:%SZ')
         self.items = {}
         self.universal_items = {}
 
@@ -49,14 +53,24 @@ class OnderwijsscrapersPipeline(object):
         # Setup the exporter
         if settings['EXPORT_METHOD'] == 'elasticsearch':
             exporter = exporters.ElasticSearchExporter(
+                scrape_started_at=self.scrape_started,
+                spider=spider.name,
+                config=settings['ELASTIC_SEARCH'][spider.name],
                 url=settings['ELASTIC_SEARCH'][spider.name]['url'],
                 index=settings['ELASTIC_SEARCH'][spider.name]['index'],
-                doctype=settings['ELASTIC_SEARCH'][spider.name]['doctype']
+                doctype=settings['ELASTIC_SEARCH'][spider.name]['doctype'],
             )
 
         elif settings['EXPORT_METHOD'] == 'file':
-            exporter = exporters.FileExporter(os.path.join(
-                settings['EXPORT_DIR'], spider.name))
+            exporter = exporters.FileExporter(
+                scrape_started_at=self.scrape_started,
+                spider=spider.name,
+                config=settings['ELASTIC_SEARCH'][spider.name],
+                url=settings['ELASTIC_SEARCH'][spider.name]['url'],
+                index=settings['ELASTIC_SEARCH'][spider.name]['index'],
+                doctype=settings['ELASTIC_SEARCH'][spider.name]['doctype'],
+                path=os.path.join(settings['EXPORT_DIR'], spider.name),
+            )
 
         id_fields = settings['ELASTIC_SEARCH'][spider.name]['id_fields']
         for item_id, item in self.items.iteritems():
@@ -67,5 +81,11 @@ class OnderwijsscrapersPipeline(object):
                 if 'reference_year' in universal_item:
                     del universal_item['reference_year']
                 item.update(universal_item)
+
+            item['meta'] = {
+                'scrape_started_at': self.scrape_started,
+                'item_scraped_at': datetime.utcnow().replace(tzinfo=pytz.utc)\
+                    .strftime('%Y-%m-%dT%H:%M:%SZ')
+            }
 
             exporter.save(item_id, item)
