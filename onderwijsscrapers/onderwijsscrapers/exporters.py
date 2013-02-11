@@ -77,7 +77,7 @@ class ElasticSearchExporter(Exporter):
         if doc_id:
             url = '%s/%s/%s' % (index, doc_type, doc_id)
         else:
-            url = '%s/%s' % (index, doc_type)
+            url = '%s/%s/%s' % (index, doc_type, uuid1())
 
         self.es.put(url, data=json.dumps(item, sort_keys=True))
 
