@@ -4,4 +4,4 @@
 .DS_Store
 .coverage
 
-_build/*
+documentation/_build/*
