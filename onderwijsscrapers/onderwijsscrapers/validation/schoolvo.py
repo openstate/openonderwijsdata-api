@@ -96,7 +96,7 @@ class Satisfactions(SequenceSchema):
     satisfaction = Satisfaction()
 
 
-class SchoolVOSchool(MappingSchema):
+class SchoolVOBranch(MappingSchema):
     address = SchoolVOAddress()
     avg_education_hours_per_student = AverageEducationHours()
     avg_education_hours_per_student_url = SchemaNode(String(), validator=url)
@@ -128,7 +128,7 @@ class SchoolVOSchool(MappingSchema):
 
 
 if __name__ == '__main__':
-    schema = SchoolVOSchool()
+    schema = SchoolVOBranch()
 
     for path in glob.glob('../export/schoolvo.nl/*.json'):
         # print path

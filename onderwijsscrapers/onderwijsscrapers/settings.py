@@ -33,6 +33,9 @@ EXPORT_METHOD = 'elasticsearch'
 # exporter is used).
 EXPORT_DIR = os.path.join(PROJECT_ROOT, 'export')
 
+from validation.duo import DuoVoSchool, DuoVoBoard, DuoVoBranch
+from validation.schoolvo import SchoolVOBranch
+
 ELASTIC_SEARCH = {
     'po.owinsp.nl': {
         'url': '',
@@ -46,24 +49,36 @@ ELASTIC_SEARCH = {
         'id_fields': ['brin', 'branch_id']
     },
     'schoolvo.nl': {
+        'validate': True,
+        'schema': SchoolVOBranch,
+        'validation_index': 'onderwijsdata_validation',
         'url': '127.0.0.1:9200',
         'index': 'schoolvo',
         'doctype': 'vo_branch',
         'id_fields': ['brin', 'branch_id']
     },
     'duo_vo_branches': {
+        'validate': True,
+        'schema': DuoVoBranch,
+        'validation_index': 'onderwijsdata_validation',
         'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'vo_branch',
         'id_fields': ['reference_year', 'brin', 'branch_id']
     },
     'duo_vo_boards': {
+        'validate': True,
+        'schema': DuoVoBoard,
+        'validation_index': 'onderwijsdata_validation',
         'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'vo_board',
         'id_fields': ['reference_year', 'board_id']
     },
     'duo_vo_schools': {
+        'validate': True,
+        'schema': DuoVoSchool,
+        'validation_index': 'onderwijsdata_validation',
         'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'vo_school',
