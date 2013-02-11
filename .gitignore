@@ -3,3 +3,5 @@
 *.db
 .DS_Store
 .coverage
+
+_build/*
