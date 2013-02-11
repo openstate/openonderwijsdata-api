@@ -12,7 +12,7 @@ OpenOnderwijs API Documentation
    :maxdepth: 2
 
    rst/introduction
-   rst/data_providers
+   rst/data
    rst/validation
    rst/api
 
