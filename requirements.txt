@@ -6,3 +6,5 @@ sphinxcontrib-httpdomain
 rawes
 requests
 dateutils
+flask
+Flask-RESTful
