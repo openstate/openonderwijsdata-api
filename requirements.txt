@@ -4,3 +4,4 @@ scrapy-sentry
 Sphinx
 rawes
 requests
+dateutils
