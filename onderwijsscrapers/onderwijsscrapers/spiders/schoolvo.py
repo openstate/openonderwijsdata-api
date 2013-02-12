@@ -535,7 +535,7 @@ class SchoolVOSpider(BaseSpider):
             explanation = hxs.select('//div[@class="a10" or @class="a9"]/span/text()')
             if explanation:
                 explanation = u' '.join([unicode(exp.encode('utf8')
-                                        .replace('\xc2\xa0', '').strip(), 'utf8')
+                                        .replace('\xc2\xa0', ' ').strip(), 'utf8')
                                         for exp in explanation.extract() if exp])
 
             docs = hxs.select('//a[contains(@href, ".pdf")]')
