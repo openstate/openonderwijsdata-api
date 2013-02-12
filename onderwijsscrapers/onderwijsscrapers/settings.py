@@ -35,6 +35,7 @@ EXPORT_DIR = os.path.join(PROJECT_ROOT, 'export')
 
 from validation.duo import DuoVoSchool, DuoVoBoard, DuoVoBranch
 from validation.schoolvo import SchoolVOBranch
+from validation.owinsp import OnderwijsInspectieVoBranch
 
 ELASTIC_SEARCH = {
     'po.owinsp.nl': {
@@ -43,6 +44,9 @@ ELASTIC_SEARCH = {
         'doctype': '',
     },
     'vo.owinsp.nl': {
+        'validate': True,
+        'schema': OnderwijsInspectieVoBranch,
+        'validation_index': 'onderwijsdata_validation',
         'url': '127.0.0.1:9200',
         'index': 'onderwijsinspectie',
         'doctype': 'vo_branch',
