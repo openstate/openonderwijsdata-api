@@ -47,7 +47,7 @@ vo_branch
     municipality                        string                              The name of the municipality this branch is located in.
     municipality_code                   integer                             Identifier (assigned by CBS [#cbs]_) to this municipality.
     name                                string                              Name of the branch of this school.
-    parent_satisfaction                 array of ParentSatisfaction         Satisfaction polls of parents.
+    parent_satisfaction                 array of :ref:`satisfaction`        Satisfaction polls of parents.
     parent_satisfaction_url             string                              URL to the *Tevredenheid ouders* page.
     phone                               string                              Unnormalised string representing the phone number of this branch.
     profile                             string                              Short description of the motto of this branch.
@@ -56,7 +56,7 @@ vo_branch
     schoolvo_code                       string                              Identifier used at http://schoolvo.nl. Consists of the board_id, brin and branch_id, separated by dashes. A school page can be accessed at `http://schoolvo.nl/?p_schoolcode=`\ *<schoolvo_code>*.
     schoolvo_id                         integer                             Identifier used at schoolvo internally.
     schoolvo_status_id                  integer                             Use unknown.
-    student_satisfaction                array of StudentSatisfaction        Satisfaction polls of students.
+    student_satisfaction                array of :ref:`satisfaction`        Satisfaction polls of students.
     student_satisfaction_url            string                              URL to the *Tevredenheid leerlingen* page.
     website                             string                              URL of the website of the school.
     =================================== =================================== ========================================================================================================
@@ -165,6 +165,42 @@ Meta
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
+    item_scraped_at                     datetime                            The date and time this branch was scraped from the source.
+    scrape_started_at                   datetime                            The date and time the scrape session this item was downloaded in started.
+    validated_at                        datetime                            The date and time this item was validated.
+    validation_result                   string                              Indication whether the item passed validation.
+    =================================== =================================== ======================================================================================================
+
+.. _satisfaction:
+
+Satisfaction
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    average_grade                       float                               The average satisfaction grade of this structure (*0.0 <= average_grade <= 10.0*).
+    education_structure                 string                              String representing the education structure [#edu_in_holland]_ this satisfaction surveys were collected for.
+    indicators                          array of :ref:`indicator`           Array of :ref:`indicator`, which indicate satisfaction scores for specific indicators [#tevr_stud]_ [#tevr_par]_.
+    national_grade                      float                               The average grade for all these structures in the Netherlands (*0.0 <= average_grade <= 10.0*).
+    source                              string                              Optional string describing the origin of the survey data.
+    =================================== =================================== ======================================================================================================
+
+.. _indicator:
+
+Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    grade                               float                               The average grade student/parents awarded this indicator.
+    indicator                           string                              The indicator.
+    =================================== =================================== ======================================================================================================
 
 .. _owinspdata:
 
@@ -181,3 +217,5 @@ Onderwijsinspectie
 .. [#medezeggenschapsraad] http://nl.wikipedia.org/wiki/Medezeggenschapsraad
 .. [#voraad] http://www.vo-raad.nl/
 .. [#coc] http://www.vo-raad.nl/dossiers/leermiddelen/gedragscode-schoolkosten
+.. [#tevr_stud] http://wiki.schoolvo.nl/mediawiki/index.php/Tevredenheid_leerlingen
+.. [#tevr_par] http://wiki.schoolvo.nl/mediawiki/index.php/Tevredenheid_ouders
