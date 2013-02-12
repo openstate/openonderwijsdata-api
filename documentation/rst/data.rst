@@ -30,19 +30,20 @@ vo_branch
     =================================== =================================== ========================================================================================================
     Field                               Type                                Description
     =================================== =================================== ========================================================================================================
-    address                             Address                             Address of the branch.
-    avg_education_hours_per_student     array of EducationHoursPerStudent   Array of EducationHoursPerStudent, representing how many hours of education were planned for a year, and how many are actually realised.
+    address                             :ref:`schoolvoaddress`              Address of the branch.
+    avg_education_hours_per_student     array of :ref:`eduhours`            Array of :ref:`eduhours`, representing how many hours of education were planned for a year, and how many are actually realised.
     avg_education_hours_per_student_url string                              URL to the *Onderwijstijd* page.
     board                               string                              The name of the board of this school.
     board_id                            integer                             Identifier (assigned by :ref:`duodata`) of the board of this branch.
     branch_id                           integer                             Identifier (assigned by :ref:`duodata`) of this branch.
     brin                                string                              "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
     building_img_url                    string                              URL to a photo of the building of this branch.
-    costs                               Costs                               Object representing the costs a parent can expect for this branch.
+    costs                               :ref:`costs`                        Object representing the costs a parent can expect for this branch.
     costs_url                           string                              URL to the *Onderwijskosten* page.
     education_structures                array                               An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
     email                               string                              Email address of this branch.
     logo_img_url                        string                              URL to a photo of the logo of the school of this branch.
+    meta                                :ref:`meta`                         Metadata, such as date of scrape and whether this item passed validation.
     municipality                        string                              The name of the municipality this branch is located in.
     municipality_code                   integer                             Identifier (assigned by CBS [#cbs]_) to this municipality.
     name                                string                              Name of the branch of this school.
@@ -60,6 +61,111 @@ vo_branch
     website                             string                              URL of the website of the school.
     =================================== =================================== ========================================================================================================
 
+
+.. _schoolvoaddress:
+
+Address
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    city                                string                              Name of the city or village this branch is located.
+    street                              string                              Street name and number of the address of this branch.
+    zip_code                            string                              Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed.
+    geo_location                        :ref:`schoolvo_coordinates`         The latitude and longitude of this branch.
+    =================================== =================================== ======================================================================================================
+
+.. _schoolvo_coordinates:
+
+Coordinates
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    lat                                 float                               Latitude of the address of this branch.
+    lon                                 float                               Longitude of the address of this branch.
+    =================================== =================================== ======================================================================================================
+
+.. _eduhours:
+
+EduHoursPerStudent
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    hours_planned                       integer                             Hours of education planned by the school council [#medezeggenschapsraad]_ for the past year.
+    hours_realised                      integer                             Hours of education realised at the school [#medezeggenschapsraad]_ for the past year.
+    year                                string                              The school year the hours apply to. There are various ways in which these years are represented at `Vensters voor Verantwoording <http://schoolvo.nl>`_, but the most common is *Leerjaar <n>*.
+    per_structure                       array of :ref:`eduhoursstructure`   Array of :ref:`eduhoursstructure`, representing the planning and realisation of education hours per education structure.
+    =================================== =================================== ======================================================================================================
+
+.. _eduhoursstructure:
+
+EduHoursPerStructure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    hours_planned                       integer                             Hours of education planned by the school council [#medezeggenschapsraad]_ for the past year.
+    hours_realised                      integer                             Hours of education realised at the school [#medezeggenschapsraad]_ for the past year.
+    structure                           string                              The structure these hours apply to (*vbmo-t, havo, vwo, ...*)
+    =================================== =================================== ======================================================================================================
+
+.. _costs:
+
+Costs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    documents                           array                               Array containing URLs (string) to documents the school published regarding the costs for parents.
+    explanation                         string                              Optional explanation provided by the school.
+    per_year                            Array of :ref:`costsperyear`        Many schools provide a detailed overview of the costs per year, which are described in this array.
+    signed_code_of_conduct              boolean                             *True* if the school signed the code of conduct of the VO-raad [#voraad]_ regarding school costs [#coc]_.
+    =================================== =================================== ======================================================================================================
+
+.. _costsperyear:
+
+CostsPerYear
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    amount_euro                         float                               Costs in € (euro) for this year.
+    explanation                         string                              Optional explanation of the details of the costs (*for a labcoat, for travel, ...*)
+    link                                string                              Optional URL to a document detailing costs.
+    other_costs                         string                              Indication whether parents should expect additional costs, other than the costs mentioned here. Value is usually "Ja" or "Nee".
+    year                                string                              String representation of the years these costs apply to.
+    =================================== =================================== ======================================================================================================
+
+.. _meta:
+
+Meta
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+
 .. _owinspdata:
 
 Onderwijsinspectie
@@ -71,3 +177,7 @@ Onderwijsinspectie
 .. [#edu_in_holland] http://en.wikipedia.org/wiki/Education_in_the_Netherlands#High_school
 .. [#cbs] Dutch Bureau of Statistics: http://www.cbs.nl/en-GB/menu/home/default.htm
 .. [#provinces] http://en.wikipedia.org/wiki/Dutch_provinces
+.. [#zipcodes] http://en.wikipedia.org/wiki/Postal_code#Netherlands
+.. [#medezeggenschapsraad] http://nl.wikipedia.org/wiki/Medezeggenschapsraad
+.. [#voraad] http://www.vo-raad.nl/
+.. [#coc] http://www.vo-raad.nl/dossiers/leermiddelen/gedragscode-schoolkosten
