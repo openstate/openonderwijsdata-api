@@ -87,10 +87,33 @@ FinancialIndicator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. table::
 
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    =================================== =================================== =================================== ==========================================================================
+    ======================================= =================================== =================================== ======================================================================
+    Field                                   Type                                Original term                       Description
+    ======================================= =================================== =================================== ======================================================================
+    capitalization_ratio                    float
+    contract_activities_div_gov_funding     float
+    contractactivities_div_total_profits    float
+    equity_div_total_profits                float
+    facilities_div_total_profits            float
+    general_reserve_div_total_income        float
+    gov_funding_div_total_profits           float
+    group                                   string
+    housing_expenses_div_total_expenses     float
+    housing_investment_div_total_profits    float
+    investments_div_total_profits           float
+    investments_relative_to_equity          float
+    liquidity_current_ratio                 float
+    liquidity_quick_ratio                   float
+    operating_capital_div_total_profits     float
+    operating_captial                       float
+    other_gov_funding_div_total_profits     float
+    profitability                           float
+    solvency_1                              float
+    solvency_2                              float
+    staff_costs_div_gov_funding             float
+    staff_expenses_div_total_expenses       float
+    year                                    integer
+    ======================================= =================================== =================================== ======================================================================
 
 .. _duometa:
 
