@@ -511,7 +511,7 @@ class SchoolVOSpider(BaseSpider):
                         cost_per_year = {
                             'year': year.strip(),
                             'amount_euro': amount,
-                            'other_costs': other_costs.strip(),
+                            'other_costs': True if other_costs.strip() == 'Ja' else False,
                             'explanation': '',
                             'link': ''
                         }
