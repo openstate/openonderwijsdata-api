@@ -52,7 +52,7 @@ class CostPerYear(MappingSchema):
     amount_euro = SchemaNode(Int(), validator=Range(min=0, max=1000))
     explanation = SchemaNode(String())
     link = SchemaNode(String())
-    other_costs = SchemaNode(String(), validator=OneOf(['Ja', 'Nee']))
+    other_costs = SchemaNode(Boolean())
     # Year can be a bunch of things ("Leerjaar 1", "alle jaren", ...)
     year = SchemaNode(String(), validator=Length(min=3, max=75))
 
