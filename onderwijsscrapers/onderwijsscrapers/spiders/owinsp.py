@@ -135,6 +135,8 @@ class VOSpider(OWINSPSpider):
             yield request
 
         organisation['name'] = hxs.select('//h1[@class="stitle"]/text()').extract()[0].strip()
+        organisation['education_structures'] = []
+        organisation['current_ratings'] = []
 
         crawl_structures = {}
         for structure in structures:
@@ -208,10 +210,11 @@ class VOSpider(OWINSPSpider):
             owinsp_id = None
 
         organisation['education_structures'].append(structure)
-        organisation['ratings'].append({
+        organisation['current_ratings'].append({
+            'education_structure': structure,
             'owinsp_id': owinsp_id,
             'owinsp_url': response.url,
-            'current_rating': current_rating,
+            'rating': current_rating,
             'rating_valid_since': rating_valid_since,
             'rating_excerpt': rating_excerpt
         })
@@ -345,7 +348,8 @@ class VOSpider(OWINSPSpider):
 
         zip_code = re.match(ZIPCODE, place)
         if zip_code:
-            organisation['address']['zip_code'] = zip_code.group(1)
+            organisation['address']['zip_code'] = zip_code.group(1)\
+                .replace(' ', '')
             city = re.sub(ZIPCODE, '', place)
             organisation['address']['city'] = city.strip()
 

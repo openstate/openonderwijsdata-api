@@ -1,5 +1,14 @@
-from colander import MappingSchema, SequenceSchema, SchemaNode, String, Length, Range, Int, url
-from datetime import datetime
+from colander import (MappingSchema, SequenceSchema, SchemaNode, String,
+                      Length, Range, Int, url, Date, Invalid)
+from datetime import datetime, date
+
+
+def date_today_or_earlier(node, value):
+    today = date.today()
+
+    if today < value:
+        raise Invalid(node, '%s is a date in the future' % value)
+
 
 board_id = SchemaNode(Int())
 branch_id = SchemaNode(Int(), validator=Range(min=0, max=1000))
@@ -29,6 +38,7 @@ rpa_area_code = SchemaNode(Int())
 wgr_area = SchemaNode(String(), validator=Length(min=3, max=300))
 wgr_area_code = SchemaNode(Int())
 city = SchemaNode(String(), validator=Length(min=3, max=300))
+publication_date = SchemaNode(Date(), validator=date_today_or_earlier)
 
 
 class Address(MappingSchema):
