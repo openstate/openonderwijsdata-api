@@ -342,12 +342,18 @@ class SchoolVOSpider(BaseSpider):
                 continue
 
             if struct:
+                general_grade = None
+                general_grade = row.select(xpaths['general_ind_grade'])
                 indicator = {
                     'indicator': row.select(xpaths['general_indicator'])\
-                                    .extract()[0].strip(),
-                    'grade': float(row.select(xpaths['general_ind_grade'])\
-                                    .extract()[0].replace(',', '.'))
+                                    .extract()[0].strip()
                 }
+                if general_grade:
+                    indicator['grade'] = float(general_grade.extract()[0]
+                        .replace(',', '.'))
+                else:
+                    indicator['grade'] = None
+
                 satisfaction['indicators'].append(indicator)
 
         # education structures
@@ -382,12 +388,17 @@ class SchoolVOSpider(BaseSpider):
                 continue
 
             if struct:
+                struct_grade = None
+                struct_grade = row.select(xpaths['edu_ind_grade'])
                 indicator = {
-                    'indicator': row.select(xpaths['edu_indicator'])[0]\
-                                    .extract().strip(),
-                    'grade': float(row.select(xpaths['edu_ind_grade'])\
-                                    .extract()[0].replace(',', '.'))
+                    'indicator': row.select(xpaths['edu_indicator'])[0]
+                                    .extract().strip()
                 }
+                if struct_grade:
+                    indicator['grade'] = float(struct_grade.extract()[0]
+                        .replace(',', '.'))
+                else:
+                    indicator['grade'] = None
                 satisfaction['indicators'].append(indicator)
 
         # Append last satisfaction, if satisfacion exists
@@ -443,13 +454,15 @@ class SchoolVOSpider(BaseSpider):
                                         .extract()[0].strip().replace('.', ''))
                     realised = int(row.select('./td[@class="a72c" or @class="a73c"]//text()')\
                                         .extract()[0].strip().replace('.', ''))
-                    struct = {
-                        'structure': row.select('./td[@class="a64cl" or @class="a65cl"]//text()')\
-                                        .extract()[0].strip(),
-                        'hours_planned': planned,
-                        'hours_realised': realised
-                    }
-                    year['per_structure'].append(struct)
+                    structure = None
+                    structure = row.select('./td[@class="a64cl" or @class="a65cl"]//text()')
+                    if structure:
+                        struct = {
+                            'structure': structure.extract()[0].strip(),
+                            'hours_planned': planned,
+                            'hours_realised': realised
+                        }
+                        year['per_structure'].append(struct)
 
             # Append last year
             per_year.append(year)
