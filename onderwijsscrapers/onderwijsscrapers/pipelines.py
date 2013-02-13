@@ -17,16 +17,6 @@ class OnderwijsscrapersPipeline(object):
         self.universal_items = {}
 
     def process_item(self, item, spider):
-        # Check if this item should be included into all related items
-        # of the same spider (e.g. ignore reference year)
-        universal_item = False
-        if 'ignore_id_fields' in item:
-            for field in item['ignore_id_fields']:
-                item[field] = None
-
-            del item['ignore_id_fields']
-            universal_item = True
-
         # Check if the fields that identify the item are present. If not,
         # log and drop the item.
         id_fields = settings['ELASTIC_SEARCH'][spider.name]['id_fields']
@@ -37,15 +27,25 @@ class OnderwijsscrapersPipeline(object):
             return
 
         item_id = '-'.join([str(item[field]) for field in id_fields])
-        if universal_item:
-            item_stack = self.universal_items
-        else:
-            item_stack = self.items
 
-        if item_id not in item_stack:
-            item_stack[item_id] = dict(item)
+        if item_id not in self.items:
+            self.items[item_id] = dict(item)
         else:
-            item_stack[item_id].update(dict(item))
+            self.items[item_id].update(dict(item))
+
+        # Check if this item should be included into all related items
+        # of the same spider (e.g. ignore reference year)
+        universal_item = False
+        if 'ignore_id_fields' in item:
+            for field in item['ignore_id_fields']:
+                item[field] = None
+
+            del item['ignore_id_fields']
+            universal_item = True
+
+        item_id = '-'.join([str(item[field]) for field in id_fields])
+        if universal_item:
+            self.universal_items[item_id] = dict(item).copy()
 
         return item
 
