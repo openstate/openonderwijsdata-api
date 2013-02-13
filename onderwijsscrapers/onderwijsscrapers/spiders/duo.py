@@ -22,8 +22,8 @@ class DuoVoBoards(BaseSpider):
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
                 'databestanden/vo/adressen/Adressen/besturen.asp',
                 self.parse_boards),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                'test/vo/Financien/Financien/Kengetallen.asp',
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+                'databestanden/vo/Financien/Financien/Kengetallen.asp',
                 self.parse_financial_key_indicators)
         ]
 
