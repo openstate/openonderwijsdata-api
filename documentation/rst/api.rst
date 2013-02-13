@@ -91,10 +91,42 @@ API
    :query doctypes: comma separated list of document types that should be included in the search. *Optinal*, *default*: search all available doctypes.
    :query size: the number of documents to return. *Optional*, *default*: 10, *min*: 1, *max*: 50.
    :query from: the offset from the first result in the result set. For example, when ``size=10`` and the total number of hits is 20, ``from=10`` will return result 10 to 20. *Optional*, *default*: 0.
-   :statuscode 200: OK, no error
+   :statuscode 200: OK, no errors.
    :statuscode 400: Bad Request. An accompanying error message will explain why the request was invalid.
 
-.. http:get:: /get_docment/(str:index)/(str:doctype)/(str:doc_id)
-   
-   :statuscode 200: no error
-   :statuscode 404: document, collection or document type does not exist
+.. http:get:: /api/v1/get_docment/(str:index)/(str:doctype)/(str:doc_id)
+  
+   This method can be used to retrieve a single document, provided that you know the document's index, type and id.
+
+   **Example: get a document from the DUO index that describes board 40586**
+
+   .. parsed-literal::
+
+      $ curl -i "http://<api_domain>/api/v1/get_document/duo/vo_board/40586"
+
+   Example response (only one hit with some of it's fields are shown here):
+
+   .. sourcecode:: http
+
+      HTTP/1.1 200 OK
+      Content-Length: 4955
+      Date: Wed, 13 Feb 2013 11:20:18 GMT
+      Content-Type: text/javascript
+
+      {
+        "_type": "vo_board",
+        "_id": "2011-40586",
+        "_index": "duo",
+        "_source": {
+          "board_id": 40586,
+          "website": "www.espritscholen.nl",
+          "municipality_code": 363,
+          "name": "Onderwijsstichting Esprit",
+          "administrative_office_id": 940,
+        }
+      }
+
+
+   :statuscode 200: OK, no errors.
+   :statuscode 400: Bad Request. An accompanying error message will explain why the request was invalid.
+   :statuscode 404: Not Found. The requested document does not exist.
