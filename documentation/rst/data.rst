@@ -13,6 +13,8 @@ The data sources present their data aggregated on different *granularities*: fin
 **vo_branch** (in Dutch: *afdeling middelbare school*)
     A school can be located at different (geographical) locations. For example, large schools that offer different levels of education [#edu_in_holland]_ often do so at separate buildings. These different departments are represented by a *vo_branch*.
 
+Note that many fields in the :ref:`duodata` overlap, as these data is available on both levels.
+
 For some fields the original Dutch term is included, in order to allow the API user to look up the definition of that term at the source collection.
 
 .. _duodata:
@@ -23,6 +25,8 @@ DUO
 
 vo_board
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Adressen - 03. Adressen hoofdbesturen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/besturen.asp>`_
+
 .. table::
 
     ================================================ =================================== =================================== =============================================================
@@ -35,7 +39,7 @@ vo_board
     denomination                                     string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
     financial_key_indicators_per_year                array of :ref:`finindicator`                                            Array of :ref:`finindicator`, where each item represents a set of key financial indicators for a given year.
     financial_key_indicators_per_year_reference_date date                                                                    Date the financial key indicator source file was published at http://data.duo.nl
-    financial_key_indicators_per_year_url            string                                                                  URL to the financial key indicator  source file at http://data.duo.nl
+    financial_key_indicators_per_year_url            string                                                                  URL to the financial key indicator source file at http://data.duo.nl
     meta                                             :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
     municipality                                     string                                                                  The name of the municipality this board is located in.
     municipality_code                                integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
@@ -49,28 +53,96 @@ vo_board
 
 vo_school
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Adressen - 01. Adressen hoofdvestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/hoofdvestigingen.asp>`_
+
 .. table::
 
     =================================== =================================== =================================== ==========================================================================
     Field                               Type                                Original term                       Description
     =================================== =================================== =================================== ==========================================================================
+    address                             :ref:`duoaddress`                                                       Address of this school.
+    board_id                            integer                                                                 Identifier (assigned by :ref:`duodata`) of the board of this school.
+    brin                                string                                                                  "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
+    corop_area                          string                              COROP-gebied                        A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+    corop_area_code                     integer                                                                 Identifier of the corop_area.
+    correspondence_address              :ref:`duoaddress`                                                       Correspondence address of this school.
+    denomination                        string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
+    dropouts_per_year                   array of :ref:`dropout`                                                 Array of :ref:`dropout`, where each item represents the dropouts for a specific year, per school year.
+    dropouts_per_year_reference_date    date                                                                    Date the dropouts source file was published at http://data.duo.nl.
+    dropouts_per_year_url               string                                                                  URL to the dropouts source file at http://data.duo.nl.
+    education_area                      string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+    education_area_code                 integer                                                                 Identifier of the education_area.
+    education_structures                array                                                                   An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
+    meta                                :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
+    municipality                        string                                                                  The name of the municipality this branch is located in.
+    municipality_code                   integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
+    name                                string                                                                  Name of the school.
+    nodal_area                          string                              Nodaal gebied                       Area defined for the planning of distribution of secondary schools. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+    nodal_area_code                     integer                                                                 Identifier of the nodal_area.
+    phone                               string                                                                  Phone number of the school.
+    province                            string                                                                  The province [#provinces]_ this branch is situated in.
+    reference_year                      integer                                                                 Year the schools source file was published.
+    rmc_region                          string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+    rmc_region_code                     integer                                                                 Identifier of the rmc_region.
+    rpa_area                            string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+    rpa_area_code                       integer                                                                 Identifier of the rpa_area.
+    website                             string                                                                  Website of this school.
+    wgr_area                            string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
+    wgr_area_code                       integer                                                                 Identifier of the wgr_area.
     =================================== =================================== =================================== ==========================================================================
 
 .. _duovobranch:
 
 vo_branch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Adressen - 02. Adressen alle vestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/vestigingen.asp>`_
+
 .. table::
 
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    =================================== =================================== =================================== ==========================================================================
+    ======================================= =================================== =================================== ======================================================================
+    Field                                   Type                                Original term                       Description
+    ======================================= =================================== =================================== ======================================================================
+    address                                 :ref:`duoaddress`                                                       Address of this branch.
+    board_id                                integer                                                                 Identifier (assigned by :ref:`duodata`) of the board of this branch.
+    branch_id                               integer                                                                 Identifier (assigned by :ref:`duodata`) of this branch.
+    brin                                    string                                                                  "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
+    corop_area                              string                              COROP-gebied                        A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+    corop_area_code                         integer                                                                 Identifier of the corop_area.
+    correspondence_address                  :ref:`duoaddress`                                                       Correspondence address of this branch.
+    denomination                            string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
+    education_area                          string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+    education_area_code                     integer                                                                 Identifier of the education_area.
+    education_structures                    array                                                                   An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
+    meta                                    :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
+    municipality                            string                                                                  The name of the municipality this branch is located in.
+    municipality_code                       integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
+    name                                    string                                                                  Name of the school.
+    nodal_area                              string                              Nodaal gebied                       Area defined for the planning of distribution of secondary schools. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+    nodal_area_code                         integer                                                                 Identifier of the nodal_area.
+    phone                                   string                                                                  Phone number of the school.
+    province                                string                                                                  The province [#provinces]_ this branch is situated in.
+    reference_year                          integer                                                                 Year the schools source file was published.
+    rmc_region                              string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+    rmc_region_code                         integer                                                                 Identifier of the rmc_region.
+    rpa_area                                string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+    rpa_area_code                           integer                                                                 Identifier of the rpa_area.
+    student_residences                      array of :ref:`duostdres`                                               Array of :ref:`duostdres`, where each item contains the distribution of students from a given municipality over the years in this branch.
+    student_residences_reference_date       date                                                                    Date the student residences source file was published at http://data.duo.nl
+    student_residences_url                  string                                                                  URL of the student residences source file.
+    students_by_structure                   array of :ref:`duostdstruct`                                            Distribution of students by education structure and gender.
+    students_by_structure_reference_date    date                                                                    Date the student per structure source file was published at http://data.
+    students_by_structure_url               string                                                                  URL of the student by structure source file.
+    website                                 string                                                                  Website of this school.
+    wgr_area                                string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
+    wgr_area_code                           integer                                                                 Identifier of the wgr_area.
+    ======================================= =================================== =================================== ======================================================================
 
 .. _duoaddress:
 
 Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/default.asp>`_
+
 .. table::
 
     =================================== =================================== =================================== ==========================================================================
@@ -81,39 +153,62 @@ Address
     zip_code                            string                                                                  Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed.
     =================================== =================================== =================================== ==========================================================================
 
-.. _finindicator:
+.. _dropout:
 
-FinancialIndicator
+Dropout
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortijdig schoolverlaten - Voortijdig schoolverlaten - 02. Vsv in het voortgezet onderwijs per vo instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vschoolverlaten/vsvers/vsv_voortgezet.asp>`_
+
 .. table::
 
     ======================================= =================================== =================================== ======================================================================
     Field                                   Type                                Original term                       Description
     ======================================= =================================== =================================== ======================================================================
-    capitalization_ratio                    float
-    contract_activities_div_gov_funding     float
-    contractactivities_div_total_profits    float
-    equity_div_total_profits                float
-    facilities_div_total_profits            float
-    general_reserve_div_total_income        float
-    gov_funding_div_total_profits           float
-    group                                   string
-    housing_expenses_div_total_expenses     float
-    housing_investment_div_total_profits    float
-    investments_div_total_profits           float
-    investments_relative_to_equity          float
-    liquidity_current_ratio                 float
-    liquidity_quick_ratio                   float
-    operating_capital_div_total_profits     float
-    operating_captial                       float
-    other_gov_funding_div_total_profits     float
-    profitability                           float
-    solvency_1                              float
-    solvency_2                              float
-    staff_costs_div_gov_funding             float
-    staff_expenses_div_total_expenses       float
-    year                                    integer
+    dropouts_with_mbo1_diploma              integer                             Aantal VSV-ers met MBO 1 diploma    Number of dropouts having a MBO 1 diploma (apprenticeship level) [#mbo1]_.
+    dropouts_with_vmbo_diploma              integer                             Aantal VSV-ers met VMBO diploma     Number of dropouts having a VMBO diploma [#vmbo]_.
+    dropouts_without_diploma                integer                             Aantal VSV-ers zonder diploma       Number of dropouts having no diploma.
+    education_structure                     string                                                                  Level of education [#edu_in_holland]_.
+    sector                                  string                              profiel/sector                      Package of courses a student takes in secondary education [#sectors]_ [#profiles]_.
+    total_dropouts                          integer                                                                 Total dropouts for the given year at this school.
+    total_students                          integer                                                                 Total students for the given year at this school.
+    year                                    integer                                                                 The year the dropout numbers apply to.
     ======================================= =================================== =================================== ======================================================================
+
+.. _finindicator:
+
+FinancialIndicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Financiën - 15. Kengetallen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/Financien/Financien/Kengetallen.asp>`_
+
+.. table::
+
+    ======================================= =============================== ======================================== =====================================================================
+    Field                                   Type                            Original term                            Description
+    ======================================= =============================== ======================================== =====================================================================
+    capitalization_ratio                    float                           Kapitalisatiefactor
+    contract_activities_div_gov_funding     float                           Contractactiviteiten/rijksbijdragen
+    contractactivities_div_total_profits    float                           Contractactiviteiten/totale baten
+    equity_div_total_profits                float                           Eigen vermogen/totale baten
+    facilities_div_total_profits            float                           Voorzieningen/totale baten
+    general_reserve_div_total_income        float                           Algemene reserve/totale baten
+    gov_funding_div_total_profits           float                           Rijksbijdragen/totale baten
+    group                                   string                          Groepering
+    housing_expenses_div_total_expenses     float                           Huisvestingslasten/totale lasten
+    housing_investment_div_total_profits    float                           Investering huisvesting/totale baten
+    investments_div_total_profits           float                           Investeringen/totale baten
+    investments_relative_to_equity          float                           Beleggingen t.o.v. eigen vermogen
+    liquidity_current_ratio                 float                           Liquiditeit (current ratio)
+    liquidity_quick_ratio                   float                           Liquiditeit (quick ratio)
+    operating_capital_div_total_profits     float                           Werkkapitaal/totale baten
+    operating_capital                       float                           Werkkapitaal
+    other_gov_funding_div_total_profits     float                           Overige overheidsbijdragen/totale baten
+    profitability                           float                           Rentabiliteit
+    solvency_1                              float                           Solvabiliteit 1
+    solvency_2                              float                           Solvabiliteit 2
+    staff_costs_div_gov_funding             float                           Personeel/rijksbijdragen
+    staff_expenses_div_total_expenses       float                           Personele lasten/totale lasten
+    year                                    integer
+    ======================================= =============================== ======================================== =====================================================================
 
 .. _duometa:
 
@@ -131,9 +226,53 @@ Meta
     validation_result                   string                              Indication whether the item passed validation.
     =================================== =================================== ======================================================================================================
 
+.. _duostdres:
 
+StudentResidence
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Leerlingen - 02. Leerlingen per vestiging naar postcode leerling en leerjaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp>`_
 
+.. table::
 
+    =================================== =================================== =================================== ==========================================================================
+    Field                               Type                                Original term                       Description
+    =================================== =================================== =================================== ==========================================================================
+    city                                string                                                                  The name of the city, town or village the students originate from.
+    municipality                        string                                                                  The name of the municipality this branch is located in.
+    municipality_code                   integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
+    year_1                              integer                                                                 The amount of students from this location in year 1.
+    year_2                              integer                                                                 The amount of students from this location in year 2.
+    year_3                              integer                                                                 The amount of students from this location in year 3.
+    year_4                              integer                                                                 The amount of students from this location in year 4.
+    year_5                              integer                                                                 The amount of students from this location in year 5.
+    year_6                              integer                                                                 The amount of students from this location in year 6.
+    zip_code                            string                                                                  Zip code (area) of the location the students originate from. Note that this value does not have to be a complete zipcode [#zipcodes]_, but can be somewhat anonimised (in order to preserve privacy of students) by being shortened to two digits. Also, students do not necessarily have a permanent residence.
+    =================================== =================================== =================================== ==========================================================================
+
+.. _duostdstruct:
+
+StudentPerStructure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Leerlingen - 01. Leerlingen per vestiging naar onderwijstype, lwoo indicatie, sector, afdeling, opleiding <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp>`_
+
+.. table::
+
+    =================================== =================================== =================================== ==========================================================================
+    Field                               Type                                Original term                       Description
+    =================================== =================================== =================================== ==========================================================================
+    department                          string                                                                  Optional. Department of a vmbo track.
+    education_name                      string                                                                  Name of the education programme.
+    education_structure                 string                                                                  Level of education [#edu_in_holland]_.
+    element_code                        integer                                                                 Unknown.
+    lwoo                                boolean                                                                 Indicates whether this sector supports "Leerwegondersteunend onderwijs", for students who need additional guidance [#lwoo]_.
+    vmbo_sector                         string                                                                  Vmbo sector [#sectors]_.
+    year_1                              mapping                                                                 Distribution of male and female students for year 1.
+    year_2                              mapping                                                                 Distribution of male and female students for year 2.
+    year_3                              mapping                                                                 Distribution of male and female students for year 3.
+    year_4                              mapping                                                                 Distribution of male and female students for year 4.
+    year_5                              mapping                                                                 Distribution of male and female students for year 5.
+    year_6                              mapping                                                                 Distribution of male and female students for year 6.
+    =================================== =================================== =================================== ==========================================================================
 
 
 .. _schoolvodata:
@@ -209,6 +348,39 @@ Coordinates
     lon                                 float                               Longitude of the address of this branch.
     =================================== =================================== ======================================================================================================
 
+.. _costs:
+
+Costs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    documents                           array                               Array containing URLs (string) to documents the school published regarding the costs for parents.
+    explanation                         string                              Optional explanation provided by the school.
+    per_year                            Array of :ref:`costsperyear`        Many schools provide a detailed overview of the costs per year, which are described in this array.
+    signed_code_of_conduct              boolean                             *True* if the school signed the code of conduct of the VO-raad [#voraad]_ regarding school costs [#coc]_.
+    =================================== =================================== ======================================================================================================
+
+.. _costsperyear:
+
+CostsPerYear
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    amount_euro                         float                               Costs in € (euro) for this year.
+    explanation                         string                              Optional explanation of the details of the costs (*for a labcoat, for travel, ...*)
+    link                                string                              Optional URL to a document detailing costs.
+    other_costs                         boolean                             Indication whether parents should expect additional costs, other than the costs mentioned here.
+    year                                string                              String representation of the years these costs apply to.
+    =================================== =================================== ======================================================================================================
+
 .. _eduhours:
 
 EduHoursPerStudent
@@ -240,9 +412,9 @@ EduHoursPerStructure
     structure                           string                              The structure these hours apply to (*vbmo-t, havo, vwo, ...*)
     =================================== =================================== ======================================================================================================
 
-.. _costs:
+.. _indicator:
 
-Costs
+Indicator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. table::
@@ -250,27 +422,8 @@ Costs
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
-    documents                           array                               Array containing URLs (string) to documents the school published regarding the costs for parents.
-    explanation                         string                              Optional explanation provided by the school.
-    per_year                            Array of :ref:`costsperyear`        Many schools provide a detailed overview of the costs per year, which are described in this array.
-    signed_code_of_conduct              boolean                             *True* if the school signed the code of conduct of the VO-raad [#voraad]_ regarding school costs [#coc]_.
-    =================================== =================================== ======================================================================================================
-
-.. _costsperyear:
-
-CostsPerYear
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. table::
-
-    =================================== =================================== ======================================================================================================
-    Field                               Type                                Description
-    =================================== =================================== ======================================================================================================
-    amount_euro                         float                               Costs in € (euro) for this year.
-    explanation                         string                              Optional explanation of the details of the costs (*for a labcoat, for travel, ...*)
-    link                                string                              Optional URL to a document detailing costs.
-    other_costs                         string                              Indication whether parents should expect additional costs, other than the costs mentioned here. Value is usually "Ja" or "Nee".
-    year                                string                              String representation of the years these costs apply to.
+    grade                               float                               The average grade student/parents awarded this indicator.
+    indicator                           string                              The indicator.
     =================================== =================================== ======================================================================================================
 
 .. _schoolvometa:
@@ -306,20 +459,6 @@ Satisfaction
     source                              string                              Optional string describing the origin of the survey data.
     =================================== =================================== ======================================================================================================
 
-.. _indicator:
-
-Indicator
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. table::
-
-    =================================== =================================== ======================================================================================================
-    Field                               Type                                Description
-    =================================== =================================== ======================================================================================================
-    grade                               float                               The average grade student/parents awarded this indicator.
-    indicator                           string                              The indicator.
-    =================================== =================================== ======================================================================================================
-
 .. _owinspdata:
 
 Onderwijsinspectie
@@ -349,3 +488,9 @@ vo_branch
 .. [#coc] http://www.vo-raad.nl/dossiers/leermiddelen/gedragscode-schoolkosten
 .. [#tevr_stud] http://wiki.schoolvo.nl/mediawiki/index.php/Tevredenheid_leerlingen
 .. [#tevr_par] http://wiki.schoolvo.nl/mediawiki/index.php/Tevredenheid_ouders
+.. [#wgr_law] http://wetten.overheid.nl/BWBR0003740
+.. [#mbo1] http://nl.wikipedia.org/wiki/Middelbaar_beroepsonderwijs#Niveau
+.. [#vmbo] http://en.wikipedia.org/wiki/Voorbereidend_middelbaar_beroepsonderwijs
+.. [#sectors] http://nl.wikipedia.org/wiki/Vmbo#Sectoren
+.. [#profiles] http://nl.wikipedia.org/wiki/Profielen_Tweede_Fase#Profielen
+.. [#lwoo] http://nl.wikipedia.org/wiki/Lwoo
