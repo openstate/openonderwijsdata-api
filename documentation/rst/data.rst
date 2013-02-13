@@ -472,9 +472,97 @@ vo_branch
     =================================== =================================== ========================================================================================================
     Field                               Type                                Description
     =================================== =================================== ========================================================================================================
+    address                             :ref:`owinspaddress`                Address of this branch
+    board                               string                              The name of the board of this school.
+    board_id                            integer                             Identifier (assigned by :ref:`duodata`) of the board of this branch.
+    branch_id                           integer                             Identifier (assigned by :ref:`duodata`) of this branch.
+    brin                                string                              "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
+    current_ratings                     array of :ref:`owinspcurrat`        Array of :ref:`owinspcurrat`, where each item represents the current rating of the Onderwijsinspectie [#owinsp]_.
+    denomination                        string                              In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
+    education_structures                array                               An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
+    meta                                :ref:`owinspmeta`                   Metadata, such as date of scrape and whether this item passed validation.
+    name                                string                              Name of this branch.
+    rating_history                      array of :ref:`owinsprathist`       Array of :ref:`owinsprathist`, where each item represents a rating the Onderwijsinspectie [#owinsp]_ awarded to this branch.
+    reports                             array of :ref:`owinspreport`        Array of :ref:`owinspreport`, where each item represents a report of the Onderwijsinspectie [#owinsp]_ in PDF.
+    result_card_url                     string                              URL to the result card ("opbrengstenkaart") of this branch.
+    website                             string                              Website of this branch (optional).
     =================================== =================================== ========================================================================================================
 
+.. _owinspaddress:
 
+Address
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    city                                string                              Name of the city or village this branch is located.
+    street                              string                              Street name and number of the address of this branch.
+    zip_code                            string                              Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed.
+    =================================== =================================== ==========================================================================
+
+.. _owinspcurrat:
+
+CurrentRating
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    education_structure                 string                              The structure this rating applies to (*vbmo-t, havo, vwo, ...*)
+    owinsp_id                           integer                             Identifier (assigned by :ref:`owinspdata`). Use unknown.
+    owinsp_url                          string                              URL to the page of the branch where the rating for this education_structure was found.
+    rating                              string                              Rating awarded by the Onderwijsinspectie [#owinsp]_.
+    rating_excerpt                      string                              Excerpt of the rating report.
+    rating_valid_since                  date                                Date this rating went into effect.
+    =================================== =================================== ==========================================================================
+
+.. _owinsprathist:
+
+HistoricalRating
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    date                                date                                Date this rating was awarded.
+    education_structure                 string                              The structure this rating applies to (*vbmo-t, havo, vwo, ...*)
+    rating                              string                              Rating awarded by the Onderwijsinspectie [#owinsp]_.
+    =================================== =================================== ==========================================================================
+
+.. _owinspmeta:
+
+Meta
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ======================================================================================================
+    Field                               Type                                Description
+    =================================== =================================== ======================================================================================================
+    item_scraped_at                     datetime                            The date and time this branch was scraped from the source.
+    scrape_started_at                   datetime                            The date and time the scrape session this item was downloaded in started.
+    validated_at                        datetime                            The date and time this item was validated.
+    validation_result                   string                              Indication whether the item passed validation.
+    =================================== =================================== ======================================================================================================
+
+.. _owinspreport:
+
+Report
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    date                                date                                Date the report was published by the Onderwijsinspectie [#owinsp]_.
+    education_structure                 string                              The structure this rating applies to (*vbmo-t, havo, vwo, ...*)
+    title                               string                              Title of the report.
+    url                                 string                              URL to the full report in PDF.
+    =================================== =================================== ==========================================================================
 
 .. [#schoolbestuur] http://nl.wikipedia.org/wiki/Schoolbestuur
 .. [#brin] http://nl.wikipedia.org/wiki/BRIN
@@ -494,3 +582,4 @@ vo_branch
 .. [#sectors] http://nl.wikipedia.org/wiki/Vmbo#Sectoren
 .. [#profiles] http://nl.wikipedia.org/wiki/Profielen_Tweede_Fase#Profielen
 .. [#lwoo] http://nl.wikipedia.org/wiki/Lwoo
+.. [#owinsp] http://nl.wikipedia.org/wiki/Inspectie_van_het_Onderwijs_(Nederland)
