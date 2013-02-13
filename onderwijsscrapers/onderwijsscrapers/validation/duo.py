@@ -22,7 +22,7 @@ class FinancialKeyIndicatorPerYear(MappingSchema):
     liquidity_current_ratio = SchemaNode(Float())
     liquidity_quick_ratio = SchemaNode(Float())
     operating_capital_div_total_profits = SchemaNode(Float())
-    operating_captial = SchemaNode(Float())
+    operating_capital = SchemaNode(Float())
     other_gov_funding_div_total_profits = SchemaNode(Float())
     profitability = SchemaNode(Float())
     solvency_1 = SchemaNode(Float())
@@ -38,7 +38,7 @@ class FinancialKeyIndicatorsPerYear(SequenceSchema):
 
 class Dropout(MappingSchema):
     year = general_rules.year
-    dropouts_with_vmbo1_dimploma = SchemaNode(Int(), validator=Range(min=0,
+    dropouts_with_mbo1_dimploma = SchemaNode(Int(), validator=Range(min=0,
         max=5000))
     dropouts_with_vmbo_diploma = SchemaNode(Int(), validator=Range(min=0,
         max=5000))

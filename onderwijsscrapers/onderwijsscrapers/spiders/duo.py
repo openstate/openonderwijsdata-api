@@ -161,7 +161,7 @@ class DuoVoBoards(BaseSpider):
             #'WEERSTANDSVERMOGEN VO TOTALE BN.': '',
             'WERKKAPITAAL / TOTALE BATEN': 'operating_capital_div_total_profits',
             'HUISVESTINGSLASTEN / TOTALE LASTEN': 'housing_expenses_div_total_expenses',
-            'WERKKAPITAAL': 'operating_captial',
+            'WERKKAPITAAL': 'operating_capital',
         }
 
         for csv_url, reference_date in available_csvs.iteritems():
@@ -367,7 +367,7 @@ class DuoVoSchools(BaseSpider):
                     'total_students': int(row['AANTAL DEELNEMERS']),
                     'total_dropouts': int(row['AANTAL VSV\'ERS']),
                     'dropouts_with_vmbo_diploma': int(row['AANTAL VSV\'ERS MET VMBO DIPLOMA']),
-                    'dropouts_with_vmbo1_dimploma': int(row['AANTAL VSV\'ERS MET MBO1 DIPLOMA']),
+                    'dropouts_with_mbo1_dimploma': int(row['AANTAL VSV\'ERS MET MBO1 DIPLOMA']),
                     'dropouts_without_diploma': int(row['AANTAL VSV\'ERS ZONDER DIPLOMA'])
                 }
 
