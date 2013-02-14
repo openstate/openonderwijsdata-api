@@ -21,7 +21,7 @@ API
 
       HTTP/1.1 200 OK
       Content-Length: 173883
-      Date: Tue, 12 Feb 2013 12:19:49 GMT   
+      Date: Tue, 12 Feb 2013 12:19:49 GMT
       Content-Type: application/json
 
       {
@@ -77,7 +77,7 @@ API
                 "zip_code": "6835 HZ"
               }
             }
-          } 
+          }
         ]
       }
 
@@ -88,14 +88,17 @@ API
    :query zip_code: filter results on ``address.zip_code``. *Optional*.
    :query city: filter results on ``address.city``. *Optional*.
    :query indexes: comma separated list of index names that should be searched. *Optional*, *default*: search all available indexes.
-   :query doctypes: comma separated list of document types that should be included in the search. *Optinal*, *default*: search all available doctypes.
+   :query doctypes: comma separated list of document types that should be included in the search. *Optional*, *default*: search all available doctypes.
    :query size: the number of documents to return. *Optional*, *default*: 10, *min*: 1, *max*: 50.
    :query from: the offset from the first result in the result set. For example, when ``size=10`` and the total number of hits is 20, ``from=10`` will return result 10 to 20. *Optional*, *default*: 0.
+   :query geo_sort: Sort results on provided coordinate. String, formatted as "*latitude*, *longitude*". *Optional*.
+   :query geo_filter: Filter results on provided coordinate. String, formatted as "*latitude*, *longitude*". *Optional*.
+   :query geo_filter_distance: Used in conjuction with **geo_filter**. Maximum distance in km of a result from the coordinate provided by **geo_filter**. *Optional*, *default*: "10km".
    :statuscode 200: OK, no errors.
    :statuscode 400: Bad Request. An accompanying error message will explain why the request was invalid.
 
 .. http:get:: /api/v1/get_docment/(str:index)/(str:doctype)/(str:doc_id)
-  
+
    This method can be used to retrieve a single document, provided that you know the document's index, type and id.
 
    **Example: get a document from the DUO index that describes board 40586**
