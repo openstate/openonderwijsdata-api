@@ -19,16 +19,21 @@ def bag42_geocode(address):
     resp = requests.get('http://bag42.nl/api/v0/geocode/json',
         params={'address': ' '.join(payload)})
 
-    result = resp.json()
+    try:
+        result = resp.json()
+    except:
+        print resp.text
+        log.msg('Unable to decode JSON object: %s' % resp.text, level=log.ERROR)
+        return None
     if result['status'] != 'OK':
-        log.msg('Unable to geocode address %s' % address, evel=log.WARNING)
+        log.msg('Unable to geocode address %s' % address, level=log.WARNING)
         return None
 
     result = result['results'][0]
     geocoded_address = {
         'geo_location': {
             'lat': float(result['geometry']['location']['lat']),
-            'lng': float(result['geometry']['location']['lng'])
+            'lon': float(result['geometry']['location']['lng'])
         }
     }
 
