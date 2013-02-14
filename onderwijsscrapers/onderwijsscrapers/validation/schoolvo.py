@@ -8,16 +8,6 @@ from colander import (MappingSchema, SequenceSchema, SchemaNode, String, Int,
 import general_rules
 
 
-class Coordinates(MappingSchema):
-    lat = SchemaNode(Float(), validator=Range(min=-180.0, max=180.0))
-    lon = SchemaNode(Float(), validator=Range(min=-180.0, max=180.0))
-
-
-# Extension of default address format with geo-coordinates
-class SchoolVOAddress(general_rules.Address):
-    geo_location = Coordinates()
-
-
 ####################################
 # Average education hours per year #
 ####################################
@@ -97,7 +87,7 @@ class Satisfactions(SequenceSchema):
 
 
 class SchoolVOBranch(MappingSchema):
-    address = SchoolVOAddress()
+    address = general_rules.Address()
     avg_education_hours_per_student = AverageEducationHours()
     avg_education_hours_per_student_url = SchemaNode(String(), validator=url)
     board = SchemaNode(String(), validator=Length(min=3, max=100))
