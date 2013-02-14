@@ -4,12 +4,33 @@
             "address": {
                 "dynamic": true,
                 "properties": {
-                    "zip_code": { "type": "string" },
-                    "street": { "type": "string" },
+                    "address_components": {
+                        "dynamic": true,
+                        "type": "nested",
+                        "properties": {
+                            "long_name": { "type": "string" },
+                            "short_name": { "type": "string" },
+                            "types": { "type": "string" }
+                        }
+                    },
                     "city": { "type": "string" },
+                    "formatted_address": { "type": "string" },
                     "geo_location": {
-                        "type": "geo_point"
-                    }
+                        "type": "geo_point",
+                            "lat_lon": true
+                    },
+                    "geo_viewport": {
+                        "northeast": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        },
+                        "southwest": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        }
+                    },
+                    "street": { "type": "string" },
+                    "zip_code": { "type": "string" }
                 }
             },
             "avg_education_hours_per_student_url": {
