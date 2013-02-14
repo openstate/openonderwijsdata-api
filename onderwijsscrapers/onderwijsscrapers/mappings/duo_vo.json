@@ -332,7 +332,7 @@
                         "passed": { "type": "integer" },
                         "failed": { "type": "integer" },
                         "candidates": { "type": "integer" },
-                        "passed": { "type": "year" },
+                        "passed": { "type": "integer" },
                         "per_departement": {
                             "dynamic": true,
                             "type": "nested",
