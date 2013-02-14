@@ -2,6 +2,7 @@ from flask import Flask
 from flask.ext import restful
 from flask.ext.restful import abort, reqparse
 import rawes
+import re
 
 app = Flask(__name__)
 api = restful.Api(app)
@@ -57,12 +58,17 @@ class Search(restful.Resource):
     parser.add_argument('size', type=int, default=10)
     parser.add_argument('from', type=int, default=0)
 
+    parser.add_argument('geo_sort', type=str)
+    parser.add_argument('geo_filter', type=str)
+    parser.add_argument('geo_filter_distance', type=str, default='10km')
+
     filters = {
         'brin': 'brin',
         'board_id': 'board_id',
         'branch_id': 'branch_id',
         'zip_code': 'address.zip_code',
-        'city': 'address.city'
+        'city': 'address.city',
+        'geo_filter_coords': 'address.geo_location'
     }
 
     def get(self):
@@ -125,22 +131,42 @@ class Search(restful.Resource):
                 query['query']['filtered']['filter'] = {'and': []}
 
             arg_value = args[arg]
-            if type(arg_value) is str:
+            if type(arg_value) is str and arg != 'geo_filter_coords':
                 arg_value = arg_value.lower().split(' ')
 
             if type(arg_value) is int:
                 arg_value = [arg_value]
 
-            query['query']['filtered']['filter']['and'].append({
-                'terms': {
-                    field: arg_value,
-                    'execution': 'and'
-                }
-            })
+            if arg != 'geo_filter_coords':
+                query['query']['filtered']['filter']['and'].append({
+                    'terms': {
+                        field: arg_value,
+                        'execution': 'and'
+                    }
+                })
+            else:
+                coords = re.sub(r'\s{1,}', ' ', args[arg])
+                query['query']['filtered']['filter']['and'].append({
+                    'geo_distance': {
+                        field: coords.strip(),
+                        'distance': args['geo_filter_distance']
+                    }
+                })
 
         # Number of hits to return and the offset
         query['size'] = args['size']
         query['from'] = args['from']
+
+        # Sort results based on distance to provided coordinate
+        if args['geo_sort']:
+            coords = re.sub(r'\s{1,}', ' ', args['geo_sort'])
+            query['sort'] = {
+                '_geo_distance': {
+                    'address.geo_location': coords.strip(),
+                    'order': 'asc',
+                    'unit': 'km'
+                }
+            }
 
         print query
 
