@@ -1,0 +1,358 @@
+{
+    "mappings":{
+        "vo_board": {
+            "dynamic": true,
+            "properties": {
+                "address": {
+                    "dynamic": true,
+                    "properties": {
+                        "address_components": {
+                            "dynamic": true,
+                            "type": "nested",
+                            "properties": {
+                                "long_name": { "type": "string" },
+                                "short_name": { "type": "string" },
+                                "types": { "type": "string" }
+                            }
+                        },
+                        "city": { "type": "string" },
+                        "formatted_address": { "type": "string" },
+                        "geo_location": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        },
+                        "geo_viewport": {
+                            "northeast": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            },
+                            "southwest": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            }
+                        },
+                        "street": { "type": "string" },
+                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "administrative_office_id": { "type": "integer" },
+                "board_id": { "type": "integer" },
+                "correspondence_address": {
+                    "dynamic": true,
+                    "properties": {
+                        "address_components": {
+                            "dynamic": true,
+                            "type": "nested",
+                            "properties": {
+                                "long_name": { "type": "string" },
+                                "short_name": { "type": "string" },
+                                "types": { "type": "string" }
+                            }
+                        },
+                        "city": { "type": "string" },
+                        "formatted_address": { "type": "string" },
+                        "geo_location": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        },
+                        "geo_viewport": {
+                            "northeast": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            },
+                            "southwest": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            }
+                        },
+                        "street": { "type": "string" },
+                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "denomination": { "type": "string" },
+                "financial_key_indicators_per_year": {
+                    "dynamic": true,
+                    "type": "nested",
+                    "properties": {
+                        "gov_funding_div_total_profits": { "type": "float" },
+                        "liquidity_current_ratio": { "type": "float" },
+                        "equity_div_total_profits": { "type": "float" },
+                        "housing_expenses_div_total_expenses": { "type": "float" },
+                        "solvency_2": { "type": "float" },
+                        "housing_investment_div_total_profits": { "type": "float" },
+                        "solvency_1": { "type": "float" },
+                        "capitalization_ratio": { "type": "float" },
+                        "facilities_div_total_profits": { "type": "float" },
+                        "other_gov_funding_div_total_profits": { "type": "float" },
+                        "operating_capital_div_total_profits": { "type": "float" },
+                        "contract_activities_div_gov_funding": { "type": "float" },
+                        "investments_relative_to_equity": { "type": "float" },
+                        "liquidity_quick_ratio": { "type": "float" },
+                        "contractactivities_div_total_profits": { "type": "float" },
+                        "staff_costs_div_gov_funding": { "type": "float" },
+                        "year": { "type": "integer" },
+                        "general_reserve_div_total_income": { "type": "float" },
+                        "investments_div_total_profits": { "type": "float" },
+                        "operating_capital": { "type": "float" },
+                        "group": { "type": "string", "index": "not_analyzed" },
+                        "staff_expenses_div_total_expenses": { "type": "float" },
+                        "operating_captial": { "type": "float" },
+                        "profitability": { "type": "float" }
+                    }
+                },
+                "financial_key_indicators_per_year_reference_date": { "format": "dateOptionalTime", "type": "date" },
+                "financial_key_indicators_per_year_url": { "type": "string", "index": "not_analyzed" },
+                "meta": {
+                    "dynamic": true,
+                    "properties": {
+                        "item_scraped_at": { "format": "dateOptionalTime", "type": "date" },
+                        "scrape_started_at": { "format": "dateOptionalTime", "type": "date" },
+                        "validated_at": { "format": "dateOptionalTime", "type": "date" },
+                        "validation_result": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "municipality": { "type": "string" },
+                "municipality_code": { "type": "integer" },
+                "name": { "type": "string" },
+                "phone": { "type": "string", "index": "not_analyzed" },
+                "reference_year": { "type": "integer" },
+                "website": { "type": "string", "index": "not_analyzed" }
+            }
+        },
+        "vo_school": {
+            "dynamic": true,
+            "properties": {
+                "address": {
+                    "dynamic": true,
+                    "properties": {
+                        "address_components": {
+                            "dynamic": true,
+                            "type": "nested",
+                            "properties": {
+                                "long_name": { "type": "string" },
+                                "short_name": { "type": "string" },
+                                "types": { "type": "string" }
+                            }
+                        },
+                        "city": { "type": "string" },
+                        "formatted_address": { "type": "string" },
+                        "geo_location": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        },
+                        "geo_viewport": {
+                            "northeast": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            },
+                            "southwest": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            }
+                        },
+                        "street": { "type": "string" },
+                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "board_id": { "type": "integer" },
+                "brin": { "type": "string", "index": "not_analyzed" },
+                "corop_area": { "type": "string" },
+                "corop_area_code": { "type": "integer" },
+                "correspondence_address": {
+                    "dynamic": true,
+                    "properties": {
+                        "address_components": {
+                            "dynamic": true,
+                            "type": "nested",
+                            "properties": {
+                                "long_name": { "type": "string" },
+                                "short_name": { "type": "string" },
+                                "types": { "type": "string" }
+                            }
+                        },
+                        "city": { "type": "string" },
+                        "formatted_address": { "type": "string" },
+                        "geo_location": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        },
+                        "geo_viewport": {
+                            "northeast": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            },
+                            "southwest": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            }
+                        },
+                        "street": { "type": "string" },
+                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "denomination": { "type": "string" },
+                "dropouts_per_year": {
+                    "dynamic": true,
+                    "type": "nested",
+                    "properties": {
+                        "sector": { "type": "string" },
+                        "total_dropouts": { "type": "integer" },
+                        "total_students": { "type": "integer" },
+                        "dropouts_with_mbo1_dimploma":  { "type": "integer" },
+                        "education_structure":  { "type": "string", "index": "not_analyzed" },
+                        "year": { "type": "integer" },
+                        "dropouts_without_diploma": { "type": "integer" },
+                        "dropouts_with_vmbo_diploma": { "type": "integer" }
+                    }
+                },
+                "dropouts_per_year_url": { "type": "string", "index": "not_analyzed" },
+                "dropouts_per_year_reference_date": { "format": "dateOptionalTime", "type": "date" },
+                "education_area": { "type": "string" },
+                "education_area_code": { "type": "integer" },
+                "education_structures": { "type": "string", "index": "not_analyzed" },
+                "meta": {
+                    "dynamic": true,
+                    "properties": {
+                        "item_scraped_at": { "format": "dateOptionalTime", "type": "date" },
+                        "scrape_started_at": { "format": "dateOptionalTime", "type": "date" },
+                        "validated_at": { "format": "dateOptionalTime", "type": "date" },
+                        "validation_result": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "municipality": { "type": "string" },
+                "municipality_code": { "type": "integer" },
+                "name": { "type": "string" },
+                "nodal_area": { "type": "string" },
+                "nodal_area_code": { "type": "integer" },
+                "phone": { "type": "string", "index": "not_analyzed" },
+                "province": { "type": "string" },
+                "reference_year": { "type": "integer" },
+                "rmc_region": { "type": "string" },
+                "rmc_region_code": { "type": "integer" },
+                "rpa_area": { "type": "string" },
+                "rpa_area_code": { "type": "integer" },
+                "student_residences_reference_date": { "format": "dateOptionalTime", "type": "date" },
+                "website": { "type": "string", "index": "not_analyzed" },
+                "wgr_area": { "type": "string" },
+                "wgr_area_code": { "type": "integer" }
+            }
+        },
+        "vo_branch": {
+            "dynamic": true,
+            "properties": {
+                "address": {
+                    "dynamic": true,
+                    "properties": {
+                        "address_components": {
+                            "dynamic": true,
+                            "type": "nested",
+                            "properties": {
+                                "long_name": { "type": "string" },
+                                "short_name": { "type": "string" },
+                                "types": { "type": "string" }
+                            }
+                        },
+                        "city": { "type": "string" },
+                        "formatted_address": { "type": "string" },
+                        "geo_location": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        },
+                        "geo_viewport": {
+                            "northeast": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            },
+                            "southwest": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            }
+                        },
+                        "street": { "type": "string" },
+                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "board_id": { "type": "integer" },
+                "brin": { "type": "string", "index": "not_analyzed" },
+                "corop_area": { "type": "string" },
+                "corop_area_code": { "type": "integer" },
+                "correspondence_address": {
+                    "dynamic": true,
+                    "properties": {
+                        "address_components": {
+                            "dynamic": true,
+                            "type": "nested",
+                            "properties": {
+                                "long_name": { "type": "string" },
+                                "short_name": { "type": "string" },
+                                "types": { "type": "string" }
+                            }
+                        },
+                        "city": { "type": "string" },
+                        "formatted_address": { "type": "string" },
+                        "geo_location": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        },
+                        "geo_viewport": {
+                            "northeast": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            },
+                            "southwest": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            }
+                        },
+                        "street": { "type": "string" },
+                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "denomination": { "type": "string" },
+                "dropouts_per_year": {
+                    "dynamic": true,
+                    "type": "nested",
+                    "properties": {
+                        "sector": { "type": "string" },
+                        "total_dropouts": { "type": "integer" },
+                        "total_students": { "type": "integer" },
+                        "dropouts_with_mbo1_dimploma":  { "type": "integer" },
+                        "education_structure":  { "type": "string", "index": "not_analyzed" },
+                        "year": { "type": "integer" },
+                        "dropouts_without_diploma": { "type": "integer" },
+                        "dropouts_with_vmbo_diploma": { "type": "integer" }
+                    }
+                },
+                "dropouts_per_year_url": { "type": "string", "index": "not_analyzed" },
+                "dropouts_per_year_reference_date": { "format": "dateOptionalTime", "type": "date" },
+                "education_area": { "type": "string" },
+                "education_area_code": { "type": "integer" },
+                "education_structures": { "type": "string", "index": "not_analyzed" },
+                "meta": {
+                    "dynamic": true,
+                    "properties": {
+                        "item_scraped_at": { "format": "dateOptionalTime", "type": "date" },
+                        "scrape_started_at": { "format": "dateOptionalTime", "type": "date" },
+                        "validated_at": { "format": "dateOptionalTime", "type": "date" },
+                        "validation_result": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "municipality": { "type": "string" },
+                "municipality_code": { "type": "integer" },
+                "name": { "type": "string" },
+                "nodal_area": { "type": "string" },
+                "nodal_area_code": { "type": "integer" },
+                "phone": { "type": "string", "index": "not_analyzed" },
+                "province": { "type": "string" },
+                "reference_year": { "type": "integer" },
+                "rmc_region": { "type": "string" },
+                "rmc_region_code": { "type": "integer" },
+                "rpa_area": { "type": "string" },
+                "rpa_area_code": { "type": "integer" },
+                "website": { "type": "string", "index": "not_analyzed" },
+                "wgr_area": { "type": "string" },
+                "wgr_area_code": { "type": "integer" }
+            }
+        }
+    }
+}
