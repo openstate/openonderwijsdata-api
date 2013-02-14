@@ -45,7 +45,7 @@ API
         ]
       }
 
-   **Example: find all Lyceum's in the :ref:`schoolvodata` and :ref:`owinspdata` indexes**
+   **Example: find all Lyceum's in the Vensters voor Verantwoording and Onderwijsinspectie indexes**
 
    .. parsed-literal::
 
@@ -81,12 +81,11 @@ API
         ]
       }
 
-   :query q: a term based query that searchers the ``name``, ``address`` (``street``, ``city``, ``zip_code``) and ``website`` fields. When the query consists of multiple terms, an ``OR`` query is constructed between the terms. *Optional*.
+   :query q: a term based query that searches the ``name``, ``address`` (``street``, ``city``, ``zip_code``) and ``website`` fields by default. When the query consists of multiple terms, an ``OR`` query is constructed between the terms. Additionally the `Lucene Query syntax <http://lucene.apache.org/core/4_1_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description>`_ can be used, including searching in (combinations of) specific fields. *Optional*.
    :query brin: filter results on ``brin``. *Optional*.
    :query board_id: filter results on ``board_id``. *Optional*.
    :query branch_id: filter results on ``branch_id``. *Optional*.
    :query zip_code: filter results on ``address.zip_code``. *Optional*.
-   :query city: filter results on ``address.city``. *Optional*.
    :query indexes: comma separated list of index names that should be searched. *Optional*, *default*: search all available indexes.
    :query doctypes: comma separated list of document types that should be included in the search. *Optinal*, *default*: search all available doctypes.
    :query size: the number of documents to return. *Optional*, *default*: 10, *min*: 1, *max*: 50.
