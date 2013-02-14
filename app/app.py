@@ -59,7 +59,7 @@ class Search(restful.Resource):
     parser.add_argument('from', type=int, default=0)
 
     parser.add_argument('geo_sort', type=str)
-    parser.add_argument('geo_filter_coords', type=str)
+    parser.add_argument('geo_filter', type=str)
     parser.add_argument('geo_filter_distance', type=str, default='10km')
 
     filters = {
