@@ -140,7 +140,7 @@
                     }
                 },
                 "student_satisfaction_url": { "type": "string", "index": "not_analyzed" },
-                "website": { "type": "string", "index": "not_analyzed" },
+                "website": { "type": "string", "index": "not_analyzed" }
             }
         }
     }
