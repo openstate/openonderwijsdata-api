@@ -1,5 +1,5 @@
 from colander import (MappingSchema, SequenceSchema, SchemaNode, String,
-                      Length, Range, Int, url, Date, Invalid)
+                      Length, Range, Int, url, Date, Invalid, Float)
 from datetime import datetime, date
 
 
@@ -41,10 +41,38 @@ city = SchemaNode(String(), validator=Length(min=3, max=300))
 publication_date = SchemaNode(Date(), validator=date_today_or_earlier)
 
 
+class Coordinates(MappingSchema):
+    lat = SchemaNode(Float(), validator=Range(min=-180.0, max=180.0))
+    lon = SchemaNode(Float(), validator=Range(min=-180.0, max=180.0))
+
+
+class Viewport(MappingSchema):
+    northeast = Coordinates()
+    southwest = Coordinates()
+
+
+class AddressComponentTypes(SequenceSchema):
+    address_type = SchemaNode(String(), validator=Length(min=4, max=100))
+
+
+class AddressComponent(MappingSchema):
+    long_name = SchemaNode(String(), validator=Length(min=4, max=300))
+    short_name = SchemaNode(String(), validator=Length(min=4, max=300))
+    types = AddressComponentTypes()
+
+
+class AddressComponents(SequenceSchema):
+    address_component = AddressComponent()
+
+
 class Address(MappingSchema):
     street = SchemaNode(String(), validator=Length(min=4, max=300))
     city = city
     zip_code = SchemaNode(String(), validator=Length(min=6, max=6))
+    geo_location = Coordinates()
+    geo_viewport = Viewport()
+    formatted_address = SchemaNode(String(), validator=Length(min=3, max=300))
+    address_components = AddressComponents()
 
 
 class EducationStructures(SequenceSchema):
