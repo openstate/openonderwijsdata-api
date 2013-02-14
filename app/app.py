@@ -145,7 +145,7 @@ class Search(restful.Resource):
                     }
                 })
             else:
-                coords = re.sub(r'\s{2,}', ' ', args[arg])
+                coords = re.sub(r'\s{1,}', ' ', args[arg])
                 query['query']['filtered']['filter']['and'].append({
                     'geo_distance': {
                         field: coords.strip(),
@@ -159,7 +159,7 @@ class Search(restful.Resource):
 
         # Sort results based on distance to provided coordinate
         if args['geo_sort']:
-            coords = re.sub(r'\s{2,}', ' ', args['geo_sort'])
+            coords = re.sub(r'\s{1,}', ' ', args['geo_sort'])
             query['sort'] = {
                 '_geo_distance': {
                     'address.geo_location': coords.strip(),
