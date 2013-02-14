@@ -1,5 +1,6 @@
 {
     "vo_branch": {
+        "dynamic": true,
         "properties": {
             "address": {
                 "dynamic": true,
