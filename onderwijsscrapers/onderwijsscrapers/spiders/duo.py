@@ -214,7 +214,7 @@ class DuoVoSchools(BaseSpider):
                 'databestanden/vo/adressen/Adressen/hoofdvestigingen.asp',
                 self.parse_schools),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vschoolverlaten/vsvers/vsv_voortgezet.asp',
+                'databestanden/vschoolverlaten/vsv_voortgezet.asp',
                 self.parse_dropouts)
         ]
 
