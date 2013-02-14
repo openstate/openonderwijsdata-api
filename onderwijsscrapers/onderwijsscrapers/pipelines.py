@@ -23,7 +23,7 @@ class OnderwijsscrapersPipeline(object):
         id_fields = settings['ELASTIC_SEARCH'][spider.name]['id_fields']
         if not all(field in item for field in id_fields):
             log.msg('Dropped item, not all required fields are present. %s'
-                % item, evel=log.WARNING, spider=spider)
+                % item, level=log.WARNING, spider=spider)
             raise DropItem
             return
 
