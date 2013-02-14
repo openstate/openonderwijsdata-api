@@ -143,15 +143,37 @@ Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 **Source:** `Voortgezet onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/default.asp>`_
 
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
 .. table::
 
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    city                                string                                                                  Name of the city or village this branch is located.
-    street                              string                                                                  Street name and number of the address of this branch.
-    zip_code                            string                                                                  Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed.
-    =================================== =================================== =================================== ==========================================================================
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    address_components                  array of :ref:`duoaddresscomponent` Array of :ref:`duoaddresscomponent`, where each item represents a classification of components of the address, such as municipality, postal code, etc.
+    formatted_address                   string                              Normalised address as returned by the BAG42 geocoding API [#bag42geo]_.
+    city                                string                              Name of the city or village this branch is located.
+    street                              string                              Street name and number of the address of this branch.
+    zip_code                            string                              Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed.
+    geo_location                        :ref:`duogeoloc`                    Latitude/longitude coordinates of this address.
+    geo_viewport                        :ref:`duogeoviewport`               Latitude/longitude coordinates of the viewport for this address
+    =================================== =================================== ==========================================================================
+
+.. _duoaddresscomponent:
+
+AddressComponent
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    long_name                           string                              Full name of this component. (*i.e. "Nederland"*)
+    short_name                          string                              Abbreviated form (if applicable) of the long_name. (*i.e. "NL"*)
+    types                               array                               Array containing classifications of this component.
+    =================================== =================================== ==========================================================================
 
 .. _dropout:
 
@@ -209,6 +231,36 @@ FinancialIndicator
     staff_expenses_div_total_expenses       float                           Personele lasten/totale lasten
     year                                    integer
     ======================================= =============================== ======================================== =====================================================================
+
+.. _duogeoloc:
+
+GeoLocation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    lat                                 float                               Latitude
+    lon                                 float                               Longitude
+    =================================== =================================== ==========================================================================
+
+.. _duogeoviewport:
+
+GeoViewport
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    northeast                           :ref:`duogeoloc`                    Coordinates of the north-east coordinate of the viewport.
+    southwest                           :ref:`duogeoloc`                    Coordinates of the south-west coordinate of the viewport.
+    =================================== =================================== ==========================================================================
 
 .. _duometa:
 
@@ -323,30 +375,37 @@ vo_branch
 
 Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
 
-    =================================== =================================== ======================================================================================================
+    =================================== =================================== ==========================================================================
     Field                               Type                                Description
-    =================================== =================================== ======================================================================================================
+    =================================== =================================== ==========================================================================
+    address_components                  array of :ref:`schoolvoaddrcomp`    Array of :ref:`schoolvoaddrcomp`, where each item represents a classification of components of the address, such as municipality, postal code, etc.
+    formatted_address                   string                              Normalised address as returned by the BAG42 geocoding API [#bag42geo]_.
     city                                string                              Name of the city or village this branch is located.
     street                              string                              Street name and number of the address of this branch.
     zip_code                            string                              Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed.
-    geo_location                        :ref:`schoolvo_coordinates`         The latitude and longitude of this branch.
-    =================================== =================================== ======================================================================================================
+    geo_location                        :ref:`schoolvo_coordinates`         Latitude/longitude coordinates of this address.
+    geo_viewport                        :ref:`schoolvoviewport`             Latitude/longitude coordinates of the viewport for this address
+    =================================== =================================== ==========================================================================
 
-.. _schoolvo_coordinates:
+.. _schoolvoaddrcomp:
 
-Coordinates
+AddressComponent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
 .. table::
 
-    =================================== =================================== ======================================================================================================
+    =================================== =================================== ==========================================================================
     Field                               Type                                Description
-    =================================== =================================== ======================================================================================================
-    lat                                 float                               Latitude of the address of this branch.
-    lon                                 float                               Longitude of the address of this branch.
-    =================================== =================================== ======================================================================================================
+    =================================== =================================== ==========================================================================
+    long_name                           string                              Full name of this component. (*i.e. "Nederland"*)
+    short_name                          string                              Abbreviated form (if applicable) of the long_name. (*i.e. "NL"*)
+    types                               array                               Array containing classifications of this component.
+    =================================== =================================== ==========================================================================
 
 .. _costs:
 
@@ -411,6 +470,36 @@ EduHoursPerStructure
     hours_realised                      integer                             Hours of education realised at the school [#medezeggenschapsraad]_ for the past year.
     structure                           string                              The structure these hours apply to (*vbmo-t, havo, vwo, ...*)
     =================================== =================================== ======================================================================================================
+
+.. _schoolvo_coordinates:
+
+GeoLocation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    lat                                 float                               Latitude
+    lon                                 float                               Longitude
+    =================================== =================================== ==========================================================================
+
+.. _schoolvoviewport:
+
+GeoViewport
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    northeast                           :ref:`schoolvo_coordinates`         Coordinates of the north-east coordinate of the viewport.
+    southwest                           :ref:`schoolvo_coordinates`         Coordinates of the south-west coordinate of the viewport.
+    =================================== =================================== ==========================================================================
 
 .. _indicator:
 
@@ -492,14 +581,36 @@ vo_branch
 
 Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
 .. table::
 
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
+    address_components                  array of :ref:`owinspaddrcomp`      Array of :ref:`owinspaddrcomp`, where each item represents a classification of components of the address, such as municipality, postal code, etc.
+    formatted_address                   string                              Normalised address as returned by the BAG42 geocoding API [#bag42geo]_.
     city                                string                              Name of the city or village this branch is located.
     street                              string                              Street name and number of the address of this branch.
     zip_code                            string                              Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed.
+    geo_location                        :ref:`owinsp_coordinates`           Latitude/longitude coordinates of this address.
+    geo_viewport                        :ref:`owinspgeoviewport`            Latitude/longitude coordinates of the viewport for this address
+    =================================== =================================== ==========================================================================
+
+.. _owinspaddrcomp:
+
+AddressComponent
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    long_name                           string                              Full name of this component. (*i.e. "Nederland"*)
+    short_name                          string                              Abbreviated form (if applicable) of the long_name. (*i.e. "NL"*)
+    types                               array                               Array containing classifications of this component.
     =================================== =================================== ==========================================================================
 
 .. _owinspcurrat:
@@ -517,6 +628,36 @@ CurrentRating
     rating                              string                              Rating awarded by the Onderwijsinspectie [#owinsp]_.
     rating_excerpt                      string                              Excerpt of the rating report.
     rating_valid_since                  date                                Date this rating went into effect.
+    =================================== =================================== ==========================================================================
+
+.. _owinsp_coordinates:
+
+GeoLocation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    lat                                 float                               Latitude
+    lon                                 float                               Longitude
+    =================================== =================================== ==========================================================================
+
+.. _owinspgeoviewport:
+
+GeoViewport
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    northeast                           :ref:`owinsp_coordinates`           Coordinates of the north-east coordinate of the viewport.
+    southwest                           :ref:`owinsp_coordinates`           Coordinates of the south-west coordinate of the viewport.
     =================================== =================================== ==========================================================================
 
 .. _owinsprathist:
@@ -583,3 +724,4 @@ Report
 .. [#profiles] http://nl.wikipedia.org/wiki/Profielen_Tweede_Fase#Profielen
 .. [#lwoo] http://nl.wikipedia.org/wiki/Lwoo
 .. [#owinsp] http://nl.wikipedia.org/wiki/Inspectie_van_het_Onderwijs_(Nederland)
+.. [#bag42geo] http://calendar42.com/bag42/
