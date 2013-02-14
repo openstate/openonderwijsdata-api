@@ -7,6 +7,7 @@ from scrapy.exceptions import DropItem
 from scrapy import log
 
 from onderwijsscrapers import exporters
+from onderwijsscrapers.item_enrichment import bag42_geocode
 
 
 class OnderwijsscrapersPipeline(object):
@@ -87,5 +88,13 @@ class OnderwijsscrapersPipeline(object):
                 'item_scraped_at': datetime.utcnow().replace(tzinfo=pytz.utc)\
                     .strftime('%Y-%m-%dT%H:%M:%SZ')
             }
+
+            # Geocode if enabled for this index
+            if settings['ELASTIC_SEARCH'][spider.name]['geocode']:
+                for address_field in settings['ELASTIC_SEARCH'][spider.name]['geocode_fields']:
+                    if address_field in item:
+                        geocoded = bag42_geocode(item[address_field])
+                        if geocoded:
+                            item[address_field].update(geocoded)
 
             exporter.save(item_id, item)
