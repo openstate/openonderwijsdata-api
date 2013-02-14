@@ -22,13 +22,15 @@
                             "lat_lon": true
                         },
                         "geo_viewport": {
-                            "northeast": {
-                                "type": "geo_point",
-                                "lat_lon": true
-                            },
-                            "southwest": {
-                                "type": "geo_point",
-                                "lat_lon": true
+                            "properties": {
+                                "northeast": {
+                                    "type": "geo_point",
+                                    "lat_lon": true
+                                },
+                                "southwest": {
+                                    "type": "geo_point",
+                                    "lat_lon": true
+                                }
                             }
                         },
                         "street": { "type": "string" },
@@ -140,7 +142,7 @@
                     }
                 },
                 "student_satisfaction_url": { "type": "string", "index": "not_analyzed" },
-                "website": { "type": "string", "index": "not_analyzed" },
+                "website": { "type": "string", "index": "not_analyzed" }
             }
         }
     }
