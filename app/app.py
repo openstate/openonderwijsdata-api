@@ -2,6 +2,7 @@ from flask import Flask
 from flask.ext import restful
 from flask.ext.restful import abort, reqparse
 import rawes
+import re
 
 app = Flask(__name__)
 api = restful.Api(app)
@@ -56,6 +57,8 @@ class Search(restful.Resource):
         default=','.join(ES_DOCUMENT_TYPES))
     parser.add_argument('size', type=int, default=10)
     parser.add_argument('from', type=int, default=0)
+
+    parser.add_argument('geo_sort', type=str)
 
     filters = {
         'brin': 'brin',
@@ -141,6 +144,16 @@ class Search(restful.Resource):
         # Number of hits to return and the offset
         query['size'] = args['size']
         query['from'] = args['from']
+
+        if args['geo_sort']:
+            coords = re.sub(r'\s{2,}', ' ', args['geo_sort'])
+            query['sort'] = {
+                '_geo_distance': {
+                    'address.geo_location': coords.strip(),
+                    'order': 'asc',
+                    'unit': 'km'
+                }
+            }
 
         print query
 
