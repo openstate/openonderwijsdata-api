@@ -22,15 +22,13 @@
                             "lat_lon": true
                         },
                         "geo_viewport": {
-                            "properties": {
-                                "northeast": {
-                                    "type": "geo_point",
-                                    "lat_lon": true
-                                },
-                                "southwest": {
-                                    "type": "geo_point",
-                                    "lat_lon": true
-                                }
+                            "northeast": {
+                                "type": "geo_point",
+                                "lat_lon": true
+                            },
+                            "southwest": {
+                                "type": "geo_point",
+                                "lat_lon": true
                             }
                         },
                         "street": { "type": "string" },

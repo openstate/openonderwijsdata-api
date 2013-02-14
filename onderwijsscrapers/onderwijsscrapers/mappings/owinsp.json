@@ -1,0 +1,87 @@
+{
+    "mappings": {
+        "address": {
+            "dynamic": true,
+            "properties": {
+                "address_components": {
+                    "dynamic": true,
+                    "type": "nested",
+                    "properties": {
+                        "long_name": { "type": "string" },
+                        "short_name": { "type": "string" },
+                        "types": { "type": "string" }
+                    }
+                },
+                "city": { "type": "string" },
+                "formatted_address": { "type": "string" },
+                "geo_location": {
+                    "type": "geo_point",
+                    "lat_lon": true
+                },
+                "geo_viewport": {
+                    "properties": {
+                        "northeast": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        },
+                        "southwest": {
+                            "type": "geo_point",
+                            "lat_lon": true
+                        }
+                    }
+                },
+                "street": { "type": "string" },
+                "zip_code": { "type": "string", "index": "not_analyzed" }
+            }
+        },
+        "board": { "type": "string" },
+        "board_id": { "type": "integer" },
+        "branch_id": { "type": "integer" },
+        "brin": { "type": "string", "index": "not_analyzed" },
+        "current_ratings": {
+            "dynamic": true,
+            "type": "nested",
+            "properties": {
+                "owinsp_url": { "type": "string", "index": "not_analyzed" },
+                "rating_valid_since": { "format": "dateOptionalTime", "type": "date" },
+                "rating_excerpt": { "type": "string" },
+                "education_structure": { "type": "string", "index": "not_analyzed" },
+                "rating": { "type": "string", "index": "not_analyzed" },
+                "owinsp_id": { "type": "integer" }
+            }
+        },
+        "denomination": { "type": "string" },
+        "education_structures": { "type": "string", "index": "not_analyzed" },
+        "meta": {
+            "dynamic": true,
+            "properties": {
+                "item_scraped_at": { "format": "dateOptionalTime", "type": "date" },
+                "scrape_started_at": { "format": "dateOptionalTime", "type": "date" },
+                "validated_at": { "format": "dateOptionalTime", "type": "date" },
+                "validation_result": { "type": "string", "index": "not_analyzed" }
+            }
+        },
+        "name": { "type": "string" },
+        "rating_history": {
+            "dynamic": true,
+            "type": "nested",
+            "properties": {
+                "education_structure": { "type": "string", "index": "not_analyzed" },
+                "rating": { "type": "string", "index": "not_analyzed" },
+                "date": { "format": "dateOptionalTime", "type": "date" }
+            }
+        },
+        "reports": {
+            "dynamic": true,
+            "type": "nested",
+            "properties": {
+                "title": { "type": "string", "index": "not_analyzed" },
+                "education_structure": { "type": "string", "index": "not_analyzed" },
+                "date": { "format": "dateOptionalTime", "type": "date" },
+                "url": { "type": "string", "index": "not_analyzed" }
+            }
+        },
+        "result_card_url": { "type": "string", "index": "not_analyzed" },
+        "website": { "type": "string", "index": "not_analyzed" }
+    }
+}
