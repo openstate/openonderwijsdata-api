@@ -99,17 +99,18 @@ class OnderwijsscrapersPipeline(object):
 
                 exporter.save(item_id, item)
 
-        # Tar files
-        if export['options']['tar']:
-            log.msg('Tarring JSON files', level=log.INFO, spider=spider)
-            # Tar the JSON files
-            scrape_started = datetime.strptime(self.scrape_started,
-                '%Y-%m-%dT%H:%M:%SZ').strftime('%Y%m%d%H%M%S')
-            with tarfile.open('%s/%s-%s.tar.gz' % (settings['TAR_LOCATION'],\
-                spider.name, scrape_started), 'w:gz') as tar:
-                for f in glob.glob('%s/*.json' % (spider.name)):
-                    tar.add(f)
+            if export_method == 'file':
+                # Tar files
+                if export['options']['tar']:
+                    log.msg('Tarring JSON files', level=log.INFO, spider=spider)
+                    # Tar the JSON files
+                    scrape_started = datetime.strptime(self.scrape_started,
+                        '%Y-%m-%dT%H:%M:%SZ').strftime('%Y%m%d%H%M%S')
+                    with tarfile.open('%s/%s-%s.tar.gz' % (settings['TAR_LOCATION'],\
+                        spider.name, scrape_started), 'w:gz') as tar:
+                        for f in glob.glob('%s/*.json' % (spider.name)):
+                            tar.add(f)
 
-        # Remove files
-        if export['exporter']['options']['remove_json']:
-            shutil.rmtree('%s/%s' % (settings['EXPORT_DIR'], spider.name))
+                # Remove files
+                if export['options']['remove_json']:
+                    shutil.rmtree('%s/%s' % (settings['EXPORT_DIR'], spider.name))
