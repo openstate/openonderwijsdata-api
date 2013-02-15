@@ -29,8 +29,17 @@ SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
 # Available methods are 'elasticsearch' and 'file'
 EXPORT_METHODS = {
-    'file': exporters.FileExporter,
-    'elasticsearch': exporters.ElasticSearchExporter
+    'file': {
+        'exporter': exporters.FileExporter,
+        'options': {
+            'tar': True,
+            'remove_json': False
+        }
+    },
+    'elasticsearch': {
+        'exporter': exporters.ElasticSearchExporter,
+        'options': {}
+    }
 }
 
 # Directory to which scrape results should be saved (in case the file
