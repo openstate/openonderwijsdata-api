@@ -99,6 +99,7 @@ class OnderwijsscrapersPipeline(object):
 
                 exporter.save(item_id, item)
 
+        print export
         # Tar files
         if export['options']['tar']:
             log.msg('Tarring JSON files', level=log.INFO, spider=spider)
@@ -111,5 +112,5 @@ class OnderwijsscrapersPipeline(object):
                     tar.add(f)
 
         # Remove files
-        if export['exporter']['options']['remove_json']:
+        if export['options']['remove_json']:
             shutil.rmtree('%s/%s' % (settings['EXPORT_DIR'], spider.name))
