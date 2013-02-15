@@ -21,6 +21,12 @@ For some fields the original Dutch term is included, in order to allow the API u
 
 DUO
 ---------------------------------------------------------------------------------
+DUO publishes many different datasets, each of these datasets has a different "release cycle". Some are published annually, just before the start of the new schoolyear, others are updated on a monthly basis. To group related data we introduce the notion of a "reference year". DUO datasets that are published within the same calendar year are grouped together into a single (vo_board, vo_school or vo_branch) document. For example: DUO published the :ref:`duostdstruct` on October 1, 2012 and :ref:`duostdres` on October 2, 2012, in this case both documents are combined into a single vo_branch document with ``reference_year`` 2012. For the sake of completeness, the exact reference date of the original item is also preserved, for example in the ``student_residences_reference_date`` and ``students_by_structure_reference_date`` attributes.
+
+.. note::
+
+   Currently DUO updates general information (addresses, names, phone numbers, etc.) of educational institutions on a monthly basis. Unfortunately, historical information is not provided. This means that for some reference years the API contains information such as the financial indicators and dropouts of a school, but does not include the address or name. A plausible explanation is that because of mergers or bankruptcies the school no longer exists in recent files.
+
 .. _duovoboard:
 
 vo_board
@@ -38,14 +44,14 @@ vo_board
     correspondence_address                           :ref:`duoaddress`                                                       Correspondence address of this board.
     denomination                                     string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
     financial_key_indicators_per_year                array of :ref:`finindicator`                                            Array of :ref:`finindicator`, where each item represents a set of key financial indicators for a given year.
-    financial_key_indicators_per_year_reference_date date                                                                    Date the financial key indicator source file was published at http://data.duo.nl
+    financial_key_indicators_per_year_reference_date date                                Peiljaar                            Date the financial key indicator source file was published at http://data.duo.nl
     financial_key_indicators_per_year_url            string                                                                  URL to the financial key indicator source file at http://data.duo.nl
     meta                                             :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
     municipality                                     string                                                                  The name of the municipality this board is located in.
     municipality_code                                integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
     name                                             string                                                                  Name of the board.
     phone                                            string                                                                  Phone number of the board.
-    reference_year                                   date                                                                    Year the boards source file was published
+    reference_year                                   date                                Peiljaar                            Year the boards source file was published
     website                                          string                                                                  URL of the webpage of the board.
     ================================================ =================================== =================================== =============================================================
 
@@ -68,7 +74,7 @@ vo_school
     correspondence_address              :ref:`duoaddress`                                                       Correspondence address of this school.
     denomination                        string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
     dropouts_per_year                   array of :ref:`dropout`                                                 Array of :ref:`dropout`, where each item represents the dropouts for a specific year, per school year.
-    dropouts_per_year_reference_date    date                                                                    Date the dropouts source file was published at http://data.duo.nl.
+    dropouts_per_year_reference_date    date                                Peildatum                           Date the dropouts source file was published at http://data.duo.nl.
     dropouts_per_year_url               string                                                                  URL to the dropouts source file at http://data.duo.nl.
     education_area                      string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
     education_area_code                 integer                                                                 Identifier of the education_area.
@@ -81,7 +87,7 @@ vo_school
     nodal_area_code                     integer                                                                 Identifier of the nodal_area.
     phone                               string                                                                  Phone number of the school.
     province                            string                                                                  The province [#provinces]_ this branch is situated in.
-    reference_year                      integer                                                                 Year the schools source file was published.
+    reference_year                      integer                             Peiljaar                                    Year the schools source file was published.
     rmc_region                          string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
     rmc_region_code                     integer                                                                 Identifier of the rmc_region.
     rpa_area                            string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
@@ -121,16 +127,16 @@ vo_branch
     nodal_area_code                         integer                                                                 Identifier of the nodal_area.
     phone                                   string                                                                  Phone number of the school.
     province                                string                                                                  The province [#provinces]_ this branch is situated in.
-    reference_year                          integer                                                                 Year the schools source file was published.
+    reference_year                          integer                             Peiljaar                            Year the schools source file was published.
     rmc_region                              string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
     rmc_region_code                         integer                                                                 Identifier of the rmc_region.
     rpa_area                                string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
     rpa_area_code                           integer                                                                 Identifier of the rpa_area.
     student_residences                      array of :ref:`duostdres`                                               Array of :ref:`duostdres`, where each item contains the distribution of students from a given municipality over the years in this branch.
-    student_residences_reference_date       date                                                                    Date the student residences source file was published at http://data.duo.nl
+    student_residences_reference_date       date                                Peildatum                           Date the student residences source file was published at http://data.duo.nl
     student_residences_url                  string                                                                  URL of the student residences source file.
     students_by_structure                   array of :ref:`duostdstruct`                                            Distribution of students by education structure and gender.
-    students_by_structure_reference_date    date                                                                    Date the student per structure source file was published at http://data.
+    students_by_structure_reference_date    date                                Peildatum                           Date the student per structure source file was published at http://data.
     students_by_structure_url               string                                                                  URL of the student by structure source file.
     website                                 string                                                                  Website of this school.
     wgr_area                                string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
@@ -704,6 +710,8 @@ Report
     title                               string                              Title of the report.
     url                                 string                              URL to the full report in PDF.
     =================================== =================================== ==========================================================================
+
+**Footnotes**
 
 .. [#schoolbestuur] http://nl.wikipedia.org/wiki/Schoolbestuur
 .. [#brin] http://nl.wikipedia.org/wiki/BRIN
