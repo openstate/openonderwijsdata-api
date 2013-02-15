@@ -55,7 +55,7 @@ class OnderwijsscrapersPipeline(object):
 
     def close_spider(self, spider):
         # Setup the exporters
-        for export_method, exporter in settings.get('EXPORT_METHODS').items():
+        for export_method, export in settings.get('EXPORT_METHODS').items():
             export_settings = {
                 'scrape_started_at': self.scrape_started,
                 'spider': spider.name,
@@ -68,7 +68,7 @@ class OnderwijsscrapersPipeline(object):
                 export_settings['path'] = os.path.join(settings['EXPORT_DIR'],
                     spider.name)
 
-            exporter = exporter['exporter'](**export_settings)
+            exporter = export['exporter'](**export_settings)
 
             id_fields = settings['EXPORT_SETTINGS'][spider.name]['id_fields']
             for item_id, item in self.items.iteritems():
@@ -100,7 +100,7 @@ class OnderwijsscrapersPipeline(object):
                 exporter.save(item_id, item)
 
         # Tar files
-        if exporter['options']['tar']:
+        if export['options']['tar']:
             log.msg('Tarring JSON files', level=log.INFO, spider=spider)
             # Tar the JSON files
             scrape_started = datetime.strptime(self.scrape_started,
@@ -111,5 +111,5 @@ class OnderwijsscrapersPipeline(object):
                     tar.add(f)
 
         # Remove files
-        if exporter['exporter']['options']['remove_json']:
+        if export['exporter']['options']['remove_json']:
             shutil.rmtree('%s/%s' % (settings['EXPORT_DIR'], spider.name))
