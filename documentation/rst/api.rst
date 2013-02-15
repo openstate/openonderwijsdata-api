@@ -91,8 +91,8 @@ API
    :query size: the number of documents to return. *Optional*, *default*: 10, *min*: 1, *max*: 50.
    :query from: the offset from the first result in the result set. For example, when ``size=10`` and the total number of hits is 20, ``from=10`` will return result 10 to 20. *Optional*, *default*: 0.
    :query geo_sort: Sort results on provided coordinate. String, formatted as "*latitude*, *longitude*". *Optional*.
-   :query geo_filter: Filter results on provided coordinate. String, formatted as "*latitude*, *longitude*". *Optional*.
-   :query geo_filter_distance: Used in conjuction with **geo_filter**. Maximum distance in km of a result from the coordinate provided by **geo_filter**. *Optional*, *default*: "10km".
+   :query geo_location: Filter results on provided coordinate. String, formatted as "*latitude*, *longitude*". *Optional*.
+   :query geo_distance: Used in conjuction with **geo_filter**. Maximum distance in km of a result from the coordinate provided by **geo_filter**. *Optional*, *default*: "10km".
    :statuscode 200: OK, no errors.
    :statuscode 400: Bad Request. An accompanying error message will explain why the request was invalid.
 
