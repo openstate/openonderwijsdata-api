@@ -83,6 +83,9 @@ class OnderwijsscrapersPipeline(object):
                     del universal_item['reference_year']
                 item.update(universal_item)
 
+            if 'ignore_id_fields' in item:
+                del item['ignore_id_fields']
+
             item['meta'] = {
                 'scrape_started_at': self.scrape_started,
                 'item_scraped_at': datetime.utcnow().replace(tzinfo=pytz.utc)\
