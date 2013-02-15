@@ -15,7 +15,13 @@
                                 "types": { "type": "string" }
                             }
                         },
-                        "city": { "type": "string" },
+                        "city": {
+                            "type": "multi_field",
+                            "fields": {
+                                "city": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
                         "formatted_address": { "type": "string" },
                         "geo_location": {
                             "type": "geo_point",
@@ -33,8 +39,20 @@
                                 }
                             }
                         },
-                        "street": { "type": "string" },
-                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                        "street": {
+                            "type": "multi_field",
+                            "fields": {
+                                "street": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
+                        "zip_code": {
+                            "type": "multi_field",
+                            "fields": {
+                                "zip_code": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        }
                     }
                 },
                 "administrative_office_id": { "type": "integer" },
@@ -51,7 +69,13 @@
                                 "types": { "type": "string" }
                             }
                         },
-                        "city": { "type": "string" },
+                        "city": {
+                            "type": "multi_field",
+                            "fields": {
+                                "city": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
                         "formatted_address": { "type": "string" },
                         "geo_location": {
                             "type": "geo_point",
@@ -69,11 +93,29 @@
                                 }
                             }
                         },
-                        "street": { "type": "string" },
-                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                        "street": {
+                            "type": "multi_field",
+                            "fields": {
+                                "street": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
+                        "zip_code": {
+                            "type": "multi_field",
+                            "fields": {
+                                "zip_code": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        }
                     }
                 },
-                "denomination": { "type": "string" },
+                "denomination": {
+                    "type": "multi_field",
+                    "fields": {
+                        "denomination": { "type": "string" },
+                        "untouched": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
                 "financial_key_indicators_per_year": {
                     "dynamic": true,
                     "type": "nested",
@@ -117,7 +159,13 @@
                 },
                 "municipality": { "type": "string" },
                 "municipality_code": { "type": "integer" },
-                "name": { "type": "string" },
+                "name": {
+                    "type": "multi_field",
+                    "fields": {
+                        "name": { "type": "string" },
+                        "untouched": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
                 "phone": { "type": "string", "index": "not_analyzed" },
                 "reference_year": { "type": "integer" },
                 "website": { "type": "string", "index": "not_analyzed" }
@@ -138,7 +186,13 @@
                                 "types": { "type": "string" }
                             }
                         },
-                        "city": { "type": "string" },
+                        "city": {
+                            "type": "multi_field",
+                            "fields": {
+                                "city": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
                         "formatted_address": { "type": "string" },
                         "geo_location": {
                             "type": "geo_point",
@@ -156,8 +210,20 @@
                                 }
                             }
                         },
-                        "street": { "type": "string" },
-                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                        "street": {
+                            "type": "multi_field",
+                            "fields": {
+                                "street": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
+                        "zip_code": {
+                            "type": "multi_field",
+                            "fields": {
+                                "zip_code": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        }
                     }
                 },
                 "board_id": { "type": "integer" },
@@ -176,7 +242,13 @@
                                 "types": { "type": "string" }
                             }
                         },
-                        "city": { "type": "string" },
+                        "city": {
+                            "type": "multi_field",
+                            "fields": {
+                                "city": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
                         "formatted_address": { "type": "string" },
                         "geo_location": {
                             "type": "geo_point",
@@ -194,11 +266,29 @@
                                 }
                             }
                         },
-                        "street": { "type": "string" },
-                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                        "street": {
+                            "type": "multi_field",
+                            "fields": {
+                                "street": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
+                        "zip_code": {
+                            "type": "multi_field",
+                            "fields": {
+                                "zip_code": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        }
                     }
                 },
-                "denomination": { "type": "string" },
+                "denomination": {
+                    "type": "multi_field",
+                    "fields": {
+                        "denomination": { "type": "string" },
+                        "untouched": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
                 "dropouts_per_year": {
                     "dynamic": true,
                     "type": "nested",
@@ -229,7 +319,13 @@
                 },
                 "municipality": { "type": "string" },
                 "municipality_code": { "type": "integer" },
-                "name": { "type": "string" },
+                "name": {
+                    "type": "multi_field",
+                    "fields": {
+                        "name": { "type": "string" },
+                        "untouched": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
                 "nodal_area": { "type": "string" },
                 "nodal_area_code": { "type": "integer" },
                 "phone": { "type": "string", "index": "not_analyzed" },
@@ -260,7 +356,13 @@
                                 "types": { "type": "string" }
                             }
                         },
-                        "city": { "type": "string" },
+                        "city": {
+                            "type": "multi_field",
+                            "fields": {
+                                "city": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
                         "formatted_address": { "type": "string" },
                         "geo_location": {
                             "type": "geo_point",
@@ -278,8 +380,20 @@
                                 }
                             }
                         },
-                        "street": { "type": "string" },
-                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                        "street": {
+                            "type": "multi_field",
+                            "fields": {
+                                "street": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
+                        "zip_code": {
+                            "type": "multi_field",
+                            "fields": {
+                                "zip_code": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        }
                     }
                 },
                 "board_id": { "type": "integer" },
@@ -299,7 +413,13 @@
                                 "types": { "type": "string" }
                             }
                         },
-                        "city": { "type": "string" },
+                        "city": {
+                            "type": "multi_field",
+                            "fields": {
+                                "city": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
                         "formatted_address": { "type": "string" },
                         "geo_location": {
                             "type": "geo_point",
@@ -317,11 +437,29 @@
                                 }
                             }
                         },
-                        "street": { "type": "string" },
-                        "zip_code": { "type": "string", "index": "not_analyzed" }
+                        "street": {
+                            "type": "multi_field",
+                            "fields": {
+                                "street": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        },
+                        "zip_code": {
+                            "type": "multi_field",
+                            "fields": {
+                                "zip_code": { "type": "string" },
+                                "untouched": { "type": "string", "index": "not_analyzed" }
+                            }
+                        }
                     }
                 },
-                "denomination": { "type": "string" },
+                "denomination": {
+                    "type": "multi_field",
+                    "fields": {
+                        "denomination": { "type": "string" },
+                        "untouched": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
                 "education_area": { "type": "string" },
                 "education_area_code": { "type": "integer" },
                 "education_structures": { "type": "string", "index": "not_analyzed" },
@@ -381,7 +519,13 @@
                 },
                 "municipality": { "type": "string" },
                 "municipality_code": { "type": "integer" },
-                "name": { "type": "string" },
+                "name": {
+                    "type": "multi_field",
+                    "fields": {
+                        "name": { "type": "string" },
+                        "untouched": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
                 "nodal_area": { "type": "string" },
                 "nodal_area_code": { "type": "integer" },
                 "phone": { "type": "string", "index": "not_analyzed" },

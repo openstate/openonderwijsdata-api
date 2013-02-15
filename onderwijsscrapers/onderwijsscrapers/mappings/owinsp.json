@@ -22,7 +22,16 @@
               }
             },
             "city": {
-              "type": "string"
+              "type": "multi_field",
+              "fields": {
+                "city": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
             },
             "formatted_address": {
               "type": "string"
@@ -44,11 +53,28 @@
               }
             },
             "street": {
-              "type": "string"
+              "type": "multi_field",
+              "fields": {
+                "street": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
             },
             "zip_code": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "multi_field",
+              "fields": {
+                "zip_code": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
             }
           }
         },
@@ -94,7 +120,16 @@
           }
         },
         "denomination": {
-          "type": "string"
+          "type": "multi_field",
+          "fields": {
+            "denomination": {
+              "type": "string"
+            },
+            "untouched": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
         },
         "education_structures": {
           "type": "string",
@@ -122,7 +157,16 @@
           }
         },
         "name": {
-          "type": "string"
+          "type": "multi_field",
+          "fields": {
+            "name": {
+              "type": "string"
+            },
+            "untouched": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
         },
         "rating_history": {
           "dynamic": true,

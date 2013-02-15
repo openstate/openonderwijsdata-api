@@ -1,0 +1,42 @@
+{
+    "mappings": {
+        "doc_validation": {
+            "dynamic": true,
+            "properties": {
+                "doc_id": {
+                    "type": "multi_field",
+                    "fields": {
+                        "doc_id": { "type": "string" },
+                        "untouched": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "doc_type": {
+                    "type": "multi_field",
+                    "fields": {
+                        "doc_type": { "type": "string" },
+                        "untouched": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "index": {
+                    "type": "multi_field",
+                    "fields": {
+                        "index": { "type": "string" },
+                        "untouched": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "item_scraped_at": { "format": "dateOptionalTime", "type": "date" },
+                "messages": {
+                    "dynamic": true,
+                    "type": "nested",
+                    "properties": {
+                        "message": { "type": "string", "index": "not_analyzed" },
+                        "field": { "type": "string", "index": "not_analyzed" }
+                    }
+                },
+                "result": { "type": "string", "index": "not_analyzed" },
+                "scrape_started_at": { "format": "dateOptionalTime", "type": "date" },
+                "validated_at": { "format": "dateOptionalTime", "type": "date" }
+            }
+        }
+    }
+}
