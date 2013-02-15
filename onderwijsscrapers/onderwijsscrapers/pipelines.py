@@ -105,8 +105,8 @@ class OnderwijsscrapersPipeline(object):
             # Tar the JSON files
             scrape_started = datetime.strptime(self.scrape_started,
                 '%Y-%m-%dT%H:%M:%SZ').strftime('%Y%m%d%H%M%S')
-            with tarfile.open('%s/%s-%s.tar.gz' % (settings['EXPORT_DIR'],\
-                scrape_started, spider.name), 'w:gz') as tar:
+            with tarfile.open('%s/%s-%s.tar.gz' % (settings['TAR_LOCATION'],\
+                spider.name, scrape_started), 'w:gz') as tar:
                 for f in glob.glob('%s/*.json' % (spider.name)):
                     tar.add(f)
 

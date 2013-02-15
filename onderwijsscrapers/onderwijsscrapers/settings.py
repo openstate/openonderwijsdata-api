@@ -27,6 +27,13 @@ ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
 
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
+# Directory to which scrape results should be saved (in case the file
+# exporter is used).
+EXPORT_DIR = os.path.join(PROJECT_ROOT, 'export')
+
+# Directory to which tarred results should be moved
+TAR_LOCATION = EXPORT_DIR
+
 # Available methods are 'elasticsearch' and 'file'
 EXPORT_METHODS = {
     'file': {
@@ -41,10 +48,6 @@ EXPORT_METHODS = {
         'options': {}
     }
 }
-
-# Directory to which scrape results should be saved (in case the file
-# exporter is used).
-EXPORT_DIR = os.path.join(PROJECT_ROOT, 'export')
 
 from validation.duo import DuoVoSchool, DuoVoBoard, DuoVoBranch
 from validation.schoolvo import SchoolVOBranch
