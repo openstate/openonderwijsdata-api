@@ -1,4 +1,5 @@
 import os
+import exporters
 
 BOT_NAME = 'onderwijsscrapers'
 BOT_VERSION = '1.0'
@@ -27,7 +28,10 @@ ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
 # Available methods are 'elasticsearch' and 'file'
-EXPORT_METHOD = 'elasticsearch'
+EXPORT_METHODS = {
+    'file': exporters.FileExporter,
+    'elasticsearch': exporters.ElasticSearchExporter
+}
 
 # Directory to which scrape results should be saved (in case the file
 # exporter is used).
@@ -37,7 +41,7 @@ from validation.duo import DuoVoSchool, DuoVoBoard, DuoVoBranch
 from validation.schoolvo import SchoolVOBranch
 from validation.owinsp import OnderwijsInspectieVoBranch
 
-ELASTIC_SEARCH = {
+EXPORT_SETTINGS = {
     'po.owinsp.nl': {
         'url': '',
         'index': '',
