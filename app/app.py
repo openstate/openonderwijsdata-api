@@ -57,10 +57,9 @@ class Search(restful.Resource):
         default=','.join(ES_DOCUMENT_TYPES))
     parser.add_argument('size', type=int, default=10)
     parser.add_argument('from', type=int, default=0)
-
-    parser.add_argument('geo_sort', type=str)
-    parser.add_argument('geo_filter', type=str)
-    parser.add_argument('geo_filter_distance', type=str, default='10km')
+    parser.add_argument('geo_location', type=str)
+    parser.add_argument('geo_distance', type=str, default='10km')
+    parser.add_argument('sort', type=str)
 
     filters = {
         'brin': 'brin',
@@ -68,7 +67,7 @@ class Search(restful.Resource):
         'branch_id': 'branch_id',
         'zip_code': 'address.zip_code',
         'city': 'address.city',
-        'geo_filter_coords': 'address.geo_location'
+        'geo_location': 'address.geo_location'
     }
 
     def get(self):
@@ -131,13 +130,13 @@ class Search(restful.Resource):
                 query['query']['filtered']['filter'] = {'and': []}
 
             arg_value = args[arg]
-            if type(arg_value) is str and arg != 'geo_filter_coords':
+            if type(arg_value) is str and arg != 'geo_location':
                 arg_value = arg_value.lower().split(' ')
 
             if type(arg_value) is int:
                 arg_value = [arg_value]
 
-            if arg != 'geo_filter_coords':
+            if arg != 'geo_location':
                 query['query']['filtered']['filter']['and'].append({
                     'terms': {
                         field: arg_value,
@@ -148,8 +147,8 @@ class Search(restful.Resource):
                 coords = re.sub(r'\s{1,}', ' ', args[arg])
                 query['query']['filtered']['filter']['and'].append({
                     'geo_distance': {
-                        field: coords.strip(),
-                        'distance': args['geo_filter_distance']
+                        field: coords,
+                        'distance': args['geo_distance']
                     }
                 })
 
