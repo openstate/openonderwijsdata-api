@@ -75,7 +75,7 @@
                                 "city": { "type": "string" },
                                 "untouched": { "type": "string", "index": "not_analyzed" }
                             }
-                        }
+                        },
                         "formatted_address": { "type": "string" },
                         "geo_location": {
                             "type": "geo_point",
