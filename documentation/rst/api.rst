@@ -86,12 +86,13 @@ API
    :query board_id: filter results on ``board_id``. *Optional*.
    :query branch_id: filter results on ``branch_id``. *Optional*.
    :query zip_code: filter results on ``address.zip_code``. *Optional*.
+   :query geo_location: Filter results on provided coordinate. String, formatted as "*latitude*, *longitude*". *Optional*.
+   :query geo_distance: Used in conjuction with **geo_filter**. Maximum distance in km of a result from the coordinate provided by **geo_filter**. *Optional*, *default*: "10km".
+   :query sort: sort the search results by a given field. *Optional*, *default*: sort by relevance to query q.
    :query indexes: comma separated list of index names that should be searched. *Optional*, *default*: search all available indexes.
    :query doctypes: comma separated list of document types that should be included in the search. *Optional*, *default*: search all available doctypes.
    :query size: the number of documents to return. *Optional*, *default*: 10, *min*: 1, *max*: 50.
    :query from: the offset from the first result in the result set. For example, when ``size=10`` and the total number of hits is 20, ``from=10`` will return result 10 to 20. *Optional*, *default*: 0.
-   :query geo_location: Filter results on provided coordinate. String, formatted as "*latitude*, *longitude*". *Optional*.
-   :query geo_distance: Used in conjuction with **geo_filter**. Maximum distance in km of a result from the coordinate provided by **geo_filter**. *Optional*, *default*: "10km".
    :statuscode 200: OK, no errors.
    :statuscode 400: Bad Request. An accompanying error message will explain why the request was invalid.
 
@@ -131,3 +132,5 @@ API
    :statuscode 200: OK, no errors.
    :statuscode 400: Bad Request. An accompanying error message will explain why the request was invalid.
    :statuscode 404: Not Found. The requested document does not exist.
+
+.. http:get:: /api/v1/get_validation_results/(str:index)/(str:doctype)/(str:doc_id)
