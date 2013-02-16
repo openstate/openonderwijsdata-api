@@ -231,7 +231,7 @@
         "name": {
           "type": "multi_field",
           "fields": {
-            "denomination": {
+            "name": {
               "type": "string"
             },
             "untouched": {
