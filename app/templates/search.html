@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block main %}
+Found {{ hits.total }} documents in {{ hits.took }}ms. {% if hits.total > 20 %}Showing 20 documents.{% endif %}
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Index</th>
+			<th>Type</th>
+			<th>BRIN</th>
+			<th>Board ID</th>
+			<th>Branch ID</th>
+			<th></th>
+			<th>Ref. year</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for hit in hits['hits'] %}
+		<tr>
+			<td>{{ hit['_index'] }}</td>
+			<td>{{ hit['_type'] }}</td>
+			<td>{{ hit['_source'].brin }}</td>
+			<td>{{ hit['_source'].board_id }}</td>
+			<td>{{ hit['_source'].branch_id }}</td>
+			<td>
+				<address>
+					<strong>{{ hit['_source'].name }}</strong><br>
+					{{ hit['_source'].address.street }}<br>
+					{{ hit['_source'].address.zip_code }} {{ hit['_source'].address.city }}<br>
+				</address>
+			</td>
+			<td>{{ hit['_source'].reference_year }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

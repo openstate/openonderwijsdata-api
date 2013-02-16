@@ -15,4 +15,5 @@ OpenOnderwijs API Documentation
    rst/data
    rst/validation
    rst/api
+   rst/todo
 

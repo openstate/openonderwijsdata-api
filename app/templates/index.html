@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="jumbotron">
+	<form class="form-search" action="/search" method="GET">
+		<div class="input-append">
+			<input name="q" type="text" placeholder="Enter a name, place, zip code or BRIN" class="input-xxlarge search-query">
+			<button type="submit" class="btn">Search</button>
+			</div>
+	</form>
+</div>
+
+<hr>
+
+<div class="row-fluid marketing">
+	<div class="span4">
+		<h4>DUO</h4>
+		<ul class="unstyled">
+			<li><span><abbr title="Vestigingen schoolen voortgezet onderwijs">VO School branches</abbr></span></li>
+			<ul>
+			{% for year in counts['duo_vo_branches']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+			{% endfor %}
+			</ul>
+			<li><span><abbr title="Bevoegde gezagen voortgezet onderwijs">VO School boards</abbr></span></li>
+			<ul>
+			{% for year in counts['duo_vo_boards']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+			{% endfor %}
+			</ul>
+			<li><span><abbr title="Hoofdvestigingen scholen voortgezet onderwijs">VO Schools</abbr></span></li>
+			<ul>
+			{% for year in counts['duo_vo_schools']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+			{% endfor %}
+			</ul>
+		</ul>
+	</div>
+	<div class="span4">
+		<h4>Onderwijsinspectie</h4>
+		<ul class="unstyled">
+			<li>
+				<span><abbr title="Vestigingen schoolen voortgezet onderwijs">VO School branches</abbr></span>
+				<span class="badge pull-right">{{ counts['onderwijsinspectie']['facets']['doc_types']['total'] }}</span>
+			</li>
+		</ul>
+	</div>
+	<div class="span4">
+		<h4>Venster voor Verantwoording</h4>
+		<ul class="unstyled">
+			<li>
+				<span><abbr title="Vestigingen schoolen voortgezet onderwijs">VO School branches</abbr></span>
+				<span class="badge pull-right">{{ counts['schoolvo']['facets']['doc_types']['total'] }}</span>
+			</li>
+		</ul>
+	</div>
+</div>
+{% endblock %}
