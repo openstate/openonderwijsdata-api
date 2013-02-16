@@ -1,8 +1,7 @@
 Todo's
 =============================================
 
-* Add DUO data covering school staff (http://data.duo.
-nl/organisatie/open_onderwijsdata/databestanden/vo/personeel/default.asp).
+* Add DUO data covering school staff (http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/personeel/default.asp).
 * Look add document validation methods. Show common problems.
 * Clean up documentation
 * Put everything on Github
