@@ -1,9 +1,6 @@
-import glob
-import os
 from datetime import datetime
 import pytz
-import shutil
-import tarfile
+
 
 from scrapy.conf import settings
 from scrapy.exceptions import DropItem
@@ -11,6 +8,7 @@ from scrapy import log
 
 # from onderwijsscrapers import exporters
 from onderwijsscrapers.item_enrichment import bag42_geocode
+from onderwijsscrapers.validation import validate
 
 
 class OnderwijsscrapersPipeline(object):
@@ -54,63 +52,69 @@ class OnderwijsscrapersPipeline(object):
         return item
 
     def close_spider(self, spider):
-        # Setup the exporters
-        for export_method, export in settings.get('EXPORT_METHODS').items():
-            export_settings = {
-                'scrape_started_at': self.scrape_started,
-                'spider': spider.name,
-                'config': settings['EXPORT_SETTINGS'][spider.name],
-                'url': settings['EXPORT_SETTINGS'][spider.name]['url'],
-                'index': settings['EXPORT_SETTINGS'][spider.name]['index'],
-                'doctype': settings['EXPORT_SETTINGS'][spider.name]['doctype']
-            }
-            if export_method == 'file':
-                export_settings['path'] = os.path.join(settings['EXPORT_DIR'],
-                    spider.name)
+        export_settings = settings['EXPORT_SETTINGS'][spider.name]
 
-            exporter = export['exporter'](**export_settings)
+        items = {}
+        validation_reports = []
 
-            id_fields = settings['EXPORT_SETTINGS'][spider.name]['id_fields']
-            for item_id, item in self.items.iteritems():
-                universal_item = 'None-%s' % '-'.join([str(item[field]) for field in \
+        # Add metadata to items and (if required) merge universal items.
+        # Also validate and perform 'item_enrichment' functions
+        # (i.e. geocodeing).
+        id_fields = export_settings['id_fields']
+        for item_id, item in self.items.iteritems():
+            universal_item = 'None-%s' % '-'.join([str(item[field]) for field in \
                     id_fields[1:]])
-                if universal_item in self.universal_items:
-                    universal_item = self.universal_items[universal_item]
-                    if 'reference_year' in universal_item:
-                        del universal_item['reference_year']
-                    item.update(universal_item)
+            if universal_item in self.universal_items:
+                universal_item = self.universal_items[universal_item]
+                if 'reference_year' in universal_item:
+                    del universal_item['reference_year']
+                item.update(universal_item)
 
-                if 'ignore_id_fields' in item:
-                    del item['ignore_id_fields']
+            if 'ignore_id_fields' in item:
+                del item['ignore_id_fields']
 
-                item['meta'] = {
-                    'scrape_started_at': self.scrape_started,
-                    'item_scraped_at': datetime.utcnow().replace(tzinfo=pytz.utc)\
-                        .strftime('%Y-%m-%dT%H:%M:%SZ')
-                }
+            item['meta'] = {
+                'scrape_started_at': self.scrape_started,
+                'item_scraped_at': datetime.utcnow().replace(tzinfo=pytz.utc)\
+                    .strftime('%Y-%m-%dT%H:%M:%SZ')
+            }
 
-                # Geocode if enabled for this index
-                if settings['EXPORT_SETTINGS'][spider.name]['geocode']:
-                    for address_field in settings['EXPORT_SETTINGS'][spider.name]['geocode_fields']:
-                        if address_field in item:
-                            geocoded = bag42_geocode(item[address_field])
-                            if geocoded:
-                                item[address_field].update(geocoded)
+            # Geocode if enabled for this index
+            if export_settings['geocode']:
+                for address_field in export_settings['geocode_fields']:
+                    if address_field in item:
+                        geocoded = bag42_geocode(item[address_field])
+                        if geocoded:
+                            item[address_field].update(geocoded)
 
-                exporter.save(item_id, item)
+            # Validate the item is this is enabled
+            if export_settings['validate']:
+                item, validation = validate(export_settings['schema'],
+                    export_settings['index'], export_settings['doctype'],
+                    item_id, item)
 
-            if export_method == 'file':
-                # Tar files
-                if export['options']['tar']:
-                    log.msg('Tarring JSON files', level=log.INFO, spider=spider)
-                    # Tar the JSON files
-                    scrape_started = datetime.strptime(self.scrape_started,
-                        '%Y-%m-%dT%H:%M:%SZ').strftime('%Y%m%d%H%M%S')
-                    with tarfile.open('%s/%s-%s.tar.gz' % (settings['TAR_LOCATION'],\
-                        spider.name, scrape_started), 'w:gz') as tar:
-                        for f in glob.glob('%s/*.json' % (spider.name)):
-                            tar.add(f)
+                validation_reports.append(validation)
 
-                # Remove files
-                if export['options']['remove_json']:
-                    shutil.rmtree('%s/%s' % (settings['EXPORT_DIR'], spider.name))
+            items[item_id] = item
+
+        for method, method_properties in settings['EXPORT_METHODS'].items():
+            # Export the document
+            exporter = method_properties['exporter'](self.scrape_started,
+                export_settings['index'], export_settings['doctype'],
+                **method_properties['options'])
+
+            for item_id, item in items.iteritems():
+                exporter.save(item, item_id)
+
+            exporter.close()
+
+            # Export validation documents
+            if export_settings['validate']:
+                exporter = method_properties['exporter'](self.scrape_started,
+                export_settings['validation_index'], 'doc_validation',
+                **method_properties['options'])
+
+                for item in validation_reports:
+                    exporter.save(item)
+
+                exporter.close()

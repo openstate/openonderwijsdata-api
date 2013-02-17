@@ -31,23 +31,25 @@ SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 # exporter is used).
 EXPORT_DIR = os.path.join(PROJECT_ROOT, 'export')
 
-# Directory to which tarred results should be moved
-TAR_LOCATION = EXPORT_DIR
-
 # Available methods are 'elasticsearch' and 'file'
 EXPORT_METHODS = {
     'file': {
         'exporter': exporters.FileExporter,
         'options': {
-            'tar': True,
+            'export_dir': EXPORT_DIR,
+            'create_tar': True,
             'remove_json': False
         }
     },
     'elasticsearch': {
         'exporter': exporters.ElasticSearchExporter,
-        'options': {}
+        'options': {
+            'url': '127.0.0.1:9200'
+        }
     }
 }
+
+ENABLED_EXPORTERS = ['file', 'tar', 'elasticsearch']
 
 from validation.duo import DuoVoSchool, DuoVoBoard, DuoVoBranch
 from validation.schoolvo import SchoolVOBranch
@@ -65,7 +67,6 @@ EXPORT_SETTINGS = {
         'validation_index': 'onderwijsdata_validation',
         'geocode': True,
         'geocode_fields': ['address'],
-        'url': '127.0.0.1:9200',
         'index': 'onderwijsinspectie',
         'doctype': 'vo_branch',
         'id_fields': ['brin', 'branch_id']
@@ -76,7 +77,6 @@ EXPORT_SETTINGS = {
         'validation_index': 'onderwijsdata_validation',
         'geocode': True,
         'geocode_fields': ['address'],
-        'url': '127.0.0.1:9200',
         'index': 'schoolvo',
         'doctype': 'vo_branch',
         'id_fields': ['brin', 'branch_id']
@@ -87,7 +87,6 @@ EXPORT_SETTINGS = {
         'validation_index': 'onderwijsdata_validation',
         'geocode': True,
         'geocode_fields': ['address'],
-        'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'vo_branch',
         'id_fields': ['reference_year', 'brin', 'branch_id']
@@ -96,9 +95,8 @@ EXPORT_SETTINGS = {
         'validate': True,
         'schema': DuoVoBoard,
         'validation_index': 'onderwijsdata_validation',
-        'geocode': True,
+        'geocode': False,
         'geocode_fields': ['address', 'correspondence_address'],
-        'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'vo_board',
         'id_fields': ['reference_year', 'board_id']
@@ -109,7 +107,6 @@ EXPORT_SETTINGS = {
         'validation_index': 'onderwijsdata_validation',
         'geocode': True,
         'geocode_fields': ['address', 'correspondence_address'],
-        'url': '127.0.0.1:9200',
         'index': 'duo',
         'doctype': 'vo_school',
         'id_fields': ['reference_year', 'brin']
