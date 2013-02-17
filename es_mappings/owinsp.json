@@ -88,8 +88,16 @@
           "type": "integer"
         },
         "brin": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "multi_field",
+          "fields": {
+            "brin": {
+              "type": "string"
+            },
+            "untouched": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
         },
         "current_ratings": {
           "dynamic": true,
