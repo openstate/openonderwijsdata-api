@@ -22,6 +22,7 @@ class ElasticSearchExporter(Exporter):
         super(ElasticSearchExporter, self).__init__(crawl_started_at, index,
             doctype)
 
+        self.url = url
         self.es = rawes.Elastic(self.url)
 
     def save(self, item, doc_id=None):

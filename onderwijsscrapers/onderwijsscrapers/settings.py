@@ -95,7 +95,7 @@ EXPORT_SETTINGS = {
         'validate': True,
         'schema': DuoVoBoard,
         'validation_index': 'onderwijsdata_validation',
-        'geocode': False,
+        'geocode': True,
         'geocode_fields': ['address', 'correspondence_address'],
         'index': 'duo',
         'doctype': 'vo_board',
