@@ -276,8 +276,9 @@ class SchoolVOSpider(BaseSpider):
                         'failed': profile_total - profile_passed
                     })
 
-            # Append last graduation dict
-            graduations.append(graduation)
+            if graduation:
+                # Append last graduation dict
+                graduations.append(graduation)
 
         school['graduations'] = graduations
 
@@ -464,8 +465,9 @@ class SchoolVOSpider(BaseSpider):
                         }
                         year['per_structure'].append(struct)
 
-            # Append last year
-            per_year.append(year)
+            if year:
+                # Append last year
+                per_year.append(year)
 
         school['avg_education_hours_per_student'] = per_year
         school['avg_education_hours_per_student_url'] = response.url
