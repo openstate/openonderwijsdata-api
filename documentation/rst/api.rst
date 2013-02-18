@@ -88,7 +88,8 @@ API
    :query zip_code: filter results on ``address.zip_code``. *Optional*.
    :query geo_location: Filter results on provided coordinate. String, formatted as "*latitude*, *longitude*". *Optional*.
    :query geo_distance: Used in conjuction with **geo_filter**. Maximum distance in km of a result from the coordinate provided by **geo_filter**. *Optional*, *default*: "10km".
-   :query sort: sort the search results by a given field. *Optional*, *default*: sort by relevance to query q.
+   :query sort: sort the search results by a given field. Use the value ``distance`` in conjunction with ``geo_location`` to sort results by distance to a given coordinate. *Optional*, *default*: sort by relevance to query q.
+   :query order: Return results in descending (``desc``) or ascending (``asc``) order.*Optional*, *default*: ``asc``.
    :query indexes: comma separated list of index names that should be searched. *Optional*, *default*: search all available indexes.
    :query doctypes: comma separated list of document types that should be included in the search. *Optional*, *default*: search all available doctypes.
    :query size: the number of documents to return. *Optional*, *default*: 10, *min*: 1, *max*: 50.
