@@ -406,7 +406,10 @@ class DuoVoBranchesSpider(BaseSpider):
                  self.parse_students_per_branch),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
                 'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp',
-                self.student_graduations)
+                self.student_graduations),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
+                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp',
+                self.student_exam_grades)
         ]
 
     def parse_branches(self, response):
@@ -899,6 +902,104 @@ class DuoVoBranchesSpider(BaseSpider):
                     graduations_reference_url=csv_url,
                     graduations_reference_date=reference_date,
                     graduations=[graduations[year] for year in graduations]
+                )
+
+                yield school
+
+    def student_exam_grades(self, response):
+        """
+        Parse "07. Geslaagden, gezakten en gemiddelde examencijfers per instelling"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                .decode('cp1252').encode('utf8')), delimiter=';')
+
+            school_ids = {}
+            grades_per_school = {}
+            for row in csv_file:
+                print row
+                # Remove newline chars and strip leading and trailing
+                # whitespace.
+                for key in row.keys():
+                    c_key = key.replace('\n', '')
+                    row[c_key] = row[key].strip()
+
+                    if not row[c_key]:
+                        del row[c_key]
+
+                brin = row['BRIN NUMMER']
+                branch_id = int(row['VESTIGINGSNUMMER'].replace(brin, ''))
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                grades = {
+                    'education_structure': row['ONDERWIJSTYPE VO']
+                }
+
+                if 'LEERWEG VMBO' in row:
+                    grades['education_structure'] += '-%s' % row['LEERWEG VMBO']
+
+                if 'VMBO SECTOR' in row:
+                    grades['vmbo_sector'] = row['VMBO SECTOR']
+
+                if 'AFDELING' in row:
+                    grades['sector'] = row['AFDELING']
+
+                if 'EXAMENKANDIDATEN' in row:
+                    grades['candidates'] = int(row['EXAMENKANDIDATEN'])
+
+                if 'GESLAAGDEN' in row:
+                    grades['passed'] = int(row['GESLAAGDEN'])
+
+                if 'GEZAKTEN' in row:
+                    grades['failed'] = int(row['GEZAKTEN'])
+
+                if 'GEMIDDELD CIJFER SCHOOLEXAMEN' in row:
+                    grades['avg_grade_school_exam'] = float(row['GEMIDDELD '
+                        'CIJFER SCHOOLEXAMEN'].replace(',', '.'))
+
+                if 'GEMIDDELD CIJFER CENTRAAL EXAMEN' in row:
+                    grades['avg_grade_central_exam'] = float(row['GEMIDDELD '
+                        'CIJFER CENTRAAL EXAMEN'].replace(',', '.'))
+
+                if 'GEMIDDELD CIJFER CIJFERLIJST' in row:
+                    grades['avg_final_grade'] = float(row['GEMIDDELD CIJFER '
+                        'CIJFERLIJST'].replace(',', '.'))
+
+                if school_id not in grades_per_school:
+                    grades_per_school[school_id] = []
+
+                grades_per_school[school_id].append(grades)
+
+            for school_id, grades in grades_per_school.iteritems():
+                school = DuoVoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    exam_grades_reference_url=csv_url,
+                    exam_grades_reference_date=reference_date,
+                    exam_grades=grades
                 )
 
                 yield school

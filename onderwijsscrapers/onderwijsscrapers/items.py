@@ -108,6 +108,12 @@ class DuoVoBranch(SchoolItem):
     graduations_reference_date = Field()
     graduations = Field()
 
+    # Contents of "07. Geslaagden, gezakten en gemiddelde examencijfers
+    # per instelling"
+    exam_grades_reference_url = Field()
+    exam_grades_reference_date = Field()
+    exam_grades = Field()
+
 
 class DuoVoSchool(SchoolItem):
     ignore_id_fields = Field()
