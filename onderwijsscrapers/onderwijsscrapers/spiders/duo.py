@@ -934,7 +934,6 @@ class DuoVoBranchesSpider(BaseSpider):
             school_ids = {}
             grades_per_school = {}
             for row in csv_file:
-                print row
                 # Remove newline chars and strip leading and trailing
                 # whitespace.
                 for key in row.keys():
