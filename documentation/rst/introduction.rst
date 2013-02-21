@@ -31,6 +31,8 @@ Currently included data
     * General information: board id, BRIN, branch id, website, etc.
     * Origin of students per year (*Leerlingen per vestiging naar postcode leerling en leerjaar*)
     * Students per education structure (*Leerlingen per vestiging naar onderwijstype, lwoo indicatie, sector, afdeling, opleiding*)
+    * Exam candidates per year, education structure and gender (*Examenkandidaten en geslaagden*)
+    * School and central exam results per year and education structure (*Geslaagden, gezakten en gemiddelde examencijfers*)
 
 * Onderwijsinspectie
 
