@@ -132,12 +132,18 @@ vo_branch
     rmc_region_code                         integer                                                                 Identifier of the rmc_region.
     rpa_area                                string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
     rpa_area_code                           integer                                                                 Identifier of the rpa_area.
-    student_residences                      array of :ref:`duostdres`                                               Array of :ref:`duostdres`, where each item contains the distribution of students from a given municipality over the years in this branch.
+    student_residences                      :ref:`duostdres`                                                        Array of :ref:`duostdres`, where each item contains the distribution of students from a given municipality over the years in this branch.
     student_residences_reference_date       date                                Peildatum                           Date the student residences source file was published at http://data.duo.nl
     student_residences_url                  string                                                                  URL of the student residences source file.
-    students_by_structure                   array of :ref:`duostdstruct`                                            Distribution of students by education structure and gender.
-    students_by_structure_reference_date    date                                Peildatum                           Date the student per structure source file was published at http://data.
+    students_by_structure                   :ref:`duostdstruct`                                                     Distribution of students by education structure and gender.
+    students_by_structure_reference_date    date                                Peildatum                           Date the student per structure source file was published at http://data.duo.nl
     students_by_structure_url               string                                                                  URL of the student by structure source file.
+    graduations                             array of :ref:`graduation`          Examenkandidaten en geslaagden      Array of :ref:`graduation` where each item represents a school year. For each year information on the number of passed, failed and candidates is available. A futher breakdown in department and gender is also available.
+    graduations_reference_date              date                                Peildatum                           Date the graduations source file was published at http://data.duo.nl
+    graduations_url                         string                                                                  URL to the dropouts source file at http://data.duo.nl/
+    exam_grades                             array of :ref:`examgrades`          Eindcijfers                         School and central exam grades per education structure and sector.
+    exam_grades_reference_date              date                                Peildatum                           Date the exam grades source file was published at http://data/duo.nl
+    exam_grades_url                         string                                                                  URL to the exam grades source file at http://data.duo.nl/
     website                                 string                                                                  Website of this school.
     wgr_area                                string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
     wgr_area_code                           integer                                                                 Identifier of the wgr_area.
@@ -201,6 +207,55 @@ Dropout
     total_students                          integer                                                                 Total students for the given year at this school.
     year                                    integer                                                                 The year the dropout numbers apply to.
     ======================================= =================================== =================================== ======================================================================
+
+.. _graduation:
+
+Graduation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Leerlingen - 06. Examenkandidaten en geslaagden <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp>`_
+
+.. table::
+
+    ======================================= ==================================== =================================== ======================================================================
+    Field                                   Type                                 Original term                       Description
+    ======================================= ==================================== =================================== ======================================================================
+    year                                    string                               Schooljaar                          The school year the graduations applay to
+    candidates                              integer                                                                  The total number of exam candidates for this school year
+    passed                                  integer                                                                  The number of candidates that graduated
+    failed                                  integer                                                                  The number of candidates that did not graduate
+    per_department                          array of :ref:`_graduationdepartment                                     Breakdown of the candidate and graduation results by deparment and gender
+    ======================================= ==================================== =================================== ======================================================================
+
+.. _graduationdepartment:
+
+GraduationPerDepartment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Belongs to :ref:`graduationdepartment`.
+
+**Source:** `Voortgezet onderwijs - Leerlingen - 06. Examenkandidaten en geslaagden <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp>`_
+
+.. table::
+
+    ======================================= =================================== =================================== ======================================================================
+    Field                                   Type                                Original term                       Description
+    ======================================= =================================== =================================== ======================================================================
+    education_structure                     string                              ONDERWIJSTYPE VO                    
+    inspectioncode                          string                                                                  
+    department                              string                              OPLEIDINGSNAAM                      
+    candidates                              Object                                                                  
+    - unknown                               integer
+    - male                                  integer
+    - female                                integer
+    passed
+    - unknown                               integer
+    - male                                  integer
+    - female                                integer
+    failed
+    - unknown                               integer
+    - male                                  integer
+    - female                                integer
+    ======================================= =================================== =================================== ======================================================================
+
 
 .. _finindicator:
 
@@ -332,6 +387,27 @@ StudentPerStructure
     year_6                              mapping                                                                 Distribution of male and female students for year 6.
     =================================== =================================== =================================== ==========================================================================
 
+
+.. _examgrades:
+
+ExamGrades
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Leerlingen - 07. Geslaagden, gezakten en gemiddelde examencijfers per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp>`_
+
+.. table::
+
+    =================================== =================================== =================================== ==========================================================================
+    Field                               Type                                Original term                       Description
+    =================================== =================================== =================================== ==========================================================================
+    sector                              string                              Afdeling                            E.g. "Cultuur en Maatschappij"        
+    education_structure                 string                              Onderwijstype VO                    E.g. "HAVO"
+    candidates                          integer                                                                 The total number of exam candidates for this school year
+    passed                              integer                                                                 The number of candidates that graduated
+    failed                              integer                                                                 The number of candidates that did not graduate
+    avg_grade_school_exam               float                               Gemiddeld cijfer schoolexamen       
+    avg_grade_central_exam              float                               Gemiddeld cijfer centraal examen    
+    avg_final_grade                     float                               Gemiddeld cijfer cijferlijst        
+    =================================== =================================== =================================== ==========================================================================
 
 .. _schoolvodata:
 
