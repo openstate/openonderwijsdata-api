@@ -66,7 +66,7 @@ GRADES = {
         'BAmvtcec': {'name': 'Engels, Frans, Duits', 'indicator': 'BAmvtbol'},
         'BAzaacec': {'name': 'Aardrijkskunde, Geschiedenis', 'indicator': 'BAzaabol'},
         'BAecocec': {'name': 'Economische vakken', 'indicator': 'BAecobol'},
-        'BAexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde', 'indicator': 'BAexbol'}
+        'BAexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde', 'indicator': 'BAexabol'}
     },
     'VMBO-K': {
         'KAtotcec': {'name': 'Alle vakken', 'indicator': 'KAtotbol'},
@@ -74,7 +74,7 @@ GRADES = {
         'KAmvtcec': {'name': 'Engels, Frans, Duits', 'indicator': 'KAmvtbol'},
         'KAzaacec': {'name': 'Aardrijkskunde, Geschiedenis', 'indicator': 'KAzaabol'},
         'KAecocec': {'name': 'Economische vakken', 'indicator': 'KAecobol'},
-        'KAexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde', 'indicator': 'KAexbol'}
+        'KAexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde', 'indicator': 'KAexabol'}
     },
     'VMBO-(G)T': {
         'GTtotcec': {'name': 'Alle vakken', 'indicator': 'GTtotbol'},
@@ -82,7 +82,7 @@ GRADES = {
         'GTmvtcec': {'name': 'Engels, Frans, Duits', 'indicator': 'GTmvtbol'},
         'GTzaacec': {'name': 'Aardrijkskunde, Geschiedenis', 'indicator': 'GTzaabol'},
         'GTecocec': {'name': 'Economische vakken', 'indicator': 'GTecobol'},
-        'GTexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde', 'indicator': 'GTexbol'}
+        'GTexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde', 'indicator': 'GTexabol'}
     },
     'HAVO': {
         'HAtotcec': {'name': 'Alle vakken', 'indicator': 'HAtotbol'},
@@ -90,7 +90,7 @@ GRADES = {
         'HAmvtcec': {'name': 'Engels, Frans, Duits', 'indicator': 'HAmvtbol'},
         'HAzaacec': {'name': 'Aardrijkskunde, Geschiedenis', 'indicator': 'HAzaabol'},
         'HAecocec': {'name': 'Economische vakken', 'indicator': 'HAecobol'},
-        'HAexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde', 'indicator': 'HAexbol'}
+        'HAexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde', 'indicator': 'HAexabol'}
     },
     'VWO': {
         'VWtotcec': {'name': 'Alle vakken', 'indicator': 'VWtotbol'},
@@ -98,7 +98,7 @@ GRADES = {
         'VWmvtcec': {'name': 'Engels, Frans, Duits', 'indicator': 'VWmvtbol'},
         'VWzaacec': {'name': 'Aardrijkskunde, Geschiedenis', 'indicator': 'VWzaabol'},
         'VWecocec': {'name': 'Economische vakken', 'indicator': 'VWecobol'},
-        'VWexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde', 'indicator': 'VWexbol'},
+        'VWexacec': {'name': 'Wiskunde, Natuurkunde, Scheikunde, Biologie', 'indicator': 'VWexabol'},
         'VWklacec': {'name': 'Latijn, Grieks', 'indicator': 'VWklabol'}
     },
 }
@@ -238,7 +238,35 @@ def get_grades(school):
     """
     grades = []
 
-    return grades
+    for struct, fields in GRADES.iteritems():
+        for field, desc in fields.iteritems():
+            grade = school[field].strip()
+            if grade:
+                grade = float(grade.replace(',', '.'))
+                indicator = int(school[desc['indicator']].strip())
+                grades.append({
+                    'education_structure': struct,
+                    'name': desc['name'],
+                    'grade': grade,
+                    'indicator': indicator
+                })
+
+    if grades:
+        return grades
+
+
+def sector_exam_participation(school):
+    """
+    Returns the participation in exams per VMBO sector.
+    """
+    pass
+
+
+def profile_exam_participation(school):
+    """
+    Returns the participation in exams per profile.
+    """
+    pass
 
 
 def process(item):
@@ -253,21 +281,23 @@ def process(item):
         branch_id = row['brin'] + '-' + row['vestnr']
         if branch_id not in schools:
             school = {}
-            # school['composition_first_year'] = get_school_composition(row)
-            # school['first_years_performance'] = get_first_years_performance(row)
-            # school['advice_structure_third_year'] = get_advice_structure(row)
+            school['composition_first_year'] = get_school_composition(row)
+            school['first_years_performance'] = get_first_years_performance(row)
+            school['advice_structure_third_year'] = get_advice_structure(row)
 
-            # retaking = get_students_without_retaking(row)
-            # if retaking:
-            #     school['percentage_students_third_year_without_retaking'] = \
-            #         retaking
+            retaking = get_students_without_retaking(row)
+            if retaking:
+                school['percentage_students_third_year_without_retaking'] = \
+                    retaking
 
-            # straight_to_graduation = get_straight_to_graduation(row)
-            # if straight_to_graduation:
-            #     school['percentage_student_3_year_to_graduation'] = \
-            #         straight_to_graduation
+            straight_to_graduation = get_straight_to_graduation(row)
+            if straight_to_graduation:
+                school['percentage_student_3_year_to_graduation'] = \
+                    straight_to_graduation
 
-            school['grades'] = get_grades(row)
+            grades = get_grades(row)
+            if grades:
+                school['grades'] = grades
         else:
             # If this happens, we have multiple entries in a single file for
             # the same brin + branch combination; that is bad
