@@ -103,6 +103,36 @@ GRADES = {
     },
 }
 
+SECTOR_PARTICIPATION = {
+    'VMBO-B': {
+        'Basectec': 'Economie',
+        'Basectlb': 'Landbouw',
+        'Basecttk': 'Techniek',
+        'Basectzw': 'Zorg en welzijn'
+    },
+    'VMBO-K': {
+        'Kasectec': 'Economie',
+        'Kasectlb': 'Landbouw',
+        'Kasecttk': 'Techniek',
+        'Kasectzw': 'Zorg en welzijn'
+    }
+}
+
+PROFILE_PARTICIPATION = {
+    'HAVO': {
+        'HaprofCM': 'Cultuur & Maatschappij',
+        'HaprofEM': 'Economie & Maatschappij',
+        'HaprofNG': 'Natuur & Gezondheid',
+        'HaprofNT': 'Natuur & Techniek'
+    },
+    'VWO': {
+        'VwprofCM': 'Cultuur & Maatschappij',
+        'VwprofEM': 'Economie & Maatschappij',
+        'VwprofNG': 'Natuur & Gezondheid',
+        'VwprofNT': 'Natuur & Techniek'
+    }
+}
+
 
 def get_school_composition(school):
     """
@@ -255,14 +285,28 @@ def get_grades(school):
         return grades
 
 
-def sector_exam_participation(school):
+def get_sector_exam_participation(school):
     """
     Returns the participation in exams per VMBO sector.
     """
-    pass
+    participations = []
+
+    for struct, sectors in SECTOR_PARTICIPATION.iteritems():
+        for sector, name in sectors.iteritems():
+            participation = school[sector].strip()
+            if participation:
+                participation = int(participation) / 100.0
+                participations.append({
+                    'percentage': participation,
+                    'sector': name,
+                    'education_structure': struct
+                })
+
+    if participations:
+        return participations
 
 
-def profile_exam_participation(school):
+def get_profile_exam_participation(school):
     """
     Returns the participation in exams per profile.
     """
@@ -297,7 +341,13 @@ def process(item):
 
             grades = get_grades(row)
             if grades:
-                school['grades'] = grades
+                school['average_exam_grades'] = grades
+
+            sector_participation = get_sector_exam_participation(row)
+            if sector_participation:
+                school['participation_exams_per_sector'] = sector_participation
+
+            profile_participation = get_profile_exam_participation(row)
         else:
             # If this happens, we have multiple entries in a single file for
             # the same brin + branch combination; that is bad
