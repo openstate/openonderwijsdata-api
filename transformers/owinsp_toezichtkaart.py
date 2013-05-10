@@ -4,6 +4,9 @@ import json
 import re
 
 MONITOR_DIR = 'toezichtkaarten'
+PROD_DIR = 'opbrengstoordelen'
+
+WRITE = True
 
 REGEXES = {
     # comma followed by optional whitespace
@@ -134,6 +137,22 @@ PROFILE_PARTICIPATION = {
 }
 
 
+PERFORMANCE_STRUCTS = {
+    'opbrengst_bb': 'VMBO-B',
+    'opbrengst_kb': 'VMBO-K',
+    'opbrengst_gt': 'VMBO-(G)T',
+    'opbrengst_ha': 'HAVO',
+    'opbrengst_vw': 'VWO'
+}
+
+PERFORMANCE_ASSESSMENTS = {
+    '0': 'onvoldoende',
+    '1': 'voldoende',
+    '6': 'van 1 jaar gegevens',
+    '9': 'geen oordeel/onvoldoende gegevens'
+}
+
+
 def get_school_composition(school):
     """
     Returns the composition of education_structures in the first year. A
@@ -253,7 +272,7 @@ def get_straight_to_graduation(school):
             graduations.append({
                 'education_structure': structure,
                 'percentage': perc,
-                'compared_graduation': indicator
+                'compared_performance': indicator
             })
 
     if graduations:
@@ -278,7 +297,7 @@ def get_grades(school):
                     'education_structure': struct,
                     'name': desc['name'],
                     'grade': grade,
-                    'indicator': indicator
+                    'compared_performance': indicator
                 })
 
     if grades:
@@ -345,34 +364,82 @@ def process(item):
 
             retaking = get_students_without_retaking(row)
             if retaking:
-                school['percentage_students_third_year_without_retaking'] = \
-                    retaking
+                school['students_in_third_year_without_retaking'] = retaking
 
             straight_to_graduation = get_straight_to_graduation(row)
             if straight_to_graduation:
-                school['percentage_student_3_year_to_graduation'] = \
-                    straight_to_graduation
+                school['students_from_third_year_to_graduation_without_retaking']\
+                    = straight_to_graduation
 
             grades = get_grades(row)
             if grades:
-                school['average_exam_grades'] = grades
+                school['exam_average_grades'] = grades
 
             sector_participation = get_sector_exam_participation(row)
             if sector_participation:
-                school['participation_exams_per_sector'] = sector_participation
+                school['exam_participation_per_sector'] = sector_participation
 
             profile_participation = get_profile_exam_participation(row)
             if profile_participation:
-                school['participation_exams_per_profile'] = profile_participation
+                school['exam_participation_per_profile'] = profile_participation
+
+            schools[branch_id] = school
         else:
             # If this happens, we have multiple entries in a single file for
             # the same brin + branch combination; that is bad
             pass
 
-        print json.dumps(school, indent=4, separators=(',', ': '))
+    return schools
+
+
+def add_judgements(schools, judgements):
+    """
+    Add final judgements of Inspection. Judgements are based on performance in
+    the "onderbouw" (first two or three years), performance in the "bovenbouw"
+    (last two or three years), grades for the central exam, and the three year
+    average of the difference between schoolexams and central exams.
+
+    The final judgement can be "onvoldoende" (not sufficient), "voldoende",
+    "van 1 jaar gegevens" (there is only data for 1 year available), or "geen
+    oordeel/onvoldoende gegevens" (no judgement/not enough data).
+    """
+    reader = csv.DictReader(judgements, delimiter=';')
+
+    for row in reader:
+        branch_id = row['brin'] + '-' + row['vestnr']
+
+        if branch_id in schools:
+            performance_assessments = []
+            for struct, struct_name in PERFORMANCE_STRUCTS.iteritems():
+                judgement = row[struct].strip()
+                if judgement and judgement in PERFORMANCE_ASSESSMENTS:
+                    performance_assessments.append({
+                        'education_structure': struct_name,
+                        'performance_assessment': PERFORMANCE_ASSESSMENTS[judgement]
+                    })
+            if performance_assessments:
+                schools[branch_id]['performance_assessments'] = \
+                    performance_assessments
+        else:
+            # Apparently, there are judgements without corresponding schools in
+            # this year.
+            pass
+
+    return schools
 
 
 if __name__ == '__main__':
-    for item in glob('%s/*.csv' % MONITOR_DIR):
-        with open(item, 'r') as csvfile:
-            process(csvfile)
+    toezichtkaarten = glob('%s/*.csv' % MONITOR_DIR)
+    for toezichtkaart in toezichtkaarten:
+        filename = toezichtkaart.split('/')[-1].replace('.csv', '')
+        with open(toezichtkaart, 'r') as csvfile:
+            schools = process(csvfile)
+
+        with open('%s/%s.csv' % (PROD_DIR, filename), 'r') as f:
+            schools = add_judgements(schools, f)
+
+    if WRITE:
+        for school, data in schools.iteritems():
+            with open('json/%s.json' % school, 'w') as f:
+                print 'Serializing %s.json' % school
+                json.dump(data, f)
