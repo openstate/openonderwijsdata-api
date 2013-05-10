@@ -310,7 +310,21 @@ def get_profile_exam_participation(school):
     """
     Returns the participation in exams per profile.
     """
-    pass
+    participations = []
+
+    for struct, profiles in PROFILE_PARTICIPATION.iteritems():
+        for profile, name in profiles.iteritems():
+            participation = school[profile].strip()
+            if participation:
+                participation = int(participation) / 100.0
+                participations.append({
+                    'education_structure': struct,
+                    'sector': name,
+                    'percentage': participation
+                })
+
+    if participations:
+        return participations
 
 
 def process(item):
@@ -348,6 +362,8 @@ def process(item):
                 school['participation_exams_per_sector'] = sector_participation
 
             profile_participation = get_profile_exam_participation(row)
+            if profile_participation:
+                school['participation_exams_per_profile'] = profile_participation
         else:
             # If this happens, we have multiple entries in a single file for
             # the same brin + branch combination; that is bad
