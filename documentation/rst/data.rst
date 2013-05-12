@@ -239,10 +239,10 @@ Belongs to :ref:`graduationdepartment`.
     ======================================= =================================== =================================== ======================================================================
     Field                                   Type                                Original term                       Description
     ======================================= =================================== =================================== ======================================================================
-    education_structure                     string                              ONDERWIJSTYPE VO                    
-    inspectioncode                          string                                                                  
-    department                              string                              OPLEIDINGSNAAM                      
-    candidates                              Object                                                                  
+    education_structure                     string                              ONDERWIJSTYPE VO
+    inspectioncode                          string
+    department                              string                              OPLEIDINGSNAAM
+    candidates                              Object
     - unknown                               integer
     - male                                  integer
     - female                                integer
@@ -399,14 +399,14 @@ ExamGrades
     =================================== =================================== =================================== ==========================================================================
     Field                               Type                                Original term                       Description
     =================================== =================================== =================================== ==========================================================================
-    sector                              string                              Afdeling                            E.g. "Cultuur en Maatschappij"        
+    sector                              string                              Afdeling                            E.g. "Cultuur en Maatschappij"
     education_structure                 string                              Onderwijstype VO                    E.g. "HAVO"
     candidates                          integer                                                                 The total number of exam candidates for this school year
     passed                              integer                                                                 The number of candidates that graduated
     failed                              integer                                                                 The number of candidates that did not graduate
-    avg_grade_school_exam               float                               Gemiddeld cijfer schoolexamen       
-    avg_grade_central_exam              float                               Gemiddeld cijfer centraal examen    
-    avg_final_grade                     float                               Gemiddeld cijfer cijferlijst        
+    avg_grade_school_exam               float                               Gemiddeld cijfer schoolexamen
+    avg_grade_central_exam              float                               Gemiddeld cijfer centraal examen
+    avg_final_grade                     float                               Gemiddeld cijfer cijferlijst
     =================================== =================================== =================================== ==========================================================================
 
 .. _schoolvodata:
@@ -640,24 +640,32 @@ vo_branch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. table::
 
-    =================================== =================================== ========================================================================================================
-    Field                               Type                                Description
-    =================================== =================================== ========================================================================================================
-    address                             :ref:`owinspaddress`                Address of this branch
-    board                               string                              The name of the board of this school.
-    board_id                            integer                             Identifier (assigned by :ref:`duodata`) of the board of this branch.
-    branch_id                           integer                             Identifier (assigned by :ref:`duodata`) of this branch.
-    brin                                string                              "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
-    current_ratings                     array of :ref:`owinspcurrat`        Array of :ref:`owinspcurrat`, where each item represents the current rating of the Onderwijsinspectie [#owinsp]_.
-    denomination                        string                              In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
-    education_structures                array                               An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
-    meta                                :ref:`owinspmeta`                   Metadata, such as date of scrape and whether this item passed validation.
-    name                                string                              Name of this branch.
-    rating_history                      array of :ref:`owinsprathist`       Array of :ref:`owinsprathist`, where each item represents a rating the Onderwijsinspectie [#owinsp]_ awarded to this branch.
-    reports                             array of :ref:`owinspreport`        Array of :ref:`owinspreport`, where each item represents a report of the Onderwijsinspectie [#owinsp]_ in PDF.
-    result_card_url                     string                              URL to the result card ("opbrengstenkaart") of this branch.
-    website                             string                              Website of this branch (optional).
-    =================================== =================================== ========================================================================================================
+    ======================================================= =================================== ========================================================================================================
+    Field                                                   Type                                Description
+    ======================================================= =================================== ========================================================================================================
+    address                                                 :ref:`owinspaddress`                Address of this branch
+    advice_structure_third_year                             array of :ref:`advice_struct_3`     An array of :ref:`advice_struct_3`, representing the distribution of the primary school advices students have in the third year of their education.
+    board                                                   string                              The name of the board of this school.
+    board_id                                                integer                             Identifier (assigned by :ref:`duodata`) of the board of this branch.
+    branch_id                                               integer                             Identifier (assigned by :ref:`duodata`) of this branch.
+    brin                                                    string                              "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
+    composition_first_year                                  :ref:`first_year_comp`              Composition of the first year of this school, distinguishing between *combined* (students from different education structures partaking in the same courses) and *categorical* (percentage of students from the same education structures).
+    current_ratings                                         array of :ref:`owinspcurrat`        Array of :ref:`owinspcurrat`, where each item represents the current rating of the Onderwijsinspectie [#owinsp]_.
+    denomination                                            string                              In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
+    education_structures                                    array                               An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
+    exam_average_grades                                     array of :ref:`exam_avg_grades`     Array of :ref:`exam_avg_grades`, showing the average exam grade per course group.
+    exam_participation_per_profile                          array of :ref:`exam_part_prof`      Array of :ref:`exam_part_prof`, containing the distribution of sectors (VMBO) and profiles (HAVO/VWO) in students participating in exams.
+    first_years_performance                                 :ref:`first_year_perf`              Description of the performance of the school's "onderbouw" (first years).
+    meta                                                    :ref:`owinspmeta`                   Metadata, such as date of scrape and whether this item passed validation.
+    name                                                    string                              Name of this branch.
+    performance_assessments                                 array of :ref:`perf_ass`            Array of :ref:`perf_ass`, indicating the "Opbrengstenoordeel", a rating given by the Inspectie to each school, based on the performance in the first years ("onderbouw"), final years ("bovenbouw"), grades of the central examinations and the three year average of the difference between "schoolexamens" and central examinations grades.
+    rating_history                                          array of :ref:`owinsprathist`       Array of :ref:`owinsprathist`, where each item represents a rating the Onderwijsinspectie [#owinsp]_ awarded to this branch.
+    reports                                                 array of :ref:`owinspreport`        Array of :ref:`owinspreport`, where each item represents a report of the Onderwijsinspectie [#owinsp]_ in PDF.
+    result_card_url                                         string                              URL to the result card ("opbrengstenkaart") of this branch.
+    students_from_third_year_to_graduation_without_retaking array of :ref:`straight_grad`       Array of :ref:`straight_grad`, showing the percentage of students that go on to graduation from their third year without retaking a year, per education structure.
+    students_in_third_year_without_retaking                 array of :ref:`3yearnoretakes`      Array of :ref:`3yearnoretakes`, showing the percentage of students that reach their third year without retaking a year.
+    website                                                 string                              Website of this branch (optional).
+    ======================================================= =================================== ========================================================================================================
 
 .. _owinspaddress:
 
@@ -695,6 +703,21 @@ AddressComponent
     types                               array                               Array containing classifications of this component.
     =================================== =================================== ==========================================================================
 
+.. _exam_avg_grades:
+
+AverageExamGrades
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    grade                               float                               The average exam grade.
+    compared_performance                integer                             Value between 1 and 5 comparing how "good" this score is compared to the national average for this education structure (1 being worse, 2 being somewhat worse, 3 being average, 4 being somewhat better and 5 being better)
+    education_structure                 string                              Level of education [#edu_in_holland]_
+    name                                string                              The name of the course group this grade applies to.
+    =================================== =================================== ==========================================================================
+
 .. _owinspcurrat:
 
 CurrentRating
@@ -711,6 +734,49 @@ CurrentRating
     rating_excerpt                      string                              Excerpt of the rating report.
     rating_valid_since                  date                                Date this rating went into effect.
     =================================== =================================== ==========================================================================
+
+.. _exam_part_prof:
+
+ExamParticipationPerProfile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    ========================================= =================================== ==========================================================================
+    Field                                     Type                                Description
+    ========================================= =================================== ==========================================================================
+    sector                                    string                              The sector of profile
+    percentage                                float                               Percentage of students participating in an exam with this sector of profile.
+    education_structure                       string                              The education structure[#edu_in_holland]_ this sector or profile belongs to.
+    ========================================= =================================== ==========================================================================
+
+.. _first_year_comp:
+
+FirstYearComposition
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    ========================================= =================================== ==========================================================================
+    Field                                     Type                                Description
+    ========================================= =================================== ==========================================================================
+    percentage_student_combined_education     float                               Percentage of students in combined education (following multiple kinds of education)
+    percentage_student_categorical_education  float                               Percentage of students in categorical education (following one kind of education)
+    combined_education_structures             array of strings                    Array containing strings representing education structures that have students following *combined* education.
+    categorical_education_structures          array of strings                    Array containing strings representing education structures that have students following *categorical* education.
+    ========================================= =================================== ==========================================================================
+
+.. _first_year_perf:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    ========================================= =================================== ==========================================================================
+    Field                                     Type                                Description
+    ========================================= =================================== ==========================================================================
+    ratio                                     float                               Index describing the change of the first years performance. The starting date for this index is not known.
+    compared_performance                      integer                             Value between 1 and 5 comparing how "good" this score is compared to the national average for this education structure (1 being worse, 2 being somewhat worse, 3 being average, 4 being somewhat better and 5 being better)
+    compared_performance_category             string                              String describing to which education structure (group) this school's first years are compared.
+    ========================================= =================================== ==========================================================================
+
+FirstYearsPerformance
 
 .. _owinsp_coordinates:
 
@@ -772,6 +838,48 @@ Meta
     validation_result                   string                              Indication whether the item passed validation.
     =================================== =================================== ======================================================================================================
 
+.. _perf_ass:
+
+PerformanceAssessments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    education_structure                 string                              The structure this assessment applies to (*vbmo-t, havo, vwo, ...*)
+    performance_assessment              string                              String describing the assessment. Can have a value "voldoende" (adequate), "onvoldoende" (inadequate), "van 1 jaar gegevens" (data for only 1 year available) or "geen oordeel/onvoldoende gegevens" (no assessment/not enough data).
+    =================================== =================================== ==========================================================================
+
+.. _advice_struct_3:
+
+PrimarySchoolAdvices
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    primary_school_advices              Array of :ref:`advice_struct_comp`  Array of :ref:`advice_struct_comp`, containing the distribution of primary school advices of students in the third year of their education.
+    education_structure                 string                              String that represents the level of education[#edu_in_holland]_ the primary school advice distribution applies to.
+    =================================== =================================== ==========================================================================
+
+.. _advice_struct_comp:
+
+PrimarySchoolAdvice
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    advice                              string                              String that represents the level of education[#edu_in_holland]_ the primary school recommended the student upon leaving primary education.
+    percentage_of_students              float                               Percentage of students with this advice in the third year of their education.
+    =================================== =================================== ==========================================================================
+
 .. _owinspreport:
 
 Report
@@ -785,6 +893,33 @@ Report
     education_structure                 string                              The structure this rating applies to (*vbmo-t, havo, vwo, ...*)
     title                               string                              Title of the report.
     url                                 string                              URL to the full report in PDF.
+    =================================== =================================== ==========================================================================
+
+.. _straight_grad:
+
+StraightToGraduation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    education_structure                 string                              Level of education [#edu_in_holland]_
+    percentage                          float                               Percentage of all students in this education structure that graduate without retaking any year between their third and their final year.
+    compared_performance                integer                             Value between 1 and 5 comparing how "good" this score is compared to the national average for this education structure (1 being worse, 2 being somewhat worse, 3 being average, 4 being somewhat better and 5 being better)
+    =================================== =================================== ==========================================================================
+
+.. _3yearnoretakes:
+
+StraightToThirdYear
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    =================================== =================================== ==========================================================================
+    Field                               Type                                Description
+    =================================== =================================== ==========================================================================
+    education_structure                 string                              Level of education [#edu_in_holland]_
+    percentage                          float                               Percentage of all students in this education structure that reach their third year without retaking any year between their first and their third year.
     =================================== =================================== ==========================================================================
 
 **Footnotes**
