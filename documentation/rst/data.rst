@@ -744,7 +744,7 @@ ExamParticipationPerProfile
     ========================================= =================================== ==========================================================================
     Field                                     Type                                Description
     ========================================= =================================== ==========================================================================
-    sector                                    string                              The sector of profile
+    sector                                    string                              The sector or profile, depending on the education structure.
     percentage                                float                               Percentage of students participating in an exam with this sector of profile.
     education_structure                       string                              The education structure[#edu_in_holland]_ this sector or profile belongs to.
     ========================================= =================================== ==========================================================================
