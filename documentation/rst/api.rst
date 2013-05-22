@@ -97,7 +97,7 @@ API
    :statuscode 200: OK, no errors.
    :statuscode 400: Bad Request. An accompanying error message will explain why the request was invalid.
 
-.. http:get:: /api/v1/get_docment/(str:index)/(str:doctype)/(str:doc_id)
+.. http:get:: /api/v1/get_document/(str:index)/(str:doctype)/(str:doc_id)
 
    This method can be used to retrieve a single document, provided that you know the document's index, type and id.
 
