@@ -409,7 +409,16 @@ class DuoVoBranchesSpider(BaseSpider):
                 self.student_graduations),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
                 'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp',
-                self.student_exam_grades)
+                self.student_exam_grades),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen8.asp',
+                self.vmbo_exam_grades_per_course),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen9.asp',
+                self.havo_exam_grades_per_course),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp',\
+                self.vwo_exam_grades_per_course)
         ]
 
     def parse_branches(self, response):
@@ -999,6 +1008,384 @@ class DuoVoBranchesSpider(BaseSpider):
                     exam_grades_reference_url=csv_url,
                     exam_grades_reference_date=reference_date,
                     exam_grades=grades
+                )
+
+                yield school
+
+    def vmbo_exam_grades_per_course(self, response):
+        """
+        Parse "08. Examenkandidaten vmbo en examencijfers per vak per instelling"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            school_ids = {}
+            courses_per_school = {}
+            for row in csv_file:
+                # Remove newline chars and strip leading and trailing
+                # whitespace.
+                for key in row.keys():
+                    c_key = key.replace('\n', '')
+                    row[c_key] = row[key].strip()
+
+                    if not row[c_key]:
+                        del row[c_key]
+
+                brin = row['BRIN NUMMER']
+                branch_id = int(row['VESTIGINGSNUMMER'])
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                grades = {
+                    'education_structure': '%s-%s' % (row['ONDERWIJSTYPE VO'],
+                                                      row['LEERWEG']),
+                    'course_identifier': row['VAKCODE'],
+                    'course_abbreviation': row['AFKORTING VAKNAAM'],
+                    'course_name': row['VAKNAAM']
+
+                }
+
+                if 'SCHOOLEXAMEN BEOORDELING' in row:
+                    grades['school_exam_rating'] = row['SCHOOLEXAMEN BEOORDELING']
+
+                if 'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING' in row:
+                    grades['amount_of_school_exams_with_rating'] = int(row[
+                        'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING'])
+
+                if 'AANTAL SCHOOLEXAMENS MET BEOORDELING MEETELLEND VOOR DIPLOMA' in row:
+                    grades['amount_of_school_exams_with_rating_counting_'
+                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                    'BEOORDELING MEETELLEND VOOR '
+                                                    'DIPLOMA'])
+
+                if 'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER' in row:
+                    grades['amount_of_school_exams_with_grades'] = int(row[
+                        'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER'])
+
+                if 'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS' in row:
+                    grades['avg_grade_school_exams'] = float(row[
+                        'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS']
+                        .replace(',', '.'))
+
+                if 'AANTAL SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                    grades['amount_of_school_exams_with_grades_counting_'
+                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                    'CIJFER MEETELLEND VOOR DIPLOMA'])
+
+                if 'GEM. CIJFER SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                    grades['avg_grade_school_exams_counting_for_diploma'] = \
+                        float(row['GEM. CIJFER SCHOOLEXAMENS MET CIJFER '
+                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+
+                if 'TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                    grades['amount_of_central_exams'] = int(row['TOTAAL AANTAL'
+                                                                ' CENTRALE EXAMENS'])
+
+                if 'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                    grades['avg_grade_central_exams'] = float(row[
+                        'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS']
+                        .replace(',', '.'))
+
+                if 'AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA' in row:
+                    grades['amount_of_central_exams_counting_for_diploma'] = \
+                        int(row['AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA'])
+
+                if 'GEM. CIJFER CENTRALE EXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                    grades['avg_grade_central_exams_counting_for_diploma'] = \
+                        float(row['GEM. CIJFER CENTRALE EXAMENS MET CIJFER '
+                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+
+                if 'GEM. CIJFER CIJFERLIJST' in row:
+                    grades['average_grade_overall'] = float(row[
+                        'GEM. CIJFER CIJFERLIJST'].replace(',', '.'))
+
+                if school_id not in courses_per_school:
+                    courses_per_school[school_id] = []
+
+                courses_per_school[school_id].append(grades)
+
+            for school_id, grades in courses_per_school.iteritems():
+                school = DuoVoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    exam_grades_reference_url=csv_url,
+                    exam_grades_reference_date=reference_date,
+                    vmbo_exam_grades_per_course=grades
+                )
+
+                yield school
+
+    def havo_exam_grades_per_course(self, response):
+        """
+        Parse "09. Examenkandidaten havo en examencijfers per vak per instelling"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            school_ids = {}
+            courses_per_school = {}
+            for row in csv_file:
+                # Remove newline chars and strip leading and trailing
+                # whitespace.
+                for key in row.keys():
+                    c_key = key.replace('\n', '')
+                    row[c_key] = row[key].strip()
+
+                    if not row[c_key]:
+                        del row[c_key]
+
+                brin = row['BRIN NUMMER']
+                branch_id = int(row['VESTIGINGSNUMMER'])
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                grades = {
+                    'education_structure': '%s-%s' % (row['ONDERWIJSTYPE VO'],
+                                                      row['LEERWEG']),
+                    'course_identifier': row['VAKCODE'],
+                    'course_abbreviation': row['AFKORTING VAKNAAM'],
+                    'course_name': row['VAKNAAM']
+
+                }
+
+                if 'SCHOOLEXAMEN BEOORDELING' in row:
+                    grades['school_exam_rating'] = row['SCHOOLEXAMEN BEOORDELING']
+
+                if 'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING' in row:
+                    grades['amount_of_school_exams_with_rating'] = int(row[
+                        'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING'])
+
+                if 'AANTAL SCHOOLEXAMENS MET BEOORDELING MEETELLEND VOOR DIPLOMA' in row:
+                    grades['amount_of_school_exams_with_rating_counting_'
+                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                    'BEOORDELING MEETELLEND VOOR '
+                                                    'DIPLOMA'])
+
+                if 'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER' in row:
+                    grades['amount_of_school_exams_with_grades'] = int(row[
+                        'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER'])
+
+                if 'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS' in row:
+                    grades['avg_grade_school_exams'] = float(row[
+                        'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS']
+                        .replace(',', '.'))
+
+                if 'AANTAL SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                    grades['amount_of_school_exams_with_grades_counting_'
+                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                    'CIJFER MEETELLEND VOOR DIPLOMA'])
+
+                if 'GEM. CIJFER SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                    grades['avg_grade_school_exams_counting_for_diploma'] = \
+                        float(row['GEM. CIJFER SCHOOLEXAMENS MET CIJFER '
+                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+
+                if 'TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                    grades['amount_of_central_exams'] = int(row['TOTAAL AANTAL'
+                                                                ' CENTRALE EXAMENS'])
+
+                if 'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                    grades['avg_grade_central_exams'] = float(row[
+                        'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS']
+                        .replace(',', '.'))
+
+                if 'AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA' in row:
+                    grades['amount_of_central_exams_counting_for_diploma'] = \
+                        int(row['AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA'])
+
+                if 'GEM. CIJFER CENTRALE EXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                    grades['avg_grade_central_exams_counting_for_diploma'] = \
+                        float(row['GEM. CIJFER CENTRALE EXAMENS MET CIJFER '
+                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+
+                if 'GEM. CIJFER CIJFERLIJST' in row:
+                    grades['average_grade_overall'] = float(row[
+                        'GEM. CIJFER CIJFERLIJST'].replace(',', '.'))
+
+                if school_id not in courses_per_school:
+                    courses_per_school[school_id] = []
+
+                courses_per_school[school_id].append(grades)
+
+            for school_id, grades in courses_per_school.iteritems():
+                school = DuoVoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    exam_grades_reference_url=csv_url,
+                    exam_grades_reference_date=reference_date,
+                    havo_exam_grades_per_course=grades
+                )
+
+                yield school
+
+    def vwo_exam_grades_per_course(self, response):
+        """
+        Parse "10. Examenkandidaten vwo en examencijfers per vak per instelling"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            school_ids = {}
+            courses_per_school = {}
+            for row in csv_file:
+                # Remove newline chars and strip leading and trailing
+                # whitespace.
+                for key in row.keys():
+                    c_key = key.replace('\n', '')
+                    row[c_key] = row[key].strip()
+
+                    if not row[c_key]:
+                        del row[c_key]
+
+                brin = row['BRIN NUMMER']
+                branch_id = int(row['VESTIGINGSNUMMER'])
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                grades = {
+                    'education_structure': '%s-%s' % (row['ONDERWIJSTYPE VO'],
+                                                      row['LEERWEG']),
+                    'course_identifier': row['VAKCODE'],
+                    'course_abbreviation': row['AFKORTING VAKNAAM'],
+                    'course_name': row['VAKNAAM']
+
+                }
+
+                if 'SCHOOLEXAMEN BEOORDELING' in row:
+                    grades['school_exam_rating'] = row['SCHOOLEXAMEN BEOORDELING']
+
+                if 'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING' in row:
+                    grades['amount_of_school_exams_with_rating'] = int(row[
+                        'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING'])
+
+                if 'AANTAL SCHOOLEXAMENS MET BEOORDELING MEETELLEND VOOR DIPLOMA' in row:
+                    grades['amount_of_school_exams_with_rating_counting_'
+                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                    'BEOORDELING MEETELLEND VOOR '
+                                                    'DIPLOMA'])
+
+                if 'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER' in row:
+                    grades['amount_of_school_exams_with_grades'] = int(row[
+                        'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER'])
+
+                if 'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS' in row:
+                    grades['avg_grade_school_exams'] = float(row[
+                        'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS']
+                        .replace(',', '.'))
+
+                if 'AANTAL SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                    grades['amount_of_school_exams_with_grades_counting_'
+                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                    'CIJFER MEETELLEND VOOR DIPLOMA'])
+
+                if 'GEM. CIJFER SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                    grades['avg_grade_school_exams_counting_for_diploma'] = \
+                        float(row['GEM. CIJFER SCHOOLEXAMENS MET CIJFER '
+                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+
+                if 'TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                    grades['amount_of_central_exams'] = int(row['TOTAAL AANTAL'
+                                                                ' CENTRALE EXAMENS'])
+
+                if 'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                    grades['avg_grade_central_exams'] = float(row[
+                        'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS']
+                        .replace(',', '.'))
+
+                if 'AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA' in row:
+                    grades['amount_of_central_exams_counting_for_diploma'] = \
+                        int(row['AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA'])
+
+                if 'GEM. CIJFER CENTRALE EXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                    grades['avg_grade_central_exams_counting_for_diploma'] = \
+                        float(row['GEM. CIJFER CENTRALE EXAMENS MET CIJFER '
+                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+
+                if 'GEM. CIJFER CIJFERLIJST' in row:
+                    grades['average_grade_overall'] = float(row[
+                        'GEM. CIJFER CIJFERLIJST'].replace(',', '.'))
+
+                if school_id not in courses_per_school:
+                    courses_per_school[school_id] = []
+
+                courses_per_school[school_id].append(grades)
+
+            for school_id, grades in courses_per_school.iteritems():
+                school = DuoVoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    exam_grades_reference_url=csv_url,
+                    exam_grades_reference_date=reference_date,
+                    vwo_exam_grades_per_course=grades
                 )
 
                 yield school
