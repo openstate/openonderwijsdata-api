@@ -49,8 +49,6 @@ EXPORT_METHODS = {
     }
 }
 
-ENABLED_EXPORTERS = ['file', 'tar', 'elasticsearch']
-
 from validation.duo import DuoVoSchool, DuoVoBoard, DuoVoBranch
 from validation.schoolvo import SchoolVOBranch
 from validation.owinsp import OnderwijsInspectieVoBranch
