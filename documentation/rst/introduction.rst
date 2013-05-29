@@ -50,6 +50,12 @@ Currently included data
   * Parent and student satisfaction suruvey results
   * School costs
 
+Access data
+--------------------------------
+The :doc:`api` section describes how the data in the OpenOnderwijs API can be accessed through a REST interface.
+
+Alternatively, `Mark Marijnissen <http://www.madebymark.nl/>`_ made a tool available on GitHub (https://github.com/markmarijnissen/openonderwijs-csv) that pulls data from the API and merges that data into CSV files.
+
 API features
 --------------------------------
 * Data sources are scraped on a regular basis
@@ -57,5 +63,5 @@ API features
 * Data is available through a simple REST API and as downloadable tarrballs
 * The API exposes powerful search capabilities
 
-.. todo:: 
+.. todo::
 	Add some links to relevant parts in the documentation. Determine what 'regular basis' will mean.
