@@ -114,6 +114,24 @@ class DuoVoBranch(SchoolItem):
     exam_grades_reference_date = Field()
     exam_grades = Field()
 
+    # Contents of "08. Examenkandidaten vmbo en examencijfers per vak
+    # per instelling"
+    vmbo_exam_grades_reference_url = Field()
+    vmbo_exam_grades_reference_date = Field()
+    vmbo_exam_grades_per_course = Field()
+
+    # Contents of "09. Examenkandidaten havo en examencijfers per vak
+    # per instelling"
+    havo_exam_grades_reference_url = Field()
+    havo_exam_grades_reference_date = Field()
+    havo_exam_grades_per_course = Field()
+
+    # Contents of "10. Examenkandidaten vwo en examencijfers per vak
+    # per instelling"
+    vwo_exam_grades_reference_url = Field()
+    vwo_exam_grades_reference_date = Field()
+    vwo_exam_grades_per_course = Field()
+
 
 class DuoVoSchool(SchoolItem):
     ignore_id_fields = Field()
