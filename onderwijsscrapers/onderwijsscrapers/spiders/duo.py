@@ -1131,8 +1131,8 @@ class DuoVoBranchesSpider(BaseSpider):
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
-                    exam_grades_reference_url=csv_url,
-                    exam_grades_reference_date=reference_date,
+                    vmbo_exam_grades_reference_url=csv_url,
+                    vmbo_exam_grades_reference_date=reference_date,
                     vmbo_exam_grades_per_course=grades
                 )
 
@@ -1257,8 +1257,8 @@ class DuoVoBranchesSpider(BaseSpider):
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
-                    exam_grades_reference_url=csv_url,
-                    exam_grades_reference_date=reference_date,
+                    havo_exam_grades_reference_url=csv_url,
+                    havo_exam_grades_reference_date=reference_date,
                     havo_exam_grades_per_course=grades
                 )
 
@@ -1383,8 +1383,8 @@ class DuoVoBranchesSpider(BaseSpider):
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
-                    exam_grades_reference_url=csv_url,
-                    exam_grades_reference_date=reference_date,
+                    vwo_exam_grades_reference_url=csv_url,
+                    vwo_exam_grades_reference_date=reference_date,
                     vwo_exam_grades_per_course=grades
                 )
 
