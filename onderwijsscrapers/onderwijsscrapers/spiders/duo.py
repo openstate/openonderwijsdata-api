@@ -1,6 +1,5 @@
 import csv
 import cStringIO
-import re
 import locale
 from datetime import datetime
 
@@ -19,12 +18,12 @@ class DuoVoBoards(BaseSpider):
 
     def start_requests(self):
         return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vo/adressen/Adressen/besturen.asp',
-                self.parse_boards),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vo/Financien/Financien/Kengetallen.asp',
-                self.parse_financial_key_indicators)
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/adressen/Adressen/besturen.asp',
+                    self.parse_boards),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/Financien/Financien/Kengetallen.asp',
+                    self.parse_financial_key_indicators)
         ]
 
     def parse_boards(self, response):
@@ -49,8 +48,8 @@ class DuoVoBoards(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-                .decode('cp1252').encode('utf8')), delimiter=';')
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
 
             for row in csv_file:
                 # strip leading and trailing whitespace.
@@ -62,7 +61,7 @@ class DuoVoBoards(BaseSpider):
                 board['name'] = row['BEVOEGD GEZAG NAAM']
                 board['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
-                        row['HUISNUMMER-TOEVOEGING']),
+                                         row['HUISNUMMER-TOEVOEGING']),
                     'zip_code': row['POSTCODE'].replace(' ', ''),
                     'city': row['PLAATSNAAM']
                 }
@@ -76,14 +75,14 @@ class DuoVoBoards(BaseSpider):
                     board['correspondence_address']['street'] = None
 
                 if row['POSTCODE CORRESPONDENTIEADRES']:
-                    board['correspondence_address']['zip_code'] = row['POSTCODE '\
-                        'CORRESPONDENTIEADRES'].replace(' ', '')
+                    board['correspondence_address']['zip_code'] = row[
+                        'POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
                 else:
                     board['correspondence_address']['zip_code'] = None
 
                 if row['PLAATSNAAM CORRESPONDENTIEADRES']:
-                    board['correspondence_address']['city'] = row['PLAATSNAAM '\
-                        'CORRESPONDENTIEADRES']
+                    board['correspondence_address']['city'] = row[
+                        'PLAATSNAAM CORRESPONDENTIEADRES']
                 else:
                     board['correspondence_address']['city'] = None
 
@@ -170,8 +169,8 @@ class DuoVoBoards(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-                .decode('cp1252').encode('utf8')), delimiter=';')
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
 
             indicators_per_board = {}
             for row in csv_file:
@@ -188,8 +187,8 @@ class DuoVoBoards(BaseSpider):
                 indicators['group'] = row['GROEPERING']
 
                 for ind, ind_norm in indicators_mapping.iteritems():
-                    indicators[ind_norm] = float(row[ind].replace('.', '')\
-                        .replace(',', '.'))
+                    indicators[ind_norm] = float(row[ind].replace('.', '')
+                                                         .replace(',', '.'))
 
                 indicators_per_board[board_id].append(indicators)
 
@@ -210,12 +209,12 @@ class DuoVoSchools(BaseSpider):
 
     def start_requests(self):
         return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vo/adressen/Adressen/hoofdvestigingen.asp',
-                self.parse_schools),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vschoolverlaten/vsv_voortgezet.asp',
-                self.parse_dropouts)
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/adressen/Adressen/hoofdvestigingen.asp',
+                    self.parse_schools),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vschoolverlaten/vsv_voortgezet.asp',
+                    self.parse_dropouts)
         ]
 
     def parse_schools(self, response):
@@ -256,8 +255,8 @@ class DuoVoSchools(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-                .decode('cp1252').encode('utf8')), delimiter=';')
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
 
             for row in csv_file:
                 # strip leading and trailing whitespace.
@@ -272,14 +271,15 @@ class DuoVoSchools(BaseSpider):
                 school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
-                        row['HUISNUMMER-TOEVOEGING']),
+                                         row['HUISNUMMER-TOEVOEGING']),
                     'city': row['PLAATSNAAM'],
                     'zip_code': row['POSTCODE'].replace(' ', '')
                 }
 
                 school['correspondence_address'] = {
                     'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
-                       row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                                         row['HUISNUMMER-TOEVOEGING '
+                                             'CORRESPONDENTIEADRES']),
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
                     'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
                 }
@@ -346,8 +346,8 @@ class DuoVoSchools(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-                .decode('cp1252').encode('utf8')), delimiter=';')
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
 
             dropouts_per_school = {}
             for row in csv_file:
@@ -395,30 +395,30 @@ class DuoVoBranchesSpider(BaseSpider):
 
     def start_requests(self):
         return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vo/adressen/Adressen/vestigingen.asp',
-                self.parse_branches),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp',
-                self.parse_student_residences),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp',
-                 self.parse_students_per_branch),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp',
-                self.student_graduations),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'\
-                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp',
-                self.student_exam_grades),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen8.asp',
-                self.vmbo_exam_grades_per_course),
+                    'databestanden/vo/adressen/Adressen/vestigingen.asp',
+                    self.parse_branches),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen9.asp',
-                self.havo_exam_grades_per_course),
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp',
+                    self.parse_student_residences),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp',\
-                self.vwo_exam_grades_per_course)
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp',
+                     self.parse_students_per_branch),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp',
+                    self.student_graduations),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp',
+                    self.student_exam_grades),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen8.asp',
+                    self.vmbo_exam_grades_per_course),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen9.asp',
+                    self.havo_exam_grades_per_course),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp',
+                    self.vwo_exam_grades_per_course)
         ]
 
     def parse_branches(self, response):
@@ -443,8 +443,8 @@ class DuoVoBranchesSpider(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-                .decode('cp1252').encode('utf8')), delimiter=';')
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
 
             for row in csv_file:
                 school = DuoVoBranch()
@@ -454,7 +454,7 @@ class DuoVoBranchesSpider(BaseSpider):
                 school['name'] = row['VESTIGINGSNAAM'].strip()
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'].strip(),
-                        row['HUISNUMMER-TOEVOEGING'].strip()),
+                                         row['HUISNUMMER-TOEVOEGING'].strip()),
                     'city': row['PLAATSNAAM'].strip(),
                     'zip_code': row['POSTCODE'].strip().replace(' ', '')
                 }
@@ -489,8 +489,9 @@ class DuoVoBranchesSpider(BaseSpider):
                     school['brin'] = row['BRIN NUMMER'].strip()
 
                 if row['VESTIGINGSNUMMER'].strip():
-                    school['branch_id'] = int(row['VESTIGINGSNUMMER'].strip()\
-                        .replace(row['BRIN NUMMER'], ''))
+                    school['branch_id'] = int(row['VESTIGINGSNUMMER']
+                                              .strip()
+                                              .replace(row['BRIN NUMMER'], ''))
 
                 if row['GEMEENTENAAM'].strip():
                     school['municipality'] = row['GEMEENTENAAM'].strip()
@@ -516,14 +517,14 @@ class DuoVoBranchesSpider(BaseSpider):
                     school['correspondence_address']['street'] = None
 
                 if row['POSTCODE CORRESPONDENTIEADRES'].strip():
-                    school['correspondence_address']['zip_code'] = row['POSTCODE '\
-                        'CORRESPONDENTIEADRES'].strip().replace(' ', '')
+                    school['correspondence_address']['zip_code'] = row[
+                        'POSTCODE CORRESPONDENTIEADRES'].strip().replace(' ', '')
                 else:
                     school['correspondence_address']['zip_code'] = None
 
                 if row['PLAATSNAAM CORRESPONDENTIEADRES'].strip():
-                    school['correspondence_address']['city'] = row['PLAATSNAAM '\
-                        'CORRESPONDENTIEADRES'].strip()
+                    school['correspondence_address']['city'] = row[
+                        'PLAATSNAAM CORRESPONDENTIEADRES'].strip()
                 else:
                     school['correspondence_address']['city'] = None
 
@@ -533,8 +534,8 @@ class DuoVoBranchesSpider(BaseSpider):
                     school['nodal_area'] = None
 
                 if row['NODAAL GEBIED CODE'].strip():
-                    school['nodal_area_code'] = int(row['NODAAL GEBIED CODE']\
-                        .strip())
+                    school['nodal_area_code'] = int(row['NODAAL GEBIED CODE']
+                                                    .strip())
                 else:
                     school['nodal_area_code'] = None
 
@@ -574,8 +575,8 @@ class DuoVoBranchesSpider(BaseSpider):
                     school['education_area'] = None
 
                 if row['ONDERWIJSGEBIED CODE'].strip():
-                    school['education_area_code'] = int(row['ONDERWIJSGEBIED CODE']\
-                        .strip())
+                    school['education_area_code'] = int(row['ONDERWIJSGEBIED '
+                                                            'CODE'].strip())
                 else:
                     school['education_area_code'] = None
 
@@ -614,20 +615,20 @@ class DuoVoBranchesSpider(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-                .decode('cp1252').encode('utf8')), delimiter=';')
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
 
             student_educations = {}
             school_ids = {}
 
             for row in csv_file:
                 school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
-                    row['VESTIGINGSNUMMER'].strip().zfill(2))
+                                       row['VESTIGINGSNUMMER'].strip().zfill(2))
 
                 school_ids[school_id] = {
                     'brin': row['BRIN NUMMER'].strip(),
-                    'branch_id': int(row['VESTIGINGSNUMMER'].strip()\
-                        .replace(row['BRIN NUMMER'], ''))
+                    'branch_id': int(row['VESTIGINGSNUMMER']
+                                     .strip().replace(row['BRIN NUMMER'], ''))
                 }
 
                 if school_id not in student_educations:
@@ -644,8 +645,8 @@ class DuoVoBranchesSpider(BaseSpider):
                     education_type['department'] = None
 
                 if row['ELEMENTCODE'].strip():
-                    education_type['elementcode'] = int(row['ELEMENTCODE']\
-                        .strip())
+                    education_type['elementcode'] = int(row['ELEMENTCODE']
+                                                        .strip())
                 else:
                     education_type['elementcode'] = None
 
@@ -683,9 +684,9 @@ class DuoVoBranchesSpider(BaseSpider):
 
                 for available_year in range(1, 7):
                     male = int(row['LEER- OF VERBLIJFSJAAR %s - MAN'
-                        % available_year])
+                               % available_year])
                     female = int(row['LEER- OF VERBLIJFSJAAR %s - VROUW'
-                        % available_year])
+                                 % available_year])
 
                     education_type['year_%s' % available_year] = {
                         'male': male,
@@ -730,19 +731,19 @@ class DuoVoBranchesSpider(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-                .decode('cp1252').encode('utf8')), delimiter=';')
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
 
             student_residences = {}
             school_ids = {}
             for row in csv_file:
                 school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
-                    row['VESTIGINGSNUMMER'].strip().zfill(2))
+                                       row['VESTIGINGSNUMMER'].strip().zfill(2))
 
                 school_ids[school_id] = {
                     'brin': row['BRIN NUMMER'].strip(),
-                    'branch_id': int(row['VESTIGINGSNUMMER'].strip()\
-                        .replace(row['BRIN NUMMER'], ''))
+                    'branch_id': int(row['VESTIGINGSNUMMER'].strip()
+                                     .replace(row['BRIN NUMMER'], ''))
                 }
 
                 if school_id not in student_residences:
@@ -795,8 +796,8 @@ class DuoVoBranchesSpider(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-                .decode('cp1252').encode('utf8')), delimiter=';')
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
 
             school_ids = {}
             graduations_school_year = {}
@@ -881,7 +882,7 @@ class DuoVoBranchesSpider(BaseSpider):
                     for gender, gender_normal in breakdown.iteritems():
                         try:
                             candidates = row['EXAMENKANDIDATEN %s %s' % (year,
-                                gender)]
+                                             gender)]
                         except KeyError:
                             continue
 
@@ -937,8 +938,8 @@ class DuoVoBranchesSpider(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
-                .decode('cp1252').encode('utf8')), delimiter=';')
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
 
             school_ids = {}
             grades_per_school = {}
@@ -984,16 +985,16 @@ class DuoVoBranchesSpider(BaseSpider):
                     grades['failed'] = int(row['GEZAKTEN'])
 
                 if 'GEMIDDELD CIJFER SCHOOLEXAMEN' in row:
-                    grades['avg_grade_school_exam'] = float(row['GEMIDDELD '
-                        'CIJFER SCHOOLEXAMEN'].replace(',', '.'))
+                    grades['avg_grade_school_exam'] = float(row[
+                        'GEMIDDELD CIJFER SCHOOLEXAMEN'].replace(',', '.'))
 
                 if 'GEMIDDELD CIJFER CENTRAAL EXAMEN' in row:
-                    grades['avg_grade_central_exam'] = float(row['GEMIDDELD '
-                        'CIJFER CENTRAAL EXAMEN'].replace(',', '.'))
+                    grades['avg_grade_central_exam'] = float(row[
+                        'GEMIDDELD CIJFER CENTRAAL EXAMEN'].replace(',', '.'))
 
                 if 'GEMIDDELD CIJFER CIJFERLIJST' in row:
-                    grades['avg_final_grade'] = float(row['GEMIDDELD CIJFER '
-                        'CIJFERLIJST'].replace(',', '.'))
+                    grades['avg_final_grade'] = float(row[
+                        'GEMIDDELD CIJFER CIJFERLIJST'].replace(',', '.'))
 
                 if school_id not in grades_per_school:
                     grades_per_school[school_id] = []
@@ -1034,7 +1035,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
                           .decode('cp1252').encode('utf8')), delimiter=';')
 
             school_ids = {}
@@ -1160,7 +1161,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
                           .decode('cp1252').encode('utf8')), delimiter=';')
 
             school_ids = {}
@@ -1185,8 +1186,7 @@ class DuoVoBranchesSpider(BaseSpider):
                 }
 
                 grades = {
-                    'education_structure': '%s-%s' % (row['ONDERWIJSTYPE VO'],
-                                                      row['LEERWEG']),
+                    'education_structure': row['ONDERWIJSTYPE VO'],
                     'course_identifier': row['VAKCODE'],
                     'course_abbreviation': row['AFKORTING VAKNAAM'],
                     'course_name': row['VAKNAAM']
@@ -1286,7 +1286,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
             csv_file = requests.get(csv_url)
             csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content\
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
                           .decode('cp1252').encode('utf8')), delimiter=';')
 
             school_ids = {}
@@ -1311,8 +1311,7 @@ class DuoVoBranchesSpider(BaseSpider):
                 }
 
                 grades = {
-                    'education_structure': '%s-%s' % (row['ONDERWIJSTYPE VO'],
-                                                      row['LEERWEG']),
+                    'education_structure': row['ONDERWIJSTYPE VO'],
                     'course_identifier': row['VAKCODE'],
                     'course_abbreviation': row['AFKORTING VAKNAAM'],
                     'course_name': row['VAKNAAM']
@@ -1387,5 +1386,4 @@ class DuoVoBranchesSpider(BaseSpider):
                     vwo_exam_grades_reference_date=reference_date,
                     vwo_exam_grades_per_course=grades
                 )
-
                 yield school
