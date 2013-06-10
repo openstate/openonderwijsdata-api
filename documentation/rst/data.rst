@@ -119,6 +119,9 @@ vo_branch
     education_area                          string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
     education_area_code                     integer                                                                 Identifier of the education_area.
     education_structures                    array                                                                   An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
+    havo_exam_grades_per_course             array of :ref:`gradespercourse`     Cijfers per vak per jaar            Grades per course per year for the HAVO section of this school.
+    havo_exam_grades_reference_date         date
+    havo_exam_grades_reference_url          string                                                                  URL to the vmbo exam grades per course source file at http://data.duo.nl/
     meta                                    :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
     municipality                            string                                                                  The name of the municipality this branch is located in.
     municipality_code                       integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
@@ -142,8 +145,14 @@ vo_branch
     graduations_reference_date              date                                Peildatum                           Date the graduations source file was published at http://data.duo.nl
     graduations_url                         string                                                                  URL to the dropouts source file at http://data.duo.nl/
     exam_grades                             array of :ref:`examgrades`          Eindcijfers                         School and central exam grades per education structure and sector.
-    exam_grades_reference_date              date                                Peildatum                           Date the exam grades source file was published at http://data/duo.nl
+    exam_grades_reference_date              date                                Peildatum                           Date the exam grades source file was published at http://data/duo.nl/
     exam_grades_url                         string                                                                  URL to the exam grades source file at http://data.duo.nl/
+    vmbo_exam_grades_per_course             array of :ref:`gradespercourse`     Cijfers per vak per jaar            Grades per course per year for the VMBO section of this school.
+    vmbo_exam_grades_reference_date         date
+    vmbo_exam_grades_reference_url          string                                                                  URL to the vmbo exam grades per course source file at http://data.duo.nl/
+    vwo_exam_grades_per_course              array of :ref:`gradespercourse`     Cijfers per vak per jaar            Grades per course per year for the VWO section of this school.
+    vwo_exam_grades_reference_date          date
+    vwo_exam_grades_reference_url           string                                                                  URL to the vmbo exam grades per course source file at http://data.duo.nl/
     website                                 string                                                                  Website of this school.
     wgr_area                                string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
     wgr_area_code                           integer                                                                 Identifier of the wgr_area.
@@ -207,6 +216,38 @@ Dropout
     total_students                          integer                                                                 Total students for the given year at this school.
     year                                    integer                                                                 The year the dropout numbers apply to.
     ======================================= =================================== =================================== ======================================================================
+
+.. _gradespercourse:
+
+GradesPerCourse
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `08. Examenkandidaten vmbo en examencijfers per vak per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen8.asp>`_
+
+**Source:** `09. Examenkandidaten havo en examencijfers per vak per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen9.asp>`_
+
+**Source:** `10. Examenkandidaten vwo en examencijfers per vak per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp>`_
+
+.. table::
+
+    ======================================================= ========================== ========================= ======================================================================
+    Field                                                   Type                       Original term             Description
+    ======================================================= ========================== ========================= ======================================================================
+    amount_of_central_exams                                 integer                                              The amount of central exams [#centralexams]_ conducted for this branch
+    amount_of_central_exams_counting_for_diploma            integer                                              The amount of central exams [#centralexams]_ conducted at this branch that count for a diploma
+    amount_of_school_exams_with_grades                      integer                                              The amount of school exams [#schoolexams]_ conducted at this branch that are graded
+    amount_of_school_exams_with_grades_counting_for_diploma integer                                              The amount of school exams [#schoolexams]_ conducted at this branch that are graded and count for a diploma
+    amount_of_school_exams_with_rating                      integer                                              Not all school exams are graded, but are rated as "onvoldoende" (insufficient), "voldoende" (sufficient) and "goed" (good). This number denotes the amount of school exams that have rating, rather then a grade
+    amount_of_school_exams_with_rating_counting_for_diploma integer                                              The amount of school exams that are rated rather than graded that count for a diploma
+    average_grade_overall                                   float                                                The final average grade. This average is based on the grades on the final list of grades
+    avg_grade_central_exams                                 float                                                The average grade for central exams.
+    avg_grade_central_exams_counting_for_diploma            float                                                The average grade of central exams that count toward a diploma
+    avg_grade_school_exams                                  float                                                The average grade for school exams
+    avg_grade_school_exams_counting_for_diploma             float                                                The average grade of school exams that count toward a diploma
+    course_abbreviation                                     string                                               Abbreviation used by DUO that denotes the course
+    course_identifier                                       string                                               Identifier used by DUO for a course
+    course_name                                             string                                               Verbose, human-readable name for the course
+    education_structure                                     string                                               Level of education [edu_in_holland]_
+    ======================================================= ========================== ========================= ======================================================================
 
 .. _graduation:
 
@@ -946,3 +987,5 @@ StraightToThirdYear
 .. [#lwoo] http://nl.wikipedia.org/wiki/Lwoo
 .. [#owinsp] http://nl.wikipedia.org/wiki/Inspectie_van_het_Onderwijs_(Nederland)
 .. [#bag42geo] http://calendar42.com/bag42/
+.. [#centralexams] http://nl.wikipedia.org/wiki/Centraal_examen
+.. [#schoolexams] http://nl.wikipedia.org/wiki/Schoolexamen
