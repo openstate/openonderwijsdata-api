@@ -34,8 +34,8 @@ class OWINSPSpider(BaseSpider):
         raise NotImplementedError('Your spider should implement this method.')
 
     def start_requests(self):
-        return [Request(url, self.parse_search_results) for url in\
-                    self.generate_search_urls()]
+        return [Request(url, self.parse_search_results) for url in
+                self.generate_search_urls()]
 
     def parse_search_results(self, response):
         hxs = HtmlXPathSelector(response)
@@ -358,3 +358,12 @@ class VOSpider(OWINSPSpider):
 
 class POSpider(OWINSPSpider):
     name = 'po.owinsp.nl'
+
+    def generate_search_urls(self, zips=settings['ZIPCODES']):
+        with open(zips, 'r') as f:
+            search_urls = [self.search_url % {
+                                'education_sector': 'po',
+                                'zipcode': line.strip()
+                            } for line in f]
+
+        return search_urls
