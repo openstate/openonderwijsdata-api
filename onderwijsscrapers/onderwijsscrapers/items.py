@@ -181,3 +181,76 @@ class DuoVoBoard(Item):
     financial_key_indicators_per_year_url = Field()
     financial_key_indicators_per_year_reference_date = Field()
     financial_key_indicators_per_year = Field()
+
+
+class DuoBaoBoard(Item):
+    ignore_id_fields = Field()
+    reference_year = Field()  # peiljaar
+    board_id = Field()  # `Bevoegd gezagnummer`
+    name = Field()  # `BEVOEGD GEZAG NAAM`
+    address = Field()  # `adres`
+    zip_code = Field()  # `postcode`
+    city = Field()  # `woonplaats`
+    correspondence_address = Field()
+    municipality = Field()  # `Gemeente naam`
+    municipality_code = Field()  # `Gemeente nummer`
+    phone = Field()  # `telefoonnummer`
+    website = Field()  # `website` or `homepage`
+    denomination = Field()  # `denominatie`
+    administrative_office_id = Field()  # `ADMINISTRATIEKANTOORNUMMER`
+
+    # Contents of "15. Kengetallen"
+    financial_key_indicators_per_year_url = Field()
+    financial_key_indicators_per_year_reference_date = Field()
+    financial_key_indicators_per_year = Field()
+
+
+class DuoBaoSchool(SchoolItem):
+    ignore_id_fields = Field()
+    reference_year = Field()  # peiljaar
+    province = Field()  # `provincie`
+    board_id = Field()  # Bevoegd gezagnummer
+    municipality = Field()  # `Gemeente naam`
+    municipality_code = Field()  # `Gemeente nummer`
+    phone = Field()  # `telefoonnummer`
+    correspondence_address = Field()
+    nodal_area = Field()  # `NODAAL GEBIED NAAM`
+    nodal_area_code = Field()  # `NODAAL GEBIED CODE`
+    rpa_area = Field()  # `RPA GEBIED NAAM`
+    rpa_area_code = Field()  # `RPA GEBIED CODE`
+    wgr_area = Field()  # `WGR GEBIED NAAM`
+    wgr_area_code = Field()  # `WGR GEBIED CODE`
+    corop_area = Field()  # `COROP GEBIED NAAM`
+    corop_area_code = Field()  # `COROP GEBIED CODE`
+    education_area = Field()  # `ONDERWIJS GEBIED NAAM`
+    education_area_code = Field()  # `ONDERWIJS GEBIED CODE`
+    rmc_region = Field()  # `RMC REGIO NAAM`
+    rmc_region_code = Field()  # `RMC REGIO CODE`
+
+
+class DuoBaoBranch(SchoolItem):
+    ignore_id_fields = Field()
+    reference_year = Field()  # peiljaar
+    province = Field()  # `provincie`
+    board_id = Field()  # Bevoegd gezagnummer
+    municipality = Field()  # `Gemeente naam`
+    municipality_code = Field()  # `Gemeente nummer`
+    phone = Field()  # `telefoonnummer`
+    correspondence_address = Field()
+    nodal_area = Field()  # `NODAAL GEBIED NAAM`
+    nodal_area_code = Field()  # `NODAAL GEBIED CODE`
+    rpa_area = Field()  # `RPA GEBIED NAAM`
+    rpa_area_code = Field()  # `RPA GEBIED CODE`
+    wgr_area = Field()  # `WGR GEBIED NAAM`
+    wgr_area_code = Field()  # `WGR GEBIED CODE`
+    corop_area = Field()  # `COROP GEBIED NAAM`
+    corop_area_code = Field()  # `COROP GEBIED CODE`
+    education_area = Field()  # `ONDERWIJS GEBIED NAAM`
+    education_area_code = Field()  # `ONDERWIJS GEBIED CODE`
+    rmc_region = Field()  # `RMC REGIO NAAM`
+    rmc_region_code = Field()  # `RMC REGIO CODE`
+
+    # Contents of "01. Leerlingen basisonderwijs naar leerlinggewicht en per
+    # vestiging het schoolgewicht en impulsgebied"
+    weights = Field() # Dict of `GEWICHT 0`, `GEWICHT 0.3`, `GEWICHT 1.2`,
+                      # `SCHOOLGEWICHT` and `IMPULSGEBIED`.

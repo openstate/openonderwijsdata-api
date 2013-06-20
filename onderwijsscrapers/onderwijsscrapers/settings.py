@@ -108,5 +108,35 @@ EXPORT_SETTINGS = {
         'index': 'duo',
         'doctype': 'vo_school',
         'id_fields': ['reference_year', 'brin']
+    },
+    'duo_bao_boards': {
+        'validate': False,
+        #'schema': DuoVoBoard,
+        'validation_index': 'onderwijsdata_validation',
+        'geocode': True,
+        'geocode_fields': ['address', 'correspondence_address'],
+        'index': 'duo',
+        'doctype': 'bao_board',
+        'id_fields': ['reference_year', 'board_id']
+    },
+    'duo_bao_schools': {
+        'validate': False,
+        #'schema': DuoVoSchool,
+        'validation_index': 'onderwijsdata_validation',
+        'geocode': True,
+        'geocode_fields': ['address', 'correspondence_address'],
+        'index': 'duo',
+        'doctype': 'bao_school',
+        'id_fields': ['reference_year', 'brin']
+    },
+    'duo_bao_branches': {
+        'validate': False,
+        #'schema': DuoVoBranch,
+        'validation_index': 'onderwijsdata_validation',
+        'geocode': True,
+        'geocode_fields': ['address', 'correspondence_address'],
+        'index': 'duo',
+        'doctype': 'bao_branch',
+        'id_fields': ['reference_year', 'brin', 'branch_id']
     }
 }
