@@ -183,7 +183,7 @@ class DuoVoBoard(Item):
     financial_key_indicators_per_year = Field()
 
 
-class DuoBaoBoard(Item):
+class DuoPoBoard(Item):
     ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     board_id = Field()  # `Bevoegd gezagnummer`
@@ -205,7 +205,7 @@ class DuoBaoBoard(Item):
     financial_key_indicators_per_year = Field()
 
 
-class DuoBaoSchool(SchoolItem):
+class DuoPoSchool(SchoolItem):
     ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     province = Field()  # `provincie`
@@ -228,7 +228,7 @@ class DuoBaoSchool(SchoolItem):
     rmc_region_code = Field()  # `RMC REGIO CODE`
 
 
-class DuoBaoBranch(SchoolItem):
+class DuoPoBranch(SchoolItem):
     ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     province = Field()  # `provincie`

@@ -9,7 +9,7 @@ from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
 from onderwijsscrapers.items import DuoVoBoard, DuoVoSchool, DuoVoBranch, \
-                                    DuoBaoBoard, DuoBaoSchool, DuoBaoBranch
+                                    DuoPoBoard, DuoPoSchool, DuoPoBranch
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
@@ -1389,20 +1389,20 @@ class DuoVoBranchesSpider(BaseSpider):
                 yield school
 
 
-class DuoBaoBoards(BaseSpider):
-    name = 'duo_bao_boards'
+class DuoPoBoards(BaseSpider):
+    name = 'duo_po_boards'
 
     def start_requests(self):
         return [
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/adressen/Adressen/po_adressen05.asp',
-                    self.parse_bao_boards),
+                    self.parse_po_boards),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Financien/Jaarrekeninggegevens/'
-                    'Kengetallen.asp', self.parse_bao_financial_key_indicators)
+                    'Kengetallen.asp', self.parse_po_financial_key_indicators)
         ]
 
-    def parse_bao_boards(self, response):
+    def parse_po_boards(self, response):
         """
         Primair onderwijs > Adressen
         Parse "05. Bevoegde gezagen basisonderwijs"
@@ -1433,7 +1433,7 @@ class DuoBaoBoards(BaseSpider):
                 for key in row.keys():
                     row[key] = row[key].strip()
 
-                board = DuoVoBoard()
+                board = DuoPoBoard()
                 board['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
                 board['name'] = row['BEVOEGD GEZAG NAAM']
                 board['address'] = {
@@ -1498,7 +1498,7 @@ class DuoBaoBoards(BaseSpider):
                 board['ignore_id_fields'] = ['reference_year']
                 yield board
 
-    def parse_bao_financial_key_indicators(self, response):
+    def parse_po_financial_key_indicators(self, response):
         """
         Primair onderwijs > Financien > Jaarrekeninggegevens
         Parse "15. Kengetallen"
@@ -1567,37 +1567,36 @@ class DuoBaoBoards(BaseSpider):
                 print row['BEVOEGD GEZAG NUMMER']
                 for ind, ind_norm in indicators_mapping.iteritems():
                     # Some fields have no value, just an empty string ''.
-                    # Set those to None (effectively 0).
+                    # Set those to 0.
                     if row[ind] == '':
-                        row[ind] = None
+                        row[ind] = '0'
                     indicators[ind_norm] = float(row[ind].replace('.', '')
                                                          .replace(',', '.'))
 
                 indicators_per_board[board_id].append(indicators)
 
             for board_id, indicators in indicators_per_board.iteritems():
-                board = DuoBaoBoard(
+                board = DuoPoBoard(
                     board_id=board_id,
                     reference_year=reference_year,
                     financial_key_indicators_per_year_url=csv_url,
                     financial_key_indicators_per_year_reference_date=reference_date,
                     financial_key_indicators_per_year=indicators
                 )
-
                 yield board
 
 
-class DuoBaoSchools(BaseSpider):
-    name = 'duo_bao_schools'
+class DuoPoSchools(BaseSpider):
+    name = 'duo_po_schools'
 
     def start_requests(self):
         return [
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/adressen/Adressen/hoofdvestigingen.asp',
-                    self.parse_bao_schools)
+                    self.parse_po_schools)
         ]
 
-    def parse_bao_schools(self, response):
+    def parse_po_schools(self, response):
         """
         Primair onderwijs > Adressen
         Parse: "01. Hoofdvestigingen basisonderwijs"
@@ -1648,7 +1647,7 @@ class DuoBaoSchools(BaseSpider):
                     else:
                         row[key] = None
 
-                school = DuoBaoSchool()
+                school = DuoPoSchool()
                 school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
@@ -1704,23 +1703,23 @@ class DuoBaoSchools(BaseSpider):
                 yield school
 
 
-class DuoBaoBranchesSpider(BaseSpider):
-    name = 'duo_bao_branches'
+class DuoPoBranchesSpider(BaseSpider):
+    name = 'duo_po_branches'
 
     def start_requests(self):
         return [
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/adressen/Adressen/vest_bo.asp',
-                    self.parse_bao_branches),
+                    self.parse_po_branches),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
-                    self.parse_bao_student_weight),
+                    self.parse_po_student_weight),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Leerlingen/Leerlingen/po_leerlingen2.asp',
-                    self.parse_bao_student_age),
+                    self.parse_po_student_age),
         ]
 
-    def parse_bao_branches(self, response):
+    def parse_po_branches(self, response):
         """
         Primair onderwijs > Adressen
         Parse "03. Alle vestigingen basisonderwijs"
@@ -1747,7 +1746,7 @@ class DuoBaoBranchesSpider(BaseSpider):
                           .decode('cp1252').encode('utf8')), delimiter=';')
 
             for row in csv_file:
-                school = DuoBaoBranch()
+                school = DuoPoBranch()
 
                 # Correct this field name which has a trailing space.
                 if row.has_key('VESTIGINGSNAAM '):
@@ -1890,7 +1889,7 @@ class DuoBaoBranchesSpider(BaseSpider):
 
                 yield school
 
-    def parse_bao_student_weight(self, response):
+    def parse_po_student_weight(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "01. Leerlingen basisonderwijs naar leerlinggewicht en per
@@ -1977,7 +1976,7 @@ class DuoBaoBranchesSpider(BaseSpider):
                 weights_per_school[school_id].append(weights)
 
             for school_id, w_per_school in weights_per_school.iteritems():
-                school = DuoBaoBranch(
+                school = DuoPoBranch(
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
@@ -1987,7 +1986,7 @@ class DuoBaoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_bao_student_age(self, response):
+    def parse_po_student_age(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "02. Leerlingen basisonderwijs naar leeftijd"
@@ -2064,7 +2063,7 @@ class DuoBaoBranchesSpider(BaseSpider):
                 ages_per_school[school_id][weight] = ages
 
             for school_id, a_per_school in ages_per_school.iteritems():
-                school = DuoBaoBranch(
+                school = DuoPoBranch(
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
