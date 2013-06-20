@@ -8,7 +8,8 @@ from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-from onderwijsscrapers.items import DuoVoBoard, DuoVoSchool, DuoVoBranch
+from onderwijsscrapers.items import DuoVoBoard, DuoVoSchool, DuoVoBranch, \
+                                    DuoBaoBoard, DuoBaoSchool, DuoBaoBranch
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
@@ -365,10 +366,10 @@ class DuoVoSchools(BaseSpider):
                     'year': int(row['JAAR']),
                     'education_structure': row['ONDERWIJSSTRUCTUUR EN LEERJAAR'],
                     'total_students': int(row['AANTAL DEELNEMERS']),
-                    'total_dropouts': int(row['AANTAL VSV\'ERS']),
-                    'dropouts_with_vmbo_diploma': int(row['AANTAL VSV\'ERS MET VMBO DIPLOMA']),
-                    'dropouts_with_mbo1_dimploma': int(row['AANTAL VSV\'ERS MET MBO1 DIPLOMA']),
-                    'dropouts_without_diploma': int(row['AANTAL VSV\'ERS ZONDER DIPLOMA'])
+                    'total_dropouts': int(row['AANTAL VSV ERS']),
+                    'dropouts_with_vmbo_diploma': int(row['AANTAL VSV ERS MET VMBO DIPLOMA']),
+                    'dropouts_with_mbo1_dimploma': int(row['AANTAL VSV ERS MET MBO1 DIPLOMA']),
+                    'dropouts_without_diploma': int(row['AANTAL VSV ERS ZONDER DIPLOMA'])
                 }
 
                 if row['PROFIEL'] == 'NVT':
@@ -1386,4 +1387,620 @@ class DuoVoBranchesSpider(BaseSpider):
                     vwo_exam_grades_reference_date=reference_date,
                     vwo_exam_grades_per_course=grades
                 )
+                yield school
+
+
+class DuoBaoBoards(BaseSpider):
+    name = 'duo_bao_boards'
+
+    def start_requests(self):
+        return [
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/adressen/Adressen/po_adressen05.asp',
+                    self.parse_bao_boards),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/Financien/Jaarrekeninggegevens/'
+                    'Kengetallen.asp', self.parse_bao_financial_key_indicators)
+        ]
+
+    def parse_bao_boards(self, response):
+        """
+        Primair onderwijs > Adressen
+        Parse "05. Bevoegde gezagen basisonderwijs"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            for row in csv_file:
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                board = DuoVoBoard()
+                board['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
+                board['name'] = row['BEVOEGD GEZAG NAAM']
+                board['address'] = {
+                    'street': '%s %s' % (row['STRAATNAAM'],
+                                         row['HUISNUMMER-TOEVOEGING']),
+                    'zip_code': row['POSTCODE'].replace(' ', ''),
+                    'city': row['PLAATSNAAM']
+                }
+
+                board['correspondence_address'] = {}
+                if row['STRAATNAAM CORRESPONDENTIEADRES']:
+                    board['correspondence_address']['street'] = '%s %s'\
+                        % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                           row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'])
+                else:
+                    board['correspondence_address']['street'] = None
+
+                if row['POSTCODE CORRESPONDENTIEADRES']:
+                    board['correspondence_address']['zip_code'] = row[
+                        'POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
+                else:
+                    board['correspondence_address']['zip_code'] = None
+
+                if row['PLAATSNAAM CORRESPONDENTIEADRES']:
+                    board['correspondence_address']['city'] = row[
+                        'PLAATSNAAM CORRESPONDENTIEADRES']
+                else:
+                    board['correspondence_address']['city'] = None
+
+                if row['GEMEENTENAAM']:
+                    board['municipality'] = row['GEMEENTENAAM']
+                else:
+                    board['municipality'] = None
+
+                if row['GEMEENTENUMMER']:
+                    board['municipality_code'] = int(row['GEMEENTENUMMER'])
+                else:
+                    board['municipality_code'] = None
+
+                if row['TELEFOONNUMMER']:
+                    board['phone'] = row['TELEFOONNUMMER']
+                else:
+                    board['phone'] = None
+
+                if row['INTERNETADRES']:
+                    board['website'] = row['INTERNETADRES']
+                else:
+                    board['website'] = None
+
+                if row['DENOMINATIE']:
+                    board['denomination'] = row['DENOMINATIE']
+                else:
+                    board['denomination'] = None
+
+                if row['ADMINISTRATIEKANTOORNUMMER']:
+                    board['administrative_office_id'] = \
+                        int(row['ADMINISTRATIEKANTOORNUMMER'])
+                else:
+                    board['administrative_office_id'] = None
+
+                board['reference_year'] = reference_year
+                board['ignore_id_fields'] = ['reference_year']
+                yield board
+
+    def parse_bao_financial_key_indicators(self, response):
+        """
+        Primair onderwijs > Financien > Jaarrekeninggegevens
+        Parse "15. Kengetallen"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        indicators_mapping = {
+            'LIQUIDITEIT (CURRENT RATIO)': 'liquidity_current_ratio',
+            'RENTABILITEIT': 'profitability',
+            'SOLVABILITEIT 1': 'solvency_1',
+            'SOLVABILITEIT 2': 'solvency_2',
+            'ALGEMENE RESERVE / TOTALE BATEN': 'general_reserve_div_total_income',
+            'BELEGGINGEN (T.O.V. EV)': 'investments_relative_to_equity',
+            #'CONTRACTACTIVITEITEN / RIJKSBIJDRAGE': 'contract_activities_div_gov_funding',
+            #'CONTRACTACTIVITEITEN / TOTALE BATEN': 'contractactivities_div_total_profits',
+            'EIGEN VERMOGEN / TOTALE BATEN': 'equity_div_total_profits',
+            #'INVESTERING HUISVESTING / TOTALE BATEN': 'housing_investment_div_total_profits',
+            'INVESTERINGEN (INVENT.+APP.) / TOTALE BATEN': 'investments_div_total_profits',
+            'KAPITALISATIEFACTOR': 'capitalization_ratio',
+            'LIQUIDITEIT (QUICK RATIO)': 'liquidity_quick_ratio',
+            'OV. OVERHEIDSBIJDRAGEN / TOT. BATEN': 'other_gov_funding_div_total_profits',
+            'PERSONEEL / RIJKSBIJDRAGEN': 'staff_costs_div_gov_funding',
+            'PERSONELE LASTEN / TOTALE LASTEN': 'staff_expenses_div_total_expenses',
+            'RIJKSBIJDRAGEN / TOTALE BATEN': 'gov_funding_div_total_profits',
+            'VOORZIENINGEN /TOTALE BATEN': 'facilities_div_total_profits',
+            #'WEERSTANDSVERMOGEN (-/- MVA)': '',
+            #'WEERSTANDSVERMOGEN VO TOTALE BN.': '',
+            'WERKKAPITAAL / TOTALE BATEN': 'operating_capital_div_total_profits',
+            'HUISVESTINGSLASTEN / TOTALE LASTEN': 'housing_expenses_div_total_expenses',
+            'WERKKAPITAAL': 'operating_capital',
+        }
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            indicators_per_board = {}
+            for row in csv_file:
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                board_id = int(row['BEVOEGD GEZAG NUMMER'])
+                if board_id not in indicators_per_board:
+                    indicators_per_board[board_id] = []
+
+                indicators = {}
+                indicators['year'] = int(row['JAAR'])
+                indicators['group'] = row['GROEPERING']
+
+                print row['BEVOEGD GEZAG NUMMER']
+                for ind, ind_norm in indicators_mapping.iteritems():
+                    # Some fields have no value, just an empty string ''.
+                    # Set those to None (effectively 0).
+                    if row[ind] == '':
+                        row[ind] = None
+                    indicators[ind_norm] = float(row[ind].replace('.', '')
+                                                         .replace(',', '.'))
+
+                indicators_per_board[board_id].append(indicators)
+
+            for board_id, indicators in indicators_per_board.iteritems():
+                board = DuoBaoBoard(
+                    board_id=board_id,
+                    reference_year=reference_year,
+                    financial_key_indicators_per_year_url=csv_url,
+                    financial_key_indicators_per_year_reference_date=reference_date,
+                    financial_key_indicators_per_year=indicators
+                )
+
+                yield board
+
+
+class DuoBaoSchools(BaseSpider):
+    name = 'duo_bao_schools'
+
+    def start_requests(self):
+        return [
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/adressen/Adressen/hoofdvestigingen.asp',
+                    self.parse_bao_schools)
+        ]
+
+    def parse_bao_schools(self, response):
+        """
+        Primair onderwijs > Adressen
+        Parse: "01. Hoofdvestigingen basisonderwijs"
+        """
+        hxs = HtmlXPathSelector(response)
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        # Fields that do not need additonal processing
+        school_fields = {
+            'BRIN NUMMER': 'brin',
+            'PROVINCIE': 'province',
+            'INSTELLINGSNAAM': 'name',
+            'GEMEENTENAAM': 'municipality',
+            'DENOMINATIE': 'denomination',
+            'INTERNETADRES': 'website',
+            'TELEFOONNUMMER': 'phone',
+            'ONDERWIJSGEBIED NAAM': 'education_area',
+            'NODAAL GEBIED NAAM': 'nodal_area',
+            'RPA-GEBIED NAAM': 'rpa_area',
+            'WGR-GEBIED NAAM': 'wgr_area',
+            'COROPGEBIED NAAM': 'corop_area',
+            'RMC-REGIO NAAM': 'rmc_region'
+        }
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            for row in csv_file:
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = row[key].strip()
+                    if value:
+                        row[key] = value
+                    else:
+                        row[key] = None
+
+                school = DuoBaoSchool()
+                school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
+                school['address'] = {
+                    'street': '%s %s' % (row['STRAATNAAM'],
+                                         row['HUISNUMMER-TOEVOEGING']),
+                    'city': row['PLAATSNAAM'],
+                    'zip_code': row['POSTCODE'].replace(' ', '')
+                }
+
+                school['correspondence_address'] = {
+                    'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                                         row['HUISNUMMER-TOEVOEGING '
+                                             'CORRESPONDENTIEADRES']),
+                    'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
+                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
+                }
+
+                school['municipality_code'] = int(row['GEMEENTENUMMER'])
+
+                if row['COROPGEBIED CODE']:
+                    school['corop_area_code'] = int(row['COROPGEBIED CODE'])
+
+                if row['NODAAL GEBIED CODE']:
+                    school['nodal_area_code'] = int(row['NODAAL GEBIED CODE'])
+                else:
+                    school['nodal_area_code'] = None
+
+                if row['RPA-GEBIED CODE']:
+                    school['rpa_area_code'] = int(row['RPA-GEBIED CODE'])
+                else:
+                    school['rpa_area_code'] = None
+
+                if row['WGR-GEBIED CODE']:
+                    school['wgr_area_code'] = int(row['WGR-GEBIED CODE'])
+                else:
+                    school['wgr_area_code'] = None
+
+                if row['ONDERWIJSGEBIED CODE']:
+                    school['education_area_code'] = int(row['ONDERWIJSGEBIED CODE'])
+                else:
+                    school['education_area_code'] = None
+
+                if row['RMC-REGIO CODE']:
+                    school['rmc_region_code'] = int(row['RMC-REGIO CODE'])
+                else:
+                    school['rmc_region_code'] = None
+
+                for field, field_norm in school_fields.iteritems():
+                    school[field_norm] = row[field]
+
+                school['reference_year'] = reference_year
+                school['ignore_id_fields'] = ['reference_year']
+
+                yield school
+
+
+class DuoBaoBranchesSpider(BaseSpider):
+    name = 'duo_bao_branches'
+
+    def start_requests(self):
+        return [
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/adressen/Adressen/vest_bo.asp',
+                    self.parse_bao_branches),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
+                    self.parse_bao_student_weight),
+        ]
+
+    def parse_bao_branches(self, response):
+        """
+        Primair onderwijs > Adressen
+        Parse "03. Alle vestigingen basisonderwijs"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            for row in csv_file:
+                school = DuoBaoBranch()
+
+                # Correct this field name which has a trailing space.
+                if row.has_key('VESTIGINGSNAAM '):
+                    row['VESTIGINGSNAAM'] = row['VESTIGINGSNAAM ']
+
+                school['reference_year'] = reference_year
+                school['ignore_id_fields'] = ['reference_year']
+                school['name'] = row['VESTIGINGSNAAM'].strip()
+                school['address'] = {
+                    'street': '%s %s' % (row['STRAATNAAM'].strip(),
+                                         row['HUISNUMMER-TOEVOEGING'].strip()),
+                    'city': row['PLAATSNAAM'].strip(),
+                    'zip_code': row['POSTCODE'].strip().replace(' ', '')
+                }
+
+                if row['INTERNETADRES'].strip():
+                    school['website'] = row['INTERNETADRES'].strip()
+                else:
+                    school['website'] = None
+
+                if row['DENOMINATIE'].strip():
+                    school['denomination'] = row['DENOMINATIE'].strip()
+                else:
+                    school['denomination'] = None
+
+                if row['PROVINCIE'].strip():
+                    school['province'] = row['PROVINCIE'].strip()
+                else:
+                    school['province'] = None
+
+                if row['BEVOEGD GEZAG NUMMER'].strip():
+                    school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'].strip())
+                else:
+                    school['board_id'] = None
+
+                if row['BRIN NUMMER'].strip():
+                    school['brin'] = row['BRIN NUMMER'].strip()
+
+                if row['VESTIGINGSNUMMER'].strip():
+                    school['branch_id'] = int(row['VESTIGINGSNUMMER']
+                                              .strip()
+                                              .replace(row['BRIN NUMMER'], ''))
+
+                if row['GEMEENTENAAM'].strip():
+                    school['municipality'] = row['GEMEENTENAAM'].strip()
+                else:
+                    school['municipality'] = None
+
+                if row['GEMEENTENUMMER'].strip():
+                    school['municipality_code'] = int(row['GEMEENTENUMMER'].strip())
+                else:
+                    school['municipality_code'] = None
+
+                if row['TELEFOONNUMMER'].strip():
+                    school['phone'] = row['TELEFOONNUMMER'].strip()
+                else:
+                    school['phone'] = None
+
+                school['correspondence_address'] = {}
+                if row['STRAATNAAM CORRESPONDENTIEADRES'].strip():
+                    school['correspondence_address']['street'] = '%s %s'\
+                        % (row['STRAATNAAM CORRESPONDENTIEADRES'].strip(),
+                           row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'].strip())
+                else:
+                    school['correspondence_address']['street'] = None
+
+                if row['POSTCODE CORRESPONDENTIEADRES'].strip():
+                    school['correspondence_address']['zip_code'] = row[
+                        'POSTCODE CORRESPONDENTIEADRES'].strip().replace(' ', '')
+                else:
+                    school['correspondence_address']['zip_code'] = None
+
+                if row['PLAATSNAAM CORRESPONDENTIEADRES'].strip():
+                    school['correspondence_address']['city'] = row[
+                        'PLAATSNAAM CORRESPONDENTIEADRES'].strip()
+                else:
+                    school['correspondence_address']['city'] = None
+
+                if row['NODAAL GEBIED NAAM'].strip():
+                    school['nodal_area'] = row['NODAAL GEBIED NAAM'].strip()
+                else:
+                    school['nodal_area'] = None
+
+                if row['NODAAL GEBIED CODE'].strip():
+                    school['nodal_area_code'] = int(row['NODAAL GEBIED CODE']
+                                                    .strip())
+                else:
+                    school['nodal_area_code'] = None
+
+                if row['RPA-GEBIED NAAM'].strip():
+                    school['rpa_area'] = row['RPA-GEBIED NAAM'].strip()
+                else:
+                    school['rpa_area'] = None
+
+                if row['RPA-GEBIED CODE'].strip():
+                    school['rpa_area_code'] = int(row['RPA-GEBIED CODE'].strip())
+                else:
+                    school['rpa_area_code'] = None
+
+                if row['WGR-GEBIED NAAM'].strip():
+                    school['wgr_area'] = row['WGR-GEBIED NAAM'].strip()
+                else:
+                    school['wgr_area'] = None
+
+                if row['WGR-GEBIED CODE'].strip():
+                    school['wgr_area_code'] = int(row['WGR-GEBIED CODE'].strip())
+                else:
+                    school['wgr_area_code'] = None
+
+                if row['COROPGEBIED NAAM'].strip():
+                    school['corop_area'] = row['COROPGEBIED NAAM'].strip()
+                else:
+                    school['corop_area'] = None
+
+                if row['COROPGEBIED CODE'].strip():
+                    school['corop_area_code'] = int(row['COROPGEBIED CODE'].strip())
+                else:
+                    school['corop_area_code'] = None
+
+                if row['ONDERWIJSGEBIED NAAM'].strip():
+                    school['education_area'] = row['ONDERWIJSGEBIED NAAM'].strip()
+                else:
+                    school['education_area'] = None
+
+                if row['ONDERWIJSGEBIED CODE'].strip():
+                    school['education_area_code'] = int(row['ONDERWIJSGEBIED '
+                                                            'CODE'].strip())
+                else:
+                    school['education_area_code'] = None
+
+                if row['RMC-REGIO NAAM'].strip():
+                    school['rmc_region'] = row['RMC-REGIO NAAM'].strip()
+                else:
+                    school['rmc_region'] = None
+
+                if row['RMC-REGIO CODE'].strip():
+                    school['rmc_region_code'] = int(row['RMC-REGIO CODE'].strip())
+                else:
+                    school['rmc_region_code'] = None
+
+                yield school
+
+    def parse_bao_student_weight(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "01. Leerlingen basisonderwijs naar leerlinggewicht en per
+                   vestiging het schoolgewicht en impulsgebied"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            for row in csv_file:
+                school = DuoBaoBranch()
+
+                # Datasets 2011 and 2012 suddenly changed these field names.
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+                if row.has_key('BEVOEGDGEZAGNUMMER'):
+                    row['BEVOEGD GEZAG NUMMER'] = row['BEVOEGDGEZAGNUMMER']
+                if row.has_key('INSTELLINGSNAAMVESTIGING'):
+                    row['INSTELLINGSNAAM VESTIGING'] = row['INSTELLINGSNAAMVESTIGING']
+                if row.has_key('GEWICHT0.00'):
+                    row['GEWICHT 0'] = row['GEWICHT0.00']
+                if row.has_key('GEWICHT0.30'):
+                    row['GEWICHT 0.3'] = row['GEWICHT0.30']
+                if row.has_key('GEWICHT1.20'):
+                    row['GEWICHT 1.2'] = row['GEWICHT1.20']
+
+                school['reference_year'] = reference_year
+                #school['ignore_id_fields'] = ['reference_year']
+
+                if row['BRIN NUMMER'].strip():
+                    school['brin'] = row['BRIN NUMMER'].strip()
+
+                if row['VESTIGINGSNUMMER'].strip():
+                    school['branch_id'] = int(row['VESTIGINGSNUMMER']
+                                              .strip()
+                                              .replace(row['BRIN NUMMER'], ''))
+
+                if row['BEVOEGD GEZAG NUMMER'].strip():
+                    school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'].strip())
+                else:
+                    school['board_id'] = None
+
+                school['name'] = row['INSTELLINGSNAAM VESTIGING'].strip()
+                school['address'] = {
+                    'city': row['PLAATSNAAM'].strip(),
+                }
+
+                if row['GEMEENTENUMMER'].strip():
+                    school['municipality_code'] = int(row['GEMEENTENUMMER'].strip())
+                else:
+                    school['municipality_code'] = None
+
+                if row['GEMEENTENAAM'].strip():
+                    school['municipality'] = row['GEMEENTENAAM'].strip()
+                else:
+                    school['municipality'] = None
+
+                if row['PROVINCIE'].strip():
+                    school['province'] = row['PROVINCIE'].strip()
+                else:
+                    school['province'] = None
+
+                if row['DENOMINATIE'].strip():
+                    school['denomination'] = row['DENOMINATIE'].strip()
+                else:
+                    school['denomination'] = None
+                
+                weights = {}
+                if row['GEWICHT 0'].strip():
+                    weights['student_weight_0'] = int(row['GEWICHT 0'].strip())
+                else:
+                    weights['student_weight_0'] = None
+
+                if row['GEWICHT 0.3'].strip():
+                    weights['student_weight_03'] = int(row['GEWICHT 0.3'].strip())
+                else:
+                    weights['student_weight_03'] = None
+
+                if row['GEWICHT 1.2'].strip():
+                    weights['student_weight_12'] = int(row['GEWICHT 1.2'].strip())
+                else:
+                    weights['student_weight_12'] = None
+
+                if row['SCHOOLGEWICHT'].strip():
+                    weights['school_weight'] = int(row['SCHOOLGEWICHT'].strip())
+                else:
+                    weights['school_weight'] = None
+
+                # The 2008 dataset doesn't contain the IMPULSGEBIED field.
+                if row.has_key('IMPULSGEBIED'):
+                    if row['IMPULSGEBIED'].strip():
+                        weights['impulse_area'] = int(row['IMPULSGEBIED'].strip())
+                    else:
+                        weights['impulse_area'] = None
+
+                school['weights'] = weights
+
                 yield school
