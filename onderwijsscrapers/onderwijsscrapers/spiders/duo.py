@@ -1316,7 +1316,6 @@ class DuoVoBranchesSpider(BaseSpider):
                     'course_identifier': row['VAKCODE'],
                     'course_abbreviation': row['AFKORTING VAKNAAM'],
                     'course_name': row['VAKNAAM']
-
                 }
 
                 if 'SCHOOLEXAMEN BEOORDELING' in row:
@@ -1716,6 +1715,9 @@ class DuoBaoBranchesSpider(BaseSpider):
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
                     self.parse_bao_student_weight),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen2.asp',
+                    self.parse_bao_student_age),
         ]
 
     def parse_bao_branches(self, response):
@@ -1915,16 +1917,13 @@ class DuoBaoBranchesSpider(BaseSpider):
             csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
                           .decode('cp1252').encode('utf8')), delimiter=';')
 
-            for row in csv_file:
-                school = DuoBaoBranch()
+            school_ids = {}
+            weights_per_school = {}
 
+            for row in csv_file:
                 # Datasets 2011 and 2012 suddenly changed these field names.
                 if row.has_key('BRINNUMMER'):
                     row['BRIN NUMMER'] = row['BRINNUMMER']
-                if row.has_key('BEVOEGDGEZAGNUMMER'):
-                    row['BEVOEGD GEZAG NUMMER'] = row['BEVOEGDGEZAGNUMMER']
-                if row.has_key('INSTELLINGSNAAMVESTIGING'):
-                    row['INSTELLINGSNAAM VESTIGING'] = row['INSTELLINGSNAAMVESTIGING']
                 if row.has_key('GEWICHT0.00'):
                     row['GEWICHT 0'] = row['GEWICHT0.00']
                 if row.has_key('GEWICHT0.30'):
@@ -1932,47 +1931,18 @@ class DuoBaoBranchesSpider(BaseSpider):
                 if row.has_key('GEWICHT1.20'):
                     row['GEWICHT 1.2'] = row['GEWICHT1.20']
 
-                school['reference_year'] = reference_year
-                #school['ignore_id_fields'] = ['reference_year']
-
-                if row['BRIN NUMMER'].strip():
-                    school['brin'] = row['BRIN NUMMER'].strip()
-
+                brin = row['BRIN NUMMER'].strip()
+                # Bypasses error coming from the 2011 dataset which contains and
+                # empty row.
                 if row['VESTIGINGSNUMMER'].strip():
-                    school['branch_id'] = int(row['VESTIGINGSNUMMER']
-                                              .strip()
-                                              .replace(row['BRIN NUMMER'], ''))
+                    branch_id = int(row['VESTIGINGSNUMMER'])
+                school_id = '%s-%s' % (brin, branch_id)
 
-                if row['BEVOEGD GEZAG NUMMER'].strip():
-                    school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'].strip())
-                else:
-                    school['board_id'] = None
-
-                school['name'] = row['INSTELLINGSNAAM VESTIGING'].strip()
-                school['address'] = {
-                    'city': row['PLAATSNAAM'].strip(),
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
                 }
 
-                if row['GEMEENTENUMMER'].strip():
-                    school['municipality_code'] = int(row['GEMEENTENUMMER'].strip())
-                else:
-                    school['municipality_code'] = None
-
-                if row['GEMEENTENAAM'].strip():
-                    school['municipality'] = row['GEMEENTENAAM'].strip()
-                else:
-                    school['municipality'] = None
-
-                if row['PROVINCIE'].strip():
-                    school['province'] = row['PROVINCIE'].strip()
-                else:
-                    school['province'] = None
-
-                if row['DENOMINATIE'].strip():
-                    school['denomination'] = row['DENOMINATIE'].strip()
-                else:
-                    school['denomination'] = None
-                
                 weights = {}
                 if row['GEWICHT 0'].strip():
                     weights['student_weight_0'] = int(row['GEWICHT 0'].strip())
@@ -2001,6 +1971,105 @@ class DuoBaoBranchesSpider(BaseSpider):
                     else:
                         weights['impulse_area'] = None
 
-                school['weights'] = weights
+                if school_id not in weights_per_school:
+                    weights_per_school[school_id] = []
 
+                weights_per_school[school_id].append(weights)
+
+            for school_id, w_per_school in weights_per_school.iteritems():
+                school = DuoBaoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    weights_per_school_reference_url=csv_url,
+                    weights_per_school_reference_date=reference_date,
+                    weights_per_school=w_per_school
+                )
+                yield school
+
+    def parse_bao_student_age(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "02. Leerlingen basisonderwijs naar leeftijd"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            school_ids = {}
+            ages_per_school = {}
+
+            for row in csv_file:
+                # Datasets 2011 and 2012 suddenly changed these field names.
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+                if row.has_key('GEMEENTE NUMMER'):
+                    row['GEMEENTENUMMER'] = row['GEMEENTE NUMMER']
+                if row.has_key('VESTIGINGS NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
+
+                brin = row['BRIN NUMMER'].strip()
+                branch_id = int(row['VESTIGINGSNUMMER'])
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                # The 2012 dataset had fields like 'LEEFTIJD 4 JAAR' instead of
+                # '4 JAAR'. This fixes the problem.
+                for key in row.keys():
+                    key_norm = key.replace('LEEFTIJD ', '')
+                    row[key_norm] = row[key].strip()
+
+                # Remove leading/trailing spaces from field names.
+                for key in row.keys():
+                    row[key.strip()] = row[key]
+
+                ages = {}
+                possible_ages = '3 4 5 6 7 8 9 10 11 12 13 14'.split()
+                for age in possible_ages:
+                    if row.has_key(age + ' JAAR'):
+                        if row[age + ' JAAR'].strip():
+                            ages['age_' + age] = int(row[age + ' JAAR'])
+                        else:
+                            ages['age_' + age] = 0
+                            
+                if school_id not in ages_per_school:
+                    ages_per_school[school_id] = {}
+
+                if row.has_key('GEWICHT'):
+                    weight = 'student_weight=%s' % row['GEWICHT'].strip()
+                else:
+                    weight = 'student_weights_combined'
+
+                ages_per_school[school_id][weight] = ages
+
+            for school_id, a_per_school in ages_per_school.iteritems():
+                school = DuoBaoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    ages_per_school_reference_url=csv_url,
+                    ages_per_school_reference_date=reference_date,
+                    ages_per_school=a_per_school
+                )
                 yield school

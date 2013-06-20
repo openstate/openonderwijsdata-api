@@ -252,5 +252,13 @@ class DuoBaoBranch(SchoolItem):
 
     # Contents of "01. Leerlingen basisonderwijs naar leerlinggewicht en per
     # vestiging het schoolgewicht en impulsgebied"
-    weights = Field() # Dict of `GEWICHT 0`, `GEWICHT 0.3`, `GEWICHT 1.2`,
-                      # `SCHOOLGEWICHT` and `IMPULSGEBIED`.
+    weights_per_school_reference_url = Field()
+    weights_per_school_reference_date = Field()
+    weights_per_school = Field() # Dict of `GEWICHT 0`, `GEWICHT 0.3`,
+                                 # `GEWICHT 1.2`, `SCHOOLGEWICHT` and
+                                 # `IMPULSGEBIED`.
+
+    # Contents of "02. Leerlingen basisonderwijs naar leeftijd"
+    ages_per_school_reference_url = Field()
+    ages_per_school_reference_date = Field()
+    ages_per_school  = Field() # Dict of childrens ages (age (3/4)-14).
