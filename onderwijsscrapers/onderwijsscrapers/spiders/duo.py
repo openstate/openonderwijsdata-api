@@ -1715,7 +1715,7 @@ class DuoPoBranchesSpider(BaseSpider):
                     'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
                     self.parse_po_student_weight),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen2.asp',
+                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp',
                     self.parse_po_student_age),
         ]
 
@@ -1944,19 +1944,19 @@ class DuoPoBranchesSpider(BaseSpider):
 
                 weights = {}
                 if row['GEWICHT 0'].strip():
-                    weights['student_weight_0'] = int(row['GEWICHT 0'].strip())
+                    weights['student_weight_0.0'] = int(row['GEWICHT 0'].strip())
                 else:
-                    weights['student_weight_0'] = None
+                    weights['student_weight_0.0'] = None
 
                 if row['GEWICHT 0.3'].strip():
-                    weights['student_weight_03'] = int(row['GEWICHT 0.3'].strip())
+                    weights['student_weight_0.3'] = int(row['GEWICHT 0.3'].strip())
                 else:
-                    weights['student_weight_03'] = None
+                    weights['student_weight_0.3'] = None
 
                 if row['GEWICHT 1.2'].strip():
-                    weights['student_weight_12'] = int(row['GEWICHT 1.2'].strip())
+                    weights['student_weight_1.2'] = int(row['GEWICHT 1.2'].strip())
                 else:
-                    weights['student_weight_12'] = None
+                    weights['student_weight_1.2'] = None
 
                 if row['SCHOOLGEWICHT'].strip():
                     weights['school_weight'] = int(row['SCHOOLGEWICHT'].strip())
@@ -2037,7 +2037,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 # '4 JAAR'. This fixes the problem.
                 for key in row.keys():
                     key_norm = key.replace('LEEFTIJD ', '')
-                    row[key_norm] = row[key].strip()
+                    row[key_norm] = row[key]
 
                 # Remove leading/trailing spaces from field names.
                 for key in row.keys():
@@ -2046,19 +2046,26 @@ class DuoPoBranchesSpider(BaseSpider):
                 ages = {}
                 possible_ages = '3 4 5 6 7 8 9 10 11 12 13 14'.split()
                 for age in possible_ages:
-                    if row.has_key(age + ' JAAR'):
-                        if row[age + ' JAAR'].strip():
-                            ages['age_' + age] = int(row[age + ' JAAR'])
+                    if row.has_key('%s JAAR' % age):
+                        if row['%s JAAR' % age].strip():
+                            ages['age_%s' % age] = int(row['%s JAAR' % age])
                         else:
-                            ages['age_' + age] = 0
+                            ages['age_%s' % age] = 0
+                    # The 2011 dataset uses other field names.
+                    elif row.has_key('LEEFTIJD.%s' % age):
+                        if row['LEEFTIJD.%s' % age].strip():
+                            ages['age_%s' % age] = int(row['LEEFTIJD.%s' % age])
+                        else:
+                            ages['age_%s' % age] = 0
+
                             
                 if school_id not in ages_per_school:
                     ages_per_school[school_id] = {}
 
-                if row.has_key('GEWICHT'):
-                    weight = 'student_weight=%s' % row['GEWICHT'].strip()
+                if row['GEWICHT'].strip():
+                    weight = 'student_weight_%.1f' % float(row['GEWICHT'].strip().replace(',', '.'))
                 else:
-                    weight = 'student_weights_combined'
+                    weight = None
 
                 ages_per_school[school_id][weight] = ages
 
