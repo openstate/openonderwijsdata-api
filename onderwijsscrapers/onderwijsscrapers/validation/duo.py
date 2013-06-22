@@ -206,6 +206,99 @@ class DuoVoSchool(MappingSchema):
     wgr_area = general_rules.wgr_area
     wgr_area_code = general_rules.wgr_area_code
 
+
+class DuoPoBoard(MappingSchema):
+    address = general_rules.Address()
+    correspondence_address = general_rules.Address()
+    board_id = general_rules.board_id
+    name = general_rules.name
+    phone = general_rules.phone
+    municipality = general_rules.municipality
+    municipality_code = general_rules.municipality_code
+    administrative_office_id = SchemaNode(Int())
+    denomination = general_rules.denomination
+    # TODO:
+    #financial_key_indicators_per_year = general_rules.FinancialKeyIndicatorsPerYear()
+    financial_key_indicators_per_year_reference_date = SchemaNode(Date(),
+        missing=True)
+    financial_key_indicators_per_year_url = general_rules.website
+    reference_year = general_rules.reference_year
+    website = general_rules.website
+
+
+class DuoPoSchool(MappingSchema):
+    address = general_rules.Address()
+    correspondence_address = general_rules.Address()
+    board_id = general_rules.board_id
+    brin = general_rules.brin
+    denomination = general_rules.denomination
+    corop_area = general_rules.corop_area
+    corop_area_code = general_rules.corop_area
+    education_area = general_rules.education_area
+    education_area_code = general_rules.education_area_code
+    municipality = general_rules.municipality
+    municipality_code = general_rules.municipality_code
+    name = general_rules.name
+    nodal_area = general_rules.nodal_area
+    nodal_area_code = general_rules.nodal_area_code
+    phone = general_rules.phone
+    province = general_rules.province
+    reference_year = general_rules.reference_year
+    rmc_region = general_rules.rmc_region
+    rmc_region_code = general_rules.rmc_region_code
+    rpa_area = general_rules.rpa_area
+    rpa_area_code = general_rules.rpa_area_code
+    website = general_rules.website
+    wgr_area = general_rules.wgr_area
+    wgr_area_code = general_rules.wgr_area_code
+
+
+class DuoPoBranch(MappingSchema):
+    address = general_rules.Address()
+    # TODO:
+    #ages_per_branch_by_student_weight = general_rules.AgesPerBranchByStudentWeight()
+    ages_per_branch_by_student_weight_reference_date = SchemaNode(Date(),
+        missing=True)
+    ages_per_branch_by_student_weight_reference_url = general_rules.website
+    correspondence_address = general_rules.Address()
+    name = general_rules.name
+    branch_id = general_rules.branch_id
+    board_id = general_rules.board_id
+    brin = general_rules.brin
+    corop_area = general_rules.corop_area
+    corop_area_code = general_rules.corop_area_code
+    denomination = general_rules.denomination
+    education_area = general_rules.education_area
+    education_area_code = general_rules.education_area_code
+    #education_structures = general_rules.EducationStructures()
+    #graduations = Graduations()
+    #graduations_reference_date = SchemaNode(Date())
+    #graduations_reference_url = general_rules.reference_url
+    #student_residences = StudentResidences()
+    #student_residences_reference_date = SchemaNode(Date())
+    #student_residences_reference_url = general_rules.reference_url
+    #students_by_structure = StudentsByStructure()
+    municipality = general_rules.municipality
+    municipality_code = general_rules.municipality_code
+    nodal_area = general_rules.nodal_area
+    nodal_area_code = general_rules.nodal_area_code
+    phone = general_rules.phone
+    province = general_rules.province
+    reference_year = general_rules.reference_year
+    rmc_region = general_rules.rmc_region
+    rmc_region_code = general_rules.rmc_region_code
+    rpa_area = general_rules.rpa_area
+    rpa_area_code = general_rules.rpa_area_code
+    website = general_rules.url
+    # TODO:
+    #weights_per_school = general_rules.WeightsPerSchool()
+    weights_per_school_reference_date = SchemaNode(Date(),
+        missing=True)
+    weights_per_school_reference_url = general_rules.website
+    wgr_area = general_rules.wgr_area
+    wgr_area_code = general_rules.wgr_area_code
+
+
 errors = []
 def validate():
     schema = DuoVoBranch()

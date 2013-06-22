@@ -189,8 +189,6 @@ class DuoPoBoard(Item):
     board_id = Field()  # `Bevoegd gezagnummer`
     name = Field()  # `BEVOEGD GEZAG NAAM`
     address = Field()  # `adres`
-    zip_code = Field()  # `postcode`
-    city = Field()  # `woonplaats`
     correspondence_address = Field()
     municipality = Field()  # `Gemeente naam`
     municipality_code = Field()  # `Gemeente nummer`
@@ -259,6 +257,7 @@ class DuoPoBranch(SchoolItem):
                                  # `IMPULSGEBIED`.
 
     # Contents of "02. Leerlingen basisonderwijs naar leeftijd"
-    ages_per_school_reference_url = Field()
-    ages_per_school_reference_date = Field()
-    ages_per_school  = Field() # Dict of childrens ages (age (3/4)-14).
+    ages_per_branch_by_student_weight_reference_url = Field()
+    ages_per_branch_by_student_weight_reference_date = Field()
+    ages_per_branch_by_student_weight  = Field() # Dict of childrens ages
+                                                 # (age (3/4)-14) by student weight.

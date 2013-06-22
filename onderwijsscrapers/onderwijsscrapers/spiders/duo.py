@@ -1564,7 +1564,6 @@ class DuoPoBoards(BaseSpider):
                 indicators['year'] = int(row['JAAR'])
                 indicators['group'] = row['GROEPERING']
 
-                print row['BEVOEGD GEZAG NUMMER']
                 for ind, ind_norm in indicators_mapping.iteritems():
                     # Some fields have no value, just an empty string ''.
                     # Set those to 0.
@@ -1966,7 +1965,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 # The 2008 dataset doesn't contain the IMPULSGEBIED field.
                 if row.has_key('IMPULSGEBIED'):
                     if row['IMPULSGEBIED'].strip():
-                        weights['impulse_area'] = int(row['IMPULSGEBIED'].strip())
+                        weights['impulse_area'] = bool(int(row['IMPULSGEBIED'].strip()))
                     else:
                         weights['impulse_area'] = None
 
@@ -2013,7 +2012,7 @@ class DuoPoBranchesSpider(BaseSpider):
                           .decode('cp1252').encode('utf8')), delimiter=';')
 
             school_ids = {}
-            ages_per_school = {}
+            ages_per_branch_by_student_weight = {}
 
             for row in csv_file:
                 # Datasets 2011 and 2012 suddenly changed these field names.
@@ -2059,23 +2058,23 @@ class DuoPoBranchesSpider(BaseSpider):
                             ages['age_%s' % age] = 0
 
                             
-                if school_id not in ages_per_school:
-                    ages_per_school[school_id] = {}
+                if school_id not in ages_per_branch_by_student_weight:
+                    ages_per_branch_by_student_weight[school_id] = {}
 
                 if row['GEWICHT'].strip():
                     weight = 'student_weight_%.1f' % float(row['GEWICHT'].strip().replace(',', '.'))
                 else:
                     weight = None
 
-                ages_per_school[school_id][weight] = ages
+                ages_per_branch_by_student_weight[school_id][weight] = ages
 
-            for school_id, a_per_school in ages_per_school.iteritems():
+            for school_id, a_per_school in ages_per_branch_by_student_weight.iteritems():
                 school = DuoPoBranch(
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
-                    ages_per_school_reference_url=csv_url,
-                    ages_per_school_reference_date=reference_date,
-                    ages_per_school=a_per_school
+                    ages_per_branch_by_student_weight_reference_url=csv_url,
+                    ages_per_branch_by_student_weight_reference_date=reference_date,
+                    ages_per_branch_by_student_weight=a_per_school
                 )
                 yield school
