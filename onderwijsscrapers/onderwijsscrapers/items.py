@@ -265,3 +265,9 @@ class DuoPoBranch(SchoolItem):
     ages_per_branch_by_student_weight_reference_date = Field()
     ages_per_branch_by_student_weight  = Field() # Dict of childrens ages
                                                  # (age (3/4)-14) by student weight.
+
+
+    # Contents of "09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
+    pupils_by_origins_reference_url = Field()
+    pupils_by_origins_reference_date = Field()
+    pupils_by_origins = Field()

@@ -93,3 +93,7 @@ class EducationStructures(SequenceSchema):
 
 #TODO:
 #class EduTypes
+
+
+#TODO:
+#class PupilsByOrigins

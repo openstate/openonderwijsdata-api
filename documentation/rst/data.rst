@@ -259,6 +259,9 @@ po_branch
     nodal_area_code                                     integer                                                                 Identifier of the nodal_area.
     phone                                               string                                                                  Phone number of the school.
     province                                            string                                                                  The province [#provinces]_ this branch is situated in.
+    pupils_by_origins                                   array of :ref:`pupilsbyorigins`                                         Number of pupils born in countries other than The Netherlands by country. Only availabe in 2009 as collecting of this data has been stopped since 2010.
+    pupils_by_origins_reference_date                    date                                Peiljaar                            Date the source file was published at http://data.duo.nl
+    pupils_by_origins_reference_url                     string                                                                  URL of the source file.
     reference_year                                      integer                             Peiljaar                            Year the schools source file was published.
     rmc_region                                          string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
     rmc_region_code                                     integer                                                                 Identifier of the rmc_region.
@@ -622,6 +625,35 @@ EduTypes
     so                                  integer                             So                                  Special education.
     spo                                 integer                             Sbao                                Special primary education.
     vso                                 integer                             Svo                                 Special secondary education.
+    =================================== =================================== =================================== ==========================================================================
+
+.. _pupilsbyorigins:
+
+PupilsByOrigins
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Number of pupils born in countries other than The Netherlands, by country.
+**Source:** `Primair onderwijs - Leerlingen - 09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp>`_
+
+.. table::
+
+    =================================== =================================== =================================== ==========================================================================
+    Field                               Type                                Original term                       Description
+    =================================== =================================== =================================== ==========================================================================
+    aruba                               integer                             Aruba
+    maluku_islands                      integer                             Molukken
+    greece                              integer                             Griekenland
+    italy                               integer                             Italie
+    cape_verde                          integer                             Kaapverdie
+    morocco                             integer                             Marokko
+    netherlands_antilles                integer                             Nederlandse Antillen
+    non_english_speaking_countries      integer                             Niet-Engelstalige landen
+    portugal                            integer                             Portugal
+    spain                               integer                             Spanje
+    suriname                            integer                             Suriname
+    tunisia                             integer                             Tunesie
+    turkey                              integer                             Turkije
+    refugees                            integer                             Vluchtelingen
+    former_yugoslavia                   integer                             Voormalig Joegoslavie
     =================================== =================================== =================================== ==========================================================================
 
 

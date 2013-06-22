@@ -1786,6 +1786,9 @@ class DuoPoBranchesSpider(BaseSpider):
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp',
                     self.parse_po_student_age),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp',
+                    self.parse_po_born_outside_nl),
         ]
 
     def parse_po_branches(self, response):
@@ -2146,5 +2149,89 @@ class DuoPoBranchesSpider(BaseSpider):
                     ages_per_branch_by_student_weight_reference_url=csv_url,
                     ages_per_branch_by_student_weight_reference_date=reference_date,
                     ages_per_branch_by_student_weight=a_per_school
+                )
+                yield school
+
+    def parse_po_born_outside_nl(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            school_ids = {}
+            pupils_by_origins = {}
+
+            for row in csv_file:
+                brin = row['BRIN NUMMER'].strip()
+                branch_id = int(row['VESTIGINGSNUMMER'])
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                # Remove leading/trailing spaces from field names and values.
+                for key in row.keys():
+                    row[key.strip()] = row[key].strip()
+
+                origin = {
+                    'ARUBA': 'aruba',
+                    'DE MOLUKSE EILANDEN': 'maluku_islands',
+                    'GIEKENLAND': 'greece',
+                    'ITALIE': 'italy',
+                    'KAAPVERDIE': 'cape_verde',
+                    'MAROKKO': 'morocco',
+                    'NEDERLANDSE ANTILLEN': 'netherlands_antilles',
+                    'NIET-ENGELSTALIGEN': 'non_english_speaking_countries',
+                    'PORTUGAL': 'portugal',
+                    'SPANJE': 'spain',
+                    'SURINAME': 'suriname',
+                    'TUNESIE': 'tunisia',
+                    'TURKIJE': 'turkey',
+                    'VLUCHTELINGEN': 'refugees',
+                    'VML.JOEGOSLAVIE': 'former_yugoslavia',
+                }
+
+                origins = {}
+                for origin, origin_norm in origin.iteritems():
+                    if row[origin].strip():
+                        origins[origin_norm] = int(row[origin])
+                    else:
+                        origins[origin_norm] = 0
+                            
+                if school_id not in pupils_by_origins:
+                    pupils_by_origins[school_id] = []
+
+                pupils_by_origins[school_id].append(origins)
+
+            for school_id, origs in pupils_by_origins.iteritems():
+                school = DuoPoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    pupils_by_origins_reference_url=csv_url,
+                    pupils_by_origins_reference_date=reference_date,
+                    pupils_by_origins=origs
                 )
                 yield school

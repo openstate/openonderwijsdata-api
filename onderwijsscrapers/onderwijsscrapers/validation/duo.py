@@ -213,7 +213,8 @@ class DuoPoBoard(MappingSchema):
     board_id = general_rules.board_id
     edu_types_reference_url = general_rules.website
     edu_types_reference_date = SchemaNode(Date(), missing=True)
-    edu_types =  general_rules.EduTypes()
+    # TODO:
+    #edu_types =  general_rules.EduTypes()
     name = general_rules.name
     phone = general_rules.phone
     municipality = general_rules.municipality
@@ -287,6 +288,10 @@ class DuoPoBranch(MappingSchema):
     nodal_area_code = general_rules.nodal_area_code
     phone = general_rules.phone
     province = general_rules.province
+    # TODO:
+    #pupils_by_origins = general_rules.PupilsByOrigins()
+    pupils_by_origins_reference_date =  SchemaNode(Date(), missing=True)
+    pupils_by_origins_reference_url = general_rules.website
     reference_year = general_rules.reference_year
     rmc_region = general_rules.rmc_region
     rmc_region_code = general_rules.rmc_region_code
