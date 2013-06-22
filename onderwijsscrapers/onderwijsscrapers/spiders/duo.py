@@ -1,7 +1,9 @@
 import csv
 import cStringIO
 import locale
+import xlrd
 from datetime import datetime
+from zipfile import ZipFile
 
 import requests
 from scrapy.spider import BaseSpider
@@ -1789,6 +1791,9 @@ class DuoPoBranchesSpider(BaseSpider):
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp',
                     self.parse_po_born_outside_nl),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp',
+                    self.parse_po_pupil_zipcode_by_age),
         ]
 
     def parse_po_branches(self, response):
@@ -2235,3 +2240,85 @@ class DuoPoBranchesSpider(BaseSpider):
                     pupils_by_origins=origs
                 )
                 yield school
+
+    def parse_po_pupil_zipcode_by_age(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        # For some reason, DUO decided to create a seperate file for each
+        # municipality, zip them and only provide xls files.
+        available_zips = {}
+        zips = hxs.select('//tr[.//a[contains(@href, ".zip")]]')
+        for zip_file in zips:
+            ref_date = zip_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            zip_url = zip_file.select('.//a/@href').re(r'(.*\.zip)')[0]
+
+            available_zips['http://duo.nl%s' % zip_url] = ref_date
+
+        for zip_url, reference_date in available_zips.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            zip_file = requests.get(zip_url)
+
+            csv_files = []
+            zfiles = ZipFile(cStringIO.StringIO(zip_file.content))
+            for zfile in zfiles.filelist:
+                xls = cStringIO.StringIO(zfiles.read(zfile))
+                wb = xlrd.open_workbook(file_contents=xls.read())
+                sh = wb.sheet_by_index(0)
+                data = []
+                for rownum in xrange(sh.nrows):
+                    data.append(sh.row_values(rownum))
+                data = [[unicode(x) for x in row] for row in data]
+                data = [';'.join(row) for row in data]
+                data = '\n'.join(data)
+                csv_files.append(csv.DictReader(cStringIO.StringIO(data.encode('utf8')), delimiter=';'))
+
+            for csv_file in csv_files:
+                school_ids = {}
+                pupil_residences = {}
+
+                for row in csv_file:
+                    # Remove leading/trailing spaces from field names and values.
+                    for key in row.keys():
+                        row[key.strip()] = row[key].strip()
+
+                    brin = row['BRIN_NUMMER'].strip()
+                    branch_id = int(row['VESTIGINGSNUMMER'])
+                    school_id = '%s-%s' % (brin, branch_id)
+
+                    school_ids[school_id] = {
+                        'brin': brin,
+                        'branch_id': branch_id
+                    }
+
+                    if school_id not in pupil_residences:
+                        pupil_residences[school_id] = []
+
+                    print row['GEMEENTENAAM']
+
+                    res_dict = {}
+                    res_dict['zip_code'] = row['POSTCODE_LEERLING'].strip()
+                    for age in range(3, 25):
+                        if row.has_key('LEEFTIJD_%i_JAAR' % age):
+                            res_dict['age_%i' % age] = int(float(row['LEEFTIJD_%i_JAAR' % age].strip()))
+
+                    pupil_residences[school_id].append(res_dict)
+
+                    for school_id, residence in pupil_residences.iteritems():
+                        school = DuoPoBranch(
+                            brin=school_ids[school_id]['brin'],
+                            branch_id=school_ids[school_id]['branch_id'],
+                            reference_year=reference_year,
+                            pupil_residences_reference_url=zip_url,
+                            pupil_residences_reference_date=reference_date,
+                            pupil_residences=residence
+                        )
+
+                    yield school

@@ -124,6 +124,26 @@ class StudentByStructure(MappingSchema):
 class StudentsByStructure(SequenceSchema):
     students_by_structure = StudentByStructure()
 
+                                                                                                                                                              
+#TODO:                                                                         
+#class FinancialKeyIndicatorsPerYear                                           
+                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                            
+#TODO:                                                                         
+#class AgesPerBranchByStudentWeight                                            
+                                                                                                                                                                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+#TODO:                                                                         
+#class WeightsPerSchool                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+#TODO:                                                                         
+#class EduTypes                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+#TODO:                                                                         
+#class PupilsByOrigins                                           
+
 
 class DuoVoBranch(MappingSchema):
     address = general_rules.Address()
@@ -214,7 +234,7 @@ class DuoPoBoard(MappingSchema):
     edu_types_reference_url = general_rules.website
     edu_types_reference_date = SchemaNode(Date(), missing=True)
     # TODO:
-    #edu_types =  general_rules.EduTypes()
+    #edu_types = EduTypes()
     name = general_rules.name
     phone = general_rules.phone
     municipality = general_rules.municipality
@@ -222,7 +242,7 @@ class DuoPoBoard(MappingSchema):
     administrative_office_id = SchemaNode(Int())
     denomination = general_rules.denomination
     # TODO:
-    #financial_key_indicators_per_year = general_rules.FinancialKeyIndicatorsPerYear()
+    #financial_key_indicators_per_year = FinancialKeyIndicatorsPerYear()
     financial_key_indicators_per_year_reference_date = SchemaNode(Date(),
         missing=True)
     financial_key_indicators_per_year_url = general_rules.website
@@ -260,7 +280,7 @@ class DuoPoSchool(MappingSchema):
 class DuoPoBranch(MappingSchema):
     address = general_rules.Address()
     # TODO:
-    #ages_per_branch_by_student_weight = general_rules.AgesPerBranchByStudentWeight()
+    #ages_per_branch_by_student_weight = AgesPerBranchByStudentWeight()
     ages_per_branch_by_student_weight_reference_date = SchemaNode(Date(),
         missing=True)
     ages_per_branch_by_student_weight_reference_url = general_rules.website
@@ -274,14 +294,6 @@ class DuoPoBranch(MappingSchema):
     denomination = general_rules.denomination
     education_area = general_rules.education_area
     education_area_code = general_rules.education_area_code
-    #education_structures = general_rules.EducationStructures()
-    #graduations = Graduations()
-    #graduations_reference_date = SchemaNode(Date())
-    #graduations_reference_url = general_rules.reference_url
-    #student_residences = StudentResidences()
-    #student_residences_reference_date = SchemaNode(Date())
-    #student_residences_reference_url = general_rules.reference_url
-    #students_by_structure = StudentsByStructure()
     municipality = general_rules.municipality
     municipality_code = general_rules.municipality_code
     nodal_area = general_rules.nodal_area
@@ -289,9 +301,13 @@ class DuoPoBranch(MappingSchema):
     phone = general_rules.phone
     province = general_rules.province
     # TODO:
-    #pupils_by_origins = general_rules.PupilsByOrigins()
-    pupils_by_origins_reference_date =  SchemaNode(Date(), missing=True)
+    #pupils_by_origins = PupilsByOrigins()
+    pupils_by_origins_reference_date = SchemaNode(Date(), missing=True)
     pupils_by_origins_reference_url = general_rules.website
+    # TODO:
+    #pupil_residences = PupilResidences()
+    pupil_residences_reference_date = SchemaNode(Date(), missing=True)
+    pupil_residences_reference_url = general_rules.website
     reference_year = general_rules.reference_year
     rmc_region = general_rules.rmc_region
     rmc_region_code = general_rules.rmc_region_code
@@ -299,7 +315,7 @@ class DuoPoBranch(MappingSchema):
     rpa_area_code = general_rules.rpa_area_code
     website = general_rules.url
     # TODO:
-    #weights_per_school = general_rules.WeightsPerSchool()
+    #weights_per_school = WeightsPerSchool()
     weights_per_school_reference_date = SchemaNode(Date(),
         missing=True)
     weights_per_school_reference_url = general_rules.website

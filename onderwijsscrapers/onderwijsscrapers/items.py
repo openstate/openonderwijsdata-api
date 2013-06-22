@@ -271,3 +271,8 @@ class DuoPoBranch(SchoolItem):
     pupils_by_origins_reference_url = Field()
     pupils_by_origins_reference_date = Field()
     pupils_by_origins = Field()
+
+    # Contents of "11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd"
+    pupil_residences_reference_url = Field()
+    pupil_residences_reference_date = Field()
+    pupil_residences = Field()
