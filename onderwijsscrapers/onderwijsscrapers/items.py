@@ -202,6 +202,10 @@ class DuoPoBoard(Item):
     financial_key_indicators_per_year_reference_date = Field()
     financial_key_indicators_per_year = Field()
 
+    # Contents of "07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort"
+    edu_types_reference_url = Field()
+    edu_types_reference_date = Field()
+    edu_types= Field()
 
 class DuoPoSchool(SchoolItem):
     ignore_id_fields = Field()

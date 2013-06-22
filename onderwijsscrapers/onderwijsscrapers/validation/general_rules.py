@@ -89,3 +89,7 @@ class EducationStructures(SequenceSchema):
 
 #TODO:
 #class WeightsPerSchool
+
+
+#TODO:
+#class EduTypes

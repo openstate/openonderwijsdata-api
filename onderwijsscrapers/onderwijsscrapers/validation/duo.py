@@ -211,6 +211,9 @@ class DuoPoBoard(MappingSchema):
     address = general_rules.Address()
     correspondence_address = general_rules.Address()
     board_id = general_rules.board_id
+    edu_types_reference_url = general_rules.website
+    edu_types_reference_date = SchemaNode(Date(), missing=True)
+    edu_types =  general_rules.EduTypes()
     name = general_rules.name
     phone = general_rules.phone
     municipality = general_rules.municipality

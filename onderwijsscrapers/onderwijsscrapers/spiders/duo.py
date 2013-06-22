@@ -1399,7 +1399,10 @@ class DuoPoBoards(BaseSpider):
                     self.parse_po_boards),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Financien/Jaarrekeninggegevens/'
-                    'Kengetallen.asp', self.parse_po_financial_key_indicators)
+                    'Kengetallen.asp', self.parse_po_financial_key_indicators),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen7.asp',
+                    self.parse_po_education_type)
         ]
 
     def parse_po_boards(self, response):
@@ -1552,9 +1555,9 @@ class DuoPoBoards(BaseSpider):
 
             indicators_per_board = {}
             for row in csv_file:
-                # strip leading and trailing whitespace.
+                # Strip leading and trailing whitespace from field names and values.
                 for key in row.keys():
-                    row[key] = row[key].strip()
+                    row[key.strip()] = row[key].strip()
 
                 board_id = int(row['BEVOEGD GEZAG NUMMER'])
                 if board_id not in indicators_per_board:
@@ -1581,6 +1584,73 @@ class DuoPoBoards(BaseSpider):
                     financial_key_indicators_per_year_url=csv_url,
                     financial_key_indicators_per_year_reference_date=reference_date,
                     financial_key_indicators_per_year=indicators
+                )
+                yield board
+
+    def parse_po_education_type(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        edu_type_mapping = {
+            'BAO': 'po',
+            'SBAO': 'spo',
+            'SO': 'so',
+            'VSO': 'vso'
+        }
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            edu_types_per_board = {}
+            for row in csv_file:
+                # Strip leading and trailing whitespace from field names and values.
+                for key in row.keys():
+                    if row[key]:
+                        row[key.strip()] = row[key].strip()
+                    else:
+                        row[key.strip()] = '0'
+
+                board_id = int(row['BEVOEGD GEZAG NUMMER'])
+                if board_id not in edu_types_per_board:
+                    edu_types_per_board[board_id] = []
+
+                edu_types = {}
+
+                for type, type_norm in edu_type_mapping.iteritems():
+                    # If some fields have no value (only empty string ''),
+                    # then set those to 0.
+                    if row[type] == '':
+                        row[type] = '0'
+                    edu_types[type_norm] = int(row[type].replace('.', ''))
+
+                edu_types_per_board[board_id].append(edu_types)
+
+            for board_id, e_types in edu_types_per_board.iteritems():
+                board = DuoPoBoard(
+                    board_id=board_id,
+                    reference_year=reference_year,
+                    edu_types_reference_url=csv_url,
+                    edu_types_reference_date=reference_date,
+                    edu_types=e_types
                 )
                 yield board
 

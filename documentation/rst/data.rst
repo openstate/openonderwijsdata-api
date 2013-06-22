@@ -166,25 +166,28 @@ po_board
 
 .. table::
 
-    ================================================ =================================== =================================== =============================================================
-    Field                                            Type                                Original term                       Description
-    ================================================ =================================== =================================== =============================================================
-    address                                          :ref:`duoaddress`                                                       Address of this board.
-    administrative_office_id                         integer                             Administratiekantoor                Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances.
-    board_id                                         integer                             Bevoegd gezag nummer                Identifier (assigned by :ref:`duodata`) of the board of this branch.
-    correspondence_address                           :ref:`duoaddress`                                                       Correspondence address of this board.
-    denomination                                     string                              Denominatie                         In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
-    financial_key_indicators_per_year                array of :ref:`finindicator`                                            Array of :ref:`finindicator`, where each item represents a set of key financial indicators for a given year.
-    financial_key_indicators_per_year_reference_date date                                Peiljaar                            Date the financial key indicator source file was published at http://data.duo.nl
-    financial_key_indicators_per_year_url            string                                                                  URL to the financial key indicator source file at http://data.duo.nl
-    meta                                             :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
-    municipality                                     string                              Gemeente                            The name of the municipality this board is located in.
-    municipality_code                                integer                             Gemeentenummer                      Identifier (assigned by CBS [#cbs]_) to this municipality.
-    name                                             string                              Bevoegd gezag naam                  Name of the board.
-    phone                                            string                              Telefoonnummer                      Phone number of the board.
-    reference_year                                   date                                Peiljaar                            Year the boards source file was published
-    website                                          string                                                                  URL of the webpage of the board.
-    ================================================ =================================== =================================== =============================================================
+    =================================================== =================================== =================================== =============================================================
+    Field                                               Type                                Original term                       Description
+    =================================================== =================================== =================================== =============================================================
+    address                                             :ref:`duoaddress`                                                       Address of this board.
+    administrative_office_id                            integer                             Administratiekantoor                Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances.
+    board_id                                            integer                             Bevoegd gezag nummer                Identifier (assigned by :ref:`duodata`) of the board of this branch.
+    correspondence_address                              :ref:`duoaddress`                                                       Correspondence address of this board.
+    denomination                                        string                              Denominatie                         In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
+    edu_types                                           array of :ref:`edutypes`                                                Array of :ref:`edutypes`, where each item shows how many pupils are in the education types po, spo, so or svo in this board's schools.
+    edu_types_reference_date                            2013-06-22                          Peiljaar                            Date the source file was published at http://data.duo.nl
+    edu_types_reference_url                             string                                                                  URL to the source file at http://data.duo.nl
+    financial_key_indicators_per_year                   array of :ref:`finindicator`                                            Array of :ref:`finindicator`, where each item represents a set of key financial indicators for a given year.
+    financial_key_indicators_per_year_reference_date    date                                Peiljaar                            Date the financial key indicator source file was published at http://data.duo.nl
+    financial_key_indicators_per_year_url               string                                                                  URL to the financial key indicator source file at http://data.duo.nl
+    meta                                                :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
+    municipality                                        string                              Gemeente                            The name of the municipality this board is located in.
+    municipality_code                                   integer                             Gemeentenummer                      Identifier (assigned by CBS [#cbs]_) to this municipality.
+    name                                                string                              Bevoegd gezag naam                  Name of the board.
+    phone                                               string                              Telefoonnummer                      Phone number of the board.
+    reference_year                                      date                                Peiljaar                            Year the boards source file was published
+    website                                             string                                                                  URL of the webpage of the board.
+    =================================================== =================================== =================================== =============================================================
 
 .. _duoposchool:
 
@@ -603,6 +606,24 @@ StudentWeights
     student_weight_0.3                  integer                                                                 Number of pupils who's both parents didn't get education beyond lbo/vbo, 'praktijkonderwijs' or vmbo 'basis- of kaderberoepsgerichte leerweg' [#weight]_.
     student_weight_1.2                  integer                                                                 Number of pupils who's parents (one or both) didn't get education beyond 'basisonderwijs' or (v)so-zmlk [#weight]_.
     =================================== =================================== =================================== ==========================================================================
+
+.. _edutypes:
+
+EduTypes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Primair onderwijs - Leerlingen - 07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen7.asp>`_
+
+.. table::
+
+    =================================== =================================== =================================== ==========================================================================
+    Field                               Type                                Original term                       Description
+    =================================== =================================== =================================== ==========================================================================
+    po                                  integer                             Bao                                 Primary education.
+    so                                  integer                             So                                  Special education.
+    spo                                 integer                             Sbao                                Special primary education.
+    vso                                 integer                             Svo                                 Special secondary education.
+    =================================== =================================== =================================== ==========================================================================
+
 
 .. _schoolvodata:
 
