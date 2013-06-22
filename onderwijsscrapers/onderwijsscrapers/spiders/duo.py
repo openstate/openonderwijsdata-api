@@ -3,6 +3,7 @@ import cStringIO
 import locale
 import xlrd
 from datetime import datetime
+from os import devnull
 from zipfile import ZipFile
 
 import requests
@@ -2270,7 +2271,9 @@ class DuoPoBranchesSpider(BaseSpider):
             zfiles = ZipFile(cStringIO.StringIO(zip_file.content))
             for zfile in zfiles.filelist:
                 xls = cStringIO.StringIO(zfiles.read(zfile))
-                wb = xlrd.open_workbook(file_contents=xls.read())
+                # Suppress warnings as the xls files are wrongly initialized.
+                with open(devnull, 'w') as OUT:
+                    wb = xlrd.open_workbook(file_contents=xls.read(), logfile=OUT)
                 sh = wb.sheet_by_index(0)
                 data = []
                 for rownum in xrange(sh.nrows):
@@ -2305,7 +2308,7 @@ class DuoPoBranchesSpider(BaseSpider):
 
                     res_dict = {}
                     res_dict['zip_code'] = row['POSTCODE_LEERLING'].strip()
-                    for age in range(3, 25):
+                    for age in range(3, 26):
                         if row.has_key('LEEFTIJD_%i_JAAR' % age):
                             res_dict['age_%i' % age] = int(float(row['LEEFTIJD_%i_JAAR' % age].strip()))
 
