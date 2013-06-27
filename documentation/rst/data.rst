@@ -1042,7 +1042,7 @@ ExamParticipationPerProfile
     ========================================= =================================== ==========================================================================
     sector                                    string                              The sector or profile, depending on the education structure.
     percentage                                float                               Percentage of students participating in an exam with this sector of profile.
-    education_structure                       string                              The education structure[#edu_in_holland]_ this sector or profile belongs to.
+    education_structure                       string                              The education structure [#edu_in_holland]_ this sector or profile belongs to.
     ========================================= =================================== ==========================================================================
 
 .. _first_year_comp:
@@ -1161,7 +1161,7 @@ PrimarySchoolAdvices
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
     primary_school_advices              Array of :ref:`advice_struct_comp`  Array of :ref:`advice_struct_comp`, containing the distribution of primary school advices of students in the third year of their education.
-    education_structure                 string                              String that represents the level of education[#edu_in_holland]_ the primary school advice distribution applies to.
+    education_structure                 string                              String that represents the level of education [#edu_in_holland]_ the primary school advice distribution applies to.
     =================================== =================================== ==========================================================================
 
 .. _advice_struct_comp:
@@ -1174,7 +1174,7 @@ PrimarySchoolAdvice
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
-    advice                              string                              String that represents the level of education[#edu_in_holland]_ the primary school recommended the student upon leaving primary education.
+    advice                              string                              String that represents the level of education [#edu_in_holland]_ the primary school recommended the student upon leaving primary education.
     percentage_of_students              float                               Percentage of students with this advice in the third year of their education.
     =================================== =================================== ==========================================================================
 
