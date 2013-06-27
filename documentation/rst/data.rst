@@ -217,7 +217,7 @@ po_school
     nodal_area_code                     integer                                                                 Identifier of the nodal_area.
     phone                               string                                                                  Phone number of the school.
     province                            string                                                                  The province [#provinces]_ this branch is situated in.
-    reference_year                      integer                             Peiljaar                                    Year the schools source file was published.
+    reference_year                      integer                             Peiljaar                            Year the schools source file was published.
     rmc_region                          string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
     rmc_region_code                     integer                                                                 Identifier of the rmc_region.
     rpa_area                            string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
@@ -276,7 +276,7 @@ po_branch
     student_weights_per_branch_reference_url            string                                                                  URL of the source file.
     wgr_area                                            string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
     wgr_area_code                                       integer                                                                 Identifier of the wgr_area.
-    ======================================= =================================== =================================== ======================================================================
+    =================================================== =================================== =================================== ======================================================================
 
 .. _duoaddress:
 
@@ -377,15 +377,15 @@ Graduation
 
 .. table::
 
-    ======================================= ==================================== =================================== ======================================================================
-    Field                                   Type                                 Original term                       Description
-    ======================================= ==================================== =================================== ======================================================================
-    year                                    string                               Schooljaar                          The school year the graduations applay to
-    candidates                              integer                                                                  The total number of exam candidates for this school year
-    passed                                  integer                                                                  The number of candidates that graduated
-    failed                                  integer                                                                  The number of candidates that did not graduate
-    per_department                          array of :ref:`_graduationdepartment                                     Breakdown of the candidate and graduation results by deparment and gender
-    ======================================= ==================================== =================================== ======================================================================
+    ======================================= ===================================== =================================== ======================================================================
+    Field                                   Type                                  Original term                       Description
+    ======================================= ===================================== =================================== ======================================================================
+    year                                    string                                Schooljaar                          The school year the graduations applay to
+    candidates                              integer                                                                   The total number of exam candidates for this school year
+    passed                                  integer                                                                   The number of candidates that graduated
+    failed                                  integer                                                                   The number of candidates that did not graduate
+    per_department                          array of :ref:`_graduationdepartment`                                     Breakdown of the candidate and graduation results by deparment and gender
+    ======================================= ===================================== =================================== ======================================================================
 
 .. _graduationdepartment:
 
@@ -1237,4 +1237,4 @@ StraightToThirdYear
 .. [#bag42geo] http://calendar42.com/bag42/
 .. [#centralexams] http://nl.wikipedia.org/wiki/Centraal_examen
 .. [#schoolexams] http://nl.wikipedia.org/wiki/Schoolexamen
-.. [#gewicht] http://www.rijksoverheid.nl/onderwerpen/leerachterstand/vraag-en-antwoord/wat-is-de-gewichtenregeling-in-het-basisonderwijs.html
+.. [#weight] http://www.rijksoverheid.nl/onderwerpen/leerachterstand/vraag-en-antwoord/wat-is-de-gewichtenregeling-in-het-basisonderwijs.html
