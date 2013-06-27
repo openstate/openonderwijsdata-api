@@ -13,7 +13,9 @@ The data sources present their data aggregated on different *granularities*: fin
 **vo_branch** (in Dutch: *afdeling middelbare school*)
     A school can be located at different (geographical) locations. For example, large schools that offer different levels of education [#edu_in_holland]_ often do so at separate buildings. These different departments are represented by a *vo_branch*.
 
-Note that many fields in the :ref:`duodata` overlap, as these data is available on all levels.
+A similar categorisation for schools at the primary level is available.
+
+Note that many fields in the :ref:`duodata` dataset overlap, as these data is available on all levels.
 
 For some fields the original Dutch term is included, in order to allow the API user to look up the definition of that term at the source collection.
 
@@ -271,7 +273,7 @@ po_branch
     rpa_area                                            string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
     rpa_area_code                                       integer                                                                 Identifier of the rpa_area.
     website                                             string                                                                  Website of this school.
-    student_weights_per_branch                          array of :ref:`studentweights`                                          The number of children per student weight (0.0, 0.3 or 1.2), school weight and impulse area data for each branch. 
+    student_weights_per_branch                          array of :ref:`studentweights`                                          The number of children per student weight (0.0, 0.3 or 1.2), school weight and impulse area data for each branch.
     student_weights_per_branch_reference_date           date                                                                    Date the source file was published at http://data.duo.nl
     student_weights_per_branch_reference_url            string                                                                  URL of the source file.
     wgr_area                                            string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
@@ -366,8 +368,9 @@ GradesPerCourse
     course_abbreviation                                     string                                               Abbreviation used by DUO that denotes the course
     course_identifier                                       string                                               Identifier used by DUO for a course
     course_name                                             string                                               Verbose, human-readable name for the course
-    education_structure                                     string                                               Level of education [edu_in_holland]_
+    education_structure                                     string                                               Level of education [#edu_in_holland]_
     ======================================================= ========================== ========================= ======================================================================
+
 
 .. _graduation:
 
@@ -377,15 +380,16 @@ Graduation
 
 .. table::
 
-    ======================================= ===================================== =================================== ======================================================================
-    Field                                   Type                                  Original term                       Description
-    ======================================= ===================================== =================================== ======================================================================
-    year                                    string                                Schooljaar                          The school year the graduations applay to
-    candidates                              integer                                                                   The total number of exam candidates for this school year
-    passed                                  integer                                                                   The number of candidates that graduated
-    failed                                  integer                                                                   The number of candidates that did not graduate
-    per_department                          array of :ref:`_graduationdepartment`                                     Breakdown of the candidate and graduation results by deparment and gender
-    ======================================= ===================================== =================================== ======================================================================
+    ==================== ===================================== =================================== ======================================================================
+    Field                Type                                  Original term                       Description
+    ==================== ===================================== =================================== ======================================================================
+    year                 string                                Schooljaar                          The school year the graduations applay to
+    candidates           integer                                                                   The total number of exam candidates for this school year
+    passed               integer                                                                   The number of candidates that graduated
+    failed               integer                                                                   The number of candidates that did not graduate
+    per_department       array of :ref:`graduationdepartment`                                      Breakdown of the candidate and graduation results by deparment and gender
+    ==================== ===================================== =================================== ======================================================================
+
 
 .. _graduationdepartment:
 
@@ -397,25 +401,25 @@ Belongs to :ref:`graduationdepartment`.
 
 .. table::
 
-    ======================================= =================================== =================================== ======================================================================
-    Field                                   Type                                Original term                       Description
-    ======================================= =================================== =================================== ======================================================================
-    education_structure                     string                              ONDERWIJSTYPE VO
-    inspectioncode                          string
-    department                              string                              OPLEIDINGSNAAM
-    candidates                              Object
-    - unknown                               integer
-    - male                                  integer
-    - female                                integer
-    passed
-    - unknown                               integer
-    - male                                  integer
-    - female                                integer
-    failed
-    - unknown                               integer
-    - male                                  integer
-    - female                                integer
-    ======================================= =================================== =================================== ======================================================================
+    =================== =================================== =================================== ======================================================================
+    Field               Type                                Original term                       Description
+    =================== =================================== =================================== ======================================================================
+    education_structure string                              ONDERWIJSTYPE VO
+    inspectioncode      string
+    department          string                              OPLEIDINGSNAAM
+    candidates          Object                                                                  The distribution of genders of candidates participating in final exams
+    - unknown           integer                                                                 The amount of candidates of which the gender is not known
+    - male              integer                                                                 The amount of male participants
+    - female            integer                                                                 The amount of female participants
+    passed              Object                                                                  The distribution of genders of candidates that passed the final exams
+    - unknown           integer
+    - male              integer
+    - female            integer
+    failed              Object                                                                  The distribution of genders of candidates that failed the final exams
+    - unknown           integer
+    - male              integer
+    - female            integer
+    =================== =================================== =================================== ======================================================================
 
 
 .. _finindicator:
@@ -531,22 +535,22 @@ StudentPerStructure
 
 .. table::
 
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    department                          string                                                                  Optional. Department of a vmbo track.
-    education_name                      string                                                                  Name of the education programme.
-    education_structure                 string                                                                  Level of education [#edu_in_holland]_.
-    element_code                        integer                                                                 Unknown.
-    lwoo                                boolean                                                                 Indicates whether this sector supports "Leerwegondersteunend onderwijs", for students who need additional guidance [#lwoo]_.
-    vmbo_sector                         string                                                                  Vmbo sector [#sectors]_.
-    year_1                              mapping                                                                 Distribution of male and female students for year 1.
-    year_2                              mapping                                                                 Distribution of male and female students for year 2.
-    year_3                              mapping                                                                 Distribution of male and female students for year 3.
-    year_4                              mapping                                                                 Distribution of male and female students for year 4.
-    year_5                              mapping                                                                 Distribution of male and female students for year 5.
-    year_6                              mapping                                                                 Distribution of male and female students for year 6.
-    =================================== =================================== =================================== ==========================================================================
+    =================================== ====================== ==========================================================================
+    Field                               Type                   Description
+    =================================== ====================== ==========================================================================
+    department                          string                 Optional. Department of a vmbo track.
+    education_name                      string                 Name of the education programme.
+    education_structure                 string                 Level of education [#edu_in_holland]_.
+    element_code                        integer                Unknown.
+    lwoo                                boolean                Indicates whether this sector supports "Leerwegondersteunend onderwijs", for students who need additional guidance [#lwoo]_.
+    vmbo_sector                         string                 Vmbo sector [#sectors]_.
+    year_1                              mapping                Distribution of male and female students for year 1.
+    year_2                              mapping                Distribution of male and female students for year 2.
+    year_3                              mapping                Distribution of male and female students for year 3.
+    year_4                              mapping                Distribution of male and female students for year 4.
+    year_5                              mapping                Distribution of male and female students for year 5.
+    year_6                              mapping                Distribution of male and female students for year 6.
+    =================================== ====================== ==========================================================================
 
 .. _examgrades:
 
@@ -574,26 +578,27 @@ ExamGrades
 AgesByStudentWeight
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This dict has three keys *student_weight_0.0*, *student_weight_0.3* and *student_weight_1.2*, the weights are based on the pupil's parents level of education [#weight]_.
+
 **Source:** `Primair onderwijs - Leerlingen - 03. Leerlingen basisonderwijs naar leerlinggewicht en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp>`_
 
 .. table::
 
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    age_3                               integer                                                                 Number of children at age 3 in the key's weight category at this branch.
-    age_4                               integer                                                                 Number of children at age 4 in the key's weight category at this branch.
-    age_5                               integer                                                                 Number of children at age 5 in the key's weight category at this branch.
-    age_6                               integer                                                                 Number of children at age 6 in the key's weight category at this branch.
-    age_7                               integer                                                                 Number of children at age 7 in the key's weight category at this branch.
-    age_8                               integer                                                                 Number of children at age 8 in the key's weight category at this branch.
-    age_9                               integer                                                                 Number of children at age 9 in the key's weight category at this branch.
-    age_10                              integer                                                                 Number of children at age 10 in the key's weight category at this branch.
-    age_11                              integer                                                                 Number of children at age 11 in the key's weight category at this branch.
-    age_12                              integer                                                                 Number of children at age 12 in the key's weight category at this branch.
-    age_13                              integer                                                                 Number of children at age 13 in the key's weight category at this branch.
-    age_14                              integer                                                                 Number of children at age 14 in the key's weight category at this branch.
-    =================================== =================================== =================================== ==========================================================================
+    =================================== ========================= ==========================================================================
+    Field                               Type                                Description
+    =================================== ========================= ==========================================================================
+    age_3                               integer                   Number of children at age 3 in the key's weight category at this branch.
+    age_4                               integer                   Number of children at age 4 in the key's weight category at this branch.
+    age_5                               integer                   Number of children at age 5 in the key's weight category at this branch.
+    age_6                               integer                   Number of children at age 6 in the key's weight category at this branch.
+    age_7                               integer                   Number of children at age 7 in the key's weight category at this branch.
+    age_8                               integer                   Number of children at age 8 in the key's weight category at this branch.
+    age_9                               integer                   Number of children at age 9 in the key's weight category at this branch.
+    age_10                              integer                   Number of children at age 10 in the key's weight category at this branch.
+    age_11                              integer                   Number of children at age 11 in the key's weight category at this branch.
+    age_12                              integer                   Number of children at age 12 in the key's weight category at this branch.
+    age_13                              integer                   Number of children at age 13 in the key's weight category at this branch.
+    age_14                              integer                   Number of children at age 14 in the key's weight category at this branch.
+    =================================== ========================= ==========================================================================
 
 .. _studentweights:
 
@@ -635,35 +640,37 @@ EduTypes
 PupilsByOrigins
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Number of pupils born in countries other than The Netherlands, by country.
+
 **Source:** `Primair onderwijs - Leerlingen - 09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp>`_
 
 .. table::
 
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    aruba                               integer                             Aruba
-    maluku_islands                      integer                             Molukken
-    greece                              integer                             Griekenland
-    italy                               integer                             Italie
-    cape_verde                          integer                             Kaapverdie
-    morocco                             integer                             Marokko
-    netherlands_antilles                integer                             Nederlandse Antillen
-    non_english_speaking_countries      integer                             Niet-Engelstalige landen
-    portugal                            integer                             Portugal
-    spain                               integer                             Spanje
-    suriname                            integer                             Suriname
-    tunisia                             integer                             Tunesie
-    turkey                              integer                             Turkije
-    refugees                            integer                             Vluchtelingen
-    former_yugoslavia                   integer                             Voormalig Joegoslavie
-    =================================== =================================== =================================== ==========================================================================
+    =================================== ================= =================================== ==========================================================================
+    Field                               Type              Original term                       Description
+    =================================== ================= =================================== ==========================================================================
+    aruba                               integer           Aruba
+    maluku_islands                      integer           Molukken
+    greece                              integer           Griekenland
+    italy                               integer           Italië
+    cape_verde                          integer           Kaapverdië
+    morocco                             integer           Marokko
+    netherlands_antilles                integer           Nederlandse Antillen
+    non_english_speaking_countries      integer           Niet-Engelstalige landen
+    portugal                            integer           Portugal
+    spain                               integer           Spanje
+    suriname                            integer           Suriname
+    tunisia                             integer           Tunesië
+    turkey                              integer           Turkije
+    refugees                            integer           Vluchtelingen
+    former_yugoslavia                   integer           Voormalig Joegoslavië
+    =================================== ================= =================================== ==========================================================================
 
 .. _pupilresidences:
 
 PupilResidences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Zip codes of pupils for each branch by age. Includes po, spo, so, and vso (hence the ages up to 25).
+
 **Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp>`_
 
 .. table::
