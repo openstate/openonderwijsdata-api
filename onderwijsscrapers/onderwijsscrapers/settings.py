@@ -24,6 +24,7 @@ scrapy_sentry.init(SENTRY_DSN)
 # Path to the file that holds all zipcodes (first 4 digits!). This file
 # is used for searching in the toezichtkaart.owinsp.nl databse.
 ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
+PO_ADDRESSES = os.path.join(PROJECT_ROOT, 'po_addresses.csv')
 
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
@@ -40,13 +41,13 @@ EXPORT_METHODS = {
             'create_tar': True,
             'remove_json': False
         }
-    },
-    'elasticsearch': {
-        'exporter': exporters.ElasticSearchExporter,
-        'options': {
-            'url': '127.0.0.1:9200'
-        }
-    }
+    }#,
+    # 'elasticsearch': {
+    #     'exporter': exporters.ElasticSearchExporter,
+    #     'options': {
+    #         'url': '127.0.0.1:9200'
+    #     }
+    # }
 }
 
 from validation.duo import DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,\
