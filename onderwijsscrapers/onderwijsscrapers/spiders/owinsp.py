@@ -204,10 +204,6 @@ class VOSpider(OWINSPSpider):
 
         urlparams = urlparse.parse_qs(response.url)
         owinsp_id = urlparams['sch_id'][0].split('.')[0]
-        try:
-            owinsp_id = int(owinsp_id)
-        except:
-            owinsp_id = None
 
         organisation['education_structures'].append(structure)
         organisation['current_ratings'].append({
