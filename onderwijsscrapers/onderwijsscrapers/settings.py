@@ -24,6 +24,7 @@ scrapy_sentry.init(SENTRY_DSN)
 # Path to the file that holds all zipcodes (first 4 digits!). This file
 # is used for searching in the toezichtkaart.owinsp.nl databse.
 ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
+PO_ADDRESSES = os.path.join(PROJECT_ROOT, 'po_addresses.csv')
 
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
