@@ -183,14 +183,12 @@ class DuoVoBoard(Item):
     financial_key_indicators_per_year = Field()
 
 
-class DuoBaoBoard(Item):
+class DuoPoBoard(Item):
     ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     board_id = Field()  # `Bevoegd gezagnummer`
     name = Field()  # `BEVOEGD GEZAG NAAM`
     address = Field()  # `adres`
-    zip_code = Field()  # `postcode`
-    city = Field()  # `woonplaats`
     correspondence_address = Field()
     municipality = Field()  # `Gemeente naam`
     municipality_code = Field()  # `Gemeente nummer`
@@ -204,8 +202,12 @@ class DuoBaoBoard(Item):
     financial_key_indicators_per_year_reference_date = Field()
     financial_key_indicators_per_year = Field()
 
+    # Contents of "07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort"
+    edu_types_reference_url = Field()
+    edu_types_reference_date = Field()
+    edu_types= Field()
 
-class DuoBaoSchool(SchoolItem):
+class DuoPoSchool(SchoolItem):
     ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     province = Field()  # `provincie`
@@ -228,7 +230,7 @@ class DuoBaoSchool(SchoolItem):
     rmc_region_code = Field()  # `RMC REGIO CODE`
 
 
-class DuoBaoBranch(SchoolItem):
+class DuoPoBranch(SchoolItem):
     ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     province = Field()  # `provincie`
@@ -252,5 +254,25 @@ class DuoBaoBranch(SchoolItem):
 
     # Contents of "01. Leerlingen basisonderwijs naar leerlinggewicht en per
     # vestiging het schoolgewicht en impulsgebied"
-    weights = Field() # Dict of `GEWICHT 0`, `GEWICHT 0.3`, `GEWICHT 1.2`,
-                      # `SCHOOLGEWICHT` and `IMPULSGEBIED`.
+    weights_per_school_reference_url = Field()
+    weights_per_school_reference_date = Field()
+    weights_per_school = Field() # Dict of `GEWICHT 0`, `GEWICHT 0.3`,
+                                 # `GEWICHT 1.2`, `SCHOOLGEWICHT` and
+                                 # `IMPULSGEBIED`.
+
+    # Contents of "02. Leerlingen basisonderwijs naar leeftijd"
+    ages_per_branch_by_student_weight_reference_url = Field()
+    ages_per_branch_by_student_weight_reference_date = Field()
+    ages_per_branch_by_student_weight  = Field() # Dict of childrens ages
+                                                 # (age (3/4)-14) by student weight.
+
+
+    # Contents of "09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
+    pupils_by_origins_reference_url = Field()
+    pupils_by_origins_reference_date = Field()
+    pupils_by_origins = Field()
+
+    # Contents of "11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd"
+    pupil_residences_reference_url = Field()
+    pupil_residences_reference_date = Field()
+    pupil_residences = Field()

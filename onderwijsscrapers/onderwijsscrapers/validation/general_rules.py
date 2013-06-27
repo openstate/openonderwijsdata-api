@@ -77,3 +77,23 @@ class Address(MappingSchema):
 
 class EducationStructures(SequenceSchema):
     structure = SchemaNode(String())
+
+
+#TODO:
+#class FinancialKeyIndicatorsPerYear
+
+
+#TODO:
+#class AgesPerBranchByStudentWeight
+
+
+#TODO:
+#class WeightsPerSchool
+
+
+#TODO:
+#class EduTypes
+
+
+#TODO:
+#class PupilsByOrigins
