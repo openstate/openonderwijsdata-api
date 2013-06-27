@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime
 import re
 import urlparse
@@ -54,9 +55,9 @@ class OWINSPSpider(BaseSpider):
             yield Request(url, self.parse_education_structure_page)
 
         pages = hxs.select('//span[@class="pagnr"]/text()').extract()[0]\
-                            .strip()
+                                                           .strip()
         current_page, total_pages = re.compile(r"^Pagina (\d+) van (\d+)$")\
-                                                .search(pages).groups()
+                                      .search(pages).groups()
 
         if current_page != total_pages:
             nav_urls = hxs.select('//span[@class="browse"]/noscript//a')
@@ -66,7 +67,7 @@ class OWINSPSpider(BaseSpider):
                 next_page = nav_urls[0].select('@href').extract()
 
             yield Request('http://toezichtkaart.owinsp.nl/schoolwijzer/%s'
-                % next_page[0], self.parse_search_results)
+                          % next_page[0], self.parse_search_results)
 
     def parse_organisation_detail_page(self, response):
         raise NotImplementedError('Your spider should implement this method.')
@@ -77,10 +78,9 @@ class VOSpider(OWINSPSpider):
 
     def generate_search_urls(self, zips=settings['ZIPCODES']):
         with open(zips, 'r') as f:
-            search_urls = [self.search_url % {
-                                'education_sector': 'vo',
-                                'zipcode': line.strip()
-                            } for line in f]
+            search_urls = [self.search_url % {'education_sector': 'vo',
+                                              'zipcode': line.strip()}
+                           for line in f]
 
         return search_urls
 
@@ -101,7 +101,7 @@ class VOSpider(OWINSPSpider):
             yield Request(url, self.parse_education_structure_page)
 
         pages = hxs.select('//span[@class="pagnr"]/text()').extract()[0]\
-                            .strip()
+                                                           .strip()
 
         page_match = PAGES.search(pages)
 
@@ -116,7 +116,7 @@ class VOSpider(OWINSPSpider):
                     next_page = nav_urls[0].select('@href').extract()
 
                 yield Request('http://toezichtkaart.owinsp.nl/schoolwijzer/%s'
-                    % next_page[0], self.parse_search_results)
+                              % next_page[0], self.parse_search_results)
 
     def parse_education_structure_page(self, response):
         """ This method is specific for the VO-schools, as these can have
@@ -173,7 +173,7 @@ class VOSpider(OWINSPSpider):
             organisation['website'] = None
 
         organisation['denomination'] = h_content.select('p/em/text()')\
-                            .extract()[0].strip()
+                                                .extract()[0].strip()
 
         if 'education_structures' not in organisation:
             organisation['education_structures'] = []
@@ -182,8 +182,8 @@ class VOSpider(OWINSPSpider):
 
         # Wait... what? Are we going to use an element's top-padding to
         # get the div we are interested in? Yes we are :(.
-        tzk_rating = hxs.select('//div[@class="content_main wide" and '
-                         '@style="padding-top:0px"]/div[@class="tzk"]')
+        tzk_rating = hxs.select('//div[@class="content_main wide" and @style'
+                                '="padding-top:0px"]/div[@class="tzk"]')
         rating = tzk_rating.select('div/text()').extract()
         if rating:
             # There are schools without ratings, such as new schools
@@ -194,7 +194,7 @@ class VOSpider(OWINSPSpider):
             # Try to parse the date
             try:
                 rating_valid_since = datetime.strptime(rating_valid_since,
-                    '%d-%m-%Y')
+                                                       '%d-%m-%Y')
                 rating_valid_since = rating_valid_since.date().isoformat()
             except:
                 rating_valid_since = None
@@ -234,7 +234,7 @@ class VOSpider(OWINSPSpider):
                 try:
                     # Try to parse date
                     date = datetime.strptime(date, '%d-%m-%Y')\
-                            .strftime('%Y-%m-%d')
+                                   .strftime('%Y-%m-%d')
                 except:
                     pass
 
@@ -266,7 +266,7 @@ class VOSpider(OWINSPSpider):
                 try:
                     # Try to parse date
                     date = datetime.strptime(date, '%d-%m-%Y')\
-                            .strftime('%Y-%m-%d')
+                                   .strftime('%Y-%m-%d')
                 except:
                     pass
 
@@ -290,7 +290,7 @@ class VOSpider(OWINSPSpider):
             else:
                 # Append '&p_navi=11111' in order to open all tabs
                 organisation['result_card_url'] = result_url[0] + '&p_navi=11111'
-                urlparams = urlparse.parse_qs(urlparse.urlparse(\
+                urlparams = urlparse.parse_qs(urlparse.urlparse(
                     organisation['result_card_url']).query)
                 organisation['brin'] = urlparams['p_brin'][0]
                 try:
@@ -300,8 +300,8 @@ class VOSpider(OWINSPSpider):
 
                 organisation['branch_id'] = branch_id
 
-                request = Request(organisation['result_card_url'],\
-                    self.parse_resultcard)
+                request = Request(organisation['result_card_url'],
+                                  self.parse_resultcard)
                 request.meta['organisation'] = organisation
 
                 yield request
@@ -316,11 +316,12 @@ class VOSpider(OWINSPSpider):
             # Some pages are empty, so just return organisation here
             return organisation
 
-        organisation['board'] = address_table.select('tr[td/text() ='
-                                '"Bevoegd gezag"]/td[2]/text()').extract()[0]
+        organisation['board'] = address_table.select('tr[td/text() ="Bevoegd '
+                                                     'gezag"]/td[2]/text()')\
+                                             .extract()[0]
 
-        board_id = address_table.select('tr[td/text() ='
-                                '"Bevoegd gezagnr."]/td[4]/text()').extract()[0]
+        board_id = address_table.select('tr[td/text() ="Bevoegd gezagnr."]/'
+                                        'td[4]/text()').extract()[0]
 
         try:
             board_id = int(board_id)
@@ -332,10 +333,11 @@ class VOSpider(OWINSPSpider):
         organisation['address'].update({'city': None, 'zip_code': None})
 
         organisation['address']['street'] = address_table.select('tr[td/text() ='
-                                '"Adres"]/td[2]/text()').extract()[0]
+                                                                 '"Adres"]/td[2]'
+                                                                 '/text()').extract()[0]
 
-        branch_id = address_table.select('tr[td/text() ='
-                                '"Vestigingsnr."]/td[4]/text()').extract()[0]
+        branch_id = address_table.select('tr[td/text() ="Vestigingsnr."]/td[4]'
+                                         '/text()').extract()[0]
         try:
             branch_id = int(branch_id)
         except:
@@ -344,7 +346,7 @@ class VOSpider(OWINSPSpider):
         organisation['branch_id'] = branch_id
 
         place = address_table.select('tr[td/text() ="Plaats"]/td[2]/text()')\
-                                    .extract()[0].replace(u'\xa0', '')
+                             .extract()[0].replace(u'\xa0', '')
 
         zip_code = re.match(ZIPCODE, place)
         if zip_code:
@@ -359,11 +361,32 @@ class VOSpider(OWINSPSpider):
 class POSpider(OWINSPSpider):
     name = 'po.owinsp.nl'
 
-    def generate_search_urls(self, zips=settings['ZIPCODES']):
-        with open(zips, 'r') as f:
-            search_urls = [self.search_url % {
-                                'education_sector': 'po',
-                                'zipcode': line.strip()
-                            } for line in f]
+    search_url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/zoekresultaat'\
+                 '?xl=1&sector=%%23&sch_id=-1&arr_id=-1&p1=%%23&p2=curpg&p3=-1'\
+                 '&p1=%%23&p2=maxpg&p3=0&p1=%%23&p2=hits&p3=301.09&p1=sector'\
+                 '&p2=%%3D&p1=naam&p2=%%3D&p1=plaats&p2=%%3D&p1=afstand&p2=%%3D&'\
+                 'p1=pc_num&p2=%%3D&p3=PO&p3=&p3=&p3=&p3=&p1=brin&p2=%%3D'\
+                 '&p3=%(brin)s&p1=%%23&p2=submit&p3=Zoeken'
+
+    def generate_search_urls(self, addresses=settings['PO_ADDRESSES']):
+        with open(addresses, 'rb') as f:
+            reader = csv.DictReader(f, delimiter=';')
+            search_urls = [self.search_url % {'brin': row['BRIN NUMMER']}
+                           for row in reader]
 
         return search_urls
+
+    def parse_search_results(self, response):
+        hxs = HtmlXPathSelector(response)
+        search_hits = hxs.select('//li[@class="match"]/noscript/a/@href')
+
+        if search_hits:
+            # There are multiple schools with this BRIN (probably different
+            # branches of the same school), so make sure to process each one
+            pass
+        else:
+            # Check whether we've found a school or not
+            pass
+
+    def parse_organisation_detail_page(self, response):
+        raise NotImplementedError('Implement this')
