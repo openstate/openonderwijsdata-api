@@ -1,6 +1,5 @@
 colander
 scrapy
-scrapy-sentry
 Sphinx
 sphinxcontrib-httpdomain
 rawes
@@ -8,3 +7,4 @@ requests
 dateutils
 flask
 Flask-RESTful
+xlrd
