@@ -284,6 +284,8 @@ po_branch
 
 Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Primair onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/default.asp>`_
+
 **Source:** `Voortgezet onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/default.asp>`_
 
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
@@ -318,6 +320,31 @@ AddressComponent
     types                               array                               Array containing classifications of this component.
     =================================== =================================== ==========================================================================
 
+AgesByStudentWeight
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This dict has three keys *student_weight_0.0*, *student_weight_0.3* and *student_weight_1.2*, the weights are based on the pupil's parents level of education [#weight]_.
+
+**Source:** `Primair onderwijs - Leerlingen - 03. Leerlingen basisonderwijs naar leerlinggewicht en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp>`_
+
+.. table::
+
+    =================================== ================ ==========================================================================
+    Field                               Type             Description
+    =================================== ================ ==========================================================================
+    age_3                               integer          Number of children at age 3 in the key's weight category at this branch.
+    age_4                               integer          Number of children at age 4 in the key's weight category at this branch.
+    age_5                               integer          Number of children at age 5 in the key's weight category at this branch.
+    age_6                               integer          Number of children at age 6 in the key's weight category at this branch.
+    age_7                               integer          Number of children at age 7 in the key's weight category at this branch.
+    age_8                               integer          Number of children at age 8 in the key's weight category at this branch.
+    age_9                               integer          Number of children at age 9 in the key's weight category at this branch.
+    age_10                              integer          Number of children at age 10 in the key's weight category at this branch.
+    age_11                              integer          Number of children at age 11 in the key's weight category at this branch.
+    age_12                              integer          Number of children at age 12 in the key's weight category at this branch.
+    age_13                              integer          Number of children at age 13 in the key's weight category at this branch.
+    age_14                              integer          Number of children at age 14 in the key's weight category at this branch.
+    =================================== ================ ==========================================================================
+
 .. _dropout:
 
 Dropout
@@ -338,6 +365,84 @@ Dropout
     total_students                          integer                                                                 Total students for the given year at this school.
     year                                    integer                                                                 The year the dropout numbers apply to.
     ======================================= =================================== =================================== ======================================================================
+
+.. _edutypes:
+
+EduTypes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Primair onderwijs - Leerlingen - 07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen7.asp>`_
+
+.. table::
+
+    =========== ========== ================ =============================
+    Field       Type       Original term    Description
+    =========== ========== ================ =============================
+    po          integer    Bao              Primary education.
+    so          integer    So               Special education.
+    spo         integer    Sbao             Special primary education.
+    vso         integer    Svo              Special secondary education.
+    =========== ========== ================ =============================
+
+.. _examgrades:
+
+ExamGrades
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Leerlingen - 07. Geslaagden, gezakten en gemiddelde examencijfers per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp>`_
+
+.. table::
+
+    =================================== =================================== =================================== ==========================================================================
+    Field                               Type                                Original term                       Description
+    =================================== =================================== =================================== ==========================================================================
+    sector                              string                              Afdeling                            E.g. "Cultuur en Maatschappij"
+    education_structure                 string                              Onderwijstype VO                    E.g. "HAVO"
+    candidates                          integer                                                                 The total number of exam candidates for this school year
+    passed                              integer                                                                 The number of candidates that graduated
+    failed                              integer                                                                 The number of candidates that did not graduate
+    avg_grade_school_exam               float                               Gemiddeld cijfer schoolexamen
+    avg_grade_central_exam              float                               Gemiddeld cijfer centraal examen
+    avg_final_grade                     float                               Gemiddeld cijfer cijferlijst
+    =================================== =================================== =================================== ==========================================================================
+
+.. _agesbystudentweight:
+
+.. _finindicator:
+
+FinancialIndicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Primair onderwijs - Financiën - 15. Kengetallen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Financien/Jaarrekeninggegevens/Kengetallen.asp>`_
+
+**Source:** `Voortgezet onderwijs - Financiën - 15. Kengetallen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/Financien/Financien/Kengetallen.asp>`_
+
+.. table::
+
+    ======================================= =============================== ======================================== =====================================================================
+    Field                                   Type                            Original term                            Description
+    ======================================= =============================== ======================================== =====================================================================
+    capitalization_ratio                    float                           Kapitalisatiefactor
+    contract_activities_div_gov_funding     float                           Contractactiviteiten/rijksbijdragen
+    contractactivities_div_total_profits    float                           Contractactiviteiten/totale baten
+    equity_div_total_profits                float                           Eigen vermogen/totale baten
+    facilities_div_total_profits            float                           Voorzieningen/totale baten
+    general_reserve_div_total_income        float                           Algemene reserve/totale baten
+    gov_funding_div_total_profits           float                           Rijksbijdragen/totale baten
+    group                                   string                          Groepering
+    housing_expenses_div_total_expenses     float                           Huisvestingslasten/totale lasten
+    housing_investment_div_total_profits    float                           Investering huisvesting/totale baten
+    investments_div_total_profits           float                           Investeringen/totale baten
+    investments_relative_to_equity          float                           Beleggingen t.o.v. eigen vermogen
+    liquidity_current_ratio                 float                           Liquiditeit (current ratio)
+    liquidity_quick_ratio                   float                           Liquiditeit (quick ratio)
+    operating_capital_div_total_profits     float                           Werkkapitaal/totale baten
+    operating_capital                       float                           Werkkapitaal
+    other_gov_funding_div_total_profits     float                           Overige overheidsbijdragen/totale baten
+    profitability                           float                           Rentabiliteit
+    solvency_1                              float                           Solvabiliteit 1
+    solvency_2                              float                           Solvabiliteit 2
+    staff_costs_div_gov_funding             float                           Personeel/rijksbijdragen
+    staff_expenses_div_total_expenses       float                           Personele lasten/totale lasten
+    year                                    integer
+    ======================================= =============================== ======================================== =====================================================================
 
 .. _gradespercourse:
 
@@ -421,43 +526,6 @@ Belongs to :ref:`graduationdepartment`.
     - female            integer
     =================== =================================== =================================== ======================================================================
 
-
-.. _finindicator:
-
-FinancialIndicator
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-**Source:** `Voortgezet onderwijs - Financiën - 15. Kengetallen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/Financien/Financien/Kengetallen.asp>`_
-
-.. table::
-
-    ======================================= =============================== ======================================== =====================================================================
-    Field                                   Type                            Original term                            Description
-    ======================================= =============================== ======================================== =====================================================================
-    capitalization_ratio                    float                           Kapitalisatiefactor
-    contract_activities_div_gov_funding     float                           Contractactiviteiten/rijksbijdragen
-    contractactivities_div_total_profits    float                           Contractactiviteiten/totale baten
-    equity_div_total_profits                float                           Eigen vermogen/totale baten
-    facilities_div_total_profits            float                           Voorzieningen/totale baten
-    general_reserve_div_total_income        float                           Algemene reserve/totale baten
-    gov_funding_div_total_profits           float                           Rijksbijdragen/totale baten
-    group                                   string                          Groepering
-    housing_expenses_div_total_expenses     float                           Huisvestingslasten/totale lasten
-    housing_investment_div_total_profits    float                           Investering huisvesting/totale baten
-    investments_div_total_profits           float                           Investeringen/totale baten
-    investments_relative_to_equity          float                           Beleggingen t.o.v. eigen vermogen
-    liquidity_current_ratio                 float                           Liquiditeit (current ratio)
-    liquidity_quick_ratio                   float                           Liquiditeit (quick ratio)
-    operating_capital_div_total_profits     float                           Werkkapitaal/totale baten
-    operating_capital                       float                           Werkkapitaal
-    other_gov_funding_div_total_profits     float                           Overige overheidsbijdragen/totale baten
-    profitability                           float                           Rentabiliteit
-    solvency_1                              float                           Solvabiliteit 1
-    solvency_2                              float                           Solvabiliteit 2
-    staff_costs_div_gov_funding             float                           Personeel/rijksbijdragen
-    staff_expenses_div_total_expenses       float                           Personele lasten/totale lasten
-    year                                    integer
-    ======================================= =============================== ======================================== =====================================================================
-
 .. _duogeoloc:
 
 GeoLocation
@@ -492,6 +560,7 @@ GeoViewport
 
 Meta
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `OpenOnderwijs scrapers <http://api.openonderwijsdata.nl/>`_
 
 .. table::
 
@@ -503,6 +572,75 @@ Meta
     validated_at                        datetime                            The date and time this item was validated.
     validation_result                   string                              Indication whether the item passed validation.
     =================================== =================================== ======================================================================================================
+
+.. _pupilsbyorigins:
+
+PupilsByOrigin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Number of pupils born in countries other than The Netherlands, by country.
+
+**Source:** `Primair onderwijs - Leerlingen - 09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp>`_
+
+.. table::
+
+    =================================== ================= =================================== ==============
+    Field                               Type              Original term                       Description
+    =================================== ================= =================================== ==============
+    aruba                               integer           Aruba
+    maluku_islands                      integer           Molukken
+    greece                              integer           Griekenland
+    italy                               integer           Italië
+    cape_verde                          integer           Kaapverdië
+    morocco                             integer           Marokko
+    netherlands_antilles                integer           Nederlandse Antillen
+    non_english_speaking_countries      integer           Niet-Engelstalige landen
+    portugal                            integer           Portugal
+    spain                               integer           Spanje
+    suriname                            integer           Suriname
+    tunisia                             integer           Tunesië
+    turkey                              integer           Turkije
+    refugees                            integer           Vluchtelingen
+    former_yugoslavia                   integer           Voormalig Joegoslavië
+    =================================== ================= =================================== ==============
+
+.. _pupilresidences:
+
+PupilResidences
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Zip codes of pupils for each branch by age. Includes po, spo, so, and vso (hence the ages up to 25).
+
+**Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp>`_
+
+.. table::
+
+    ========= ========== ================== ==========================================================================
+    Field     Type       Original term      Description
+    ========= ========== ================== ==========================================================================
+    age_3     integer    Leeftijd 3 jaar    Number of pupils of age 3 living in this zip code for this branch.
+    age_4     integer    Leeftijd 4 jaar    Number of pupils of age 4 living in this zip code for this branch.
+    age_5     integer    Leeftijd 5 jaar    Number of pupils of age 5 living in this zip code for this branch.
+    age_6     integer    Leeftijd 6 jaar    Number of pupils of age 6 living in this zip code for this branch.
+    age_7     integer    Leeftijd 7 jaar    Number of pupils of age 7 living in this zip code for this branch.
+    age_8     integer    Leeftijd 8 jaar    Number of pupils of age 8 living in this zip code for this branch.
+    age_9     integer    Leeftijd 9 jaar    Number of pupils of age 9 living in this zip code for this branch.
+    age_10    integer    Leeftijd 10 jaar   Number of pupils of age 10 living in this zip code for this branch.
+    age_11    integer    Leeftijd 11 jaar   Number of pupils of age 11 living in this zip code for this branch.
+    age_12    integer    Leeftijd 12 jaar   Number of pupils of age 12 living in this zip code for this branch.
+    age_13    integer    Leeftijd 13 jaar   Number of pupils of age 13 living in this zip code for this branch.
+    age_14    integer    Leeftijd 14 jaar   Number of pupils of age 14 living in this zip code for this branch.
+    age_15    integer    Leeftijd 15 jaar   Number of pupils of age 15 living in this zip code for this branch.
+    age_16    integer    Leeftijd 16 jaar   Number of pupils of age 16 living in this zip code for this branch.
+    age_17    integer    Leeftijd 17 jaar   Number of pupils of age 17 living in this zip code for this branch.
+    age_18    integer    Leeftijd 18 jaar   Number of pupils of age 18 living in this zip code for this branch.
+    age_19    integer    Leeftijd 19 jaar   Number of pupils of age 19 living in this zip code for this branch.
+    age_20    integer    Leeftijd 20 jaar   Number of pupils of age 20 living in this zip code for this branch.
+    age_21    integer    Leeftijd 21 jaar   Number of pupils of age 21 living in this zip code for this branch.
+    age_22    integer    Leeftijd 22 jaar   Number of pupils of age 22 living in this zip code for this branch.
+    age_23    integer    Leeftijd 23 jaar   Number of pupils of age 23 living in this zip code for this branch.
+    age_24    integer    Leeftijd 24 jaar   Number of pupils of age 24 living in this zip code for this branch.
+    age_25    integer    Leeftijd 25 jaar   Number of pupils of age 25 living in this zip code for this branch.
+    zip_code  string     Postcode           The zip code where these pupils live.
+    ========= ========== ================== ==========================================================================
 
 .. _duostdres:
 
@@ -552,54 +690,6 @@ StudentPerStructure
     year_6                              mapping                Distribution of male and female students for year 6.
     =================================== ====================== ==========================================================================
 
-.. _examgrades:
-
-ExamGrades
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-**Source:** `Voortgezet onderwijs - Leerlingen - 07. Geslaagden, gezakten en gemiddelde examencijfers per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp>`_
-
-.. table::
-
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    sector                              string                              Afdeling                            E.g. "Cultuur en Maatschappij"
-    education_structure                 string                              Onderwijstype VO                    E.g. "HAVO"
-    candidates                          integer                                                                 The total number of exam candidates for this school year
-    passed                              integer                                                                 The number of candidates that graduated
-    failed                              integer                                                                 The number of candidates that did not graduate
-    avg_grade_school_exam               float                               Gemiddeld cijfer schoolexamen
-    avg_grade_central_exam              float                               Gemiddeld cijfer centraal examen
-    avg_final_grade                     float                               Gemiddeld cijfer cijferlijst
-    =================================== =================================== =================================== ==========================================================================
-
-.. _agesbystudentweight:
-
-AgesByStudentWeight
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This dict has three keys *student_weight_0.0*, *student_weight_0.3* and *student_weight_1.2*, the weights are based on the pupil's parents level of education [#weight]_.
-
-**Source:** `Primair onderwijs - Leerlingen - 03. Leerlingen basisonderwijs naar leerlinggewicht en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp>`_
-
-.. table::
-
-    =================================== ========================= ==========================================================================
-    Field                               Type                                Description
-    =================================== ========================= ==========================================================================
-    age_3                               integer                   Number of children at age 3 in the key's weight category at this branch.
-    age_4                               integer                   Number of children at age 4 in the key's weight category at this branch.
-    age_5                               integer                   Number of children at age 5 in the key's weight category at this branch.
-    age_6                               integer                   Number of children at age 6 in the key's weight category at this branch.
-    age_7                               integer                   Number of children at age 7 in the key's weight category at this branch.
-    age_8                               integer                   Number of children at age 8 in the key's weight category at this branch.
-    age_9                               integer                   Number of children at age 9 in the key's weight category at this branch.
-    age_10                              integer                   Number of children at age 10 in the key's weight category at this branch.
-    age_11                              integer                   Number of children at age 11 in the key's weight category at this branch.
-    age_12                              integer                   Number of children at age 12 in the key's weight category at this branch.
-    age_13                              integer                   Number of children at age 13 in the key's weight category at this branch.
-    age_14                              integer                   Number of children at age 14 in the key's weight category at this branch.
-    =================================== ========================= ==========================================================================
-
 .. _studentweights:
 
 StudentWeights
@@ -617,93 +707,6 @@ StudentWeights
     student_weight_0.3                  integer                                                                 Number of pupils who's both parents didn't get education beyond lbo/vbo, 'praktijkonderwijs' or vmbo 'basis- of kaderberoepsgerichte leerweg' [#weight]_.
     student_weight_1.2                  integer                                                                 Number of pupils who's parents (one or both) didn't get education beyond 'basisonderwijs' or (v)so-zmlk [#weight]_.
     =================================== =================================== =================================== ==========================================================================
-
-.. _edutypes:
-
-EduTypes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-**Source:** `Primair onderwijs - Leerlingen - 07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen7.asp>`_
-
-.. table::
-
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    po                                  integer                             Bao                                 Primary education.
-    so                                  integer                             So                                  Special education.
-    spo                                 integer                             Sbao                                Special primary education.
-    vso                                 integer                             Svo                                 Special secondary education.
-    =================================== =================================== =================================== ==========================================================================
-
-.. _pupilsbyorigins:
-
-PupilsByOrigins
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Number of pupils born in countries other than The Netherlands, by country.
-
-**Source:** `Primair onderwijs - Leerlingen - 09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp>`_
-
-.. table::
-
-    =================================== ================= =================================== ==========================================================================
-    Field                               Type              Original term                       Description
-    =================================== ================= =================================== ==========================================================================
-    aruba                               integer           Aruba
-    maluku_islands                      integer           Molukken
-    greece                              integer           Griekenland
-    italy                               integer           Italië
-    cape_verde                          integer           Kaapverdië
-    morocco                             integer           Marokko
-    netherlands_antilles                integer           Nederlandse Antillen
-    non_english_speaking_countries      integer           Niet-Engelstalige landen
-    portugal                            integer           Portugal
-    spain                               integer           Spanje
-    suriname                            integer           Suriname
-    tunisia                             integer           Tunesië
-    turkey                              integer           Turkije
-    refugees                            integer           Vluchtelingen
-    former_yugoslavia                   integer           Voormalig Joegoslavië
-    =================================== ================= =================================== ==========================================================================
-
-.. _pupilresidences:
-
-PupilResidences
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Zip codes of pupils for each branch by age. Includes po, spo, so, and vso (hence the ages up to 25).
-
-**Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp>`_
-
-.. table::
-
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    age_3                               integer                             Leeftijd 3 jaar                     Number of pupils of age 3 living in this zip code for this branch.
-    age_4                               integer                             Leeftijd 4 jaar                     Number of pupils of age 4 living in this zip code for this branch.
-    age_5                               integer                             Leeftijd 5 jaar                     Number of pupils of age 5 living in this zip code for this branch.
-    age_6                               integer                             Leeftijd 6 jaar                     Number of pupils of age 6 living in this zip code for this branch.
-    age_7                               integer                             Leeftijd 7 jaar                     Number of pupils of age 7 living in this zip code for this branch.
-    age_8                               integer                             Leeftijd 8 jaar                     Number of pupils of age 8 living in this zip code for this branch.
-    age_9                               integer                             Leeftijd 9 jaar                     Number of pupils of age 9 living in this zip code for this branch.
-    age_10                              integer                             Leeftijd 10 jaar                    Number of pupils of age 10 living in this zip code for this branch.
-    age_11                              integer                             Leeftijd 11 jaar                    Number of pupils of age 11 living in this zip code for this branch.
-    age_12                              integer                             Leeftijd 12 jaar                    Number of pupils of age 12 living in this zip code for this branch.
-    age_13                              integer                             Leeftijd 13 jaar                    Number of pupils of age 13 living in this zip code for this branch.
-    age_14                              integer                             Leeftijd 14 jaar                    Number of pupils of age 14 living in this zip code for this branch.
-    age_15                              integer                             Leeftijd 15 jaar                    Number of pupils of age 15 living in this zip code for this branch.
-    age_16                              integer                             Leeftijd 16 jaar                    Number of pupils of age 16 living in this zip code for this branch.
-    age_17                              integer                             Leeftijd 17 jaar                    Number of pupils of age 17 living in this zip code for this branch.
-    age_18                              integer                             Leeftijd 18 jaar                    Number of pupils of age 18 living in this zip code for this branch.
-    age_19                              integer                             Leeftijd 19 jaar                    Number of pupils of age 19 living in this zip code for this branch.
-    age_20                              integer                             Leeftijd 20 jaar                    Number of pupils of age 20 living in this zip code for this branch.
-    age_21                              integer                             Leeftijd 21 jaar                    Number of pupils of age 21 living in this zip code for this branch.
-    age_22                              integer                             Leeftijd 22 jaar                    Number of pupils of age 22 living in this zip code for this branch.
-    age_23                              integer                             Leeftijd 23 jaar                    Number of pupils of age 23 living in this zip code for this branch.
-    age_24                              integer                             Leeftijd 24 jaar                    Number of pupils of age 24 living in this zip code for this branch.
-    age_25                              integer                             Leeftijd 25 jaar                    Number of pupils of age 25 living in this zip code for this branch.
-    zip_code                            string                              Postcode                            The zip code where these pupils live.
-    =================================== =================================== =================================== ==========================================================================
-
 
 .. _schoolvodata:
 
