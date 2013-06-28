@@ -42,13 +42,13 @@ EXPORT_METHODS = {
             'create_tar': True,
             'remove_json': False
         }
-    }#,
-    # 'elasticsearch': {
-    #     'exporter': exporters.ElasticSearchExporter,
-    #     'options': {
-    #         'url': '127.0.0.1:9200'
-    #     }
-    # }
+    },
+    'elasticsearch': {
+        'exporter': exporters.ElasticSearchExporter,
+        'options': {
+            'url': '127.0.0.1:9200'
+        }
+    }
 }
 
 from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,

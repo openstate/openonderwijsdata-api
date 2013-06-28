@@ -163,7 +163,7 @@ class VOSpider(OWINSPSpider):
         address = h_content.select('./p[@class="detpag"]/text()').extract()
         address = ', '.join([x.strip() for x in address])
         organisation['address'] = {
-            'street': address.replace(u'\xa0\xa0', u' '),
+            'street': address.replace(u'\xa0\xa0', u', '),
             'city': None,
             'zip_code': None
         }
@@ -472,7 +472,7 @@ class POSpider(OWINSPSpider):
         address_str = ', '.join([x.strip() for x in address])
 
         school['address'] = {
-            'street': address_str.replace(u'\xa0\xa0', u' '),
+            'street': address_str.replace(u'\xa0\xa0', u', '),
             'city': None,
             'zip_code': None
         }
