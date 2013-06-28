@@ -119,7 +119,8 @@ class Search(restful.Resource):
     parser.add_argument('board_id', type=int)
     parser.add_argument('branch_id', type=int)
     parser.add_argument('zip_code', type=str)
-    parser.add_argument('city', type=str)
+    parser.add_argument('city', type=str),
+    parser.add_argument('reference_year', type=int),
 
     parser.add_argument('sort', type=str)
     parser.add_argument('order', type=str, default='asc')
@@ -137,7 +138,8 @@ class Search(restful.Resource):
         'branch_id': 'branch_id',
         'zip_code': 'address.zip_code',
         'city': 'address.city',
-        'geo_location': 'address.geo_location'
+        'geo_location': 'address.geo_location',
+        'reference_year': 'reference_year'
     }
 
     def get(self):
