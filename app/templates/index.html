@@ -15,6 +15,33 @@
 	<div class="span4">
 		<h4>DUO</h4>
 		<ul class="unstyled">
+			<li><span><abbr title="Vestigingen schoolen primair onderwijs">PO School branches</abbr></span></li>
+			<ul>
+			{% for year in counts['duo_po_branches']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+			{% endfor %}
+			</ul>
+			<li><span><abbr title="Bevoegde gezagen primair onderwijs">PO School boards</abbr></span></li>
+			<ul>
+			{% for year in counts['duo_po_boards']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+			{% endfor %}
+			</ul>
+			<li><span><abbr title="Hoofdvestigingen scholen primair onderwijs">PO Schools</abbr></span></li>
+			<ul>
+			{% for year in counts['duo_vo_schools']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+			{% endfor %}
+			</ul>
 			<li><span><abbr title="Vestigingen schoolen voortgezet onderwijs">VO School branches</abbr></span></li>
 			<ul>
 			{% for year in counts['duo_vo_branches']['facets']['years']['terms'] %}
