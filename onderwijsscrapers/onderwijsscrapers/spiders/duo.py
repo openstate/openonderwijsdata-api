@@ -1608,12 +1608,7 @@ class DuoPoBoards(BaseSpider):
 
             available_csvs['http://duo.nl%s' % csv_url] = ref_date
 
-        edu_type_mapping = {
-            'BAO': 'po',
-            'SBAO': 'spo',
-            'SO': 'so',
-            'VSO': 'vso'
-        }
+        possible_edu_types = ['BAO', 'SBAO', 'SO', 'VSO']
 
         for csv_url, reference_date in available_csvs.iteritems():
             reference_year = reference_date.year
@@ -1624,7 +1619,7 @@ class DuoPoBoards(BaseSpider):
             csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
                           .decode('cp1252').encode('utf8')), delimiter=';')
 
-            edu_types_per_board = {}
+            students_per_edu_type = {}
             for row in csv_file:
                 # Strip leading and trailing whitespace from field names and values.
                 for key in row.keys():
@@ -1634,27 +1629,30 @@ class DuoPoBoards(BaseSpider):
                         row[key.strip()] = '0'
 
                 board_id = int(row['BEVOEGD GEZAG NUMMER'])
-                if board_id not in edu_types_per_board:
-                    edu_types_per_board[board_id] = []
+                if board_id not in students_per_edu_type:
+                    students_per_edu_type[board_id] = []
 
-                edu_types = {}
+                edu_types = []
 
-                for type, type_norm in edu_type_mapping.iteritems():
-                    # If some fields have no value (only empty string ''),
-                    # then set those to 0.
-                    if row[type] == '':
-                        row[type] = '0'
-                    edu_types[type_norm] = int(row[type].replace('.', ''))
+                for edu_type in possible_edu_types:
+                    if edu_type in row:
+                        if row[edu_type] == '':
+                            row[edu_type] = '0'
 
-                edu_types_per_board[board_id].append(edu_types)
+                        edu_types.append({
+                            'edu_type': edu_type,
+                            'students': int(row[edu_type].replace('.', ''))
+                        })
 
-            for board_id, e_types in edu_types_per_board.iteritems():
+                students_per_edu_type[board_id].append(edu_types)
+
+            for board_id, e_types in students_per_edu_type.iteritems():
                 board = DuoPoBoard(
                     board_id=board_id,
                     reference_year=reference_year,
-                    edu_types_reference_url=csv_url,
-                    edu_types_reference_date=reference_date,
-                    edu_types=e_types
+                    students_per_edu_type_reference_url=csv_url,
+                    students_per_edu_type_reference_date=reference_date,
+                    students_per_edu_type=e_types
                 )
                 yield board
 
@@ -2136,7 +2134,6 @@ class DuoPoBranchesSpider(BaseSpider):
                             ages['age_%s' % age] = int(row['LEEFTIJD.%s' % age])
                         else:
                             ages['age_%s' % age] = 0
-
 
                 if school_id not in ages_per_branch_by_student_weight:
                     ages_per_branch_by_student_weight[school_id] = {}

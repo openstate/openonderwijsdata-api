@@ -1,5 +1,212 @@
 {
   "mappings": {
+    "po_branch": {
+      "dynamic": true,
+      "properties": {
+        "address": {
+          "dynamic": true,
+          "properties": {
+            "address_components": {
+              "dynamic": true,
+              "type": "nested",
+              "properties": {
+                "long_name": {
+                  "type": "string"
+                },
+                "short_name": {
+                  "type": "string"
+                },
+                "types": {
+                  "type": "string"
+                }
+              }
+            },
+            "city": {
+              "type": "multi_field",
+              "fields": {
+                "city": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            },
+            "formatted_address": {
+              "type": "string"
+            },
+            "geo_location": {
+              "type": "geo_point",
+              "lat_lon": true
+            },
+            "geo_viewport": {
+              "properties": {
+                "northeast": {
+                  "type": "geo_point",
+                  "lat_lon": true
+                },
+                "southwest": {
+                  "type": "geo_point",
+                  "lat_lon": true
+                }
+              }
+            },
+            "street": {
+              "type": "multi_field",
+              "fields": {
+                "street": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            },
+            "zip_code": {
+              "type": "multi_field",
+              "fields": {
+                "zip_code": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            }
+          }
+        },
+        "board_id": {
+          "type": "integer"
+        },
+        "branch_id": {
+          "type": "integer"
+        },
+        "brin": {
+          "type": "multi_field",
+          "fields": {
+            "brin": {
+              "type": "string"
+            },
+            "untouched": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "current_rating": {
+          "dynamic": true,
+          "properties": {
+            "owinsp_url": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "rating_valid_since": {
+              "format": "dateOptionalTime",
+              "type": "date"
+            },
+            "rating_excerpt": {
+              "type": "string"
+            },
+            "rating": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "owinsp_id": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "denomination": {
+          "type": "multi_field",
+          "fields": {
+            "denomination": {
+              "type": "string"
+            },
+            "untouched": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "education_structures": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "meta": {
+          "dynamic": true,
+          "properties": {
+            "item_scraped_at": {
+              "format": "dateOptionalTime",
+              "type": "date"
+            },
+            "scrape_started_at": {
+              "format": "dateOptionalTime",
+              "type": "date"
+            },
+            "validated_at": {
+              "format": "dateOptionalTime",
+              "type": "date"
+            },
+            "validation_result": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "name": {
+          "type": "multi_field",
+          "fields": {
+            "name": {
+              "type": "string"
+            },
+            "untouched": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "rating_history": {
+          "dynamic": true,
+          "type": "nested",
+          "properties": {
+            "rating": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "date": {
+              "format": "dateOptionalTime",
+              "type": "date"
+            }
+          }
+        },
+        "reports": {
+          "dynamic": true,
+          "type": "nested",
+          "properties": {
+            "title": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "date": {
+              "format": "dateOptionalTime",
+              "type": "date"
+            },
+            "url": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "website": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    },  
     "vo_branch": {
       "dynamic": true,
       "properties": {
