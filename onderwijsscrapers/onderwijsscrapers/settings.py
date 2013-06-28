@@ -61,13 +61,13 @@ EXPORT_METHODS = {
             'create_tar': True,
             'remove_json': False
         }
-    }#,
-    # 'elasticsearch': {
-    #     'exporter': exporters.ElasticSearchExporter,
-    #     'options': {
-    #         'url': '127.0.0.1:9200'
-    #     }
-    # }
+    },
+    'elasticsearch': {
+        'exporter': exporters.ElasticSearchExporter,
+        'options': {
+            'url': '127.0.0.1:9200'
+        }
+    }
 }
 
 from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
@@ -157,10 +157,10 @@ EXPORT_SETTINGS = {
         'id_fields': ['reference_year', 'brin']
     },
     'duo_po_branches': {
-        'validate': False,
+        'validate': True,
         'schema': DuoPoBranch,
         'validation_index': 'onderwijsdata_validation',
-        'geocode': False,
+        'geocode': True,
         'geocode_fields': ['address', 'correspondence_address'],
         'index': 'duo',
         'doctype': 'po_branch',
