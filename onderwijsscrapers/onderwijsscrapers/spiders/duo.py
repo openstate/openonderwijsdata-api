@@ -1632,19 +1632,19 @@ class DuoPoBoards(BaseSpider):
                 if board_id not in students_per_edu_type:
                     students_per_edu_type[board_id] = []
 
-                edu_types = []
-
                 for edu_type in possible_edu_types:
                     if edu_type in row:
                         if row[edu_type] == '':
-                            row[edu_type] = '0'
+                            continue
 
-                        edu_types.append({
+                        if row[edu_type] == 0:
+                            continue
+
+                        students_per_edu_type[board_id].append({
+                            'denomination': row['DENOMINATIE'],
                             'edu_type': edu_type,
                             'students': int(row[edu_type].replace('.', ''))
                         })
-
-                students_per_edu_type[board_id].append(edu_types)
 
             for board_id, e_types in students_per_edu_type.iteritems():
                 board = DuoPoBoard(
