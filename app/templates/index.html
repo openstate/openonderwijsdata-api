@@ -75,8 +75,12 @@
 		<h4>Onderwijsinspectie</h4>
 		<ul class="unstyled">
 			<li>
+				<span><abbr title="Vestigingen schoolen primair onderwijs">PO School branches</abbr></span>
+				<span class="badge pull-right">{{ counts['onderwijsinspectie_po_branches']['facets']['doc_types']['total'] }}</span>
+			</li>
+			<li>
 				<span><abbr title="Vestigingen schoolen voortgezet onderwijs">VO School branches</abbr></span>
-				<span class="badge pull-right">{{ counts['onderwijsinspectie']['facets']['doc_types']['total'] }}</span>
+				<span class="badge pull-right">{{ counts['onderwijsinspectie_vo_branches']['facets']['doc_types']['total'] }}</span>
 			</li>
 		</ul>
 	</div>
