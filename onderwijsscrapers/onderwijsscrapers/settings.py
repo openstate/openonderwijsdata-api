@@ -29,6 +29,25 @@ MULTIPLE_SCHOOLS_FOR_BRIN = os.path.join(PROJECT_ROOT, 'multiple_brins.txt')
 
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
+# Mapping of DUO countries of origin to more acceptable variants
+ORIGINS = {
+    'ARUBA': 'aruba',
+    'DE MOLUKSE EILANDEN': 'maluku_islands',
+    'GIEKENLAND': 'greece',
+    'ITALIE': 'italy',
+    'KAAPVERDIE': 'cape_verde',
+    'MAROKKO': 'morocco',
+    'NEDERLANDSE ANTILLEN': 'netherlands_antilles',
+    'NIET-ENGELSTALIGEN': 'non_english_speaking_countries',
+    'PORTUGAL': 'portugal',
+    'SPANJE': 'spain',
+    'SURINAME': 'suriname',
+    'TUNESIE': 'tunisia',
+    'TURKIJE': 'turkey',
+    'VLUCHTELINGEN': 'refugees',
+    'VML.JOEGOSLAVIE': 'former_yugoslavia',
+}
+
 # Directory to which scrape results should be saved (in case the file
 # exporter is used).
 EXPORT_DIR = os.path.join(PROJECT_ROOT, 'export')
@@ -42,13 +61,13 @@ EXPORT_METHODS = {
             'create_tar': True,
             'remove_json': False
         }
-    },
-    'elasticsearch': {
-        'exporter': exporters.ElasticSearchExporter,
-        'options': {
-            'url': '127.0.0.1:9200'
-        }
-    }
+    }#,
+    # 'elasticsearch': {
+    #     'exporter': exporters.ElasticSearchExporter,
+    #     'options': {
+    #         'url': '127.0.0.1:9200'
+    #     }
+    # }
 }
 
 from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
@@ -138,10 +157,10 @@ EXPORT_SETTINGS = {
         'id_fields': ['reference_year', 'brin']
     },
     'duo_po_branches': {
-        'validate': True,
+        'validate': False,
         'schema': DuoPoBranch,
         'validation_index': 'onderwijsdata_validation',
-        'geocode': True,
+        'geocode': False,
         'geocode_fields': ['address', 'correspondence_address'],
         'index': 'duo',
         'doctype': 'po_branch',

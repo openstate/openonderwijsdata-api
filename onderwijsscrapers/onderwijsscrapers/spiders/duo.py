@@ -7,12 +7,13 @@ from os import devnull
 from zipfile import ZipFile
 
 import requests
+from scrapy.conf import settings
 from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-from onderwijsscrapers.items import DuoVoBoard, DuoVoSchool, DuoVoBranch, \
-                                    DuoPoBoard, DuoPoSchool, DuoPoBranch
+from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
+                                     DuoPoBoard, DuoPoSchool, DuoPoBranch)
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
@@ -1780,18 +1781,18 @@ class DuoPoBranchesSpider(BaseSpider):
 
     def start_requests(self):
         return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/adressen/Adressen/vest_bo.asp',
-                    self.parse_po_branches),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
-                    self.parse_po_student_weight),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp',
-                    self.parse_po_student_age),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp',
-                    self.parse_po_born_outside_nl),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/adressen/Adressen/vest_bo.asp',
+            #         self.parse_po_branches),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
+            #         self.parse_po_student_weight),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp',
+            #         self.parse_po_student_age),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp',
+            #         self.parse_po_born_outside_nl),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp',
                     self.parse_po_pupil_zipcode_by_age),
@@ -2136,7 +2137,7 @@ class DuoPoBranchesSpider(BaseSpider):
                         else:
                             ages['age_%s' % age] = 0
 
-                            
+
                 if school_id not in ages_per_branch_by_student_weight:
                     ages_per_branch_by_student_weight[school_id] = {}
 
@@ -2185,7 +2186,7 @@ class DuoPoBranchesSpider(BaseSpider):
                           .decode('cp1252').encode('utf8')), delimiter=';')
 
             school_ids = {}
-            pupils_by_origins = {}
+            students_by_origin = {}
 
             for row in csv_file:
                 brin = row['BRIN NUMMER'].strip()
@@ -2201,44 +2202,27 @@ class DuoPoBranchesSpider(BaseSpider):
                 for key in row.keys():
                     row[key.strip()] = row[key].strip()
 
-                origin = {
-                    'ARUBA': 'aruba',
-                    'DE MOLUKSE EILANDEN': 'maluku_islands',
-                    'GIEKENLAND': 'greece',
-                    'ITALIE': 'italy',
-                    'KAAPVERDIE': 'cape_verde',
-                    'MAROKKO': 'morocco',
-                    'NEDERLANDSE ANTILLEN': 'netherlands_antilles',
-                    'NIET-ENGELSTALIGEN': 'non_english_speaking_countries',
-                    'PORTUGAL': 'portugal',
-                    'SPANJE': 'spain',
-                    'SURINAME': 'suriname',
-                    'TUNESIE': 'tunisia',
-                    'TURKIJE': 'turkey',
-                    'VLUCHTELINGEN': 'refugees',
-                    'VML.JOEGOSLAVIE': 'former_yugoslavia',
-                }
-
-                origins = {}
-                for origin, origin_norm in origin.iteritems():
+                origins = []
+                for origin, country in settings['ORIGINS'].iteritems():
+                    orig = {'country': country}
                     if row[origin].strip():
-                        origins[origin_norm] = int(row[origin])
+                        orig['students'] = int(row[origin].strip())
                     else:
-                        origins[origin_norm] = 0
-                            
-                if school_id not in pupils_by_origins:
-                    pupils_by_origins[school_id] = []
+                        orig['students'] = 0
 
-                pupils_by_origins[school_id].append(origins)
+                    origins.append(orig)
 
-            for school_id, origs in pupils_by_origins.iteritems():
+                if school_id not in students_by_origin:
+                    students_by_origin[school_id] = origins
+
+            for school_id, origs in students_by_origin.iteritems():
                 school = DuoPoBranch(
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
-                    pupils_by_origins_reference_url=csv_url,
-                    pupils_by_origins_reference_date=reference_date,
-                    pupils_by_origins=origs
+                    students_by_origin_reference_url=csv_url,
+                    students_by_origin_reference_date=reference_date,
+                    students_by_origin=origs
                 )
                 yield school
 
@@ -2285,7 +2269,7 @@ class DuoPoBranchesSpider(BaseSpider):
 
             for csv_file in csv_files:
                 school_ids = {}
-                pupil_residences = {}
+                student_residences = {}
 
                 for row in csv_file:
                     # Remove leading/trailing spaces from field names and values.
@@ -2301,27 +2285,33 @@ class DuoPoBranchesSpider(BaseSpider):
                         'branch_id': branch_id
                     }
 
-                    if school_id not in pupil_residences:
-                        pupil_residences[school_id] = []
+                    if school_id not in student_residences:
+                        student_residences[school_id] = []
 
-                    print row['GEMEENTENAAM']
+                    student_residence = {
+                        'zip_code': row['POSTCODE_LEERLING'].strip(),
+                        'ages': []
+                    }
 
-                    res_dict = {}
-                    res_dict['zip_code'] = row['POSTCODE_LEERLING'].strip()
                     for age in range(3, 26):
                         if row.has_key('LEEFTIJD_%i_JAAR' % age):
-                            res_dict['age_%i' % age] = int(float(row['LEEFTIJD_%i_JAAR' % age].strip()))
+                            student_residence['ages'].append({
+                                'age': age,
+                                # Find out why Sicco casts to a float before he
+                                # cast to an int..
+                                'students': int(float(row['LEEFTIJD_%i_JAAR' % age].strip()))
+                            })
 
-                    pupil_residences[school_id].append(res_dict)
+                    student_residences[school_id].append(student_residence)
 
-                    for school_id, residence in pupil_residences.iteritems():
+                    for school_id, residence in student_residences.iteritems():
                         school = DuoPoBranch(
                             brin=school_ids[school_id]['brin'],
                             branch_id=school_ids[school_id]['branch_id'],
                             reference_year=reference_year,
-                            pupil_residences_reference_url=zip_url,
-                            pupil_residences_reference_date=reference_date,
-                            pupil_residences=residence
+                            student_residences_reference_url=zip_url,
+                            student_residences_reference_date=reference_date,
+                            student_residences=residence
                         )
 
                     yield school
