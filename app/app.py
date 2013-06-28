@@ -4,20 +4,11 @@ from flask.ext.restful import abort, reqparse
 import rawes
 import re
 
+from settings import (ES_URL, ES_INDEXES, ES_DOCUMENT_TYPES_PER_INDEX,
+                      ES_DOCUMENT_TYPES, ES_VALIDATION_RESULTS_INDEX)
+
 app = Flask(__name__)
 api = restful.Api(app)
-
-ES_URL = 'localhost:9200'
-ES_INDEXES = set(['duo', 'schoolvo', 'onderwijsinspectie'])
-ES_DOCUMENT_TYPES_PER_INDEX = {
-    'duo': set(['vo_school', 'vo_branch', 'vo_board']),
-    'schoolvo': set(['vo_branch']),
-    'onderwijsinspectie': set(['vo_branch'])
-}
-ES_DOCUMENT_TYPES = set()
-for index, doctypes in ES_DOCUMENT_TYPES_PER_INDEX.iteritems():
-    ES_DOCUMENT_TYPES = ES_DOCUMENT_TYPES | doctypes
-ES_VALIDATION_RESULTS_INDEX = 'onderwijsdata_validation'
 
 es = rawes.Elastic(ES_URL)
 
@@ -43,8 +34,7 @@ def format_es_search_results(es_results):
 def index():
     counts = {}
 
-    counts['schoolvo'] = es.get('schoolvo/_search',
-        data={
+    counts['schoolvo'] = es.get('schoolvo/_search', data={
         "facets": {
             "doc_types": {
                 "terms": {"field": "_type"}
@@ -53,8 +43,7 @@ def index():
         "size": 0
     })
 
-    counts['onderwijsinspectie'] = es.get('onderwijsinspectie/_search',
-        data={
+    counts['onderwijsinspectie'] = es.get('onderwijsinspectie/_search', data={
         "facets": {
             "doc_types": {
                 "terms": {"field": "_type"}
@@ -101,14 +90,13 @@ def index():
 
 @app.route('/search')
 def simple_search():
-    print request.args.get('q')
     query = {
         'query': {
             'query_string': {
                 'fields': ['name^10', 'address.street', 'address.city',
-                    'address.zip_code' 'municipality', 'wgr_area',
-                    'rmc_region', 'rpa_area', 'province', 'corop_area',
-                    'nodal_area', 'website', 'brin'],
+                           'address.zip_code' 'municipality', 'wgr_area',
+                           'rmc_region', 'rpa_area', 'province', 'corop_area',
+                           'nodal_area', 'website', 'brin'],
                 'allow_leading_wildcard': False,
                 'query': request.args.get('q')
             }
@@ -116,8 +104,10 @@ def simple_search():
         'size': 20
     }
 
-    hits = format_es_search_results(es.get('%s/%s/_search' %
-        (','.join(ES_INDEXES), ','.join(ES_DOCUMENT_TYPES)), data=query))
+    es_results = es.get('%s/%s/_search' % (','.join(ES_INDEXES),
+                                           ','.join(ES_DOCUMENT_TYPES)),
+                        data=query)
+    hits = format_es_search_results(es_results)
 
     return render_template('search.html', hits=hits)
 
@@ -137,7 +127,7 @@ class Search(restful.Resource):
     parser.add_argument('geo_distance', type=str, default='10km')
     parser.add_argument('indexes', type=str, default=','.join(ES_INDEXES))
     parser.add_argument('doctypes', type=str,
-        default=','.join(ES_DOCUMENT_TYPES))
+                        default=','.join(ES_DOCUMENT_TYPES))
     parser.add_argument('size', type=int, default=10)
     parser.add_argument('from', type=int, default=0)
 
@@ -161,12 +151,12 @@ class Search(restful.Resource):
             if index not in ES_INDEXES:
                 abort(400, message='Index "%s" does not exist' % index)
 
-            existing_doctypes.extend(ES_DOCUMENT_TYPES_PER_INDEX[index]\
-                & req_doctypes)
+            existing_doctypes.extend(ES_DOCUMENT_TYPES_PER_INDEX[index]
+                                     & req_doctypes)
 
         if not existing_doctypes:
             abort(400, message='The requested doctype(s) do not appear in the '
-                'requested index(es)')
+                               'requested index(es)')
 
         # Return an error if none of the query parameters contains a value
         # (except for 'indexes' and 'doctypes', as these always contain
@@ -249,7 +239,7 @@ class Search(restful.Resource):
             if args['sort'] == 'distance':
                 if not args['geo_location']:
                     abort(400, message='Cannot sort by distance if '
-                        'geo_location is not provided.')
+                                       'geo_location is not provided.')
 
                 query['sort'] = [{
                     '_geo_distance': {
@@ -264,7 +254,9 @@ class Search(restful.Resource):
                 ]
 
         return format_es_search_results(es.get('%s/%s/_search'
-                % (args['indexes'], args['doctypes']), data=query))
+                                               % (args['indexes'],
+                                                  args['doctypes']),
+                                               data=query))
 
 
 class GetDocument(restful.Resource):
@@ -277,7 +269,7 @@ class GetDocument(restful.Resource):
         # requested index
         if doc_type not in ES_DOCUMENT_TYPES_PER_INDEX[index]:
             abort(400, message='Doctype "%s" does not exist in index "%s"'
-                % (doc_type, index))
+                               % (doc_type, index))
 
         doc = es.get('%s/%s/%s' % (index, doc_type, doc_id))
         if not doc['exists']:
@@ -296,7 +288,7 @@ class GetValidationResults(restful.Resource):
         # requested index
         if doc_type not in ES_DOCUMENT_TYPES_PER_INDEX[index]:
             abort(400, message='Doctype "%s" does not exist in index "%s"'
-                % (doc_type, index))
+                               % (doc_type, index))
 
         query = {
             'query': {
@@ -317,8 +309,8 @@ class GetValidationResults(restful.Resource):
 
 api.add_resource(Search, '/api/v1/search')
 api.add_resource(GetDocument, '/api/v1/get_document/<index>/<doc_type>/<doc_id>')
-api.add_resource(GetValidationResults, '/api/v1/get_validation_results/'\
-    '<index>/<doc_type>/<doc_id>')
+api.add_resource(GetValidationResults, '/api/v1/get_validation_results/'
+                                       '<index>/<doc_type>/<doc_id>')
 
 
 if __name__ == "__main__":
