@@ -24,7 +24,12 @@ scrapy_sentry.init(SENTRY_DSN)
 # Path to the file that holds all zipcodes (first 4 digits!). This file
 # is used for searching in the toezichtkaart.owinsp.nl databse.
 ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
+
+# Path to the file with all PO addresses we need in the owinsp spider to search
+# for po_schools
 PO_ADDRESSES = os.path.join(PROJECT_ROOT, 'po_addresses.csv')
+
+NO_BRIN_FILE = os.path.join(PROJECT_ROOT, 'no_brins.txt')
 
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
@@ -50,16 +55,18 @@ EXPORT_METHODS = {
     # }
 }
 
-from validation.duo import DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,\
-                           DuoPoBoard, DuoPoBranch
+from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
+                            DuoPoBoard, DuoPoBranch)
 from validation.schoolvo import SchoolVOBranch
 from validation.owinsp import OnderwijsInspectieVoBranch
 
 EXPORT_SETTINGS = {
     'po.owinsp.nl': {
-        'url': '',
-        'index': '',
-        'doctype': '',
+        'geocode': False,
+        'geocode_fields': ['address'],
+        'index': 'onderwijsinspectie',
+        'doctype': 'po_branch',
+        'id_fields': ['brin', 'branch_id']
     },
     'vo.owinsp.nl': {
         'validate': True,
