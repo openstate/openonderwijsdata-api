@@ -61,7 +61,7 @@ EXPORT_SETTINGS = {
         'validate': True,
         'schema': OnderwijsInspectiePoBranch,
         'validation_index': 'onderwijsdata_validation',
-        'geocode': False,
+        'geocode': True,
         'geocode_fields': ['address'],
         'index': 'onderwijsinspectie',
         'doctype': 'po_branch',
