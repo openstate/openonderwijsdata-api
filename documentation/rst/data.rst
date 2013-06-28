@@ -261,18 +261,18 @@ po_branch
     nodal_area_code                                     integer                                                                 Identifier of the nodal_area.
     phone                                               string                                                                  Phone number of the school.
     province                                            string                                                                  The province [#provinces]_ this branch is situated in.
-    pupils_by_origins                                   array of :ref:`pupilsbyorigins`                                         Number of pupils born in countries other than The Netherlands by country. Only availabe in 2009 as collecting of this data has been stopped since 2010.
-    pupils_by_origins_reference_date                    date                                Peiljaar                            Date the source file was published at http://data.duo.nl
-    pupils_by_origins_reference_url                     string                                                                  URL of the source file.
-    pupil_residences                                    array of :ref:`pupilresidences`                                         The number of pupils in this branch living in certain zipcodes by ages.
-    pupil_residences_reference_date                     date                                Peiljaar                            Date the source file was published at http://data.duo.nl
-    pupil_residences_reference_url                      string                                                                  URL of the source file.
+    student_residences                                  array of :ref:`dustrespo`                                               The number of pupils in this branch living in certain zipcodes by ages.
+    student_residences_reference_date                   date                                Peiljaar                            Date the source file was published at http://data.duo.nl
+    student_residences_reference_url                    string                                                                  URL of the source file.
     reference_year                                      integer                             Peiljaar                            Year the schools source file was published.
     rmc_region                                          string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
     rmc_region_code                                     integer                                                                 Identifier of the rmc_region.
     rpa_area                                            string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
     rpa_area_code                                       integer                                                                 Identifier of the rpa_area.
     website                                             string                                                                  Website of this school.
+    students_by_origin                                  array of :ref:`students_by_origin`                                      Number of studentes born in countries other than The Netherlands by country. Only availabe in 2009 as collecting of this data has been stopped since 2010.
+    students_by_origin_reference_date                   date                                 Peiljaar                           Date the source file was published at http://data.duo.nl
+    students_by_origin_reference_url                    string                                                                  URL of the source file.
     student_weights_per_branch                          array of :ref:`studentweights`                                          The number of children per student weight (0.0, 0.3 or 1.2), school weight and impulse area data for each branch.
     student_weights_per_branch_reference_date           date                                                                    Date the source file was published at http://data.duo.nl
     student_weights_per_branch_reference_url            string                                                                  URL of the source file.
@@ -573,74 +573,53 @@ Meta
     validation_result                   string                              Indication whether the item passed validation.
     =================================== =================================== ======================================================================================================
 
-.. _pupilsbyorigins:
+.. _dustrespo:
 
-PupilsByOrigin
+StudentResidences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Number of pupils born in countries other than The Netherlands, by country.
-
-**Source:** `Primair onderwijs - Leerlingen - 09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp>`_
-
-.. table::
-
-    =================================== ================= =================================== ==============
-    Field                               Type              Original term                       Description
-    =================================== ================= =================================== ==============
-    aruba                               integer           Aruba
-    maluku_islands                      integer           Molukken
-    greece                              integer           Griekenland
-    italy                               integer           Italië
-    cape_verde                          integer           Kaapverdië
-    morocco                             integer           Marokko
-    netherlands_antilles                integer           Nederlandse Antillen
-    non_english_speaking_countries      integer           Niet-Engelstalige landen
-    portugal                            integer           Portugal
-    spain                               integer           Spanje
-    suriname                            integer           Suriname
-    tunisia                             integer           Tunesië
-    turkey                              integer           Turkije
-    refugees                            integer           Vluchtelingen
-    former_yugoslavia                   integer           Voormalig Joegoslavië
-    =================================== ================= =================================== ==============
-
-.. _pupilresidences:
-
-PupilResidences
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Zip codes of pupils for each branch by age. Includes po, spo, so, and vso (hence the ages up to 25).
+Number of pupils per age group (up to 25, as special education is included).
 
 **Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp>`_
 
 .. table::
 
-    ========= ========== ================== ==========================================================================
-    Field     Type       Original term      Description
-    ========= ========== ================== ==========================================================================
-    age_3     integer    Leeftijd 3 jaar    Number of pupils of age 3 living in this zip code for this branch.
-    age_4     integer    Leeftijd 4 jaar    Number of pupils of age 4 living in this zip code for this branch.
-    age_5     integer    Leeftijd 5 jaar    Number of pupils of age 5 living in this zip code for this branch.
-    age_6     integer    Leeftijd 6 jaar    Number of pupils of age 6 living in this zip code for this branch.
-    age_7     integer    Leeftijd 7 jaar    Number of pupils of age 7 living in this zip code for this branch.
-    age_8     integer    Leeftijd 8 jaar    Number of pupils of age 8 living in this zip code for this branch.
-    age_9     integer    Leeftijd 9 jaar    Number of pupils of age 9 living in this zip code for this branch.
-    age_10    integer    Leeftijd 10 jaar   Number of pupils of age 10 living in this zip code for this branch.
-    age_11    integer    Leeftijd 11 jaar   Number of pupils of age 11 living in this zip code for this branch.
-    age_12    integer    Leeftijd 12 jaar   Number of pupils of age 12 living in this zip code for this branch.
-    age_13    integer    Leeftijd 13 jaar   Number of pupils of age 13 living in this zip code for this branch.
-    age_14    integer    Leeftijd 14 jaar   Number of pupils of age 14 living in this zip code for this branch.
-    age_15    integer    Leeftijd 15 jaar   Number of pupils of age 15 living in this zip code for this branch.
-    age_16    integer    Leeftijd 16 jaar   Number of pupils of age 16 living in this zip code for this branch.
-    age_17    integer    Leeftijd 17 jaar   Number of pupils of age 17 living in this zip code for this branch.
-    age_18    integer    Leeftijd 18 jaar   Number of pupils of age 18 living in this zip code for this branch.
-    age_19    integer    Leeftijd 19 jaar   Number of pupils of age 19 living in this zip code for this branch.
-    age_20    integer    Leeftijd 20 jaar   Number of pupils of age 20 living in this zip code for this branch.
-    age_21    integer    Leeftijd 21 jaar   Number of pupils of age 21 living in this zip code for this branch.
-    age_22    integer    Leeftijd 22 jaar   Number of pupils of age 22 living in this zip code for this branch.
-    age_23    integer    Leeftijd 23 jaar   Number of pupils of age 23 living in this zip code for this branch.
-    age_24    integer    Leeftijd 24 jaar   Number of pupils of age 24 living in this zip code for this branch.
-    age_25    integer    Leeftijd 25 jaar   Number of pupils of age 25 living in this zip code for this branch.
-    zip_code  string     Postcode           The zip code where these pupils live.
-    ========= ========== ================== ==========================================================================
+    ========= ========================== ================== ==========================================================================
+    Field     Type                       Original term      Description
+    ========= ========================== ================== ==========================================================================
+    ages      array of :ref:`duostpores`
+    zip_code  string                     Postcode           The zip code where these pupils live.
+    ========= ========================== ================== ==========================================================================
+
+.. _duostpores:
+
+StudentResidence
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. table::
+
+    ========= ========================== ================== ==========================================================================
+    Field     Type                       Original term      Description
+    ========= ========================== ================== ==========================================================================
+    age       integer                                       Age group
+    students  integer                                       Amount of students
+    ========= ========================== ================== ==========================================================================
+
+.. _students_by_origin:
+
+StudentsByOrigin
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Number of students born in countries other than The Netherlands, by country.
+
+**Source:** `Primair onderwijs - Leerlingen - 09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp>`_
+
+.. table::
+
+    =================================== ================= ===================================
+    Field                               Type              Description
+    =================================== ================= ===================================
+    country                             string            Country students originated from
+    students                            integer           The amount of students originating form this country at this school
+    =================================== ================= ===================================
 
 .. _duostdres:
 
