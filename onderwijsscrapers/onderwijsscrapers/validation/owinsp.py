@@ -53,9 +53,11 @@ class OnderwijsInspectieVoBranch(MappingSchema):
     current_ratings = CurrentRatings()
     board = general_rules.name
 
+
 class OnderwijsInspectiePoBranch(MappingSchema):
     name = general_rules.name
     brin = general_rules.brin
+    board_id = general_rules.board_id
     denomination = general_rules.denomination
     branch_id = general_rules.branch_id
     address = general_rules.Address()

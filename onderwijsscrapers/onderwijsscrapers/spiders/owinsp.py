@@ -375,6 +375,7 @@ class POSpider(OWINSPSpider):
         # Override start_requests to pass BRIN
         return [
             Request(search_url['url'], self.parse_search_results, meta={
+                'board_id': search_url['board_id'],
                 'brin': search_url['brin'],
                 'branch_id': search_url['branch_id'],
                 'zipcode': search_url['zipcode'],
@@ -387,6 +388,7 @@ class POSpider(OWINSPSpider):
             reader = csv.DictReader(f, delimiter=';')
             search_urls = [{
                 'url': self.search_url % {'brin': row['BRIN NUMMER']},
+                'board_id': int(row['BEVOEGD GEZAG NUMMER'].strip()),
                 'brin': row['BRIN NUMMER'],
                 'branch_id': int(row['VESTIGINGSNUMMER'].replace(
                                  row['BRIN NUMMER'], '').strip()),
@@ -463,6 +465,7 @@ class POSpider(OWINSPSpider):
 
         school['brin'] = meta['brin']
         school['branch_id'] = meta['branch_id']
+        school['board_id'] = meta['board_id']
 
         school['name'] = hxs.select('//h1[@class="stitle"]/text()')\
                             .extract()[0].strip()

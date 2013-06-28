@@ -47,17 +47,16 @@ class SchoolVOItem(SchoolItem):
 
 
 class OnderwijsInspectieItem(SchoolItem):
+    board_id = Field()  # Bevoegd gezagnummer
     rating_date = Field()
     rating_excerpt = Field()
     rating_history = Field()
     reports = Field()
-    # education_sector = Field()
 
 
 class OwinspVOSchool(OnderwijsInspectieItem):
-    education_structures = Field()  # `Onderwijsaanbod`
     board = Field()  # `Bestuur` or `Bevoegd gezag`
-    board_id = Field()  # Bevoegd gezagnummer
+    education_structures = Field()  # `Onderwijsaanbod`
     result_card_url = Field()  # Opbrengstenkaart URL
 
     current_ratings = Field()
