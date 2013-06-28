@@ -61,9 +61,11 @@ class OnderwijsscrapersPipeline(object):
         # Also validate and perform 'item_enrichment' functions
         # (i.e. geocodeing).
         id_fields = export_settings['id_fields']
+        total_items = len(self.items.keys())
+        count = 0
         for item_id, item in self.items.iteritems():
-            universal_item = 'None-%s' % '-'.join([str(item[field]) for field in \
-                    id_fields[1:]])
+            universal_item = 'None-%s' % '-'.join([str(item[field]) for field in
+                                                   id_fields[1:]])
             if universal_item in self.universal_items:
                 universal_item = self.universal_items[universal_item]
                 if 'reference_year' in universal_item:
@@ -75,23 +77,26 @@ class OnderwijsscrapersPipeline(object):
 
             item['meta'] = {
                 'scrape_started_at': self.scrape_started,
-                'item_scraped_at': datetime.utcnow().replace(tzinfo=pytz.utc)\
-                    .strftime('%Y-%m-%dT%H:%M:%SZ')
+                'item_scraped_at': datetime.utcnow().replace(tzinfo=pytz.utc)
+                                                    .strftime('%Y-%m-%dT%H:%M:%SZ')
             }
 
             # Geocode if enabled for this index
             if export_settings['geocode']:
+                count += 1
                 for address_field in export_settings['geocode_fields']:
                     if address_field in item:
                         geocoded = bag42_geocode(item[address_field])
                         if geocoded:
                             item[address_field].update(geocoded)
+                log.msg('Geocoded %d/%d' % (count, total_items), level=log.INFO)
 
             # Validate the item is this is enabled
             if export_settings['validate']:
                 item, validation = validate(export_settings['schema'],
-                    export_settings['index'], export_settings['doctype'],
-                    item_id, item)
+                                            export_settings['index'],
+                                            export_settings['doctype'],
+                                            item_id, item)
 
                 validation_reports.append(validation)
 
@@ -100,8 +105,9 @@ class OnderwijsscrapersPipeline(object):
         for method, method_properties in settings['EXPORT_METHODS'].items():
             # Export the document
             exporter = method_properties['exporter'](self.scrape_started,
-                export_settings['index'], export_settings['doctype'],
-                **method_properties['options'])
+                                                     export_settings['index'],
+                                                     export_settings['doctype'],
+                                                     **method_properties['options'])
 
             for item_id, item in items.iteritems():
                 exporter.save(item, item_id)
@@ -111,8 +117,9 @@ class OnderwijsscrapersPipeline(object):
             # Export validation documents
             if export_settings['validate']:
                 exporter = method_properties['exporter'](self.scrape_started,
-                export_settings['validation_index'], 'doc_validation',
-                **method_properties['options'])
+                                                         export_settings['validation_index'],
+                                                         'doc_validation',
+                                                         **method_properties['options'])
 
                 for item in validation_reports:
                     exporter.save(item)

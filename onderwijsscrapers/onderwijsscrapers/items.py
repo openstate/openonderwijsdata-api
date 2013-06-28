@@ -271,9 +271,9 @@ class DuoPoBranch(SchoolItem):
                                                   # (age (3/4)-14) by student weight.
 
     # Contents of "09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
-    pupils_by_origins_reference_url = Field()
-    pupils_by_origins_reference_date = Field()
-    pupils_by_origins = Field()
+    students_by_origin_url = Field()
+    students_by_origin_reference_date = Field()
+    students_by_origin = Field()
 
     # Contents of "11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd"
     pupil_residences_reference_url = Field()
