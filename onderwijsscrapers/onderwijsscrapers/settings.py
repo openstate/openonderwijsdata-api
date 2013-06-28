@@ -24,7 +24,8 @@ ZIPCODES = os.path.join(PROJECT_ROOT, 'zips.txt')
 # for po_schools
 PO_ADDRESSES = os.path.join(PROJECT_ROOT, 'po_addresses.csv')
 
-NO_BRIN_FILE = os.path.join(PROJECT_ROOT, 'no_brins.txt')
+NO_BRIN = os.path.join(PROJECT_ROOT, 'no_brins.txt')
+MULTIPLE_SCHOOLS_FOR_BRIN = os.path.join(PROJECT_ROOT, 'multiple_brins.txt')
 
 SCHOOLVO_URL = 'http://www.schoolvo.nl/'
 
@@ -53,10 +54,13 @@ EXPORT_METHODS = {
 from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
                             DuoPoBoard, DuoPoBranch)
 from validation.schoolvo import SchoolVOBranch
-from validation.owinsp import OnderwijsInspectieVoBranch
+from validation.owinsp import (OnderwijsInspectieVoBranch, OnderwijsInspectiePoBranch)
 
 EXPORT_SETTINGS = {
     'po.owinsp.nl': {
+        'validate': True,
+        'schema': OnderwijsInspectiePoBranch,
+        'validation_index': 'onderwijsdata_validation',
         'geocode': False,
         'geocode_fields': ['address'],
         'index': 'onderwijsinspectie',

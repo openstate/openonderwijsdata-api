@@ -51,7 +51,7 @@ class OnderwijsInspectieItem(SchoolItem):
     rating_excerpt = Field()
     rating_history = Field()
     reports = Field()
-    education_sector = Field()
+    # education_sector = Field()
 
 
 class OwinspVOSchool(OnderwijsInspectieItem):
