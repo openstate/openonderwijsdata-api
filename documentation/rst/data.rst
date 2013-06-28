@@ -712,6 +712,8 @@ StudentWeights
 
 Vensters voor Verantwoording
 ---------------------------------------------------------------------------------
+`Vensters voor Verantwoording <http://schoolvo.nl/>`_ provides VO schools with a platform where they can share data on their performance with the public. The data described here is currently **not** available to the public through the `OpenOnderwijs API <http://api.openonderwijsdata.nl/>`_.
+
 vo_branch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. table::
@@ -933,6 +935,8 @@ Satisfaction
 
 Onderwijsinspectie
 ---------------------------------------------------------------------------------
+The Inspectie voor het Onderwijs [#owinsp]_ is tasked with inspecting Dutch schools. Since 1997, they are required to publish reports on their findings when inspecting schools.
+
 .. _owinspdatavobranch:
 
 vo_branch
@@ -963,6 +967,27 @@ vo_branch
     result_card_url                                         string                              URL to the result card ("opbrengstenkaart") of this branch.
     students_from_third_year_to_graduation_without_retaking array of :ref:`straight_grad`       Array of :ref:`straight_grad`, showing the percentage of students that go on to graduation from their third year without retaking a year, per education structure.
     students_in_third_year_without_retaking                 array of :ref:`3yearnoretakes`      Array of :ref:`3yearnoretakes`, showing the percentage of students that reach their third year without retaking a year.
+    website                                                 string                              Website of this branch (optional).
+    ======================================================= =================================== ========================================================================================================
+
+.. _owinspdatapobranch:
+
+po_branch
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. table::
+
+    ======================================================= =================================== ========================================================================================================
+    Field                                                   Type                                Description
+    ======================================================= =================================== ========================================================================================================
+    address                                                 :ref:`owinspaddress`                Address of this branch
+    branch_id                                               integer                             Identifier (assigned by :ref:`duodata`) of this branch.
+    brin                                                    string                              "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
+    current_ratings                                         :ref:`owinspcurrat`                 :ref:`owinspcurrat`, which represents the current rating of the Onderwijsinspectie [#owinsp]_.
+    denomination                                            string                              In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
+    meta                                                    :ref:`owinspmeta`                   Metadata, such as date of scrape and whether this item passed validation.
+    name                                                    string                              Name of this branch.
+    rating_history                                          array of :ref:`owinsprathist`       Array of :ref:`owinsprathist`, where each item represents a rating the Onderwijsinspectie [#owinsp]_ awarded to this branch.
+    reports                                                 array of :ref:`owinspreport`        Array of :ref:`owinspreport`, where each item represents a report of the Onderwijsinspectie [#owinsp]_ in PDF.
     website                                                 string                              Website of this branch (optional).
     ======================================================= =================================== ========================================================================================================
 
@@ -1026,7 +1051,7 @@ CurrentRating
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
-    education_structure                 string                              The structure this rating applies to (*vbmo-t, havo, vwo, ...*)
+    education_structure                 string                              The structure this rating applies to (*vbmo-t, havo, vwo, ...*). **This value is optional**: as :ref:`owinspdatapobranch` do not have education structures, only :ref:`owinspdatavobranch` have this value.
     owinsp_id                           integer                             Identifier (assigned by :ref:`owinspdata`). Use unknown.
     owinsp_url                          string                              URL to the page of the branch where the rating for this education_structure was found.
     rating                              string                              Rating awarded by the Onderwijsinspectie [#owinsp]_.
