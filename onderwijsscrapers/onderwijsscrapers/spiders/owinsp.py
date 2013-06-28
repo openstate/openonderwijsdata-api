@@ -388,7 +388,8 @@ class POSpider(OWINSPSpider):
             search_urls = [{
                 'url': self.search_url % {'brin': row['BRIN NUMMER']},
                 'brin': row['BRIN NUMMER'],
-                'branch_id': row['VESTIGINGSNUMMER'],
+                'branch_id': int(row['VESTIGINGSNUMMER'].replace(
+                                 row['BRIN NUMMER'], '').strip()),
                 'zipcode': row['POSTCODE'],
                 'website': row['INTERNETADRES']
             } for row in reader]
