@@ -8,10 +8,10 @@ class SchoolItem(Item):
     address = Field()  # `adres`
     website = Field()  # `website` or `homepage`
     denomination = Field()  # `denominatie`
-    education_structures = Field()  # `Onderwijsaanbod`
 
 
 class SchoolVOItem(SchoolItem):
+    education_structures = Field()  # `Onderwijsaanbod`
     # Holds the indicators that are available for this school
     available_indicators = Field()
 
@@ -47,7 +47,6 @@ class SchoolVOItem(SchoolItem):
 
 
 class OnderwijsInspectieItem(SchoolItem):
-    current_ratings = Field()
     rating_date = Field()
     rating_excerpt = Field()
     rating_history = Field()
@@ -55,21 +54,25 @@ class OnderwijsInspectieItem(SchoolItem):
     education_sector = Field()
 
 
-class VOSchool(OnderwijsInspectieItem):
+class OwinspVOSchool(OnderwijsInspectieItem):
+    education_structures = Field()  # `Onderwijsaanbod`
     board = Field()  # `Bestuur` or `Bevoegd gezag`
     board_id = Field()  # Bevoegd gezagnummer
     result_card_url = Field()  # Opbrengstenkaart URL
+
+    current_ratings = Field()
 
     # Field used to merge all sectors of a single school into one item.
     # This field is not stored.
     education_structures_to_scrape = Field()
 
 
-class POSchool(OnderwijsInspectieItem):
-    pass
+class OwinspPOSchool(OnderwijsInspectieItem):
+    current_rating = Field()  # A PO school has only one rating
 
 
 class DuoVoBranch(SchoolItem):
+    education_structures = Field()  # `Onderwijsaanbod`
     ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     province = Field()  # `provincie`
@@ -134,6 +137,7 @@ class DuoVoBranch(SchoolItem):
 
 
 class DuoVoSchool(SchoolItem):
+    education_structures = Field()  # `Onderwijsaanbod`
     ignore_id_fields = Field()
     reference_year = Field()  # peiljaar
     province = Field()  # `provincie`
@@ -205,7 +209,8 @@ class DuoPoBoard(Item):
     # Contents of "07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort"
     edu_types_reference_url = Field()
     edu_types_reference_date = Field()
-    edu_types= Field()
+    edu_types = Field()
+
 
 class DuoPoSchool(SchoolItem):
     ignore_id_fields = Field()
@@ -256,16 +261,15 @@ class DuoPoBranch(SchoolItem):
     # vestiging het schoolgewicht en impulsgebied"
     weights_per_school_reference_url = Field()
     weights_per_school_reference_date = Field()
-    weights_per_school = Field() # Dict of `GEWICHT 0`, `GEWICHT 0.3`,
-                                 # `GEWICHT 1.2`, `SCHOOLGEWICHT` and
-                                 # `IMPULSGEBIED`.
+    weights_per_school = Field()  # Dict of `GEWICHT 0`, `GEWICHT 0.3`,
+                                  # `GEWICHT 1.2`, `SCHOOLGEWICHT` and
+                                  # `IMPULSGEBIED`.
 
     # Contents of "02. Leerlingen basisonderwijs naar leeftijd"
     ages_per_branch_by_student_weight_reference_url = Field()
     ages_per_branch_by_student_weight_reference_date = Field()
-    ages_per_branch_by_student_weight  = Field() # Dict of childrens ages
-                                                 # (age (3/4)-14) by student weight.
-
+    ages_per_branch_by_student_weight = Field()  # Dict of childrens ages
+                                                  # (age (3/4)-14) by student weight.
 
     # Contents of "09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
     pupils_by_origins_reference_url = Field()
