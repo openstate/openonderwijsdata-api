@@ -24,7 +24,7 @@ Found {{ hits.total }} documents in {{ hits.took }}ms. {% if hits.total > 20 %}S
 			<td>{{ hit['_source'].branch_id }}</td>
 			<td>
 				<address>
-					<strong>{{ hit['_source'].name }}</strong><br>
+					<strong><a href="/api/v1/get_document/hit['_index'] }}/{{ hit['_type'] }}/{{ hit['_id'] }}" target="_blank">{{ hit['_source'].name }}</a></strong><br>
 					{{ hit['_source'].address.street }}<br>
 					{{ hit['_source'].address.zip_code }} {{ hit['_source'].address.city }}<br>
 				</address>
