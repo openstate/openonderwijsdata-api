@@ -1,14 +1,16 @@
 import csv
 from datetime import datetime
 import re
+from urllib import urlencode
 import urlparse
 
 from scrapy.conf import settings
 from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
+from scrapy import log
 
-from onderwijsscrapers.items import VOSchool
+from onderwijsscrapers.items import OwinspVOSchool, OwinspPOSchool
 
 SCHOOL_ID = re.compile(r'(sch_id=\d+)')
 PAGES = re.compile(r'^Pagina (\d+) van (\d+)$')
@@ -124,8 +126,8 @@ class VOSpider(OWINSPSpider):
         hxs = HtmlXPathSelector(response)
         structures = hxs.select('//li[@class="match"]/noscript/a')
 
-        # The VOSchool item to be populated
-        organisation = VOSchool()
+        # The OwinspVOSchool item to be populated
+        organisation = OwinspVOSchool()
         organisation['education_structures_to_scrape'] = set()
 
         # If we end up at the schools page directly, immediately yield request
@@ -364,25 +366,220 @@ class POSpider(OWINSPSpider):
                  'p1=pc_num&p2=%%3D&p3=PO&p3=&p3=&p3=&p3=&p1=brin&p2=%%3D'\
                  '&p3=%(brin)s&p1=%%23&p2=submit&p3=Zoeken'
 
+    school_url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/zoekresultaat'\
+                 '?xl=1&p1=sector&p2=%%3D&p3=PO&p1=brin&p2=%%3D&p3=%(brin)s'\
+                 '&p1=%%23&p2=submit&p3=Zoeken&sector=PO&sch_id=%(sch_id)s&'\
+                 'arr_id=%(arr_id)s'
+
+    def start_requests(self):
+        # Override start_requests to pass BRIN
+        return [
+            Request(search_url['url'], self.parse_search_results, meta={
+                'brin': search_url['brin'],
+                'branch_id': search_url['branch_id'],
+                'zipcode': search_url['zipcode'],
+                'website': search_url['website']
+            }) for search_url in self.generate_search_urls()
+        ]
+
     def generate_search_urls(self, addresses=settings['PO_ADDRESSES']):
         with open(addresses, 'rb') as f:
             reader = csv.DictReader(f, delimiter=';')
-            search_urls = [self.search_url % {'brin': row['BRIN NUMMER']}
-                           for row in reader]
+            search_urls = [{
+                'url': self.search_url % {'brin': row['BRIN NUMMER']},
+                'brin': row['BRIN NUMMER'],
+                'branch_id': row['VESTIGINGSNUMMER'],
+                'zipcode': row['POSTCODE'],
+                'website': row['INTERNETADRES']
+            } for row in reader]
 
         return search_urls
 
     def parse_search_results(self, response):
         hxs = HtmlXPathSelector(response)
+
+        brin = response.meta['brin']
+        meta = response.meta
+
         search_hits = hxs.select('//li[@class="match"]/noscript/a/@href')
 
         if search_hits:
-            # There are multiple schools with this BRIN (probably different
-            # branches of the same school), so make sure to process each one
-            pass
+            # There are multiple schools with this BRIN (different
+            # branches of the same school, or the Inspectie not having updated
+            # their records); either way, try to find the correct school by
+            # matching it to the zip code from DUO
+            with open(settings['MULTIPLE_SCHOOLS_FOR_BRIN'], 'a') as f:
+                f.write('%s\t%s\n' % (brin, response.url))
+            log.msg('Multiple hits found for BRIN %s' % (brin), level=log.WARNING)
+
+            for result in hxs.select('//li[@class="match"]//a'):
+                link_text = result.select('./text()').extract()[0]\
+                                                     .split(',')[-1].strip()\
+                                                     .lower()
+                zip_result = re.sub(r'\s+', '', link_text, re.UNICODE)
+
+                if re.sub(r'\s+', '', meta['zipcode']) == zip_result:
+                    url = self.open_blocks(result.select('./@href')
+                                                 .extract()[0].strip())
+                    params = urlparse.parse_qs(url)
+                    meta['sch_id'] = params['sch_id']
+
+                    yield Request(url, self.parse_organisation_detail_page, meta=meta)
+
         else:
             # Check whether we've found a school or not
-            pass
+            msg = hxs.select('//div[@id="hoofd_content"]/div[@class="message_info"]')
+            if not msg:
+                # Found a school:
+                # Construct the URL to a school by finding the sch_id and arr_id,
+                # and "unfolding" the content blocks by appending .22 to the sch_id
+                subscription_link = hxs.select('//div[@class="abo_box"]//li'
+                                               '[@class="actlink"]//a/@href').extract()
+                link_addendum = self.open_blocks(subscription_link[0]
+                                                 .split('submit&p3=Zoeken')[1])
+
+                url_params = urlparse.parse_qs(link_addendum)
+                meta['sch_id'] = url_params['sch_id'][0]
+                meta['arr_id'] = url_params['arr_id'][0]
+
+                yield Request(self.school_url % {
+                    'brin': meta['brin'],
+                    'arr_id': meta['arr_id'],
+                    'sch_id': meta['sch_id']
+                }, self.parse_organisation_detail_page, meta=meta)
+            else:
+                # There is no school in the owinsp database with this brin
+                with open(settings['NO_BRIN'], 'a') as f:
+                    f.write('%s\n' % brin)
+                log.msg('BRIN %s does not exist in the Onderwijsinspectie'
+                        'database' % (brin), level=log.WARNING)
+                return
 
     def parse_organisation_detail_page(self, response):
-        raise NotImplementedError('Implement this')
+        hxs = HtmlXPathSelector(response)
+        meta = response.meta
+        school = OwinspPOSchool()
+
+        school['brin'] = meta['brin']
+        school['branch_id'] = meta['branch_id']
+
+        school['name'] = hxs.select('//h1[@class="stitle"]/text()')\
+                            .extract()[0].strip()
+
+        h_content = hxs.select('//div[@id="hoofd_content"]')
+        address = h_content.select('./p[@class="detpag"]/text()').extract()
+        address_str = ', '.join([x.strip() for x in address])
+
+        school['address'] = {
+            'street': address_str.replace(u'\xa0\xa0', u' '),
+            'city': None,
+            'zip_code': None
+        }
+
+        if address[1]:
+            zip_city = address[1].encode('utf8').split('\xc2\xa0')
+            if len(zip_city) > 1:
+                school['address']['zip_code'] = zip_city[0].strip()
+                school['address']['city'] = zip_city[-1].strip()
+
+        website = h_content.select('ul/li[@class="actlink"]/a/@href').extract()
+        if website:
+            school['website'] = website[0]
+        else:
+            school['website'] = None
+
+        school['denomination'] = h_content.select('p/em/text()')\
+                                          .extract()[0].strip()
+
+        rating_excerpt = h_content.select('p[3]/text()').extract()[1].strip()
+
+        # Wait... what? Are we going to use an element's top-padding to
+        # get the div we are interested in? Yes we are :(.
+        tzk_rating = hxs.select('//div[@class="content_main wide" and @style'
+                                '="padding-top:0px"]/div[@class="tzk"]')
+        rating = tzk_rating.select('div/text()').extract()
+
+        if rating:
+            # There are schools without ratings, such as new schools
+            current_rating = rating[0]
+            rating_valid_since = tzk_rating.select('h3/div/text()')\
+                .extract()[0].replace('\n', ' ').strip()[-10:]
+
+            # Try to parse the date
+            try:
+                rating_valid_since = datetime.strptime(rating_valid_since,
+                                                       '%d-%m-%Y')
+                rating_valid_since = rating_valid_since.date().isoformat()
+            except:
+                rating_valid_since = None
+        else:
+            current_rating = None
+            rating_valid_since = None
+
+        owinsp_id = meta['sch_id'].replace('.22', '')
+
+        school['current_rating'] = {
+            'owinsp_id': owinsp_id,
+            'owinsp_url': response.url,
+            'rating': current_rating,
+            'rating_valid_since': rating_valid_since,
+            'rating_excerpt': rating_excerpt
+        }
+
+        if 'reports' not in school:
+            school['reports'] = []
+
+        reports = hxs.select('//div[@class="report" and span'
+                             '[@class="icoon_pdf2"]]/span'
+                             '[@class="icoon_download"]/a')
+
+        if reports:
+            report_urls = []
+
+            for report in reports:
+                title = report.select('text()').extract()[0]
+                date, title = title.split(': ')
+                try:
+                    # Try to parse date
+                    date = datetime.strptime(date, '%d-%m-%Y')\
+                                   .strftime('%Y-%m-%d')
+                except:
+                    pass
+
+                url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
+                    % report.select('@href').extract()[0]
+
+                # Some pages contain the same reports multiple times, we
+                # only want to include them once.
+                if url in report_urls:
+                    continue
+
+                school['reports'].append({
+                    'url': url,
+                    'title': title.strip(),
+                    'date': date
+                })
+
+                report_urls.append(url)
+
+        if 'rating_history' not in school:
+            school['rating_history'] = []
+
+        rating_history = hxs.select('//table[@summary="Rapporten"]//'
+                                    'li[@class="arrref"]/text()').extract()
+        if rating_history:
+            for ratingstring in rating_history:
+                date, rating = ratingstring.split(': ')
+                try:
+                    # Try to parse date
+                    date = datetime.strptime(date, '%d-%m-%Y')\
+                                   .strftime('%Y-%m-%d')
+                except:
+                    date = None
+
+                school['rating_history'].append({
+                    'rating': rating.strip(),
+                    'date': date
+                })
+
+        return school
