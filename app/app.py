@@ -129,6 +129,12 @@ def index():
 
 @app.route('/search')
 def simple_search():
+    strip_chars = ["/", "\\"]
+
+    q = request.args.get('q')
+    for char in strip_chars:
+        q = q.replace(char, '')
+
     query = {
         'query': {
             'query_string': {
@@ -137,7 +143,7 @@ def simple_search():
                            'rmc_region', 'rpa_area', 'province', 'corop_area',
                            'nodal_area', 'website', 'brin'],
                 'allow_leading_wildcard': False,
-                'query': request.args.get('q')
+                'query': q
             }
         },
         'size': 20
@@ -312,9 +318,11 @@ class GetDocument(restful.Resource):
             abort(400, message='Doctype "%s" does not exist in index "%s"'
                                % (doc_type, index))
 
-        doc = es.get('%s/%s/%s' % (index, doc_type, doc_id))
-        if not doc['exists']:
-            abort(404, message='The requested document does not exist')
+        try:
+            doc = es.get('%s/%s/%s' % (index, doc_type, doc_id))
+        except rawes.elastic_exception.ElasticException, error:
+            if error.status_code == 404:
+                abort(404, message='The requested document does not exist')
 
         return format_es_single_doc(doc)
 
