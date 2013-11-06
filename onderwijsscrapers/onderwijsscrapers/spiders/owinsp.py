@@ -50,7 +50,7 @@ class OWINSPSpider(BaseSpider):
 
         for link in search_hits:
             url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
-                % link.extract()
+                    % link.extract()
             # Find sch_id, and append '.22' to unfold content blocks
             url = self.open_blocks(url)
 
@@ -205,7 +205,7 @@ class VOSpider(OWINSPSpider):
             rating_valid_since = None
 
         urlparams = urlparse.parse_qs(response.url)
-        owinsp_id = urlparams['sch_id'][0].split('.')[0]
+        owinsp_id = urlparams['obj_id'][0].split('.')[0]
 
         organisation['education_structures'].append(structure)
         organisation['current_ratings'].append({
