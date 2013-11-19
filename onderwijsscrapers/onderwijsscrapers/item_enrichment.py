@@ -16,8 +16,13 @@ def bag42_geocode(address):
         if field in address and address[field] is not None:
             payload.append(address[field])
 
-    resp = requests.get('http://bag42.nl/api/v0/geocode/json',
-        params={'address': ' '.join(payload)})
+    try:
+        resp = requests.get('http://bag42.nl/api/v0/geocode/json',
+                            params={'address': ' '.join(payload)})
+    except requests.exceptions.ConnectionError:
+        sleep(2)
+        resp = requests.get('http://bag42.nl/api/v0/geocode/json',
+                            params={'address': ' '.join(payload)})
 
     try:
         result = resp.json()
