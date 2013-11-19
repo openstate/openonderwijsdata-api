@@ -12,7 +12,7 @@ from scrapy import log
 
 from onderwijsscrapers.items import OwinspVOSchool, OwinspPOSchool
 
-SCHOOL_ID = re.compile(r'(sch_id=\d+)')
+SCHOOL_ID = re.compile(r'(obj_id=\d+)')
 PAGES = re.compile(r'^Pagina (\d+) van (\d+)$')
 ZIPCODE = re.compile(r'(\d{4}\s?\w{2})')
 
@@ -51,7 +51,7 @@ class OWINSPSpider(BaseSpider):
         for link in search_hits:
             url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
                     % link.extract()
-            # Find sch_id, and append '.22' to unfold content blocks
+            # Find obj_id, and append '.22' to unfold content blocks
             url = self.open_blocks(url)
 
             yield Request(url, self.parse_education_structure_page)
@@ -97,7 +97,7 @@ class VOSpider(OWINSPSpider):
         for link in search_hits:
             url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/%s'\
                 % link.extract()
-            # Find sch_id, and append '.22' to unfold content blocks
+            # Find obj_id, and append '.22' to unfold content blocks
             url = self.open_blocks(url)
 
             yield Request(url, self.parse_education_structure_page)
@@ -359,16 +359,22 @@ class VOSpider(OWINSPSpider):
 class POSpider(OWINSPSpider):
     name = 'po.owinsp.nl'
 
+    # search_url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/zoekresultaat'\
+                 # '?xl=1&sector=%%23&sch_id=-1&arr_id=-1&p1=%%23&p2=curpg&p3=-1'\
+                 # '&p1=%%23&p2=maxpg&p3=0&p1=%%23&p2=hits&p3=301.09&p1=sector'\
+                 # '&p2=%%3D&p1=naam&p2=%%3D&p1=plaats&p2=%%3D&p1=afstand&p2=%%3D&'\
+                 # 'p1=pc_num&p2=%%3D&p3=PO&p3=&p3=&p3=&p3=&p1=brin&p2=%%3D'\
+    #              '&p3=%(brin)s&p1=%%23&p2=submit&p3=Zoeken'
     search_url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/zoekresultaat'\
-                 '?xl=1&sector=%%23&sch_id=-1&arr_id=-1&p1=%%23&p2=curpg&p3=-1'\
-                 '&p1=%%23&p2=maxpg&p3=0&p1=%%23&p2=hits&p3=301.09&p1=sector'\
-                 '&p2=%%3D&p1=naam&p2=%%3D&p1=plaats&p2=%%3D&p1=afstand&p2=%%3D&'\
-                 'p1=pc_num&p2=%%3D&p3=PO&p3=&p3=&p3=&p3=&p1=brin&p2=%%3D'\
-                 '&p3=%(brin)s&p1=%%23&p2=submit&p3=Zoeken'
+                 '?xl=1&sector=%%23&obj_id=-1&arr_id=-1&p1=%%23&p2=curpg&p3=-1'\
+                 '&p1=%%23&p2=maxpg&p3=0&p1=%%23&p2=hits&p3=0&p1=sector&p2=%%3D&'\
+                 'p1=naam&p2=%%3D&p1=plaats&p2=%%3D&p1=afstand&p2=%%3D&p1=pc_num&'\
+                 'p2=%%3D&p3=PO&p3=&p3=&p3=&p3=&p1=brin&p2=%%3D&p3=%(brin)s&p1=%%23&p'\
+                 '2=submit&p3=Zoeken'
 
     school_url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/zoekresultaat'\
                  '?xl=1&p1=sector&p2=%%3D&p3=PO&p1=brin&p2=%%3D&p3=%(brin)s'\
-                 '&p1=%%23&p2=submit&p3=Zoeken&sector=PO&sch_id=%(sch_id)s&'\
+                 '&p1=%%23&p2=submit&p3=Zoeken&sector=PO&obj_id=%(obj_id)s&'\
                  'arr_id=%(arr_id)s'
 
     def start_requests(self):
@@ -425,7 +431,7 @@ class POSpider(OWINSPSpider):
                     url = self.open_blocks(result.select('./@href')
                                                  .extract()[0].strip())
                     params = urlparse.parse_qs(url)
-                    meta['sch_id'] = params['sch_id']
+                    meta['obj_id'] = params['obj_id']
 
                     yield Request(url, self.parse_organisation_detail_page, meta=meta)
 
@@ -434,21 +440,21 @@ class POSpider(OWINSPSpider):
             msg = hxs.select('//div[@id="hoofd_content"]/div[@class="message_info"]')
             if not msg:
                 # Found a school:
-                # Construct the URL to a school by finding the sch_id and arr_id,
-                # and "unfolding" the content blocks by appending .22 to the sch_id
+                # Construct the URL to a school by finding the obj_id and arr_id,
+                # and "unfolding" the content blocks by appending .22 to the obj_id
                 subscription_link = hxs.select('//div[@class="abo_box"]//li'
                                                '[@class="actlink"]//a/@href').extract()
                 link_addendum = self.open_blocks(subscription_link[0]
                                                  .split('submit&p3=Zoeken')[1])
 
                 url_params = urlparse.parse_qs(link_addendum)
-                meta['sch_id'] = url_params['sch_id'][0]
+                meta['obj_id'] = url_params['obj_id'][0]
                 meta['arr_id'] = url_params['arr_id'][0]
 
                 yield Request(self.school_url % {
                     'brin': meta['brin'],
                     'arr_id': meta['arr_id'],
-                    'sch_id': meta['sch_id']
+                    'obj_id': meta['obj_id']
                 }, self.parse_organisation_detail_page, meta=meta)
             else:
                 # There is no school in the owinsp database with this brin
@@ -520,7 +526,7 @@ class POSpider(OWINSPSpider):
             current_rating = None
             rating_valid_since = None
 
-        owinsp_id = meta['sch_id'].replace('.22', '')
+        owinsp_id = meta['obj_id'].replace('.22', '')
 
         school['current_rating'] = {
             'owinsp_id': owinsp_id,
