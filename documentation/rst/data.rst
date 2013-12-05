@@ -959,7 +959,6 @@ po_branch
     Field                                                   Type                                Description
     ======================================================= =================================== ========================================================================================================
     address                                                 :ref:`owinspaddress`                Address of this branch
-    branch_id                                               integer                             Identifier (assigned by :ref:`duodata`) of this branch.
     brin                                                    string                              "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
     current_ratings                                         :ref:`owinspcurrat`                 :ref:`owinspcurrat`, which represents the current rating of the Onderwijsinspectie [#owinsp]_.
     denomination                                            string                              In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.

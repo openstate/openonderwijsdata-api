@@ -67,6 +67,7 @@ class OwinspVOSchool(OnderwijsInspectieItem):
 
 
 class OwinspPOSchool(OnderwijsInspectieItem):
+    owinsp_id = Field()
     current_rating = Field()  # A PO school has only one rating
 
 

@@ -1,8 +1,8 @@
 import csv
 from datetime import datetime
 import re
-from urllib import urlencode
 import urlparse
+from scrapy.utils.url import urljoin_rfc
 
 from scrapy.conf import settings
 from scrapy.spider import BaseSpider
@@ -383,7 +383,6 @@ class POSpider(OWINSPSpider):
             Request(search_url['url'], self.parse_search_results, meta={
                 'board_id': search_url['board_id'],
                 'brin': search_url['brin'],
-                'branch_id': search_url['branch_id'],
                 'zipcode': search_url['zipcode'],
                 'website': search_url['website']
             }) for search_url in self.generate_search_urls()
@@ -396,8 +395,6 @@ class POSpider(OWINSPSpider):
                 'url': self.search_url % {'brin': row['BRIN NUMMER']},
                 'board_id': int(row['BEVOEGD GEZAG NUMMER'].strip()),
                 'brin': row['BRIN NUMMER'],
-                'branch_id': int(row['VESTIGINGSNUMMER'].replace(
-                                 row['BRIN NUMMER'], '').strip()),
                 'zipcode': row['POSTCODE'],
                 'website': row['INTERNETADRES']
             } for row in reader]
@@ -422,18 +419,13 @@ class POSpider(OWINSPSpider):
             log.msg('Multiple hits found for BRIN %s' % (brin), level=log.WARNING)
 
             for result in hxs.select('//li[@class="match"]//a'):
-                link_text = result.select('./text()').extract()[0]\
-                                                     .split(',')[-1].strip()\
-                                                     .lower()
-                zip_result = re.sub(r'\s+', '', link_text, re.UNICODE)
+                url = urljoin_rfc(response.url, result.select('./@href').extract()[0])
 
-                if re.sub(r'\s+', '', meta['zipcode']) == zip_result:
-                    url = self.open_blocks(result.select('./@href')
-                                                 .extract()[0].strip())
-                    params = urlparse.parse_qs(url)
-                    meta['obj_id'] = params['obj_id']
+                url = self.open_blocks(url)
+                params = urlparse.parse_qs(url)
+                meta['obj_id'] = params['obj_id'][0]
 
-                    yield Request(url, self.parse_organisation_detail_page, meta=meta)
+                yield Request(url, self.parse_organisation_detail_page, meta=meta)
 
         else:
             # Check whether we've found a school or not
@@ -470,8 +462,10 @@ class POSpider(OWINSPSpider):
         school = OwinspPOSchool()
 
         school['brin'] = meta['brin']
-        school['branch_id'] = meta['branch_id']
         school['board_id'] = meta['board_id']
+
+        owinsp_id = meta['obj_id'].replace('.22', '')
+        school['owinsp_id'] = owinsp_id
 
         school['name'] = hxs.select('//h1[@class="stitle"]/text()')\
                             .extract()[0].strip()
@@ -525,8 +519,6 @@ class POSpider(OWINSPSpider):
         else:
             current_rating = None
             rating_valid_since = None
-
-        owinsp_id = meta['obj_id'].replace('.22', '')
 
         school['current_rating'] = {
             'owinsp_id': owinsp_id,

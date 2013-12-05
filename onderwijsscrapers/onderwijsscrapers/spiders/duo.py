@@ -1779,9 +1779,9 @@ class DuoPoBranchesSpider(BaseSpider):
 
     def start_requests(self):
         return [
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/adressen/Adressen/vest_bo.asp',
-            #         self.parse_po_branches),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/adressen/Adressen/vest_bo.asp',
+                    self.parse_po_branches),
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
             #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
             #         self.parse_po_student_weight),
@@ -1791,9 +1791,9 @@ class DuoPoBranchesSpider(BaseSpider):
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
             #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp',
             #         self.parse_po_born_outside_nl),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp',
-                    self.parse_po_pupil_zipcode_by_age),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp',
+            #         self.parse_po_pupil_zipcode_by_age),
         ]
 
     def parse_po_branches(self, response):

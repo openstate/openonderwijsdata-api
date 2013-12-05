@@ -62,12 +62,12 @@ EXPORT_METHODS = {
             'remove_json': False
         }
     },
-    'elasticsearch': {
-        'exporter': exporters.ElasticSearchExporter,
-        'options': {
-            'url': '127.0.0.1:9200'
-        }
-    }
+    # 'elasticsearch': {
+    #     'exporter': exporters.ElasticSearchExporter,
+    #     'options': {
+    #         'url': '127.0.0.1:9200'
+    #     }
+    # }
 }
 
 from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
@@ -80,17 +80,17 @@ EXPORT_SETTINGS = {
         'validate': True,
         'schema': OnderwijsInspectiePoBranch,
         'validation_index': 'onderwijsdata_validation',
-        'geocode': True,
+        'geocode': False,
         'geocode_fields': ['address'],
         'index': 'onderwijsinspectie',
         'doctype': 'po_branch',
-        'id_fields': ['brin', 'branch_id']
+        'id_fields': ['owinsp_id', 'brin']
     },
     'vo.owinsp.nl': {
         'validate': True,
         'schema': OnderwijsInspectieVoBranch,
         'validation_index': 'onderwijsdata_validation',
-        'geocode': True,
+        'geocode': False,
         'geocode_fields': ['address'],
         'index': 'onderwijsinspectie',
         'doctype': 'vo_branch',
@@ -160,7 +160,7 @@ EXPORT_SETTINGS = {
         'validate': True,
         'schema': DuoPoBranch,
         'validation_index': 'onderwijsdata_validation',
-        'geocode': True,
+        'geocode': False,
         'geocode_fields': ['address', 'correspondence_address'],
         'index': 'duo',
         'doctype': 'po_branch',
