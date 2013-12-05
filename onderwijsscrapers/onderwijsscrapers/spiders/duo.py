@@ -290,8 +290,9 @@ class DuoVoSchools(BaseSpider):
                 }
 
                 school['municipality_code'] = int(row['GEMEENTENUMMER'])
-                school['education_structures'] = row['ONDERWIJSSTRUCTUUR']\
-                    .split('/')
+                school['education_structures'] = row['ONDERWIJSSTRUCTUUR']
+                if school['education_structures']:
+                    school['education_structures'] = school['education_structures'].split('/')
 
                 if row['COROPGEBIED CODE']:
                     school['corop_area_code'] = int(row['COROPGEBIED CODE'])
