@@ -69,6 +69,15 @@
 				</li>
 			{% endfor %}
 			</ul>
+			<li><span><abbr title="Samenwerkingsverbanden passend onderwijs">PaO Collaborations</abbr></span></li>
+			<ul>
+			{% for year in counts['duo_pao_collaborations']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+			{% endfor %}
+			</ul>
 		</ul>
 	</div>
 	<div class="span4">

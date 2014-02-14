@@ -115,13 +115,23 @@ def index():
         "size": 0
     })
 
+    counts['duo_pao_collaborations'] = es.get('duo/pao_collaboration/_search', data={
+        "facets": {
+            "years": {
+                "terms": {"field": "reference_year", "order": "term"}
+            }
+        },
+        "size": 0
+    })
+
     type_names = {
         'po_board': 'Boards (primary)',
         'vo_board': 'Boards (secondary)',
         'po_school': 'School (primary)',
         'vo_school': 'Schools (secondary)',
         'po_branch': 'School Branches (primary)',
-        'vo_branch': 'School Branches (secondary)'
+        'vo_branch': 'School Branches (secondary)',
+        'pao_collaboration': 'Collaborations (special)'
     }
 
     return render_template('index.html', counts=counts, type_names=type_names)
@@ -162,6 +172,7 @@ class Search(restful.Resource):
     parser.add_argument('q', type=str)
     parser.add_argument('brin', type=str)
     parser.add_argument('board_id', type=int)
+    parser.add_argument('collaboration_id', type=int)
     parser.add_argument('branch_id', type=int)
     parser.add_argument('zip_code', type=str)
     parser.add_argument('city', type=str),
@@ -180,6 +191,7 @@ class Search(restful.Resource):
     filters = {
         'brin': 'brin',
         'board_id': 'board_id',
+        'collaboration_id':'collaboration_id',
         'branch_id': 'branch_id',
         'zip_code': 'address.zip_code',
         'city': 'address.city',
