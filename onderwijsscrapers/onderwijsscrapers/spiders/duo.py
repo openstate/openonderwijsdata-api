@@ -13,7 +13,8 @@ from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
 from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
-                                     DuoPoBoard, DuoPoSchool, DuoPoBranch)
+                                     DuoPoBoard, DuoPoSchool, DuoPoBranch,
+                                     DuoPaoCollaboration)
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
@@ -2313,3 +2314,77 @@ class DuoPoBranchesSpider(BaseSpider):
                         )
 
                     yield school
+
+
+
+class DuoPaoCollaborationsSpider(BaseSpider):
+    name = 'duo_pao_collaborations'
+
+    def start_requests(self):
+        return [
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/passendow/Adressen/Adressen/passend_po_1.asp',
+                    self.parse_pao_collaborations)
+        ]
+
+    def parse_pao_collaborations(self, response):
+        """
+        Passend onderwijs > Adressen
+        Parse: "01. Adressen samenwerkingsverbanden lichte ondersteuning primair onderwijs"
+        """
+        hxs = HtmlXPathSelector(response)
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        # Fields that do not need additonal processing
+        collaboration_fields = {
+            'SAMENWERKINGSVERBAND': 'collaboration'
+        }
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            for row in csv_file:
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = row[key].strip()
+                    if value:
+                        row[key] = value
+                    else:
+                        row[key] = None
+
+                collaboration = DuoPaoCollaboration()
+                collaboration['collaboration_id'] = int(row['ADMINISTRATIENUMMER'])
+                collaboration['address'] = {
+                    'street': row['ADRES'] if row['ADRES'] else None,
+                    'city': row['PLAATSNAAM'] if row['PLAATSNAAM'] else None,
+                    'zip_code': row['POSTCODE'].replace(' ', '') if row['POSTCODE'] else None
+                }
+
+                collaboration['correspondence_address'] = {
+                    'street': row['CORRESPONDENTIEADRES'],
+                    'city': row['PLAATS CORRESPONDENTIEADRES'],
+                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
+                }
+
+                for field, field_norm in collaboration_fields.iteritems():
+                    collaboration[field_norm] = row[field]
+
+                collaboration['reference_year'] = reference_year
+                collaboration['ignore_id_fields'] = ['reference_year']
+
+                yield collaboration
+

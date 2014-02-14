@@ -280,3 +280,14 @@ class DuoPoBranch(SchoolItem):
     student_residences_reference_url = Field()
     student_residences_reference_date = Field()
     student_residences = Field()
+
+class DuoPaoCollaboration(Item):
+    reference_year = Field()
+    ignore_id_fields = Field()
+    collaboration = Field()  #ADMINISTRATIENUMMER
+    collaboration_id = Field()  #SAMENWERKINGSVERBAND
+    address = Field() #ADRES, POSTCODE, PLAATSNAAM
+    correspondence_address = Field() #CORRESPONDENTIEADRES, 
+                                     #POSTCODE CORRESPONDENTIEADRES
+                                     #PLAATS CORRESPONDENTIEADRES
+    

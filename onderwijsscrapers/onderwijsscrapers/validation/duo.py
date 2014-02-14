@@ -322,6 +322,12 @@ class DuoPoBranch(MappingSchema):
     wgr_area = general_rules.wgr_area
     wgr_area_code = general_rules.wgr_area_code
 
+class DuoPaoCollaboration(MappingSchema):
+    address = general_rules.Address()
+    correspondence_address = general_rules.Address()
+    collaboration_id = general_rules.collaboration_id
+    reference_year = general_rules.reference_year
+
 
 errors = []
 def validate():

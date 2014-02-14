@@ -12,6 +12,7 @@ def date_today_or_earlier(node, value):
 
 board_id = SchemaNode(Int())
 branch_id = SchemaNode(Int(), validator=Range(min=0, max=1000))
+collaboration_id = SchemaNode(Int())
 brin = SchemaNode(String(), validator=Length(min=4, max=4))
 name = SchemaNode(String(), validator=Length(min=4, max=300))
 phone = SchemaNode(String(), validator=Length(min=10, max=15))
