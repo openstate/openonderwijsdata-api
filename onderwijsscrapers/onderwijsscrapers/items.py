@@ -284,8 +284,8 @@ class DuoPoBranch(SchoolItem):
 class DuoPaoCollaboration(Item):
     reference_year = Field()
     ignore_id_fields = Field()
-    collaboration = Field()  #ADMINISTRATIENUMMER
-    collaboration_id = Field()  #SAMENWERKINGSVERBAND
+    collaboration = Field()  #SAMENWERKINGSVERBAND
+    collaboration_id = Field()  #ADMINISTRATIENUMMER
     address = Field() #ADRES, POSTCODE, PLAATSNAAM
     correspondence_address = Field() #CORRESPONDENTIEADRES, 
                                      #POSTCODE CORRESPONDENTIEADRES

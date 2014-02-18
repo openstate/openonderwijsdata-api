@@ -2065,6 +2065,188 @@
           "type": "integer"
         }
       }
+    },
+    "pao_collaboration": {
+      "dynamic": true,
+      "properties": {
+        "collaboration": {
+          "type": "string"
+        },
+        "collaboration_id": {
+          "type": "integer"
+        },
+        "address": {
+          "dynamic": true,
+          "properties": {
+            "address_components": {
+              "dynamic": true,
+              "type": "nested",
+              "properties": {
+                "long_name": {
+                  "type": "string"
+                },
+                "short_name": {
+                  "type": "string"
+                },
+                "types": {
+                  "type": "string"
+                }
+              }
+            },
+            "city": {
+              "type": "multi_field",
+              "fields": {
+                "city": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            },
+            "formatted_address": {
+              "type": "string"
+            },
+            "geo_location": {
+              "type": "geo_point",
+              "lat_lon": true
+            },
+            "geo_viewport": {
+              "properties": {
+                "northeast": {
+                  "type": "geo_point",
+                  "lat_lon": true
+                },
+                "southwest": {
+                  "type": "geo_point",
+                  "lat_lon": true
+                }
+              }
+            },
+            "street": {
+              "type": "multi_field",
+              "fields": {
+                "street": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            },
+            "zip_code": {
+              "type": "multi_field",
+              "fields": {
+                "zip_code": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            }
+          }
+        },
+        "correspondence_address": {
+          "dynamic": true,
+          "properties": {
+            "address_components": {
+              "dynamic": true,
+              "type": "nested",
+              "properties": {
+                "long_name": {
+                  "type": "string"
+                },
+                "short_name": {
+                  "type": "string"
+                },
+                "types": {
+                  "type": "string"
+                }
+              }
+            },
+            "city": {
+              "type": "multi_field",
+              "fields": {
+                "city": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            },
+            "formatted_address": {
+              "type": "string"
+            },
+            "geo_location": {
+              "type": "geo_point",
+              "lat_lon": true
+            },
+            "geo_viewport": {
+              "properties": {
+                "northeast": {
+                  "type": "geo_point",
+                  "lat_lon": true
+                },
+                "southwest": {
+                  "type": "geo_point",
+                  "lat_lon": true
+                }
+              }
+            },
+            "street": {
+              "type": "multi_field",
+              "fields": {
+                "street": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            },
+            "zip_code": {
+              "type": "multi_field",
+              "fields": {
+                "zip_code": {
+                  "type": "string"
+                },
+                "untouched": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            }
+          }
+        },
+        "meta": {
+          "dynamic": true,
+          "properties": {
+            "item_scraped_at": {
+              "format": "dateOptionalTime",
+              "type": "date"
+            },
+            "scrape_started_at": {
+              "format": "dateOptionalTime",
+              "type": "date"
+            },
+            "validated_at": {
+              "format": "dateOptionalTime",
+              "type": "date"
+            },
+            "validation_result": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        }
+      }
     }
   }
 }
