@@ -215,12 +215,15 @@ class DuoVoSchools(BaseSpider):
 
     def start_requests(self):
         return [
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/vo/adressen/Adressen/hoofdvestigingen.asp',
+            #         self.parse_schools),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/vschoolverlaten/vsv_voortgezet.asp',
+            #         self.parse_dropouts),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/adressen/Adressen/hoofdvestigingen.asp',
-                    self.parse_schools),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vschoolverlaten/vsv_voortgezet.asp',
-                    self.parse_dropouts)
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp',
+                    self.parse_students_prognosis),
         ]
 
     def parse_schools(self, response):
@@ -396,6 +399,68 @@ class DuoVoSchools(BaseSpider):
 
                 yield school
 
+    def parse_students_prognosis(self, response):
+        """
+        Parse: "11. Prognose aantal leerlingen"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            students_prognosis_per_school = {}
+            for row in csv_file:
+                # strip leading and trailing whitespace and remove
+                # thousands separator ('.')
+                for key in row.keys():
+                    row[key] = row[key].strip().replace('.', '')
+
+                brin = row['BRIN NUMMER']
+
+                if brin not in students_prognosis_per_school:
+                    students_prognosis_per_school[brin] = []
+
+                # ignoring actual data for now, only adding prognosis
+                students_prognosis = {}
+                for k, v in row.iteritems():
+                    row_words = k.split()
+                    # k is of the form 'PROGNOSE LWOO PRO 2024'
+                    if row_words[0] == 'PROGNOSE' or row_words[0]=='POGNOSE': # don't ask
+                        if row_words[-1].isdigit():
+                            year = int(row_words[-1])
+                            structure = '_'.join(row_words[1:-1]).lower()
+                            if structure not in students_prognosis:
+                                students_prognosis[structure] = {}
+                            students_prognosis[structure][year] = int(v)
+
+                students_prognosis_per_school[brin].append(students_prognosis)
+
+            for brin, students_prognosis in students_prognosis_per_school.iteritems():
+                school = DuoVoSchool(
+                    brin=brin,
+                    students_prognosis_url=csv_url,
+                    students_prognosis=students_prognosis,
+                    students_prognosis_reference_date=reference_date,
+                    reference_year=reference_year,
+                )
+
+                yield school
 
 class DuoVoBranchesSpider(BaseSpider):
     name = 'duo_vo_branches'
@@ -1666,7 +1731,7 @@ class DuoPoSchools(BaseSpider):
         return [
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/adressen/Adressen/hoofdvestigingen.asp',
-                    self.parse_po_schools)
+                    self.parse_po_schools),
         ]
 
     def parse_po_schools(self, response):
@@ -1775,15 +1840,14 @@ class DuoPoSchools(BaseSpider):
 
                 yield school
 
-
 class DuoPoBranchesSpider(BaseSpider):
     name = 'duo_po_branches'
 
     def start_requests(self):
         return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/adressen/Adressen/vest_bo.asp',
-                    self.parse_po_branches),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/adressen/Adressen/vest_bo.asp',
+            #         self.parse_po_branches),
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
             #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
             #         self.parse_po_student_weight),
@@ -1796,6 +1860,9 @@ class DuoPoBranchesSpider(BaseSpider):
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
             #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp',
             #         self.parse_po_pupil_zipcode_by_age),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/po/Leerlingen/Leerlingen/leerjaar.asp',
+                    self.parse_po_student_year),
         ]
 
     def parse_po_branches(self, response):
@@ -2315,6 +2382,85 @@ class DuoPoBranchesSpider(BaseSpider):
 
                     yield school
 
+    def parse_po_student_year(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar"
+        """
+        hxs = HtmlXPathSelector(response)
+
+        available_csvs = {}
+        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+        for csv_file in csvs:
+            ref_date = csv_file.select('./td[1]/span/text()').extract()
+            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+            available_csvs['http://duo.nl%s' % csv_url] = ref_date
+
+        for csv_url, reference_date in available_csvs.iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            school_ids = {}
+            years_per_branch = {}
+
+            for row in csv_file:
+                # Datasets 2011 and 2012 suddenly changed these field names. (?)
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+                if row.has_key('GEMEENTE NUMMER'):
+                    row['GEMEENTENUMMER'] = row['GEMEENTE NUMMER']
+                if row.has_key('VESTIGINGS NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
+                if row.has_key('VESTIGINSNUMMER'): # don't ask
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
+
+                brin = row['BRIN NUMMER'].strip()
+                branch_id = 0 if not row['VESTIGINGSNUMMER'] else int(row['VESTIGINGSNUMMER'])
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                # Remove leading/trailing spaces from field names.
+                for key in row.keys():
+                    row[key.strip()] = row[key]
+
+                years = {}
+                possible_years = '1 2 3 4 5 6 7 8'.split()
+                for year in possible_years:
+                    if row['LEERJAAR %s' % year].strip():
+                        years['year_%s' % year] = int(row['LEERJAAR %s' % year])
+                    else:
+                        years['year_%s' % year] = 0
+                # Is there a total student number from somewhere?
+                # if row['TOTAAL'].strip():
+                #         years['students'] = int(row['TOTAAL'])
+
+                if school_id not in years_per_branch:
+                    years_per_branch[school_id] = {}
+
+                years_per_branch[school_id] = years
+
+            for school_id, y_per_branch in years_per_branch.iteritems():
+                school = DuoPoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    students_by_year_reference_url=csv_url,
+                    students_by_year_reference_date=reference_date,
+                    students_by_year=y_per_branch
+                )
+                yield school
 
 
 class DuoPaoCollaborationsSpider(BaseSpider):

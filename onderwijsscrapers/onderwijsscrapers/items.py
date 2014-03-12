@@ -164,6 +164,11 @@ class DuoVoSchool(SchoolItem):
     dropouts_per_year_reference_date = Field()
     dropouts_per_year = Field()
 
+    # Contents of "11. Prognose aantal leerlingen"
+    students_prognosis_url = Field()
+    students_prognosis_reference_date = Field()
+    students_prognosis = Field() # dict of prognosis[structure][year]
+
 
 class DuoVoBoard(Item):
     ignore_id_fields = Field()
@@ -271,19 +276,27 @@ class DuoPoBranch(SchoolItem):
     ages_per_branch_by_student_weight = Field()  # Dict of childrens ages
                                                   # (age (3/4)-14) by student weight.
 
-    # Contents of "09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
+    # Contents of "??. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
     students_by_origin_reference_url = Field()
     students_by_origin_reference_date = Field()
     students_by_origin = Field()
 
-    # Contents of "11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd"
+    # Contents of "09. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd"
     student_residences_reference_url = Field()
     student_residences_reference_date = Field()
     student_residences = Field()
 
+    # Contents of "11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar"
+    students_by_year_reference_url = Field()
+    students_by_year_reference_date = Field()
+    students_by_year = Field()  # Dict of `year_x`
+
 class DuoPaoCollaboration(Item):
     reference_year = Field()
     ignore_id_fields = Field()
+
+    # TODO: reference_url, reference_date
+
     collaboration = Field()  #SAMENWERKINGSVERBAND
     collaboration_id = Field()  #ADMINISTRATIENUMMER
     address = Field() #ADRES, POSTCODE, PLAATSNAAM
