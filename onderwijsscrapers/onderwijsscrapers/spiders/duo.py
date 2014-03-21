@@ -19,6 +19,29 @@ from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
 
+def find_available_csvs(response):
+    """ Get all URLS of CSV files on the DUO page """
+    hxs = HtmlXPathSelector(response)
+    available_csvs = {}
+    csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+    for csv_file in csvs:
+        ref_date = csv_file.select('./td[1]/span/text()').extract()
+        ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+        csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+        available_csvs['http://duo.nl%s' % csv_url] = ref_date
+    return available_csvs
+
+def parse_csv_file(csv_url):
+    """ Download and parse CSV file """
+    csv_file = requests.get(csv_url)
+    csv_file.encoding = 'cp1252'
+    csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
+                  .decode('cp1252').encode('utf8')), delimiter=';')
+    return csv_file
+
+
 class DuoVoBoards(BaseSpider):
     name = 'duo_vo_boards'
 
@@ -36,28 +59,11 @@ class DuoVoBoards(BaseSpider):
         """
         Parse "03. Adressen bevoegde gezagen"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # strip leading and trailing whitespace.
                 for key in row.keys():
                     row[key] = row[key].strip()
@@ -131,17 +137,6 @@ class DuoVoBoards(BaseSpider):
         """
         Parse "15. Kengetallen"
         """
-        hxs = HtmlXPathSelector(response)
-
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
 
         indicators_mapping = {
             'LIQUIDITEIT (CURRENT RATIO)': 'liquidity_current_ratio',
@@ -169,17 +164,11 @@ class DuoVoBoards(BaseSpider):
             'WERKKAPITAAL': 'operating_capital',
         }
 
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             indicators_per_board = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # strip leading and trailing whitespace.
                 for key in row.keys():
                     row[key] = row[key].strip()
@@ -230,16 +219,6 @@ class DuoVoSchools(BaseSpider):
         """
         Parse: "01. Adressen hoofdvestigingen"
         """
-        hxs = HtmlXPathSelector(response)
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
 
         # Fields that do not need additonal processing
         school_fields = {
@@ -258,16 +237,10 @@ class DuoVoSchools(BaseSpider):
             'RMC-REGIO NAAM': 'rmc_region'
         }
 
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # strip leading and trailing whitespace.
                 for key in row.keys():
                     value = row[key].strip()
@@ -338,29 +311,12 @@ class DuoVoSchools(BaseSpider):
         """
         Parse: "02. Vsv in het voortgezet onderwijs per vo instelling"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             dropouts_per_school = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # strip leading and trailing whitespace and remove
                 # thousands separator ('.')
                 for key in row.keys():
@@ -403,29 +359,12 @@ class DuoVoSchools(BaseSpider):
         """
         Parse: "11. Prognose aantal leerlingen"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             students_prognosis_per_school = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # strip leading and trailing whitespace and remove
                 # thousands separator ('.')
                 for key in row.keys():
@@ -497,28 +436,11 @@ class DuoVoBranchesSpider(BaseSpider):
         """
         Parse "02. Adressen alle vestigingen"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 school = DuoVoBranch()
 
                 school['reference_year'] = reference_year
@@ -669,31 +591,14 @@ class DuoVoBranchesSpider(BaseSpider):
         Parse "01. Leerlingen per vestiging naar onderwijstype, lwoo
         indicatie, sector, afdeling, opleiding"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             student_educations = {}
             school_ids = {}
 
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
                                        row['VESTIGINGSNUMMER'].strip().zfill(2))
 
@@ -785,30 +690,13 @@ class DuoVoBranchesSpider(BaseSpider):
         Parse "02. Leerlingen per vestiging naar postcode leerling en
         leerjaar"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             student_residences = {}
             school_ids = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
                                        row['VESTIGINGSNUMMER'].strip().zfill(2))
 
@@ -850,30 +738,13 @@ class DuoVoBranchesSpider(BaseSpider):
         """
         Parse "06. Examenkandidaten en geslaagden"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             school_ids = {}
             graduations_school_year = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Remove newline chars and strip leading and trailing
                 # whitespace.
                 for key in row.keys():
@@ -992,30 +863,13 @@ class DuoVoBranchesSpider(BaseSpider):
         """
         Parse "07. Geslaagden, gezakten en gemiddelde examencijfers per instelling"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             school_ids = {}
             grades_per_school = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Remove newline chars and strip leading and trailing
                 # whitespace.
                 for key in row.keys():
@@ -1089,30 +943,13 @@ class DuoVoBranchesSpider(BaseSpider):
         """
         Parse "08. Examenkandidaten vmbo en examencijfers per vak per instelling"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             school_ids = {}
             courses_per_school = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Remove newline chars and strip leading and trailing
                 # whitespace.
                 for key in row.keys():
@@ -1215,30 +1052,13 @@ class DuoVoBranchesSpider(BaseSpider):
         """
         Parse "09. Examenkandidaten havo en examencijfers per vak per instelling"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             school_ids = {}
             courses_per_school = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Remove newline chars and strip leading and trailing
                 # whitespace.
                 for key in row.keys():
@@ -1340,30 +1160,13 @@ class DuoVoBranchesSpider(BaseSpider):
         """
         Parse "10. Examenkandidaten vwo en examencijfers per vak per instelling"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             school_ids = {}
             courses_per_school = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Remove newline chars and strip leading and trailing
                 # whitespace.
                 for key in row.keys():
@@ -1481,28 +1284,11 @@ class DuoPoBoards(BaseSpider):
         Primair onderwijs > Adressen
         Parse "05. Bevoegde gezagen basisonderwijs"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # strip leading and trailing whitespace.
                 for key in row.keys():
                     row[key] = row[key].strip()
@@ -1577,17 +1363,6 @@ class DuoPoBoards(BaseSpider):
         Primair onderwijs > Financien > Jaarrekeninggegevens
         Parse "15. Kengetallen"
         """
-        hxs = HtmlXPathSelector(response)
-
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
 
         indicators_mapping = {
             'LIQUIDITEIT (CURRENT RATIO)': 'liquidity_current_ratio',
@@ -1615,17 +1390,11 @@ class DuoPoBoards(BaseSpider):
             'WERKKAPITAAL': 'operating_capital',
         }
 
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             indicators_per_board = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Strip leading and trailing whitespace from field names and values.
                 for key in row.keys():
                     row[key.strip()] = row[key].strip()
@@ -1663,31 +1432,14 @@ class DuoPoBoards(BaseSpider):
         Primair onderwijs > Leerlingen
         Parse "07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort"
         """
-        hxs = HtmlXPathSelector(response)
-
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
 
         possible_edu_types = ['BAO', 'SBAO', 'SO', 'VSO']
 
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             students_per_edu_type = {}
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Strip leading and trailing whitespace from field names and values.
                 for key in row.keys():
                     if row[key]:
@@ -1739,16 +1491,6 @@ class DuoPoSchools(BaseSpider):
         Primair onderwijs > Adressen
         Parse: "01. Hoofdvestigingen basisonderwijs"
         """
-        hxs = HtmlXPathSelector(response)
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
 
         # Fields that do not need additonal processing
         school_fields = {
@@ -1767,16 +1509,10 @@ class DuoPoSchools(BaseSpider):
             'RMC-REGIO NAAM': 'rmc_region'
         }
 
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # strip leading and trailing whitespace.
                 for key in row.keys():
                     value = row[key].strip()
@@ -1870,28 +1606,11 @@ class DuoPoBranchesSpider(BaseSpider):
         Primair onderwijs > Adressen
         Parse "03. Alle vestigingen basisonderwijs"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 school = DuoPoBranch()
 
                 # Correct this field name which has a trailing space.
@@ -2041,31 +1760,14 @@ class DuoPoBranchesSpider(BaseSpider):
         Parse "01. Leerlingen basisonderwijs naar leerlinggewicht en per
                    vestiging het schoolgewicht en impulsgebied"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             school_ids = {}
             weights_per_school = {}
 
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Datasets 2011 and 2012 suddenly changed these field names.
                 if row.has_key('BRINNUMMER'):
                     row['BRIN NUMMER'] = row['BRINNUMMER']
@@ -2137,31 +1839,14 @@ class DuoPoBranchesSpider(BaseSpider):
         Primair onderwijs > Leerlingen
         Parse "02. Leerlingen basisonderwijs naar leeftijd"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             school_ids = {}
             ages_per_branch_by_student_weight = {}
 
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Datasets 2011 and 2012 suddenly changed these field names.
                 if row.has_key('BRINNUMMER'):
                     row['BRIN NUMMER'] = row['BRINNUMMER']
@@ -2230,31 +1915,14 @@ class DuoPoBranchesSpider(BaseSpider):
         Primair onderwijs > Leerlingen
         Parse "09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             school_ids = {}
             students_by_origin = {}
 
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 brin = row['BRIN NUMMER'].strip()
                 branch_id = int(row['VESTIGINGSNUMMER'])
                 school_id = '%s-%s' % (brin, branch_id)
@@ -2337,7 +2005,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 school_ids = {}
                 student_residences = {}
 
-                for row in csv_file:
+                for row in csv_file :
                     # Remove leading/trailing spaces from field names and values.
                     for key in row.keys():
                         row[key.strip()] = row[key].strip()
@@ -2387,31 +2055,14 @@ class DuoPoBranchesSpider(BaseSpider):
         Primair onderwijs > Leerlingen
         Parse "11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar"
         """
-        hxs = HtmlXPathSelector(response)
 
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
-
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
             school_ids = {}
             years_per_branch = {}
 
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # Datasets 2011 and 2012 suddenly changed these field names. (?)
                 if row.has_key('BRINNUMMER'):
                     row['BRIN NUMMER'] = row['BRINNUMMER']
@@ -2478,32 +2129,16 @@ class DuoPaoCollaborationsSpider(BaseSpider):
         Passend onderwijs > Adressen
         Parse: "01. Adressen samenwerkingsverbanden lichte ondersteuning primair onderwijs"
         """
-        hxs = HtmlXPathSelector(response)
-        available_csvs = {}
-        csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-        for csv_file in csvs:
-            ref_date = csv_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
-
-            available_csvs['http://duo.nl%s' % csv_url] = ref_date
 
         # Fields that do not need additonal processing
         collaboration_fields = {
             'SAMENWERKINGSVERBAND': 'collaboration'
         }
 
-        for csv_url, reference_date in available_csvs.iteritems():
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
-                          .decode('cp1252').encode('utf8')), delimiter=';')
-
-            for row in csv_file:
+            for row in parse_csv_file(csv_url):
                 # strip leading and trailing whitespace.
                 for key in row.keys():
                     value = row[key].strip()
