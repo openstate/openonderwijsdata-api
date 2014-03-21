@@ -226,6 +226,11 @@ class DuoVoSchool(MappingSchema):
     wgr_area = general_rules.wgr_area
     wgr_area_code = general_rules.wgr_area_code
 
+    # TODO:
+    #students_prognosis = StudentPrognosis()
+    students_prognosis_reference_date = SchemaNode(Date(), missing=True)
+    students_prognosis_url = general_rules.website
+
 
 class DuoPoBoard(MappingSchema):
     address = general_rules.Address()
@@ -276,6 +281,11 @@ class DuoPoSchool(MappingSchema):
     wgr_area = general_rules.wgr_area
     wgr_area_code = general_rules.wgr_area_code
 
+    # TODO:
+    #spo_clusters = SPOClusters()
+    spo_clusters_reference_date = SchemaNode(Date(), missing=True)
+    spo_clusters_reference_url = general_rules.website
+
 
 class DuoPoBranch(MappingSchema):
     address = general_rules.Address()
@@ -316,11 +326,16 @@ class DuoPoBranch(MappingSchema):
     website = general_rules.url
     # TODO:
     #weights_per_school = WeightsPerSchool()
-    weights_per_school_reference_date = SchemaNode(Date(),
-        missing=True)
+    weights_per_school_reference_date = SchemaNode(Date(), missing=True)
     weights_per_school_reference_url = general_rules.website
     wgr_area = general_rules.wgr_area
     wgr_area_code = general_rules.wgr_area_code
+
+    # TODO:
+    #po_student_year = StudentsPerStructurePerYear()
+    po_student_year_reference_date = SchemaNode(Date(), missing=True)
+    po_student_year_reference_url = general_rules.website
+    
 
 class DuoPaoCollaboration(MappingSchema):
     address = general_rules.Address()

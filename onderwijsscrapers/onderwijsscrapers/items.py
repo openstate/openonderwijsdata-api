@@ -239,6 +239,11 @@ class DuoPoSchool(SchoolItem):
     rmc_region = Field()  # `RMC REGIO NAAM`
     rmc_region_code = Field()  # `RMC REGIO CODE`
 
+    # Contents of "04. Leerlingen speciaal onderwijs naar cluster"
+    spo_clusters_reference_url = Field()
+    spo_clusters_reference_date = Field()
+    spo_clusters = Field()
+
 
 class DuoPoBranch(SchoolItem):
     ignore_id_fields = Field()

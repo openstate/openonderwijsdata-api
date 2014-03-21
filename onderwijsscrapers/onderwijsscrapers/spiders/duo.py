@@ -376,17 +376,17 @@ class DuoVoSchools(BaseSpider):
                     students_prognosis_per_school[brin] = []
 
                 # ignoring actual data for now, only adding prognosis
-                students_prognosis = {}
+                students_prognosis = []
                 for k, v in row.iteritems():
                     row_words = k.split()
                     # k is of the form 'PROGNOSE LWOO PRO 2024'
                     if row_words[0] == 'PROGNOSE' or row_words[0]=='POGNOSE': # don't ask
                         if row_words[-1].isdigit():
-                            year = int(row_words[-1])
-                            structure = '_'.join(row_words[1:-1]).lower()
-                            if structure not in students_prognosis:
-                                students_prognosis[structure] = {}
-                            students_prognosis[structure][year] = int(v)
+                            students_prognosis.append({
+                                'year' : int(row_words[-1]),
+                                'structure' : '_'.join(row_words[1:-1]).lower(),
+                                'students' : int(v),
+                            })
 
                 students_prognosis_per_school[brin].append(students_prognosis)
 
@@ -1481,9 +1481,12 @@ class DuoPoSchools(BaseSpider):
 
     def start_requests(self):
         return [
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/adressen/Adressen/hoofdvestigingen.asp',
+            #         self.parse_po_schools),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/adressen/Adressen/hoofdvestigingen.asp',
-                    self.parse_po_schools),
+                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen4.asp',
+                    self.parse_spo_clusters),
         ]
 
     def parse_po_schools(self, response):
@@ -1574,6 +1577,36 @@ class DuoPoSchools(BaseSpider):
                 school['reference_year'] = reference_year
                 school['ignore_id_fields'] = ['reference_year']
 
+                yield school
+
+    def parse_spo_clusters(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "04. Leerlingen speciaal onderwijs naar cluster"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            spo_clusters_per_school = {}
+
+
+            for row in parse_csv_file(csv_url):
+                spo_clusters_per_school[row['BRIN NUMMER']] = {
+                    'cluster_1': int(row['CLUSTER 1']),
+                    'cluster_2': int(row['CLUSTER 2']),
+                    'cluster_3': int(row['CLUSTER 3']),
+                    'cluster_4': int(row['CLUSTER 4']),
+                }
+
+            for brin, spo_clusters in spo_clusters_per_school.iteritems():
+                school = DuoPoSchool(
+                    brin=brin,
+                    reference_year=reference_year,
+                    spo_clusters_reference_url=csv_url,
+                    spo_clusters_reference_date=reference_date,
+                    spo_clusters=spo_clusters
+                )
                 yield school
 
 class DuoPoBranchesSpider(BaseSpider):
