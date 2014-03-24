@@ -42,6 +42,16 @@ def parse_csv_file(csv_url):
     return csv_file
 
 
+def int_or_none(value):
+    """
+        Try to make `value` an int. If the string is not a number, 
+        or empty, return None.
+    """
+    try: 
+        return int(value)
+    except ValueError:
+        return None
+
 class DuoVoBoards(BaseSpider):
     name = 'duo_vo_boards'
 
@@ -92,36 +102,18 @@ class DuoVoBoards(BaseSpider):
                 else:
                     board['correspondence_address']['zip_code'] = None
 
-                if row['PLAATSNAAM CORRESPONDENTIEADRES']:
-                    board['correspondence_address']['city'] = row[
-                        'PLAATSNAAM CORRESPONDENTIEADRES']
-                else:
-                    board['correspondence_address']['city'] = None
+                board['correspondence_address']['city'] = row[
+                        'PLAATSNAAM CORRESPONDENTIEADRES'] or None
 
-                if row['GEMEENTENAAM']:
-                    board['municipality'] = row['GEMEENTENAAM']
-                else:
-                    board['municipality'] = None
+                board['municipality'] = row['GEMEENTENAAM'] or None
 
-                if row['GEMEENTENUMMER']:
-                    board['municipality_code'] = int(row['GEMEENTENUMMER'])
-                else:
-                    board['municipality_code'] = None
+                board['municipality_code'] = int_or_none(row['GEMEENTENUMMER'])
 
-                if row['TELEFOONNUMMER']:
-                    board['phone'] = row['TELEFOONNUMMER']
-                else:
-                    board['phone'] = None
+                board['phone'] = row['TELEFOONNUMMER'] or None
 
-                if row['INTERNETADRES']:
-                    board['website'] = row['INTERNETADRES']
-                else:
-                    board['website'] = None
+                board['website'] = row['INTERNETADRES'] or None
 
-                if row['DENOMINATIE']:
-                    board['denomination'] = row['DENOMINATIE']
-                else:
-                    board['denomination'] = None
+                board['denomination'] = row['DENOMINATIE'] or None
 
                 if row['ADMINISTRATIEKANTOORNUMMER']:
                     board['administrative_office_id'] = \
@@ -244,10 +236,7 @@ class DuoVoSchools(BaseSpider):
                 # strip leading and trailing whitespace.
                 for key in row.keys():
                     value = row[key].strip()
-                    if value:
-                        row[key] = value
-                    else:
-                        row[key] = None
+                    row[key] = value or None
 
                 school = DuoVoSchool()
                 school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
@@ -266,7 +255,7 @@ class DuoVoSchools(BaseSpider):
                     'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
                 }
 
-                school['municipality_code'] = int(row['GEMEENTENUMMER'])
+                school['municipality_code'] = int_or_none(row['GEMEENTENUMMER'])
                 school['education_structures'] = row['ONDERWIJSSTRUCTUUR']
                 if school['education_structures']:
                     school['education_structures'] = school['education_structures'].split('/')
@@ -274,30 +263,15 @@ class DuoVoSchools(BaseSpider):
                 if row['COROPGEBIED CODE']:
                     school['corop_area_code'] = int(row['COROPGEBIED CODE'])
 
-                if row['NODAAL GEBIED CODE']:
-                    school['nodal_area_code'] = int(row['NODAAL GEBIED CODE'])
-                else:
-                    school['nodal_area_code'] = None
+                school['nodal_area_code'] = int_or_none(row['NODAAL GEBIED CODE'])
 
-                if row['RPA-GEBIED CODE']:
-                    school['rpa_area_code'] = int(row['RPA-GEBIED CODE'])
-                else:
-                    school['rpa_area_code'] = None
+                school['rpa_area_code'] = int_or_none(row['RPA-GEBIED CODE'])
 
-                if row['WGR-GEBIED CODE']:
-                    school['wgr_area_code'] = int(row['WGR-GEBIED CODE'])
-                else:
-                    school['wgr_area_code'] = None
+                school['wgr_area_code'] = int_or_none(row['WGR-GEBIED CODE'])
 
-                if row['ONDERWIJSGEBIED CODE']:
-                    school['education_area_code'] = int(row['ONDERWIJSGEBIED CODE'])
-                else:
-                    school['education_area_code'] = None
+                school['education_area_code'] = int_or_none(row['ONDERWIJSGEBIED CODE'])
 
-                if row['RMC-REGIO CODE']:
-                    school['rmc_region_code'] = int(row['RMC-REGIO CODE'])
-                else:
-                    school['rmc_region_code'] = None
+                school['rmc_region_code'] = int_or_none(row['RMC-REGIO CODE'])
 
                 for field, field_norm in school_fields.iteritems():
                     school[field_norm] = row[field]
@@ -453,15 +427,9 @@ class DuoVoBranchesSpider(BaseSpider):
                     'zip_code': row['POSTCODE'].strip().replace(' ', '')
                 }
 
-                if row['INTERNETADRES'].strip():
-                    school['website'] = row['INTERNETADRES'].strip()
-                else:
-                    school['website'] = None
+                school['website'] = row['INTERNETADRES'].strip() or None
 
-                if row['DENOMINATIE'].strip():
-                    school['denomination'] = row['DENOMINATIE'].strip()
-                else:
-                    school['denomination'] = None
+                school['denomination'] = row['DENOMINATIE'].strip() or None
 
                 if row['ONDERWIJSSTRUCTUUR'].strip():
                     school['education_structures'] = row['ONDERWIJSSTRUCTUUR']\
@@ -469,15 +437,9 @@ class DuoVoBranchesSpider(BaseSpider):
                 else:
                     school['education_structures'] = None
 
-                if row['PROVINCIE'].strip():
-                    school['province'] = row['PROVINCIE'].strip()
-                else:
-                    school['province'] = None
+                school['province'] = row['PROVINCIE'].strip() or None
 
-                if row['BEVOEGD GEZAG NUMMER'].strip():
-                    school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'].strip())
-                else:
-                    school['board_id'] = None
+                school['board_id'] = int_or_none(row['BEVOEGD GEZAG NUMMER'].strip())
 
                 if row['BRIN NUMMER'].strip():
                     school['brin'] = row['BRIN NUMMER'].strip()
@@ -487,20 +449,11 @@ class DuoVoBranchesSpider(BaseSpider):
                                               .strip()
                                               .replace(row['BRIN NUMMER'], ''))
 
-                if row['GEMEENTENAAM'].strip():
-                    school['municipality'] = row['GEMEENTENAAM'].strip()
-                else:
-                    school['municipality'] = None
+                school['municipality'] = row['GEMEENTENAAM'].strip() or None
 
-                if row['GEMEENTENUMMER'].strip():
-                    school['municipality_code'] = int(row['GEMEENTENUMMER'].strip())
-                else:
-                    school['municipality_code'] = None
+                school['municipality_code'] = int_or_none(row['GEMEENTENUMMER'].strip())
 
-                if row['TELEFOONNUMMER'].strip():
-                    school['phone'] = row['TELEFOONNUMMER'].strip()
-                else:
-                    school['phone'] = None
+                school['phone'] = row['TELEFOONNUMMER'].strip() or None
 
                 school['correspondence_address'] = {}
                 if row['STRAATNAAM CORRESPONDENTIEADRES'].strip():
@@ -516,57 +469,27 @@ class DuoVoBranchesSpider(BaseSpider):
                 else:
                     school['correspondence_address']['zip_code'] = None
 
-                if row['PLAATSNAAM CORRESPONDENTIEADRES'].strip():
-                    school['correspondence_address']['city'] = row[
-                        'PLAATSNAAM CORRESPONDENTIEADRES'].strip()
-                else:
-                    school['correspondence_address']['city'] = None
+                school['correspondence_address']['city'] = row[
+                        'PLAATSNAAM CORRESPONDENTIEADRES'].strip() or None
 
-                if row['NODAAL GEBIED NAAM'].strip():
-                    school['nodal_area'] = row['NODAAL GEBIED NAAM'].strip()
-                else:
-                    school['nodal_area'] = None
+                school['nodal_area'] = row['NODAAL GEBIED NAAM'].strip() or None
 
-                if row['NODAAL GEBIED CODE'].strip():
-                    school['nodal_area_code'] = int(row['NODAAL GEBIED CODE']
+                school['nodal_area_code'] = int_or_none(row['NODAAL GEBIED CODE']
                                                     .strip())
-                else:
-                    school['nodal_area_code'] = None
 
-                if row['RPA-GEBIED NAAM'].strip():
-                    school['rpa_area'] = row['RPA-GEBIED NAAM'].strip()
-                else:
-                    school['rpa_area'] = None
+                school['rpa_area'] = row['RPA-GEBIED NAAM'].strip() or None
 
-                if row['RPA-GEBIED CODE'].strip():
-                    school['rpa_area_code'] = int(row['RPA-GEBIED CODE'].strip())
-                else:
-                    school['rpa_area_code'] = None
+                school['rpa_area_code'] = int_or_none(row['RPA-GEBIED CODE'].strip())
 
-                if row['WGR-GEBIED NAAM'].strip():
-                    school['wgr_area'] = row['WGR-GEBIED NAAM'].strip()
-                else:
-                    school['wgr_area'] = None
+                school['wgr_area'] = row['WGR-GEBIED NAAM'].strip() or None
 
-                if row['WGR-GEBIED CODE'].strip():
-                    school['wgr_area_code'] = int(row['WGR-GEBIED CODE'].strip())
-                else:
-                    school['wgr_area_code'] = None
+                school['wgr_area_code'] = int_or_none(row['WGR-GEBIED CODE'].strip())
 
-                if row['COROPGEBIED NAAM'].strip():
-                    school['corop_area'] = row['COROPGEBIED NAAM'].strip()
-                else:
-                    school['corop_area'] = None
+                school['corop_area'] = row['COROPGEBIED NAAM'].strip() or None
 
-                if row['COROPGEBIED CODE'].strip():
-                    school['corop_area_code'] = int(row['COROPGEBIED CODE'].strip())
-                else:
-                    school['corop_area_code'] = None
+                school['corop_area_code'] = int_or_none(row['COROPGEBIED CODE'].strip())
 
-                if row['ONDERWIJSGEBIED NAAM'].strip():
-                    school['education_area'] = row['ONDERWIJSGEBIED NAAM'].strip()
-                else:
-                    school['education_area'] = None
+                school['education_area'] = row['ONDERWIJSGEBIED NAAM'].strip() or None
 
                 if row['ONDERWIJSGEBIED CODE'].strip():
                     school['education_area_code'] = int(row['ONDERWIJSGEBIED '
@@ -574,15 +497,9 @@ class DuoVoBranchesSpider(BaseSpider):
                 else:
                     school['education_area_code'] = None
 
-                if row['RMC-REGIO NAAM'].strip():
-                    school['rmc_region'] = row['RMC-REGIO NAAM'].strip()
-                else:
-                    school['rmc_region'] = None
+                school['rmc_region'] = row['RMC-REGIO NAAM'].strip() or None
 
-                if row['RMC-REGIO CODE'].strip():
-                    school['rmc_region_code'] = int(row['RMC-REGIO CODE'].strip())
-                else:
-                    school['rmc_region_code'] = None
+                school['rmc_region_code'] = int_or_none(row['RMC-REGIO CODE'].strip())
 
                 yield school
 
@@ -648,16 +565,10 @@ class DuoVoBranchesSpider(BaseSpider):
                     education_type['vmbo_sector'] = None
 
                 naam = row['OPLEIDINGSNAAM'].strip()
-                if naam:
-                    education_type['education_name'] = naam
-                else:
-                    education_type['education_name'] = None
+                education_type['education_name'] = naam or None
 
                 otype = row['ONDERWIJSTYPE VO EN LEER- OF VERBLIJFSJAAR'].strip()
-                if otype:
-                    education_type['education_structure'] = otype
-                else:
-                    education_type['education_structure'] = None
+                education_type['education_structure'] = otype or None
 
                 for available_year in range(1, 7):
                     male = int(row['LEER- OF VERBLIJFSJAAR %s - MAN'
@@ -1317,42 +1228,21 @@ class DuoPoBoards(BaseSpider):
                 else:
                     board['correspondence_address']['zip_code'] = None
 
-                if row['PLAATSNAAM CORRESPONDENTIEADRES']:
-                    board['correspondence_address']['city'] = row[
-                        'PLAATSNAAM CORRESPONDENTIEADRES']
-                else:
-                    board['correspondence_address']['city'] = None
+                board['correspondence_address']['city'] = row[
+                        'PLAATSNAAM CORRESPONDENTIEADRES'] or None
 
-                if row['GEMEENTENAAM']:
-                    board['municipality'] = row['GEMEENTENAAM']
-                else:
-                    board['municipality'] = None
+                board['municipality'] = row['GEMEENTENAAM'] or None
 
-                if row['GEMEENTENUMMER']:
-                    board['municipality_code'] = int(row['GEMEENTENUMMER'])
-                else:
-                    board['municipality_code'] = None
+                board['municipality_code'] = int_or_none(row['GEMEENTENUMMER'])
 
-                if row['TELEFOONNUMMER']:
-                    board['phone'] = row['TELEFOONNUMMER']
-                else:
-                    board['phone'] = None
+                board['phone'] = row['TELEFOONNUMMER'] or None
 
-                if row['INTERNETADRES']:
-                    board['website'] = row['INTERNETADRES']
-                else:
-                    board['website'] = None
+                board['website'] = row['INTERNETADRES'] or None
 
-                if row['DENOMINATIE']:
-                    board['denomination'] = row['DENOMINATIE']
-                else:
-                    board['denomination'] = None
+                board['denomination'] = row['DENOMINATIE'] or None
 
-                if row['ADMINISTRATIEKANTOORNUMMER']:
-                    board['administrative_office_id'] = \
-                        int(row['ADMINISTRATIEKANTOORNUMMER'])
-                else:
-                    board['administrative_office_id'] = None
+                board['administrative_office_id'] = \
+                        int_or_none(row['ADMINISTRATIEKANTOORNUMMER'])
 
                 board['reference_year'] = reference_year
                 board['ignore_id_fields'] = ['reference_year']
@@ -1519,10 +1409,7 @@ class DuoPoSchools(BaseSpider):
                 # strip leading and trailing whitespace.
                 for key in row.keys():
                     value = row[key].strip()
-                    if value:
-                        row[key] = value
-                    else:
-                        row[key] = None
+                    row[key] = value or None
 
                 school = DuoPoSchool()
                 school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'])
@@ -1546,30 +1433,15 @@ class DuoPoSchools(BaseSpider):
                 if row['COROPGEBIED CODE']:
                     school['corop_area_code'] = int(row['COROPGEBIED CODE'])
 
-                if row['NODAAL GEBIED CODE']:
-                    school['nodal_area_code'] = int(row['NODAAL GEBIED CODE'])
-                else:
-                    school['nodal_area_code'] = None
+                school['nodal_area_code'] = int_or_none(row['NODAAL GEBIED CODE'])
 
-                if row['RPA-GEBIED CODE']:
-                    school['rpa_area_code'] = int(row['RPA-GEBIED CODE'])
-                else:
-                    school['rpa_area_code'] = None
+                school['rpa_area_code'] = int_or_none(row['RPA-GEBIED CODE'])
 
-                if row['WGR-GEBIED CODE']:
-                    school['wgr_area_code'] = int(row['WGR-GEBIED CODE'])
-                else:
-                    school['wgr_area_code'] = None
+                school['wgr_area_code'] = int_or_none(row['WGR-GEBIED CODE'])
 
-                if row['ONDERWIJSGEBIED CODE']:
-                    school['education_area_code'] = int(row['ONDERWIJSGEBIED CODE'])
-                else:
-                    school['education_area_code'] = None
+                school['education_area_code'] = int_or_none(row['ONDERWIJSGEBIED CODE'])
 
-                if row['RMC-REGIO CODE']:
-                    school['rmc_region_code'] = int(row['RMC-REGIO CODE'])
-                else:
-                    school['rmc_region_code'] = None
+                school['rmc_region_code'] = int_or_none(row['RMC-REGIO CODE'])
 
                 for field, field_norm in school_fields.iteritems():
                     school[field_norm] = row[field]
@@ -1660,25 +1532,13 @@ class DuoPoBranchesSpider(BaseSpider):
                     'zip_code': row['POSTCODE'].strip().replace(' ', '')
                 }
 
-                if row['INTERNETADRES'].strip():
-                    school['website'] = row['INTERNETADRES'].strip()
-                else:
-                    school['website'] = None
+                school['website'] = row['INTERNETADRES'].strip() or None
 
-                if row['DENOMINATIE'].strip():
-                    school['denomination'] = row['DENOMINATIE'].strip()
-                else:
-                    school['denomination'] = None
+                school['denomination'] = row['DENOMINATIE'].strip() or None
 
-                if row['PROVINCIE'].strip():
-                    school['province'] = row['PROVINCIE'].strip()
-                else:
-                    school['province'] = None
+                school['province'] = row['PROVINCIE'].strip() or None
 
-                if row['BEVOEGD GEZAG NUMMER'].strip():
-                    school['board_id'] = int(row['BEVOEGD GEZAG NUMMER'].strip())
-                else:
-                    school['board_id'] = None
+                school['board_id'] = int_or_none(row['BEVOEGD GEZAG NUMMER'].strip())
 
                 if row['BRIN NUMMER'].strip():
                     school['brin'] = row['BRIN NUMMER'].strip()
@@ -1688,20 +1548,11 @@ class DuoPoBranchesSpider(BaseSpider):
                                               .strip()
                                               .replace(row['BRIN NUMMER'], ''))
 
-                if row['GEMEENTENAAM'].strip():
-                    school['municipality'] = row['GEMEENTENAAM'].strip()
-                else:
-                    school['municipality'] = None
+                school['municipality'] = row['GEMEENTENAAM'].strip() or None
 
-                if row['GEMEENTENUMMER'].strip():
-                    school['municipality_code'] = int(row['GEMEENTENUMMER'].strip())
-                else:
-                    school['municipality_code'] = None
+                school['municipality_code'] = int_or_none(row['GEMEENTENUMMER'].strip())
 
-                if row['TELEFOONNUMMER'].strip():
-                    school['phone'] = row['TELEFOONNUMMER'].strip()
-                else:
-                    school['phone'] = None
+                school['phone'] = row['TELEFOONNUMMER'].strip() or None
 
                 school['correspondence_address'] = {}
                 if row['STRAATNAAM CORRESPONDENTIEADRES'].strip():
@@ -1717,16 +1568,10 @@ class DuoPoBranchesSpider(BaseSpider):
                 else:
                     school['correspondence_address']['zip_code'] = None
 
-                if row['PLAATSNAAM CORRESPONDENTIEADRES'].strip():
-                    school['correspondence_address']['city'] = row[
-                        'PLAATSNAAM CORRESPONDENTIEADRES'].strip()
-                else:
-                    school['correspondence_address']['city'] = None
+                school['correspondence_address']['city'] = row[
+                        'PLAATSNAAM CORRESPONDENTIEADRES'].strip() or None
 
-                if row['NODAAL GEBIED NAAM'].strip():
-                    school['nodal_area'] = row['NODAAL GEBIED NAAM'].strip()
-                else:
-                    school['nodal_area'] = None
+                school['nodal_area'] = row['NODAAL GEBIED NAAM'].strip() or None
 
                 if row['NODAAL GEBIED CODE'].strip():
                     school['nodal_area_code'] = int(row['NODAAL GEBIED CODE']
@@ -1734,40 +1579,19 @@ class DuoPoBranchesSpider(BaseSpider):
                 else:
                     school['nodal_area_code'] = None
 
-                if row['RPA-GEBIED NAAM'].strip():
-                    school['rpa_area'] = row['RPA-GEBIED NAAM'].strip()
-                else:
-                    school['rpa_area'] = None
+                school['rpa_area'] = row['RPA-GEBIED NAAM'].strip() or None
 
-                if row['RPA-GEBIED CODE'].strip():
-                    school['rpa_area_code'] = int(row['RPA-GEBIED CODE'].strip())
-                else:
-                    school['rpa_area_code'] = None
+                school['rpa_area_code'] = int_or_none(row['RPA-GEBIED CODE'].strip())
 
-                if row['WGR-GEBIED NAAM'].strip():
-                    school['wgr_area'] = row['WGR-GEBIED NAAM'].strip()
-                else:
-                    school['wgr_area'] = None
+                school['wgr_area'] = row['WGR-GEBIED NAAM'].strip() or None
 
-                if row['WGR-GEBIED CODE'].strip():
-                    school['wgr_area_code'] = int(row['WGR-GEBIED CODE'].strip())
-                else:
-                    school['wgr_area_code'] = None
+                school['wgr_area_code'] = int_or_none(row['WGR-GEBIED CODE'].strip())
 
-                if row['COROPGEBIED NAAM'].strip():
-                    school['corop_area'] = row['COROPGEBIED NAAM'].strip()
-                else:
-                    school['corop_area'] = None
+                school['corop_area'] = row['COROPGEBIED NAAM'].strip() or None
 
-                if row['COROPGEBIED CODE'].strip():
-                    school['corop_area_code'] = int(row['COROPGEBIED CODE'].strip())
-                else:
-                    school['corop_area_code'] = None
+                school['corop_area_code'] = int_or_none(row['COROPGEBIED CODE'].strip())
 
-                if row['ONDERWIJSGEBIED NAAM'].strip():
-                    school['education_area'] = row['ONDERWIJSGEBIED NAAM'].strip()
-                else:
-                    school['education_area'] = None
+                school['education_area'] = row['ONDERWIJSGEBIED NAAM'].strip() or None
 
                 if row['ONDERWIJSGEBIED CODE'].strip():
                     school['education_area_code'] = int(row['ONDERWIJSGEBIED '
@@ -1775,15 +1599,9 @@ class DuoPoBranchesSpider(BaseSpider):
                 else:
                     school['education_area_code'] = None
 
-                if row['RMC-REGIO NAAM'].strip():
-                    school['rmc_region'] = row['RMC-REGIO NAAM'].strip()
-                else:
-                    school['rmc_region'] = None
+                school['rmc_region'] = row['RMC-REGIO NAAM'].strip() or None
 
-                if row['RMC-REGIO CODE'].strip():
-                    school['rmc_region_code'] = int(row['RMC-REGIO CODE'].strip())
-                else:
-                    school['rmc_region_code'] = None
+                school['rmc_region_code'] = int_or_none(row['RMC-REGIO CODE'].strip())
 
                 yield school
 
@@ -1824,25 +1642,14 @@ class DuoPoBranchesSpider(BaseSpider):
                 }
 
                 weights = {}
-                if row['GEWICHT 0'].strip():
-                    weights['student_weight_0.0'] = int(row['GEWICHT 0'].strip())
-                else:
-                    weights['student_weight_0.0'] = None
+            
+                weights['student_weight_0.0'] = int_or_none(row['GEWICHT 0'].strip())        
 
-                if row['GEWICHT 0.3'].strip():
-                    weights['student_weight_0.3'] = int(row['GEWICHT 0.3'].strip())
-                else:
-                    weights['student_weight_0.3'] = None
+                weights['student_weight_0.3'] = int_or_none(row['GEWICHT 0.3'].strip())
 
-                if row['GEWICHT 1.2'].strip():
-                    weights['student_weight_1.2'] = int(row['GEWICHT 1.2'].strip())
-                else:
-                    weights['student_weight_1.2'] = None
+                weights['student_weight_1.2'] = int_or_none(row['GEWICHT 1.2'].strip())
 
-                if row['SCHOOLGEWICHT'].strip():
-                    weights['school_weight'] = int(row['SCHOOLGEWICHT'].strip())
-                else:
-                    weights['school_weight'] = None
+                weights['school_weight'] = int_or_none(row['SCHOOLGEWICHT'].strip())
 
                 # The 2008 dataset doesn't contain the IMPULSGEBIED field.
                 if row.has_key('IMPULSGEBIED'):
@@ -2175,10 +1982,7 @@ class DuoPaoCollaborationsSpider(BaseSpider):
                 # strip leading and trailing whitespace.
                 for key in row.keys():
                     value = row[key].strip()
-                    if value:
-                        row[key] = value
-                    else:
-                        row[key] = None
+                    row[key] = value or None
 
                 collaboration = DuoPaoCollaboration()
                 collaboration['collaboration_id'] = int(row['ADMINISTRATIENUMMER'])
