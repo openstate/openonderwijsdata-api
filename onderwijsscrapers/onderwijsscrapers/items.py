@@ -240,9 +240,9 @@ class DuoPoSchool(SchoolItem):
     rmc_region_code = Field()  # `RMC REGIO CODE`
 
     # Contents of "04. Leerlingen speciaal onderwijs naar cluster"
-    spo_clusters_reference_url = Field()
-    spo_clusters_reference_date = Field()
-    spo_clusters = Field()
+    spo_students_per_cluster_reference_url = Field()
+    spo_students_per_cluster_reference_date = Field()
+    spo_students_per_cluster = Field()
 
 
 class DuoPoBranch(SchoolItem):
@@ -296,6 +296,15 @@ class DuoPoBranch(SchoolItem):
     students_by_year_reference_date = Field()
     students_by_year = Field()  # Dict of `year_x`
 
+    # Contents of "05. Leerlingen speciaal (basis)onderwijs naar geboortejaar"
+    spo_law = Field() # `AANDUIDING WET`
+    spo_edu_type = Field() # `SOORT PRIMAIR ONDERWIJS` # possibly multiple with slash
+    spo_cluster = Field() # `CLUSTER`
+    # todo: validation
+    spo_students_by_birthyear_reference_url = Field()
+    spo_students_by_birthyear_reference_date = Field()
+    spo_students_by_birthyear = Field()
+
 class DuoPaoCollaboration(Item):
     reference_year = Field()
     ignore_id_fields = Field()
@@ -308,4 +317,4 @@ class DuoPaoCollaboration(Item):
     correspondence_address = Field() #CORRESPONDENTIEADRES, 
                                      #POSTCODE CORRESPONDENTIEADRES
                                      #PLAATS CORRESPONDENTIEADRES
-    
+

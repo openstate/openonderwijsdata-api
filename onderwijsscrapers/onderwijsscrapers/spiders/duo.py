@@ -1501,9 +1501,12 @@ class DuoPoBranchesSpider(BaseSpider):
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
             #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp',
             #         self.parse_po_pupil_zipcode_by_age),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/Leerlingen/Leerlingen/leerjaar.asp',
+            #         self.parse_po_student_year),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/leerjaar.asp',
-                    self.parse_po_student_year),
+                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen5.asp',
+                    self.parse_spo_students_by_birthyear),
         ]
 
     def parse_po_branches(self, response):
@@ -1953,6 +1956,53 @@ class DuoPoBranchesSpider(BaseSpider):
                 )
                 yield school
 
+    def parse_spo_students_by_birthyear(self, response):
+        """
+        Passend onderwijs > Leerlingen
+        Parse: "05. Leerlingen speciaal (basis)onderwijs naar geboortejaar"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            for row in parse_csv_file(csv_url):
+                # Datasets 2011 and 2012 suddenly changed these field names. (?)
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+                if row.has_key('VESTIGINGS NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
+                if row.has_key('VESTIGINSNUMMER'): # don't ask
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
+
+
+                branch = DuoPoBranch()
+                branch['brin'] = row['BRIN NUMMER'].strip()
+                branch['branch_id'] = 0 if not row['VESTIGINGSNUMMER'] else int(row['VESTIGINGSNUMMER'])
+                branch['reference_year']=reference_year
+
+                branch['spo_law'] = row['AANDUIDING WET']
+                branch['spo_edu_type'] = row['SOORT PRIMAIR ONDERWIJS'] # possibly multiple with slash
+                branch['spo_cluster'] = row['CLUSTER'] # i hope they don't use slashes                
+
+                # ignoring total
+                students_by_birthyear = []
+                for k, v in row.iteritems():
+                    row_words = k.split('.')
+                    # k is of the form 'aantal.2005' or just the year (yes, really)
+                    if row_words[-1].isdigit() and v.isdigit() and int(v)>0 :
+                        students_by_birthyear.append({
+                            'birthyear' : int(row_words[-1]),
+                            'students' : int(v),
+                        })
+                        
+
+                branch['spo_students_by_birthyear'] = students_by_birthyear
+                branch['spo_students_by_birthyear_reference_url'] = csv_url
+                branch['spo_students_by_birthyear_reference_date'] = reference_date
+
+                yield branch
+       
 
 class DuoPaoCollaborationsSpider(BaseSpider):
     name = 'duo_pao_collaborations'
@@ -1987,9 +2037,9 @@ class DuoPaoCollaborationsSpider(BaseSpider):
                 collaboration = DuoPaoCollaboration()
                 collaboration['collaboration_id'] = int(row['ADMINISTRATIENUMMER'])
                 collaboration['address'] = {
-                    'street': row['ADRES'] if row['ADRES'] else None,
-                    'city': row['PLAATSNAAM'] if row['PLAATSNAAM'] else None,
-                    'zip_code': row['POSTCODE'].replace(' ', '') if row['POSTCODE'] else None
+                    'street': row['ADRES'] or None,
+                    'city': row['PLAATSNAAM'] or None,
+                    'zip_code': row['POSTCODE'].replace(' ', '') or None
                 }
 
                 collaboration['correspondence_address'] = {

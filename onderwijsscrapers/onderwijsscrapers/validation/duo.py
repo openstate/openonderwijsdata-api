@@ -135,14 +135,22 @@ class StudentsByStructure(SequenceSchema):
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
 #TODO:                                                                         
 #class WeightsPerSchool                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-#TODO:                                                                         
-#class EduTypes                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 #TODO:                                                                         
 #class PupilsByOrigins                                           
+
+
+class StudentsByBirthyear(MappingSchema):
+    birthyear = general_rules.year
+    students = SchemaNode(Int())
+class StudentsByBirthyear(SequenceSchema):
+    spo_students_by_birthyear = StudentsByBirthyear()
+
+
+
+
 
 
 class DuoVoBranch(MappingSchema):
@@ -236,10 +244,7 @@ class DuoPoBoard(MappingSchema):
     address = general_rules.Address()
     correspondence_address = general_rules.Address()
     board_id = general_rules.board_id
-    edu_types_reference_url = general_rules.website
-    edu_types_reference_date = SchemaNode(Date(), missing=True)
-    # TODO:
-    #edu_types = EduTypes()
+
     name = general_rules.name
     phone = general_rules.phone
     municipality = general_rules.municipality
@@ -283,8 +288,8 @@ class DuoPoSchool(MappingSchema):
 
     # TODO:
     #spo_clusters = SPOClusters()
-    spo_clusters_reference_date = SchemaNode(Date(), missing=True)
-    spo_clusters_reference_url = general_rules.website
+    spo_students_per_cluster_reference_date = SchemaNode(Date(), missing=True)
+    spo_students_per_cluster_reference_url = general_rules.website
 
 
 class DuoPoBranch(MappingSchema):
@@ -324,10 +329,12 @@ class DuoPoBranch(MappingSchema):
     rpa_area = general_rules.rpa_area
     rpa_area_code = general_rules.rpa_area_code
     website = general_rules.url
+
     # TODO:
     #weights_per_school = WeightsPerSchool()
     weights_per_school_reference_date = SchemaNode(Date(), missing=True)
     weights_per_school_reference_url = general_rules.website
+    
     wgr_area = general_rules.wgr_area
     wgr_area_code = general_rules.wgr_area_code
 
@@ -336,6 +343,12 @@ class DuoPoBranch(MappingSchema):
     po_student_year_reference_date = SchemaNode(Date(), missing=True)
     po_student_year_reference_url = general_rules.website
     
+    spo_law = SchemaNode(String(), validator=Length(min=2, max=4))
+    spo_edu_type = SchemaNode(String()) # possibly multiple with slash
+    spo_cluster = SchemaNode(Int(), validator=Range(min=0, max=4))
+    spo_students_by_birthyear_reference_url = general_rules.website
+    spo_students_by_birthyear_reference_date = SchemaNode(Date(), missing=True)
+    spo_students_by_birthyear = StudentsByBirthyear() # todo: validation
 
 class DuoPaoCollaboration(MappingSchema):
     address = general_rules.Address()
