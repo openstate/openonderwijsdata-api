@@ -405,6 +405,9 @@ class DuoVoBranchesSpider(BaseSpider):
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp',
                     self.vwo_exam_grades_per_course)
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen3.asp',
+                    self.parse_vavo_students)
         ]
 
     def parse_branches(self, response):
@@ -1171,6 +1174,49 @@ class DuoVoBranchesSpider(BaseSpider):
                     vwo_exam_grades_reference_url=csv_url,
                     vwo_exam_grades_reference_date=reference_date,
                     vwo_exam_grades_per_course=grades
+                )
+                yield school
+
+    def parse_vavo_students(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "Leerlingen per vestiging en bevoegd gezag (vavo apart)"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            school_ids = {}
+            vavo_students_per_school = {}
+
+            for row in parse_csv_file(csv_url):
+
+                brin = row['BRIN NUMMER'].strip()
+                branch_id = int(row['VESTIGINGSNUMMER'].strip()[-2:] or 0)
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                vavo_students = {
+                    'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
+                    'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
+                }
+
+                if school_id not in vavo_students_per_school:
+                    vavo_students_per_school[school_id] = []
+                vavo_students_per_school[school_id].append(vavo_students)
+
+            for school_id, per_school in vavo_students_per_school.iteritems():
+                school = DuoVoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    vavo_students_reference_url=csv_url,
+                    vavo_students_reference_date=reference_date,
+                    vavo_students=per_school
                 )
                 yield school
 

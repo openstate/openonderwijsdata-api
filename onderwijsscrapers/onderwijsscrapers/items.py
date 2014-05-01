@@ -135,6 +135,11 @@ class DuoVoBranch(SchoolItem):
     vwo_exam_grades_reference_date = Field()
     vwo_exam_grades_per_course = Field()
 
+    # Contents of "03 Leerlingen per vestiging en bestuur (vavo apart)"
+    vavo_students_reference_url = Field()
+    vavo_students_reference_date = Field()
+    vavo_students = Field()
+
 
 class DuoVoSchool(SchoolItem):
     education_structures = Field()  # `Onderwijsaanbod`

@@ -219,6 +219,11 @@ class DuoVoBranch(MappingSchema):
     wgr_area_code = general_rules.wgr_area_code
 
 
+    vavo_students_reference_url = general_rules.website
+    vavo_students_reference_date = SchemaNode(Date(), missing=True)
+    #vavo_students = # TODO
+
+
 class DuoVoBoard(MappingSchema):
     address = general_rules.Address()
     correspondence_address = general_rules.Address()
