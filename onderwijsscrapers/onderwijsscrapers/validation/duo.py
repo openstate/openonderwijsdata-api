@@ -136,17 +136,25 @@ class StudentsByStructure(SequenceSchema):
 #TODO:                                                                         
 #class WeightsPerSchool                                                        
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 #TODO:                                                                         
 #class PupilsByOrigins                                           
 
+class SPOStudentsPerCluster(MappingSchema):
+    # http://duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster
+    cluster_1 = SchemaNode(Int())
+    cluster_2 = SchemaNode(Int())
+    cluster_3 = SchemaNode(Int())
+    cluster_4 = SchemaNode(Int())
 
-class StudentsByBirthyear(MappingSchema):
+class SPOStudentsPerCluster(SequenceSchema):
+    spo_students_per_cluster = SPOStudentsPerCluster()
+
+class SPOStudentsByBirthyear(MappingSchema):
     birthyear = general_rules.year
     students = SchemaNode(Int())
-class StudentsByBirthyear(SequenceSchema):
-    spo_students_by_birthyear = StudentsByBirthyear()
+class SPOStudentsByBirthyear(SequenceSchema):
+    spo_students_by_birthyear = SPOStudentsByBirthyear()
 
 
 
@@ -286,8 +294,7 @@ class DuoPoSchool(MappingSchema):
     wgr_area = general_rules.wgr_area
     wgr_area_code = general_rules.wgr_area_code
 
-    # TODO:
-    #spo_clusters = SPOClusters()
+    spo_students_per_cluster = SPOStudentsPerCluster()
     spo_students_per_cluster_reference_date = SchemaNode(Date(), missing=True)
     spo_students_per_cluster_reference_url = general_rules.website
 
@@ -348,7 +355,7 @@ class DuoPoBranch(MappingSchema):
     spo_cluster = SchemaNode(Int(), validator=Range(min=0, max=4))
     spo_students_by_birthyear_reference_url = general_rules.website
     spo_students_by_birthyear_reference_date = SchemaNode(Date(), missing=True)
-    spo_students_by_birthyear = StudentsByBirthyear() # todo: validation
+    spo_students_by_birthyear = SPOStudentsByBirthyear()
 
 class DuoPaoCollaboration(MappingSchema):
     address = general_rules.Address()

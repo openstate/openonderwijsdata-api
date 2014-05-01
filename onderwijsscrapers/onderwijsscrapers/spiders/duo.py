@@ -1376,7 +1376,7 @@ class DuoPoSchools(BaseSpider):
             #         self.parse_po_schools),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Leerlingen/Leerlingen/po_leerlingen4.asp',
-                    self.parse_spo_clusters),
+                    self.parse_spo_students_per_cluster),
         ]
 
     def parse_po_schools(self, response):
@@ -1451,7 +1451,7 @@ class DuoPoSchools(BaseSpider):
 
                 yield school
 
-    def parse_spo_clusters(self, response):
+    def parse_spo_students_per_cluster(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "04. Leerlingen speciaal onderwijs naar cluster"
@@ -1460,24 +1460,24 @@ class DuoPoSchools(BaseSpider):
         for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
-            spo_clusters_per_school = {}
+            spo_students_per_cluster_per_school = {}
 
 
             for row in parse_csv_file(csv_url):
-                spo_clusters_per_school[row['BRIN NUMMER']] = {
+                spo_students_per_cluster_per_school[row['BRIN NUMMER']] = {
                     'cluster_1': int(row['CLUSTER 1']),
                     'cluster_2': int(row['CLUSTER 2']),
                     'cluster_3': int(row['CLUSTER 3']),
                     'cluster_4': int(row['CLUSTER 4']),
                 }
 
-            for brin, spo_clusters in spo_clusters_per_school.iteritems():
+            for brin, spo_students_per_cluster in spo_students_per_cluster_per_school.iteritems():
                 school = DuoPoSchool(
                     brin=brin,
                     reference_year=reference_year,
-                    spo_clusters_reference_url=csv_url,
-                    spo_clusters_reference_date=reference_date,
-                    spo_clusters=spo_clusters
+                    spo_students_per_cluster_reference_url=csv_url,
+                    spo_students_per_cluster_reference_date=reference_date,
+                    spo_students_per_cluster=spo_students_per_cluster
                 )
                 yield school
 
