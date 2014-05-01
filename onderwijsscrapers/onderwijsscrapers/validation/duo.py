@@ -140,6 +140,22 @@ class StudentsByStructure(SequenceSchema):
 #TODO:                                                                         
 #class PupilsByOrigins             
 
+class SPOStudentsByAdvice(MappingSchema):
+    vso = SchemaNode(Int()) # `VSO`
+    pro = SchemaNode(Int()) # `PrO`
+    vmbo_bl = SchemaNode(Int()) # `VMBO BL`
+    vmbo_bl_kl = SchemaNode(Int()) # `VMBO BL-KL`
+    vmbo_kl = SchemaNode(Int()) # `VMBO KL`
+    vmbo_kl_gt = SchemaNode(Int()) # `VMBO KL-GT`
+    vmbo_gt = SchemaNode(Int()) # `VMBO GT`
+    vmbo_gt_havo = SchemaNode(Int()) # `VMBO GT-HAVO`
+    havo = SchemaNode(Int()) # `HAVO`
+    havo_vwo = SchemaNode(Int()) # `HAVO-VWO`
+    vwo = SchemaNode(Int()) # `VWO`
+    unknown = SchemaNode(Int()) # `ONBEKEND`
+
+class SPOStudentsByAdvice(SequenceSchema):
+    spo_students_by_advice = SPOStudentsByAdvice()
 
 class SPOStudentsByEduType(MappingSchema):
     spo_indication = SchemaNode(String()) # `INDICATIE SPECIAL BASIS ONDERWIJS`
@@ -163,8 +179,6 @@ class SPOStudentsByBirthyear(MappingSchema):
     students = SchemaNode(Int())
 class SPOStudentsByBirthyear(SequenceSchema):
     spo_students_by_birthyear = SPOStudentsByBirthyear()
-
-
 
 
 
@@ -370,6 +384,10 @@ class DuoPoBranch(MappingSchema):
     spo_students_by_edu_type_reference_url = general_rules.website
     spo_students_by_edu_type_reference_date = SchemaNode(Date(), missing=True)
     spo_students_by_edu_type = SPOStudentsByEduType()
+
+    spo_students_by_advice_reference_url = general_rules.website
+    spo_students_by_advice_reference_date = SchemaNode(Date(), missing=True)
+    spo_students_by_advice = SPOStudentsByAdvice()
 
 class DuoPaoCollaboration(MappingSchema):
     address = general_rules.Address()

@@ -1508,9 +1508,12 @@ class DuoPoBranchesSpider(BaseSpider):
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
             #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen5.asp',
             #         self.parse_spo_students_by_birthyear),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen6.asp',
+            #         self.parse_spo_students_by_edu_type),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen6.asp',
-                    self.parse_po_students_by_edu_type),
+                    'databestanden/po/Leerlingen/Leerlingen/Schooladvies.asp',
+                    self.parse_spo_students_by_advice),
         ]
 
     def parse_po_branches(self, response):
@@ -2007,7 +2010,7 @@ class DuoPoBranchesSpider(BaseSpider):
 
                 yield branch
     
-    def parse_po_students_by_edu_type(self, response):
+    def parse_spo_students_by_edu_type(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "06. Leerlingen speciaal (basis)onderwijs naar onderwijssoort"
@@ -2070,6 +2073,76 @@ class DuoPoBranchesSpider(BaseSpider):
                     spo_students_by_edu_type=per_school
                 )
                 yield school
+
+    def parse_spo_students_by_advice(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "12. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar schooladvies"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            school_ids = {}
+            spo_students_by_advice_per_school = {}
+
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = (row[key] or '').strip()
+                    row[key] = value or None
+                    row[key.strip()] = value or None
+
+                # Datasets 2011 and 2012 suddenly changed these field names.
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+                if row.has_key('VESTIGINGS NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
+                if row.has_key('VESTIGINSNUMMER'): # don't ask
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
+
+                brin = row['BRIN NUMMER'].strip()
+                if row['VESTIGINGSNUMMER'].strip():
+                    branch_id = int(row['VESTIGINGSNUMMER'])
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+
+                spo_students_by_advice = {
+                    'vso' : int(row['VSO'] or 0),
+                    'pro' : int(row['PrO'] or 0),
+                    'vmbo_bl' : int(row['VMBO BL'] or 0),
+                    'vmbo_bl_kl' : int(row['VMBO BL-KL'] or 0),
+                    'vmbo_kl' : int(row['VMBO KL'] or 0),
+                    'vmbo_kl_gt' : int(row['VMBO KL-GT'] or 0),
+                    'vmbo_gt' : int(row['VMBO GT'] or 0),
+                    'vmbo_gt_havo' : int(row['VMBO GT-HAVO'] or 0),
+                    'havo' : int(row['HAVO'] or 0),
+                    'havo_vwo' : int(row['HAVO-VWO'] or 0),
+                    'vwo' : int(row['VWO'] or 0),
+                    'unknown' : int(row['ONBEKEND'] or 0),
+                    }
+
+                if school_id not in spo_students_by_advice_per_school:
+                    spo_students_by_advice_per_school[school_id] = []
+
+                spo_students_by_advice_per_school[school_id].append(spo_students_by_advice)
+
+            for school_id, per_school in spo_students_by_advice_per_school.iteritems():
+                school = DuoPoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    spo_students_by_advice_reference_url=csv_url,
+                    spo_students_by_advice_reference_date=reference_date,
+                    spo_students_by_advice=per_school
+                )
+                yield school
+
 
 class DuoPaoCollaborationsSpider(BaseSpider):
     name = 'duo_pao_collaborations'

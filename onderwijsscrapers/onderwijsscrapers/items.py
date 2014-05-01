@@ -310,6 +310,11 @@ class DuoPoBranch(SchoolItem):
     spo_students_by_edu_type_reference_date = Field()
     spo_students_by_edu_type = Field()
 
+    # Contents of "12. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar schooladvies"
+    spo_students_by_advice_reference_url = Field()
+    spo_students_by_advice_reference_date = Field()
+    spo_students_by_advice = Field()
+
 
 class DuoPaoCollaboration(Item):
     reference_year = Field()
