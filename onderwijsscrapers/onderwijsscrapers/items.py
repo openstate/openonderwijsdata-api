@@ -196,6 +196,11 @@ class DuoVoBoard(Item):
     financial_key_indicators_per_year_reference_date = Field()
     financial_key_indicators_per_year = Field()
 
+    # Contents of "04 Leerlingen per bestuur en denominatie (vavo apart)"
+    vavo_students_reference_url = Field()
+    vavo_students_reference_date = Field()
+    vavo_students = Field()
+
 
 class DuoPoBoard(Item):
     ignore_id_fields = Field()

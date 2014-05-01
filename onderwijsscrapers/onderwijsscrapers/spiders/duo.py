@@ -58,12 +58,15 @@ class DuoVoBoards(BaseSpider):
 
     def start_requests(self):
         return [
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/vo/adressen/Adressen/besturen.asp',
+            #         self.parse_boards),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/vo/Financien/Financien/Kengetallen.asp',
+            #         self.parse_financial_key_indicators),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/adressen/Adressen/besturen.asp',
-                    self.parse_boards),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/Financien/Financien/Kengetallen.asp',
-                    self.parse_financial_key_indicators)
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen4.asp',
+                    self.parse_vavo_students),
         ]
 
     def parse_boards(self, response):
@@ -191,6 +194,39 @@ class DuoVoBoards(BaseSpider):
 
                 yield board
 
+    def parse_vavo_students(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "04 Leerlingen per bestuur en denominatie (vavo apart)"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            vavo_students_per_school = {}
+
+            for row in parse_csv_file(csv_url):
+
+                board_id = int(row['BEVOEGD GEZAG NUMMER'].strip())
+
+                vavo_students = {
+                    'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
+                    'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
+                }
+
+                if board_id not in vavo_students_per_school:
+                    vavo_students_per_school[board_id] = []
+                vavo_students_per_school[board_id].append(vavo_students)
+
+            for board_id, per_school in vavo_students_per_school.iteritems():
+                school = DuoVoBranch(
+                    board_id=board_id,
+                    reference_year=reference_year,
+                    vavo_students_reference_url=csv_url,
+                    vavo_students_reference_date=reference_date,
+                    vavo_students=per_school,
+                )
+                yield school
 
 class DuoVoSchools(BaseSpider):
     name = 'duo_vo_schools'
@@ -404,10 +440,10 @@ class DuoVoBranchesSpider(BaseSpider):
                     self.havo_exam_grades_per_course),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp',
-                    self.vwo_exam_grades_per_course)
+                    self.vwo_exam_grades_per_course),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen3.asp',
-                    self.parse_vavo_students)
+                    self.parse_vavo_students),
         ]
 
     def parse_branches(self, response):

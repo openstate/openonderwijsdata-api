@@ -140,6 +140,13 @@ class StudentsByStructure(SequenceSchema):
 #TODO:                                                                         
 #class PupilsByOrigins             
 
+class VavoStudents(MappingSchema):
+     non_vavo = SchemaNode(Int()) # `AANTAL LEERLINGEN`
+     vavo = SchemaNode(Int()) # `AANTAL VO LEERLINGEN UITBESTEED AAN VAVO`
+     # (there's also a TOTAAL AANTAL LEERLINGEN sum column that we ignore)
+class VavoStudents(SequenceSchema):
+    vavo_students = VavoStudents()
+
 class SPOStudentsByAdvice(MappingSchema):
     vso = SchemaNode(Int()) # `VSO`
     pro = SchemaNode(Int()) # `PrO`
@@ -153,7 +160,6 @@ class SPOStudentsByAdvice(MappingSchema):
     havo_vwo = SchemaNode(Int()) # `HAVO-VWO`
     vwo = SchemaNode(Int()) # `VWO`
     unknown = SchemaNode(Int()) # `ONBEKEND`
-
 class SPOStudentsByAdvice(SequenceSchema):
     spo_students_by_advice = SPOStudentsByAdvice()
 
@@ -221,7 +227,7 @@ class DuoVoBranch(MappingSchema):
 
     vavo_students_reference_url = general_rules.website
     vavo_students_reference_date = SchemaNode(Date(), missing=True)
-    #vavo_students = # TODO
+    vavo_students = VavoStudents()
 
 
 class DuoVoBoard(MappingSchema):
@@ -238,6 +244,10 @@ class DuoVoBoard(MappingSchema):
         missing=True)
     reference_year = general_rules.reference_year
     website = general_rules.website
+
+    vavo_students_reference_url = general_rules.website
+    vavo_students_reference_date = SchemaNode(Date(), missing=True)
+    vavo_students = VavoStudents()
 
 
 class DuoVoSchool(MappingSchema):
