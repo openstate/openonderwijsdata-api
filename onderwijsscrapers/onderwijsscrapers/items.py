@@ -297,13 +297,19 @@ class DuoPoBranch(SchoolItem):
     students_by_year = Field()  # Dict of `year_x`
 
     # Contents of "05. Leerlingen speciaal (basis)onderwijs naar geboortejaar"
+    # are these three fields primary for this dataset?
     spo_law = Field() # `AANDUIDING WET`
     spo_edu_type = Field() # `SOORT PRIMAIR ONDERWIJS` # possibly multiple with slash
     spo_cluster = Field() # `CLUSTER`
-    # todo: validation
     spo_students_by_birthyear_reference_url = Field()
     spo_students_by_birthyear_reference_date = Field()
     spo_students_by_birthyear = Field()
+
+    # Contents of "06. Leerlingen speciaal (basis)onderwijs naar onderwijssoort"
+    spo_students_by_edu_type_reference_url = Field()
+    spo_students_by_edu_type_reference_date = Field()
+    spo_students_by_edu_type = Field()
+
 
 class DuoPaoCollaboration(Item):
     reference_year = Field()

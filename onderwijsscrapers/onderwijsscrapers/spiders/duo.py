@@ -39,6 +39,7 @@ def parse_csv_file(csv_url):
     csv_file.encoding = 'cp1252'
     csv_file = csv.DictReader(cStringIO.StringIO(csv_file.content
                   .decode('cp1252').encode('utf8')), delimiter=';')
+    # todo: is this a dict or an iterator? can we do (whitespace) preprocessing here?
     return csv_file
 
 
@@ -1504,9 +1505,12 @@ class DuoPoBranchesSpider(BaseSpider):
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
             #         'databestanden/po/Leerlingen/Leerlingen/leerjaar.asp',
             #         self.parse_po_student_year),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen5.asp',
+            #         self.parse_spo_students_by_birthyear),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen5.asp',
-                    self.parse_spo_students_by_birthyear),
+                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen6.asp',
+                    self.parse_po_students_by_edu_type),
         ]
 
     def parse_po_branches(self, response):
@@ -2002,7 +2006,70 @@ class DuoPoBranchesSpider(BaseSpider):
                 branch['spo_students_by_birthyear_reference_date'] = reference_date
 
                 yield branch
-       
+    
+    def parse_po_students_by_edu_type(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "06. Leerlingen speciaal (basis)onderwijs naar onderwijssoort"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            school_ids = {}
+            spo_students_by_edu_type_per_school = {}
+
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = (row[key] or '').strip()
+                    row[key] = value or None
+                    row[key.strip()] = value or None
+
+                # Datasets 2011 and 2012 suddenly changed these field names.
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+                if row.has_key('VESTIGINGS NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
+                if row.has_key('VESTIGINSNUMMER'): # don't ask
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
+
+                if row.has_key('INDICATIE SPECIAAL (BASIS)ONDERWIJS'): # really now
+                    row['INDICATIE SPECIAL BASIS ONDERWIJS'] = row['INDICATIE SPECIAAL (BASIS)ONDERWIJS']
+
+                brin = row['BRIN NUMMER'].strip()
+                if row['VESTIGINGSNUMMER'].strip():
+                    branch_id = int(row['VESTIGINGSNUMMER'])
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+
+                spo_students_by_edu_type = {
+                    'spo_indication' : row['INDICATIE SPECIAL BASIS ONDERWIJS'],
+                    'sbao' : int(row['SBAO'] or 0),
+                    'so' : int(row['SO'] or 0),
+                    'vso' : int(row['VSO'] or 0),
+                    }
+
+                if school_id not in spo_students_by_edu_type_per_school:
+                    spo_students_by_edu_type_per_school[school_id] = []
+
+                spo_students_by_edu_type_per_school[school_id].append(spo_students_by_edu_type)
+
+            for school_id, per_school in spo_students_by_edu_type_per_school.iteritems():
+                school = DuoPoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    spo_students_by_edu_type_reference_url=csv_url,
+                    spo_students_by_edu_type_reference_date=reference_date,
+                    spo_students_by_edu_type=per_school
+                )
+                yield school
 
 class DuoPaoCollaborationsSpider(BaseSpider):
     name = 'duo_pao_collaborations'
@@ -2029,10 +2096,6 @@ class DuoPaoCollaborationsSpider(BaseSpider):
             reference_year = reference_date.year
             reference_date = str(reference_date)
             for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace.
-                for key in row.keys():
-                    value = row[key].strip()
-                    row[key] = value or None
 
                 collaboration = DuoPaoCollaboration()
                 collaboration['collaboration_id'] = int(row['ADMINISTRATIENUMMER'])

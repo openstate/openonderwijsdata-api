@@ -138,7 +138,16 @@ class StudentsByStructure(SequenceSchema):
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 #TODO:                                                                         
-#class PupilsByOrigins                                           
+#class PupilsByOrigins             
+
+
+class SPOStudentsByEduType(MappingSchema):
+    spo_indication = SchemaNode(String()) # `INDICATIE SPECIAL BASIS ONDERWIJS`
+    sbao = SchemaNode(Int()) # `SBAO`
+    so = SchemaNode(Int()) # `SO`
+    vso = SchemaNode(Int()) # `VSO`
+class SPOStudentsByEduType(SequenceSchema):
+    spo_students_by_edu_type = SPOStudentsByEduType()
 
 class SPOStudentsPerCluster(MappingSchema):
     # http://duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster
@@ -146,7 +155,6 @@ class SPOStudentsPerCluster(MappingSchema):
     cluster_2 = SchemaNode(Int())
     cluster_3 = SchemaNode(Int())
     cluster_4 = SchemaNode(Int())
-
 class SPOStudentsPerCluster(SequenceSchema):
     spo_students_per_cluster = SPOStudentsPerCluster()
 
@@ -353,9 +361,15 @@ class DuoPoBranch(MappingSchema):
     spo_law = SchemaNode(String(), validator=Length(min=2, max=4))
     spo_edu_type = SchemaNode(String()) # possibly multiple with slash
     spo_cluster = SchemaNode(Int(), validator=Range(min=0, max=4))
+    
     spo_students_by_birthyear_reference_url = general_rules.website
     spo_students_by_birthyear_reference_date = SchemaNode(Date(), missing=True)
     spo_students_by_birthyear = SPOStudentsByBirthyear()
+
+    
+    spo_students_by_edu_type_reference_url = general_rules.website
+    spo_students_by_edu_type_reference_date = SchemaNode(Date(), missing=True)
+    spo_students_by_edu_type = SPOStudentsByEduType()
 
 class DuoPaoCollaboration(MappingSchema):
     address = general_rules.Address()
