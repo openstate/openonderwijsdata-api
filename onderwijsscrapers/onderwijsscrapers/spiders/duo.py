@@ -239,9 +239,15 @@ class DuoVoSchools(BaseSpider):
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
             #         'databestanden/vschoolverlaten/vsv_voortgezet.asp',
             #         self.parse_dropouts),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp',
+            #         self.parse_students_prognosis),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp',
-                    self.parse_students_prognosis),
+                    'databestanden/passendow/Adressen/Adressen/passend_vo_6.asp',
+                    self.parse_vo_lo_collaboration),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/passendow/Adressen/Adressen/passend_vo_8.asp',
+                    self.parse_pao_collaboration),
         ]
 
     def parse_schools(self, response):
@@ -411,6 +417,90 @@ class DuoVoSchools(BaseSpider):
                 )
 
                 yield school
+
+    def parse_vo_lo_collaboration(self, response):
+        """
+        Passend onderwijs > Adressen
+        Parse "06. Adressen instellingen per samenwerkingsverband lichte ondersteuning, voortgezet onderwijs"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            vo_lo_collaboration_per_school = {}
+
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = (row[key] or '').strip()
+                    row[key] = value or None
+                    row[key.strip()] = value or None
+
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+
+                brin = row['BRIN NUMMER']
+                cid = row['ADMINISTRATIENUMMER'].strip()
+                if '-' in cid:
+                    int_parts = map(int_or_none, cid.split('-'))
+                    if any([i == None for i in int_parts]):
+                        cid = '-'.join(map(str, int_parts))
+                collaboration = cid
+
+                if brin not in vo_lo_collaboration_per_school:
+                    vo_lo_collaboration_per_school[brin] = []
+
+                vo_lo_collaboration_per_school[brin].append(collaboration)
+
+            for brin, per_school in vo_lo_collaboration_per_school.iteritems():
+                school = DuoVoSchool(
+                    brin=brin,
+                    reference_year=reference_year,
+                    vo_lo_collaboration_reference_url=csv_url,
+                    vo_lo_collaboration_reference_date=reference_date,
+                    vo_lo_collaboration=per_school
+                )
+                yield school
+
+    def parse_pao_collaboration(self, response):
+        """
+        Passend onderwijs > Adressen
+        Parse "08. Adressen instellingen per samenwerkingsverband passend onderwijs, voortgezet onderwijs"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            pao_collaboration_per_school = {}
+
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = (row[key] or '').strip()
+                    row[key] = value or None
+                    row[key.strip()] = value or None
+
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+
+                brin = row['BRIN NUMMER']
+                collaboration = row['ADMINISTRATIENUMMER']
+
+                if brin not in pao_collaboration_per_school:
+                    pao_collaboration_per_school[brin] = []
+
+                pao_collaboration_per_school[brin].append(collaboration)
+
+            for brin, per_school in pao_collaboration_per_school.iteritems():
+                school = DuoVoSchool(
+                    brin=brin,
+                    reference_year=reference_year,
+                    pao_collaboration_reference_url=csv_url,
+                    pao_collaboration_reference_date=reference_date,
+                    pao_collaboration=per_school
+                )
+                yield school
+
 
 class DuoVoBranchesSpider(BaseSpider):
     name = 'duo_vo_branches'
@@ -1457,9 +1547,15 @@ class DuoPoSchools(BaseSpider):
             # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
             #         'databestanden/po/adressen/Adressen/hoofdvestigingen.asp',
             #         self.parse_po_schools),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen4.asp',
+            #         self.parse_spo_students_per_cluster),
+            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+            #         'databestanden/passendow/Adressen/Adressen/passend_po_2.asp',
+            #         self.parse_po_lo_collaboration),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen4.asp',
-                    self.parse_spo_students_per_cluster),
+                    'databestanden/passendow/Adressen/Adressen/passend_po_4.asp',
+                    self.parse_pao_collaboration),
         ]
 
     def parse_po_schools(self, response):
@@ -1561,6 +1657,84 @@ class DuoPoSchools(BaseSpider):
                     spo_students_per_cluster_reference_url=csv_url,
                     spo_students_per_cluster_reference_date=reference_date,
                     spo_students_per_cluster=spo_students_per_cluster
+                )
+                yield school
+
+    def parse_po_lo_collaboration(self, response):
+        """
+        Passend onderwijs > Adressen
+        Parse "02. Adressen instellingen per samenwerkingsverband lichte ondersteuning, primair onderwijs"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            po_lo_collaboration_per_school = {}
+
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = (row[key] or '').strip()
+                    row[key] = value or None
+                    row[key.strip()] = value or None
+
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+
+                brin = row['BRIN NUMMER']
+                collaboration = row['ADMINISTRATIENUMMER']
+
+                if brin not in po_lo_collaboration_per_school:
+                    po_lo_collaboration_per_school[brin] = []
+
+                po_lo_collaboration_per_school[brin].append(collaboration)
+
+            for brin, per_school in po_lo_collaboration_per_school.iteritems():
+                school = DuoPoSchool(
+                    brin=brin,
+                    reference_year=reference_year,
+                    po_lo_collaboration_reference_url=csv_url,
+                    po_lo_collaboration_reference_date=reference_date,
+                    po_lo_collaboration=per_school
+                )
+                yield school
+
+    def parse_pao_collaboration(self, response):
+        """
+        Passend onderwijs > Adressen
+        Parse "04. Adressen instellingen per samenwerkingsverband passend onderwijs, primair onderwijs"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            pao_collaboration_per_school = {}
+
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = (row[key] or '').strip()
+                    row[key] = value or None
+                    row[key.strip()] = value or None
+
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
+
+                brin = row['BRIN NUMMER']
+                collaboration = row['ADMINISTRATIENUMMER']
+
+                if brin not in pao_collaboration_per_school:
+                    pao_collaboration_per_school[brin] = []
+
+                pao_collaboration_per_school[brin].append(collaboration)
+
+            for brin, per_school in pao_collaboration_per_school.iteritems():
+                school = DuoPoSchool(
+                    brin=brin,
+                    reference_year=reference_year,
+                    pao_collaboration_reference_url=csv_url,
+                    pao_collaboration_reference_date=reference_date,
+                    pao_collaboration=per_school
                 )
                 yield school
 
@@ -2195,6 +2369,7 @@ class DuoPoBranchesSpider(BaseSpider):
 
 
                 spo_students_by_advice = {
+                    # TODO intOrNone
                     'vso' : int(row['VSO'] or 0),
                     'pro' : int(row['PrO'] or 0),
                     'vmbo_bl' : int(row['VMBO BL'] or 0),
@@ -2233,15 +2408,26 @@ class DuoPaoCollaborationsSpider(BaseSpider):
         return [
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/passendow/Adressen/Adressen/passend_po_1.asp',
-                    self.parse_pao_collaborations)
+                    self.parse_collaborations),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/passendow/Adressen/Adressen/passend_po_3.asp',
+                    self.parse_collaborations),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/passendow/Adressen/Adressen/passend_vo_1.asp',
+                    self.parse_collaborations),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/passendow/Adressen/Adressen/passend_vo_7.asp',
+                    self.parse_collaborations),
         ]
 
-    def parse_pao_collaborations(self, response):
+    def parse_collaborations(self, response):
         """
         Passend onderwijs > Adressen
         Parse: "01. Adressen samenwerkingsverbanden lichte ondersteuning primair onderwijs"
+        Parse: "03. Adressen samenwerkingsverbanden passend onderwijs, primair onderwijs"
+        Parse: "05. Adressen samenwerkingsverbanden lichte ondersteuning, voortgezet onderwijs"
+        Parse: "07. Adressen samenwerkingsverbanden passend onderwijs, voortgezet onderwijs"
         """
-
         # Fields that do not need additonal processing
         collaboration_fields = {
             'SAMENWERKINGSVERBAND': 'collaboration'
@@ -2253,17 +2439,24 @@ class DuoPaoCollaborationsSpider(BaseSpider):
             for row in parse_csv_file(csv_url):
 
                 collaboration = DuoPaoCollaboration()
-                collaboration['collaboration_id'] = int(row['ADMINISTRATIENUMMER'])
+                
+                cid = row['ADMINISTRATIENUMMER'].strip()
+                if '-' in cid:
+                    int_parts = map(int_or_none, cid.split('-'))
+                    if any([i == None for i in int_parts]):
+                        cid = '-'.join(map(str, int_parts))
+                collaboration['collaboration_id'] = cid
+
                 collaboration['address'] = {
-                    'street': row['ADRES'] or None,
-                    'city': row['PLAATSNAAM'] or None,
+                    'street': row['ADRES'].strip() or None,
+                    'city': row['PLAATSNAAM'].strip() or None,
                     'zip_code': row['POSTCODE'].replace(' ', '') or None
                 }
 
                 collaboration['correspondence_address'] = {
                     'street': row['CORRESPONDENTIEADRES'],
                     'city': row['PLAATS CORRESPONDENTIEADRES'],
-                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
+                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
                 }
 
                 for field, field_norm in collaboration_fields.iteritems():
@@ -2273,4 +2466,3 @@ class DuoPaoCollaborationsSpider(BaseSpider):
                 collaboration['ignore_id_fields'] = ['reference_year']
 
                 yield collaboration
-

@@ -174,6 +174,18 @@ class DuoVoSchool(SchoolItem):
     students_prognosis_reference_date = Field()
     students_prognosis = Field() # dict of prognosis[structure][year]
 
+    # Contents of Passend onderwijs > Adressen "06. Adressen instellingen 
+    # per samenwerkingsverband lichte ondersteuning, voortgezet onderwijs"  
+    vo_lo_collaboration_reference_url = Field()
+    vo_lo_collaboration_reference_date = Field()
+    vo_lo_collaboration = Field()
+
+    # Contents of Passend onderwijs > Adressen "08. Adressen instellingen
+    # per samenwerkingsverband passend onderwijs, voortgezet onderwijs"
+    pao_collaboration_reference_url = Field()
+    pao_collaboration_reference_date = Field()
+    pao_collaboration = Field()
+
 
 class DuoVoBoard(Item):
     ignore_id_fields = Field()
@@ -253,6 +265,18 @@ class DuoPoSchool(SchoolItem):
     spo_students_per_cluster_reference_url = Field()
     spo_students_per_cluster_reference_date = Field()
     spo_students_per_cluster = Field()
+
+    # Contents of Passend onderwijs > Adressen "02. Adressen instellingen 
+    # per samenwerkingsverband lichte ondersteuning, primair onderwijs"  
+    po_lo_collaboration_reference_url = Field()
+    po_lo_collaboration_reference_date = Field()
+    po_lo_collaboration = Field()
+
+    # Contents of Passend onderwijs > Adressen "04. Adressen instellingen 
+    # per samenwerkingsverband passend onderwijs, primair onderwijs"
+    pao_collaboration_reference_url = Field()
+    pao_collaboration_reference_date = Field()
+    pao_collaboration = Field()
 
 
 class DuoPoBranch(SchoolItem):

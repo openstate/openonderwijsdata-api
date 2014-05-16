@@ -284,6 +284,14 @@ class DuoVoSchool(MappingSchema):
     students_prognosis_reference_date = SchemaNode(Date(), missing=True)
     students_prognosis_url = general_rules.website
 
+    vo_lo_collaboration_reference_url = general_rules.website
+    vo_lo_collaboration_reference_date = SchemaNode(Date(), missing=True)
+    vo_lo_collaboration = general_rules.collaboration_id
+
+    pao_collaboration_reference_url = general_rules.website
+    pao_collaboration_reference_date = SchemaNode(Date(), missing=True)
+    pao_collaboration = general_rules.collaboration_id
+
 
 class DuoPoBoard(MappingSchema):
     address = general_rules.Address()
@@ -334,6 +342,14 @@ class DuoPoSchool(MappingSchema):
     spo_students_per_cluster = SPOStudentsPerCluster()
     spo_students_per_cluster_reference_date = SchemaNode(Date(), missing=True)
     spo_students_per_cluster_reference_url = general_rules.website
+
+    po_lo_collaboration_reference_url = general_rules.website
+    po_lo_collaboration_reference_date = SchemaNode(Date(), missing=True)
+    po_lo_collaboration = general_rules.collaboration_id
+
+    pao_collaboration_reference_url = general_rules.website
+    pao_collaboration_reference_date = SchemaNode(Date(), missing=True)
+    pao_collaboration = general_rules.collaboration_id
 
 
 class DuoPoBranch(MappingSchema):
