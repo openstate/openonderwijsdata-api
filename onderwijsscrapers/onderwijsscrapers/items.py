@@ -140,6 +140,11 @@ class DuoVoBranch(SchoolItem):
     vavo_students_reference_date = Field()
     vavo_students = Field()
 
+    # Contents of "05. Leerlingen per samenwerkingsverband en onderwijstype"
+    students_by_finegrained_structure_reference_url = Field()
+    students_by_finegrained_structure_reference_date = Field()
+    students_by_finegrained_structure = Field()
+
 
 class DuoVoSchool(SchoolItem):
     education_structures = Field()  # `Onderwijsaanbod`

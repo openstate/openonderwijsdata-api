@@ -534,6 +534,9 @@ class DuoVoBranchesSpider(BaseSpider):
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen3.asp',
                     self.parse_vavo_students),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen5.asp',
+                    self.parse_students_by_finegrained_structure),
         ]
 
     def parse_branches(self, response):
@@ -1305,7 +1308,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
     def parse_vavo_students(self, response):
         """
-        Primair onderwijs > Leerlingen
+        Voortgezet onderwijs > Leerlingen
         Parse "Leerlingen per vestiging en bevoegd gezag (vavo apart)"
         """
 
@@ -1346,6 +1349,65 @@ class DuoVoBranchesSpider(BaseSpider):
                 )
                 yield school
 
+    def parse_students_by_finegrained_structure(self, response):
+        """
+        Voortgezet onderwijs > Leerlingen
+        Parse "05. Leerlingen per samenwerkingsverband en onderwijstype"
+        """
+
+        for csv_url, reference_date in find_available_csvs(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            school_ids = {}
+            counts_per_school = {}
+
+            for row in parse_csv_file(csv_url):
+
+                brin = row['BRIN NUMMER'].strip()
+                branch_id = int(row['VESTIGINGSNUMMER'].strip()[-2:] or 0)
+                school_id = '%s-%s' % (brin, branch_id)
+
+                school_ids[school_id] = {
+                    'brin': brin,
+                    'branch_id': branch_id
+                }
+
+                if school_id not in counts_per_school:
+                    counts_per_school[school_id] = []
+
+                # Don't make special fiends, just use all of 'em
+                fields = [
+                    'Brugjaar 1-2',
+                    'Engelse Stroom',
+                    'HAVO lj 4-5',
+                    'HAVO uitbest. aan VAVO',
+                    'HAVO/VWO lj 3',
+                    'Int. Baccelaureaat',
+                    'Praktijkonderwijs alle vj',
+                    'VMBO BL lj 3-4',
+                    'VMBO GL lj 3-4',
+                    'VMBO KL lj 3-4',
+                    'VMBO TL lj 3-4',
+                    'VMBO uitbest. aan VAVO',
+                    'VMBO-MBO2 lj 3-6',
+                    'VWO lj 4-6',
+                    'VWO uitbest. aan VAVO',
+                ]
+                for field, count in row.items():
+                    if field.strip() in fields and count:
+                        counts = {'type': field.strip(), 'count': int(count)}
+                        counts_per_school[school_id].append(counts)
+
+            for school_id, per_school in counts_per_school.iteritems():
+                school = DuoVoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    students_by_finegrained_structure_reference_url=csv_url,
+                    students_by_finegrained_structure_reference_date=reference_date,
+                    students_by_finegrained_structure=per_school
+                )
+                yield school
 
 class DuoPoBoards(BaseSpider):
     name = 'duo_po_boards'

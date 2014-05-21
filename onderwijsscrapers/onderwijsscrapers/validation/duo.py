@@ -138,7 +138,14 @@ class StudentsByStructure(SequenceSchema):
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 #TODO:                                                                         
-#class PupilsByOrigins             
+#class PupilsByOrigins            
+
+
+class FineGrainedStructureStudents(MappingSchema): # TODO consider: colander.TupleSchema
+    type = SchemaNode(String()) # Actually a certain set of values
+    count = SchemaNode(Int())
+class FineGrainedStructureStudents(SequenceSchema):
+    students_by_finegrained_structure = FineGrainedStructureStudents()
 
 class VavoStudents(MappingSchema):
      non_vavo = SchemaNode(Int()) # `AANTAL LEERLINGEN`
@@ -228,6 +235,11 @@ class DuoVoBranch(MappingSchema):
     vavo_students_reference_url = general_rules.website
     vavo_students_reference_date = SchemaNode(Date(), missing=True)
     vavo_students = VavoStudents()
+
+    students_by_finegrained_structure_reference_url = general_rules.website
+    students_by_finegrained_structure_reference_date = SchemaNode(Date(), missing=True)
+    students_by_finegrained_structure = FineGrainedStructureStudents()
+
 
 
 class DuoVoBoard(MappingSchema):
