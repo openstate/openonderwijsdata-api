@@ -33,6 +33,20 @@ def find_available_csvs(response):
         available_csvs['http://duo.nl%s' % csv_url] = ref_date
     return available_csvs
 
+def find_available_csvs(response):
+    """ Get all URLS of ZIP files on the DUO page """
+    hxs = HtmlXPathSelector(response)
+    available_csvs = {}
+    csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
+    for csv_file in csvs:
+        ref_date = csv_file.select('./td[1]/span/text()').extract()
+        ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+        csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+
+        available_csvs['http://duo.nl%s' % csv_url] = ref_date
+    return available_csvs
+
 def parse_csv_file(csv_url):
     """ Download and parse CSV file """
     csv_file = requests.get(csv_url)
@@ -41,7 +55,6 @@ def parse_csv_file(csv_url):
                   .decode('cp1252').encode('utf8')), delimiter=';')
     # todo: is this a dict or an iterator? can we do (whitespace) preprocessing here?
     return csv_file
-
 
 def int_or_none(value):
     """
@@ -58,12 +71,12 @@ class DuoVoBoards(BaseSpider):
 
     def start_requests(self):
         return [
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vo/adressen/Adressen/besturen.asp',
-            #         self.parse_boards),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vo/Financien/Financien/Kengetallen.asp',
-            #         self.parse_financial_key_indicators),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/adressen/Adressen/besturen.asp',
+                    self.parse_boards),
+            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
+                    'databestanden/vo/Financien/Financien/Kengetallen.asp',
+                    self.parse_financial_key_indicators),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen4.asp',
                     self.parse_vavo_students),
