@@ -100,6 +100,9 @@ vo_school
     rmc_region_code                     integer                                                                 Identifier of the rmc_region.
     rpa_area                            string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
     rpa_area_code                       integer                                                                 Identifier of the rpa_area.
+    students_prognosis                  array of :ref:`students_prognosis`                                      Prognosis of the number of students, per year
+    students_prognosis_reference_date   date                                Peildatum                           Date the source file was published at http://data.duo.nl
+    students_prognosis_url              string                                                                  URL of the source file.
     website                             string                                                                  Website of this school.
     wgr_area                            string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
     wgr_area_code                       integer                                                                 Identifier of the wgr_area.
@@ -202,35 +205,38 @@ po_school
 **Source:** `Primair onderwijs - Adressen - 01. Hoofdvestigingen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/hoofdvestigingen.asp>`_
 
 .. table::
-    =================================== =================================== =================================== ==========================================================================
-    Field                               Type                                Original term                       Description
-    =================================== =================================== =================================== ==========================================================================
-    address                             :ref:`duoaddress`                                                       Address of this school.
-    board_id                            integer                             Bevoegd gezag nummer                Identifier (assigned by :ref:`duodata`) of the board of this school.
-    brin                                string                                                                  "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
-    corop_area                          string                              COROP-gebied                        A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
-    corop_area_code                     integer                                                                 Identifier of the corop_area.
-    correspondence_address              :ref:`duoaddress`                                                       Correspondence address of this school.
-    denomination                        string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
-    education_area                      string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
-    education_area_code                 integer                                                                 Identifier of the education_area.
-    meta                                :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
-    municipality                        string                                                                  The name of the municipality this branch is located in.
-    municipality_code                   integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
-    name                                string                                                                  Name of the school.
-    nodal_area                          string                              Nodaal gebied                       Area defined for the planning of distribution of secondary schools. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
-    nodal_area_code                     integer                                                                 Identifier of the nodal_area.
-    phone                               string                                                                  Phone number of the school.
-    province                            string                                                                  The province [#provinces]_ this branch is situated in.
-    reference_year                      integer                             Peiljaar                            Year the schools source file was published.
-    rmc_region                          string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
-    rmc_region_code                     integer                                                                 Identifier of the rmc_region.
-    rpa_area                            string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
-    rpa_area_code                       integer                                                                 Identifier of the rpa_area.
-    website                             string                                                                  Website of this school.
-    wgr_area                            string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
-    wgr_area_code                       integer                                                                 Identifier of the wgr_area.
-    =================================== =================================== =================================== ==========================================================================
+    =========================================== =================================== =================================== ==========================================================================
+    Field                                       Type                                Original term                       Description
+    =========================================== =================================== =================================== ==========================================================================
+    address                                     :ref:`duoaddress`                                                       Address of this school.
+    board_id                                    integer                             Bevoegd gezag nummer                Identifier (assigned by :ref:`duodata`) of the board of this school.
+    brin                                        string                                                                  "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
+    corop_area                                  string                              COROP-gebied                        A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+    corop_area_code                             integer                                                                 Identifier of the corop_area.
+    correspondence_address                      :ref:`duoaddress`                                                       Correspondence address of this school.
+    denomination                                string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
+    education_area                              string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+    education_area_code                         integer                                                                 Identifier of the education_area.
+    meta                                        :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
+    municipality                                string                                                                  The name of the municipality this branch is located in.
+    municipality_code                           integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
+    name                                        string                                                                  Name of the school.
+    nodal_area                                  string                              Nodaal gebied                       Area defined for the planning of distribution of secondary schools. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+    nodal_area_code                             integer                                                                 Identifier of the nodal_area.
+    phone                                       string                                                                  Phone number of the school.
+    province                                    string                                                                  The province [#provinces]_ this branch is situated in.
+    reference_year                              integer                             Peiljaar                            Year the schools source file was published.
+    rmc_region                                  string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+    rmc_region_code                             integer                                                                 Identifier of the rmc_region.
+    rpa_area                                    string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+    rpa_area_code                               integer                                                                 Identifier of the rpa_area.
+    spo_students_per_cluster                    dict of :ref:`spo_per_cluster`                                          Number of pupils in special education, per special education cluster.
+    spo_students_per_cluster_reference_date     date                                                                    Date the source file was published at http://data.duo.nl
+    spo_students_per_cluster_reference_url      string                                                                  URL of the source file.
+    website                                     string                                                                  Website of this school.
+    wgr_area                                    string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
+    wgr_area_code                               integer                                                                 Identifier of the wgr_area.
+    =========================================== =================================== =================================== ==========================================================================
 
 .. _duopobranch:
 
@@ -278,6 +284,18 @@ po_branch
     student_weights_per_branch                          array of :ref:`studentweights`                                          The number of children per student weight (0.0, 0.3 or 1.2), school weight and impulse area data for each branch.
     student_weights_per_branch_reference_date           date                                                                    Date the source file was published at http://data.duo.nl
     student_weights_per_branch_reference_url            string                                                                  URL of the source file.
+    students_by_year                                    array of :ref:`students_by_year`                                        Number of students by year
+    students_by_year_reference_date                     date                                                                    Date the source file was published at http://data.duo.nl
+    students_by_year_reference_url                      string                                                                  URL of the source file.
+    spo_students_by_birthyear                           array of :ref:`spo_by_birthyear`                                        Number of students per birth year
+    spo_students_by_birthyear_reference_date            date                                                                    Date the source file was published at http://data.duo.nl
+    spo_students_by_birthyear_reference_url             string                                                                  URL of the source file.
+    spo_students_by_edu_type                            array of :ref:`spo_by_edu_type`                                         Number of students per special education type
+    spo_students_by_edu_type_reference_date             date                                                                    Date the source file was published at http://data.duo.nl
+    spo_students_by_edu_type_reference_url              string                                                                  URL of the source file.
+    students_by_advice                                  array of :ref:`students_by_advice`                                      Number of students by secondary education level recommendation made upon leaving primary school
+    students_by_advice_reference_date                   date                                                                    Date the source file was published at http://data.duo.nl
+    students_by_advice_reference_url                    string                                                                  URL of the source file.
     wgr_area                                            string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
     wgr_area_code                                       integer                                                                 Identifier of the wgr_area.
     =================================================== =================================== =================================== ======================================================================
@@ -577,6 +595,82 @@ Meta
     validation_result                   string                              Indication whether the item passed validation.
     =================================== =================================== ======================================================================================================
 
+.. _students_by_advice:
+
+StudentsByAdvice
+^^^^^^^^^^^^^^^^
+
+The level of education [#edu_in_holland]_ that the primary school recommended the student upon leaving primary education
+**Source:** `Primair onderwijs - Leerlingen - 12. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar schooladvies <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/Schooladvies.asp>`_
+
+.. table::
+    =================================== =================================== =================================== ======================================================================================================
+    Field                               Type                                Original term                       Description
+    =================================== =================================== =================================== ======================================================================================================
+    vso                                 integer                             VSO                                 Number of students with VSO advice
+    pro                                 integer                             PrO                                 Number of students with PrO advice
+    vmbo_bl                             integer                             VMBO BL                             Number of students with VMBO BL advice
+    vmbo_bl_kl                          integer                             VMBO BL-KL                          Number of students with VMBO BL-KL advice
+    vmbo_kl                             integer                             VMBO KL                             Number of students with VMBO KL advice
+    vmbo_kl_gt                          integer                             VMBO KL-GT                          Number of students with VMBO KL-GT advice
+    vmbo_gt                             integer                             VMBO GT                             Number of students with VMBO GT advice
+    vmbo_gt_havo                        integer                             VMBO GT-HAVO                        Number of students with VMBO GT-HAVO advice
+    havo                                integer                             HAVO                                Number of students with HAVO advice
+    havo_vwo                            integer                             HAVO-VWO                            Number of students with HAVO-VWO advice
+    vwo                                 integer                             VWO                                 Number of students with VWO advice
+    unknown                             integer                             ONBEKEND                            Number of students with unknown advice
+
+.. _spo_by_birthyear:
+
+SPOStudentsByBirthyear
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. spo_law 
+.. spo_edu_type
+.. spo_cluster
+
+**Source:** `Primair onderwijs - Leerlingen - 05. Leerlingen speciaal (basis)onderwijs naar geboortejaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen5.asp>`_
+
+.. table::
+    =================================== =================================== =================================== ======================================================================================================
+    Field                               Type                                Original term                       Description
+    =================================== =================================== =================================== ======================================================================================================
+    birthyear                           integer                                                                 Year of birth
+    students                            integer                                                                 Number of students born in this year
+
+.. _spo_by_edu_type:
+
+SPOStudentsByEduType
+^^^^^^^^^^^^^^^^^^^^
+
+**Source:** `Primair onderwijs - Leerlingen - 06. Leerlingen speciaal (basis)onderwijs naar onderwijssoort <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen6.asp>`_
+
+.. table::
+    =================================== =================================== ======================================================================================================================================================= ======================================================================================================
+    Field                               Type                                Original term                                                                                                                                           Description
+    =================================== =================================== ======================================================================================================================================================= ======================================================================================================
+    spo_indication                      string                              `Indicatie Special Basis Onderwijs<http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Indicatie%20speciaal%20onderwijs>`_  Indication of type of special education
+    so                                  integer                             SO                                                                                                                                                      Special education.
+    spo                                 integer                             SBAO                                                                                                                                                    Special primary education.
+    vso                                 integer                             SVO                                                                                                                                                     Special secondary education.
+
+.. _spo_per_cluster:
+
+SPOStudentsPerCluster
+^^^^^^^^^^^^^^^^^^^^
+
+**Source:** `Primair onderwijs - Leerlingen - 04. Leerlingen speciaal onderwijs naar cluster <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen4.asp>`_
+
+.. table::
+    ========================= ======== ===================================================================================================== ======================================================================================================
+    Field                     Type     Original term                                                                                         Description
+    ========================= ======== ===================================================================================================== ======================================================================================================
+    cluster_1                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for visually handicapped students
+    cluster_2                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for auditory / communicatively disabled students: deaf, hard of hearing, severe speech difficulties.
+    cluster_3                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for pupils with physical and / or intellectual disabilities: very difficult learning, protracted illness with physical disabilities.
+    cluster_4                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for pupils with psychiatric disorders and severe learning and / or behavioral problems, chronically ill students without disabilities and students associated with university-associated institutes that provide assistance to children with complex learning, behavioral or emotional problems (*Pedologisch Instituut*).
+
+
 .. _dustrespo:
 
 StudentResidences
@@ -603,8 +697,23 @@ StudentResidence
     Field     Type                       Original term      Description
     ========= ========================== ================== ==========================================================================
     age       integer                                       Age group
-    students  integer                                       Amount of students
+    students  integer                                       Number of students
     ========= ========================== ================== ==========================================================================
+
+.. _students_prognosis:
+
+StudentPrognosis
+^^^^^^^^^^^^^^^^
+
+**Source:** `Primair onderwijs - Leerlingen - 11. Prognose aantal leerlingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp>`_
+
+.. table::
+    ================ ========================== ==========================================================================
+    Field            Type                       Description
+    ================ ========================== ==========================================================================
+    year             integer                    Prognosis is for this year
+    structure        string                     Level of education [#edu_in_holland]_.
+    students         integer                    Number of students
 
 .. _students_by_origin:
 
@@ -619,7 +728,7 @@ Number of students born in countries other than The Netherlands, by country.
     Field                               Type              Description
     =================================== ================= ===================================
     country                             string            Country students originated from
-    students                            integer           The amount of students originating form this country at this school
+    students                            integer           The number of students originating form this country at this school
     =================================== ================= ===================================
 
 .. _duostdres:
@@ -635,12 +744,12 @@ StudentResidence
     city                                string                                                                  The name of the city, town or village the students originate from.
     municipality                        string                                                                  The name of the municipality this branch is located in.
     municipality_code                   integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
-    year_1                              integer                                                                 The amount of students from this location in year 1.
-    year_2                              integer                                                                 The amount of students from this location in year 2.
-    year_3                              integer                                                                 The amount of students from this location in year 3.
-    year_4                              integer                                                                 The amount of students from this location in year 4.
-    year_5                              integer                                                                 The amount of students from this location in year 5.
-    year_6                              integer                                                                 The amount of students from this location in year 6.
+    year_1                              integer                                                                 The number of students from this location in year 1.
+    year_2                              integer                                                                 The number of students from this location in year 2.
+    year_3                              integer                                                                 The number of students from this location in year 3.
+    year_4                              integer                                                                 The number of students from this location in year 4.
+    year_5                              integer                                                                 The number of students from this location in year 5.
+    year_6                              integer                                                                 The number of students from this location in year 6.
     zip_code                            string                                                                  Zip code (area) of the location the students originate from. Note that this value does not have to be a complete zipcode [#zipcodes]_, but can be somewhat anonimised (in order to preserve privacy of students) by being shortened to two digits. Also, students do not necessarily have a permanent residence.
     =================================== =================================== =================================== ==========================================================================
 
@@ -668,11 +777,25 @@ StudentPerStructure
     year_6                              mapping                Distribution of male and female students for year 6.
     =================================== ====================== ==========================================================================
 
+.. _students_by_year:
+
+StudentsByYear
+^^^^^^^^^^^^^^
+
+**Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/leerjaar.asp>`_
+
+.. table::
+    =================================== ====================== ==========================================================================
+    Field                               Type                   Description
+    =================================== ====================== ==========================================================================
+    year_*n*                            integer                Number of students for year *n* (including special education) .
+
+
 .. _studentweights:
 
 StudentWeights
 ^^^^^^^^^^^^^^
-**Source:** `Primair onderwijs - Leerlingen - 01. Leerlingen basisonderwijs naar leerlinggewicht en per vestiging het schoolgewicht en impulsgebied <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp>`_
+**Source:** `Primair onderwijs - Leerlingen - 01. Leerlingen basisonderwijs naar leerlinggewicht en per vestiging het schoolgewicht en impulsgebied <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp>`_`_
 
 .. table::
     =================================== =================================== =================================== ==========================================================================
