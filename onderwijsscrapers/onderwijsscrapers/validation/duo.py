@@ -154,7 +154,8 @@ class VavoStudents(MappingSchema):
 class VavoStudents(SequenceSchema):
     vavo_students = VavoStudents()
 
-class SPOStudentsByAdvice(MappingSchema):
+class StudentsByAdvice(MappingSchema):
+    # TODO: 
     vso = SchemaNode(Int()) # `VSO`
     pro = SchemaNode(Int()) # `PrO`
     vmbo_bl = SchemaNode(Int()) # `VMBO BL`
@@ -167,8 +168,8 @@ class SPOStudentsByAdvice(MappingSchema):
     havo_vwo = SchemaNode(Int()) # `HAVO-VWO`
     vwo = SchemaNode(Int()) # `VWO`
     unknown = SchemaNode(Int()) # `ONBEKEND`
-class SPOStudentsByAdvice(SequenceSchema):
-    spo_students_by_advice = SPOStudentsByAdvice()
+class StudentsByAdvice(SequenceSchema):
+    students_by_advice = StudentsByAdvice()
 
 class SPOStudentsByEduType(MappingSchema):
     spo_indication = SchemaNode(String()) # `INDICATIE SPECIAL BASIS ONDERWIJS`
@@ -428,9 +429,9 @@ class DuoPoBranch(MappingSchema):
     spo_students_by_edu_type_reference_date = SchemaNode(Date(), missing=True)
     spo_students_by_edu_type = SPOStudentsByEduType()
 
-    spo_students_by_advice_reference_url = general_rules.website
-    spo_students_by_advice_reference_date = SchemaNode(Date(), missing=True)
-    spo_students_by_advice = SPOStudentsByAdvice()
+    students_by_advice_reference_url = general_rules.website
+    students_by_advice_reference_date = SchemaNode(Date(), missing=True)
+    students_by_advice = StudentsByAdvice()
 
 class DuoPaoCollaboration(MappingSchema):
     address = general_rules.Address()

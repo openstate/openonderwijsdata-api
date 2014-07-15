@@ -1831,7 +1831,7 @@ class DuoPoBranchesSpider(BaseSpider):
             #         self.parse_spo_students_by_edu_type),
             Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
                     'databestanden/po/Leerlingen/Leerlingen/Schooladvies.asp',
-                    self.parse_spo_students_by_advice),
+                    self.parse_po_students_by_advice),
         ]
 
     def parse_po_branches(self, response):
@@ -2306,6 +2306,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 branch['branch_id'] = 0 if not row['VESTIGINGSNUMMER'] else int(row['VESTIGINGSNUMMER'])
                 branch['reference_year']=reference_year
 
+                # Should this be in root, or spo_students_by_birthyear?
                 branch['spo_law'] = row['AANDUIDING WET']
                 branch['spo_edu_type'] = row['SOORT PRIMAIR ONDERWIJS'] # possibly multiple with slash
                 branch['spo_cluster'] = row['CLUSTER'] # i hope they don't use slashes                
@@ -2371,7 +2372,7 @@ class DuoPoBranchesSpider(BaseSpider):
 
                 spo_students_by_edu_type = {
                     'spo_indication' : row['INDICATIE SPECIAL BASIS ONDERWIJS'],
-                    'sbao' : int(row['SBAO'] or 0),
+                    'spo' : int(row['SBAO'] or 0),
                     'so' : int(row['SO'] or 0),
                     'vso' : int(row['VSO'] or 0),
                     }
@@ -2392,17 +2393,19 @@ class DuoPoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_spo_students_by_advice(self, response):
+    def parse_po_students_by_advice(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "12. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar schooladvies"
+
+        TODO: compare to owinsp PRIMARY_SCHOOL_ADVICES_STRUCTURES
         """
 
         for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
-            spo_students_by_advice_per_school = {}
+            students_by_advice_per_school = {}
 
             for row in parse_csv_file(csv_url):
                 # strip leading and trailing whitespace.
@@ -2430,7 +2433,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 }
 
 
-                spo_students_by_advice = {
+                students_by_advice = {
                     # TODO intOrNone
                     'vso' : int(row['VSO'] or 0),
                     'pro' : int(row['PrO'] or 0),
@@ -2446,19 +2449,19 @@ class DuoPoBranchesSpider(BaseSpider):
                     'unknown' : int(row['ONBEKEND'] or 0),
                     }
 
-                if school_id not in spo_students_by_advice_per_school:
-                    spo_students_by_advice_per_school[school_id] = []
+                if school_id not in students_by_advice_per_school:
+                    students_by_advice_per_school[school_id] = []
 
-                spo_students_by_advice_per_school[school_id].append(spo_students_by_advice)
+                students_by_advice_per_school[school_id].append(students_by_advice)
 
-            for school_id, per_school in spo_students_by_advice_per_school.iteritems():
+            for school_id, per_school in students_by_advice_per_school.iteritems():
                 school = DuoPoBranch(
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
-                    spo_students_by_advice_reference_url=csv_url,
-                    spo_students_by_advice_reference_date=reference_date,
-                    spo_students_by_advice=per_school
+                    students_by_advice_reference_url=csv_url,
+                    students_by_advice_reference_date=reference_date,
+                    students_by_advice=per_school
                 )
                 yield school
 
