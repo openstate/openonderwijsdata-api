@@ -412,9 +412,9 @@ class DuoPoBranch(MappingSchema):
     wgr_area_code = general_rules.wgr_area_code
 
     # TODO:
-    #po_student_year = StudentsPerStructurePerYear()
-    po_student_year_reference_date = SchemaNode(Date(), missing=True)
-    po_student_year_reference_url = general_rules.website
+    #student_year = StudentsByYear()
+    student_year_reference_date = SchemaNode(Date(), missing=True)
+    student_year_reference_url = general_rules.website
     
     spo_law = SchemaNode(String(), validator=Length(min=2, max=4))
     spo_edu_type = SchemaNode(String()) # possibly multiple with slash
