@@ -305,6 +305,7 @@ po_branch
 paocollaboration
 ^^^^^^^^^^^^^^^^
 **Source:** `Passend onderwijs - Adressen - 01. Adressen samenwerkingsverbanden lichte ondersteuning primair onderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/passendow/Adressen/Adressen/passend_po_1.asp>`
+
 .. table::
     ================================================ =================================== =================================== =============================================================
     Field                                            Type                                Original term                       Description
