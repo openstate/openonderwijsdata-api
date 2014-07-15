@@ -15,6 +15,14 @@ The data sources present their data aggregated on different *granularities*: fin
 
 A similar categorisation for schools at the primary level is available.
 
+Additionally, there's data available for the *appropriate education* collaborations (*passend onderwijs*):
+
+**pao_collaboration** (in Dutch: *samenwerkingsverband passend onderwijs*)
+    With appropriate education schools can provide education more tailored to students who need extra support. In 2014, responsibility for part of what used to be special education moved to the collaborations for appropriate education.
+    
+**po_lo_collaboration** (in Dutch: *samenwerkingsverband lichte ondersteuning, primair onderwijs*)
+    Before 2014, schools were part of collaborations for *light support*.
+
 Note that many fields in the :ref:`duodata` dataset overlap, as these data is available on all levels.
 
 For some fields the original Dutch term is included, in order to allow the API user to look up the definition of that term at the source collection.
@@ -279,6 +287,22 @@ po_branch
     wgr_area                                            string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
     wgr_area_code                                       integer                                                                 Identifier of the wgr_area.
     =================================================== =================================== =================================== ======================================================================
+
+.. _duopaocollaboration:
+
+paocollaboration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Source:** `Passend onderwijs - Adressen - 01. Adressen samenwerkingsverbanden lichte ondersteuning primair onderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/passendow/Adressen/Adressen/passend_po_1.asp>`
+.. table::
+
+    ================================================ =================================== =================================== =============================================================
+    Field                                            Type                                Original term                       Description
+    ================================================ =================================== =================================== =============================================================
+    collaboration_id                                 string                              Administratienummer                 Identification number of collaboration                 
+    address                                          :ref:`duoaddress`                                                       Address of this collaboration.
+    correspondence_address                           :ref:`duoaddress`                                                       Correspondence address of this collaboration.
+    ================================================ =================================== =================================== =============================================================
+
 
 .. _duoaddress:
 
