@@ -1,26 +1,24 @@
-class DuoVoSchoolsSpider(BaseSpider):
+from onderwijsscrapers.items import DuoVoSchool
+from duo import DuoSpider, int_or_none, find_available_csvs, parse_csv_file
+
+class DuoVoSchoolsSpider(DuoSpider):
     name = 'duo_vo_schools'
 
-    def start_requests(self):
-        return [
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vo/adressen/Adressen/hoofdvestigingen.asp',
-            #         self.parse_schools),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vschoolverlaten/vsv_voortgezet.asp',
-            #         self.parse_dropouts),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp',
-            #         self.parse_students_prognosis),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_vo_6.asp',
-                    self.parse_vo_lo_collaboration),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_vo_8.asp',
-                    self.parse_pao_collaboration),
-        ]
+    def __init__(self):
+        self.requests = {
+            'vo/adressen/Adressen/hoofdvestigingen.asp':
+                self.parse_schools,
+            'vschoolverlaten/vsv_voortgezet.asp':
+                self.parse_dropouts,
+            'vo/leerlingen/Leerlingen/vo_leerlingen11.asp':
+                self.parse_students_prognosis,
+            'passendow/Adressen/Adressen/passend_vo_6.asp':
+                self.parse_vo_lo_collaboration,
+            'passendow/Adressen/Adressen/passend_vo_8.asp':
+                self.parse_pao_collaboration,
+        }
 
-    def parse_schools(row):
+    def parse_schools(self, response):
         """
         Parse: "01. Adressen hoofdvestigingen"
         """
@@ -94,7 +92,7 @@ class DuoVoSchoolsSpider(BaseSpider):
 
                 yield school
 
-    def parse_dropouts(row):
+    def parse_dropouts(self, response):
         """
         Parse: "02. Vsv in het voortgezet onderwijs per vo instelling"
         """
@@ -142,7 +140,7 @@ class DuoVoSchoolsSpider(BaseSpider):
 
                 yield school
 
-    def parse_students_prognosis(row):
+    def parse_students_prognosis(self, response):
         """
         Parse: "11. Prognose aantal leerlingen"
         """
@@ -188,7 +186,7 @@ class DuoVoSchoolsSpider(BaseSpider):
 
                 yield school
 
-    def parse_vo_lo_collaboration(row):
+    def parse_vo_lo_collaboration(self, response):
         """
         Passend onderwijs > Adressen
         Parse "06. Adressen instellingen per samenwerkingsverband lichte ondersteuning, voortgezet onderwijs"
@@ -232,7 +230,7 @@ class DuoVoSchoolsSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_pao_collaboration(row):
+    def parse_pao_collaboration(self, response):
         """
         Passend onderwijs > Adressen
         Parse "08. Adressen instellingen per samenwerkingsverband passend onderwijs, voortgezet onderwijs"

@@ -1,23 +1,22 @@
-class DuoPaoCollaborationsSpider(BaseSpider):
+from onderwijsscrapers.items import DuoPaoCollaboration
+from duo import DuoSpider, int_or_none, find_available_csvs, parse_csv_file
+
+class DuoPaoCollaborationsSpider(DuoSpider):
     name = 'duo_pao_collaborations'
 
-    def start_requests(self):
-        return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_po_1.asp',
-                    self.parse_collaborations),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_po_3.asp',
-                    self.parse_collaborations),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_vo_1.asp',
-                    self.parse_collaborations),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_vo_7.asp',
-                    self.parse_collaborations),
-        ]
+    def __init__(self):
+        self.requests = {
+            'passendow/Adressen/Adressen/passend_po_1.asp':
+                self.parse_collaborations,
+            'passendow/Adressen/Adressen/passend_po_3.asp':
+                self.parse_collaborations,
+            'passendow/Adressen/Adressen/passend_vo_1.asp':
+                self.parse_collaborations,
+            'passendow/Adressen/Adressen/passend_vo_7.asp':
+                self.parse_collaborations,
+        }
 
-    def parse_collaborations(row):
+    def parse_collaborations(self, response):
         """
         Passend onderwijs > Adressen
         Parse: "01. Adressen samenwerkingsverbanden lichte ondersteuning primair onderwijs"

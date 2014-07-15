@@ -1,29 +1,20 @@
+from onderwijsscrapers.items import DuoVoBoard
+from duo import DuoSpider, int_or_none, find_available_csvs, parse_csv_file
+
 class DuoVoBoardsSpider(DuoSpider):
     name = 'duo_vo_boards'
 
-    # requests = {
-    #     'vo/adressen/Adressen/besturen.asp':
-    #         self.parse_boards,
-    #     'vo/Financien/Financien/Kengetallen.asp':
-    #         self.parse_financial_key_indicators,
-    #     'vo/leerlingen/Leerlingen/vo_leerlingen4.asp':
-    #         self.parse_vavo_students,
-    # }
+    def __init__(self):
+        self.requests = {
+            'vo/adressen/Adressen/besturen.asp':
+                self.parse_boards,
+            'vo/Financien/Financien/Kengetallen.asp':
+                self.parse_financial_key_indicators,
+            'vo/leerlingen/Leerlingen/vo_leerlingen4.asp':
+                self.parse_vavo_students,
+        }
 
-    def start_requests(self):
-        return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/adressen/Adressen/besturen.asp',
-                    self.parse_boards),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/Financien/Financien/Kengetallen.asp',
-                    self.parse_financial_key_indicators),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen4.asp',
-                    self.parse_vavo_students),
-        ]
-
-    def parse_boards(row):
+    def parse_boards(self, response):
         """
         Parse "03. Adressen bevoegde gezagen"
         """
@@ -75,7 +66,7 @@ class DuoVoBoardsSpider(DuoSpider):
                 board['ignore_id_fields'] = ['reference_year']
                 yield board
 
-    def parse_financial_key_indicators(row):
+    def parse_financial_key_indicators(self, response):
         """
         Parse "15. Kengetallen"
         """
@@ -140,7 +131,7 @@ class DuoVoBoardsSpider(DuoSpider):
 
                 yield board
 
-    def parse_vavo_students(row):
+    def parse_vavo_students(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "04 Leerlingen per bestuur en denominatie (vavo apart)"

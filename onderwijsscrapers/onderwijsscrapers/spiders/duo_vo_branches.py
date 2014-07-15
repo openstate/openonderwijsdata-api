@@ -1,41 +1,34 @@
-class DuoVoBranchesSpider(BaseSpider):
+from onderwijsscrapers.items import DuoVoBranch
+from duo import DuoSpider, int_or_none, find_available_csvs, parse_csv_file
+
+class DuoVoBranchesSpider(DuoSpider):
     name = 'duo_vo_branches'
 
-    def start_requests(self):
-        return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/adressen/Adressen/vestigingen.asp',
-                    self.parse_branches),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp',
-                    self.parse_student_residences),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp',
-                     self.parse_students_per_branch),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp',
-                    self.student_graduations),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp',
-                    self.student_exam_grades),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen8.asp',
-                    self.vmbo_exam_grades_per_course),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen9.asp',
-                    self.havo_exam_grades_per_course),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp',
-                    self.vwo_exam_grades_per_course),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen3.asp',
-                    self.parse_vavo_students),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen5.asp',
-                    self.parse_students_by_finegrained_structure),
-        ]
+    def __init__(self):
+        self.requests = {
+            'vo/adressen/Adressen/vestigingen.asp':
+                self.parse_branches,
+            'vo/leerlingen/Leerlingen/vo_leerlingen2.asp':
+                self.parse_student_residences,
+            'vo/leerlingen/Leerlingen/vo_leerlingen1.asp':
+                 self.parse_students_per_branch,
+            'vo/leerlingen/Leerlingen/vo_leerlingen6.asp':
+                self.student_graduations,
+            'vo/leerlingen/Leerlingen/vo_leerlingen7.asp':
+                self.student_exam_grades,
+            'vo/leerlingen/Leerlingen/vo_leerlingen8.asp':
+                self.vmbo_exam_grades_per_course,
+            'vo/leerlingen/Leerlingen/vo_leerlingen9.asp':
+                self.havo_exam_grades_per_course,
+            'vo/leerlingen/Leerlingen/vo_leerlingen10.asp':
+                self.vwo_exam_grades_per_course,
+            'vo/leerlingen/Leerlingen/vo_leerlingen3.asp':
+                self.parse_vavo_students,
+            'vo/leerlingen/Leerlingen/vo_leerlingen5.asp':
+                self.parse_students_by_finegrained_structure,
+        }
 
-    def parse_branches(row):
+    def parse_branches(self, response):
         """
         Parse "02. Adressen alle vestigingen"
         """
@@ -132,7 +125,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
                 yield school
 
-    def parse_students_per_branch(row):
+    def parse_students_per_branch(self, response):
         """
         Parse "01. Leerlingen per vestiging naar onderwijstype, lwoo
         indicatie, sector, afdeling, opleiding"
@@ -225,7 +218,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
                 yield school
 
-    def parse_student_residences(row):
+    def parse_student_residences(self, response):
         """
         Parse "02. Leerlingen per vestiging naar postcode leerling en
         leerjaar"
@@ -274,7 +267,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
                 yield school
 
-    def student_graduations(row):
+    def student_graduations(self, response):
         """
         Parse "06. Examenkandidaten en geslaagden"
         """
@@ -399,7 +392,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
                 yield school
 
-    def student_exam_grades(row):
+    def student_exam_grades(self, response):
         """
         Parse "07. Geslaagden, gezakten en gemiddelde examencijfers per instelling"
         """
@@ -479,7 +472,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
                 yield school
 
-    def vmbo_exam_grades_per_course(row):
+    def vmbo_exam_grades_per_course(self, response):
         """
         Parse "08. Examenkandidaten vmbo en examencijfers per vak per instelling"
         """
@@ -588,7 +581,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
                 yield school
 
-    def havo_exam_grades_per_course(row):
+    def havo_exam_grades_per_course(self, response):
         """
         Parse "09. Examenkandidaten havo en examencijfers per vak per instelling"
         """
@@ -696,7 +689,7 @@ class DuoVoBranchesSpider(BaseSpider):
 
                 yield school
 
-    def vwo_exam_grades_per_course(row):
+    def vwo_exam_grades_per_course(self, response):
         """
         Parse "10. Examenkandidaten vwo en examencijfers per vak per instelling"
         """
@@ -802,7 +795,7 @@ class DuoVoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_vavo_students(row):
+    def parse_vavo_students(self, response):
         """
         Voortgezet onderwijs > Leerlingen
         Parse "Leerlingen per vestiging en bevoegd gezag (vavo apart)"
@@ -845,7 +838,7 @@ class DuoVoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_students_by_finegrained_structure(row):
+    def parse_students_by_finegrained_structure(self, response):
         """
         Voortgezet onderwijs > Leerlingen
         Parse "05. Leerlingen per samenwerkingsverband en onderwijstype"

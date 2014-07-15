@@ -1,20 +1,20 @@
-class DuoPoBoardsSpider(BaseSpider):
+from onderwijsscrapers.items import DuoPoBoard
+from duo import DuoSpider, int_or_none, find_available_csvs, parse_csv_file
+
+class DuoPoBoardsSpider(DuoSpider):
     name = 'duo_po_boards'
 
-    def start_requests(self):
-        return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/adressen/Adressen/po_adressen05.asp',
-                    self.parse_po_boards),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Financien/Jaarrekeninggegevens/'
-                    'Kengetallen.asp', self.parse_po_financial_key_indicators),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen7.asp',
-                    self.parse_po_education_type)
-        ]
+    def __init__(self):
+        self.requests = {
+            'po/adressen/Adressen/po_adressen05.asp':
+                self.parse_po_boards,
+            'po/Financien/Jaarrekeninggegevens/Kengetallen.asp': 
+                self.parse_po_financial_key_indicators,
+            'po/Leerlingen/Leerlingen/po_leerlingen7.asp':
+                self.parse_po_education_type,
+        }
 
-    def parse_po_boards(row):
+    def parse_po_boards(self, response):
         """
         Primair onderwijs > Adressen
         Parse "05. Bevoegde gezagen basisonderwijs"
@@ -72,7 +72,7 @@ class DuoPoBoardsSpider(BaseSpider):
                 board['ignore_id_fields'] = ['reference_year']
                 yield board
 
-    def parse_po_financial_key_indicators(row):
+    def parse_po_financial_key_indicators(self, response):
         """
         Primair onderwijs > Financien > Jaarrekeninggegevens
         Parse "15. Kengetallen"
@@ -141,7 +141,7 @@ class DuoPoBoardsSpider(BaseSpider):
                 )
                 yield board
 
-    def parse_po_education_type(row):
+    def parse_po_education_type(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort"

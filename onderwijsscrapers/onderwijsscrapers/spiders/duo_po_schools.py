@@ -1,23 +1,22 @@
-class DuoPoSchoolsSpider(BaseSpider):
+from onderwijsscrapers.items import DuoPoSchool
+from duo import DuoSpider, int_or_none, find_available_csvs, parse_csv_file
+
+class DuoPoSchoolsSpider(DuoSpider):
     name = 'duo_po_schools'
 
-    def start_requests(self):
-        return [
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/adressen/Adressen/hoofdvestigingen.asp',
-            #         self.parse_po_schools),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen4.asp',
-            #         self.parse_spo_students_per_cluster),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/passendow/Adressen/Adressen/passend_po_2.asp',
-            #         self.parse_po_lo_collaboration),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_po_4.asp',
-                    self.parse_pao_collaboration),
-        ]
+    def __init__(self):
+        self.requests = {
+            'po/adressen/Adressen/hoofdvestigingen.asp':
+                self.parse_po_schools,
+            'po/Leerlingen/Leerlingen/po_leerlingen4.asp':
+                self.parse_spo_students_per_cluster,
+            'passendow/Adressen/Adressen/passend_po_2.asp':
+                self.parse_po_lo_collaboration,
+            'passendow/Adressen/Adressen/passend_po_4.asp':
+                self.parse_pao_collaboration,
+        }
 
-    def parse_po_schools(row):
+    def parse_po_schools(self, response):
         """
         Primair onderwijs > Adressen
         Parse: "01. Hoofdvestigingen basisonderwijs"
@@ -89,7 +88,7 @@ class DuoPoSchoolsSpider(BaseSpider):
 
                 yield school
 
-    def parse_spo_students_per_cluster(row):
+    def parse_spo_students_per_cluster(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "04. Leerlingen speciaal onderwijs naar cluster"
@@ -119,7 +118,7 @@ class DuoPoSchoolsSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_po_lo_collaboration(row):
+    def parse_po_lo_collaboration(self, response):
         """
         Passend onderwijs > Adressen
         Parse "02. Adressen instellingen per samenwerkingsverband lichte ondersteuning, primair onderwijs"
@@ -158,7 +157,7 @@ class DuoPoSchoolsSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_pao_collaboration(row):
+    def parse_pao_collaboration(self, response):
         """
         Passend onderwijs > Adressen
         Parse "04. Adressen instellingen per samenwerkingsverband passend onderwijs, primair onderwijs"

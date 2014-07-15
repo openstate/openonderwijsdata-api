@@ -1,38 +1,33 @@
-class DuoPoBranchesSpider(BaseSpider):
+from onderwijsscrapers.items import DuoPoBranch
+from duo import DuoSpider, int_or_none, find_available_csvs, parse_csv_file, extract_csv_files, parse_csv_file
+from scrapy.conf import settings
+
+class DuoPoBranchesSpider(DuoSpider):
     name = 'duo_po_branches'
 
-    def start_requests(self):
-        return [
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/adressen/Adressen/vest_bo.asp',
-            #         self.parse_po_branches),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
-            #         self.parse_po_student_weight),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp',
-            #         self.parse_po_student_age),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp',
-            #         self.parse_po_born_outside_nl),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp',
-            #         self.parse_po_pupil_zipcode_by_age),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/leerjaar.asp',
-            #         self.parse_po_student_year),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen5.asp',
-            #         self.parse_spo_students_by_birthyear),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen6.asp',
-            #         self.parse_spo_students_by_edu_type),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/Schooladvies.asp',
-                    self.parse_spo_students_by_advice),
-        ]
+    def __init__(self):
+        self.requests = {
+            'po/adressen/Adressen/vest_bo.asp':
+                self.parse_po_branches,
+            'po/Leerlingen/Leerlingen/po_leerlingen1.asp':
+                self.parse_po_student_weight,
+            'po/Leerlingen/Leerlingen/po_leerlingen3.asp':
+                self.parse_po_student_age,
+            'po/Leerlingen/Leerlingen/po_leerlingen9.asp':
+                self.parse_po_born_outside_nl,
+            'po/Leerlingen/Leerlingen/po_leerlingen11.asp':
+                self.parse_po_pupil_zipcode_by_age,
+            'po/Leerlingen/Leerlingen/leerjaar.asp':
+                self.parse_po_student_year,
+            'po/Leerlingen/Leerlingen/po_leerlingen5.asp':
+                self.parse_spo_students_by_birthyear,
+            'po/Leerlingen/Leerlingen/po_leerlingen6.asp':
+                self.parse_spo_students_by_edu_type,
+            'po/Leerlingen/Leerlingen/Schooladvies.asp':
+                self.parse_spo_students_by_advice,
+        }
 
-    def parse_po_branches(row):
+    def parse_po_branches(self, response):
         """
         Primair onderwijs > Adressen
         Parse "03. Alle vestigingen basisonderwijs"
@@ -131,7 +126,7 @@ class DuoPoBranchesSpider(BaseSpider):
 
                 yield school
 
-    def parse_po_student_weight(row):
+    def parse_po_student_weight(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "01. Leerlingen basisonderwijs naar leerlinggewicht en per
@@ -200,7 +195,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_po_student_age(row):
+    def parse_po_student_age(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "02. Leerlingen basisonderwijs naar leeftijd"
@@ -276,7 +271,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_po_born_outside_nl(row):
+    def parse_po_born_outside_nl(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
@@ -326,48 +321,19 @@ class DuoPoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_po_pupil_zipcode_by_age(row):
+    def parse_po_pupil_zipcode_by_age(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd"
         """
-        hxs = HtmlXPathSelector(response)
 
         # For some reason, DUO decided to create a seperate file for each
         # municipality, zip them and only provide xls files.
-        available_zips = {}
-        zips = hxs.select('//tr[.//a[contains(@href, ".zip")]]')
-        for zip_file in zips:
-            ref_date = zip_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            zip_url = zip_file.select('.//a/@href').re(r'(.*\.zip)')[0]
-
-            available_zips['http://duo.nl%s' % zip_url] = ref_date
-
-        for zip_url, reference_date in available_zips.iteritems():
+        for zip_url, reference_date in find_available_zips(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
 
-            zip_file = requests.get(zip_url)
-
-            csv_files = []
-            zfiles = ZipFile(cStringIO.StringIO(zip_file.content))
-            for zfile in zfiles.filelist:
-                xls = cStringIO.StringIO(zfiles.read(zfile))
-                # Suppress warnings as the xls files are wrongly initialized.
-                with open(devnull, 'w') as OUT:
-                    wb = xlrd.open_workbook(file_contents=xls.read(), logfile=OUT)
-                sh = wb.sheet_by_index(0)
-                data = []
-                for rownum in xrange(sh.nrows):
-                    data.append(sh.row_values(rownum))
-                data = [[unicode(x) for x in row] for row in data]
-                data = [';'.join(row) for row in data]
-                data = '\n'.join(data)
-                csv_files.append(csv.DictReader(cStringIO.StringIO(data.encode('utf8')), delimiter=';'))
-
-            for csv_file in csv_files:
+            for csv_file in extract_csv_files(zip_url):
                 school_ids = {}
                 student_residences = {}
 
@@ -416,7 +382,7 @@ class DuoPoBranchesSpider(BaseSpider):
 
                     yield school
 
-    def parse_po_student_year(row):
+    def parse_po_student_year(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar"
@@ -479,7 +445,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_spo_students_by_birthyear(row):
+    def parse_spo_students_by_birthyear(self, response):
         """
         Passend onderwijs > Leerlingen
         Parse: "05. Leerlingen speciaal (basis)onderwijs naar geboortejaar"
@@ -526,7 +492,7 @@ class DuoPoBranchesSpider(BaseSpider):
 
                 yield branch
     
-    def parse_spo_students_by_edu_type(row):
+    def parse_spo_students_by_edu_type(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "06. Leerlingen speciaal (basis)onderwijs naar onderwijssoort"
@@ -590,7 +556,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-    def parse_spo_students_by_advice(row):
+    def parse_spo_students_by_advice(self, response):
         """
         Primair onderwijs > Leerlingen
         Parse "12. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar schooladvies"
