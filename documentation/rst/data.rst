@@ -42,8 +42,9 @@ DUO publishes many different datasets, each of these datasets has a different "r
 .. _`Nodaal gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
 .. _`Rmc-regio`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
 .. _`Rpa-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
-.. _`Wgr-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
-
+.. _`Wgr-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied
+.. _`Indicatie Special Basis Onderwijs`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Indicatie%20speciaal%20onderwijs
+.. _`Cluster`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster
 
 .. _duovoboard:
 
@@ -681,14 +682,14 @@ SPOStudentsByEduType
 
 .. table::
 
-    =================================== =================================== ======================================================================================================================================================= ======================================================================================================
-    Field                               Type                                Original term                                                                                                                                           Description
-    =================================== =================================== ======================================================================================================================================================= ======================================================================================================
-    spo_indication                      string                              `Indicatie Special Basis Onderwijs<http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Indicatie%20speciaal%20onderwijs>`_  Indication of type of special education
-    so                                  integer                             SO                                                                                                                                                      Special education.
-    spo                                 integer                             SBAO                                                                                                                                                    Special primary education.
-    vso                                 integer                             SVO                                                                                                                                                     Special secondary education.
-    =================================== =================================== ======================================================================================================================================================= ======================================================================================================
+    =================================== =================================== ===================================== ======================================================================================================
+    Field                               Type                                Original term                         Description
+    =================================== =================================== ===================================== ======================================================================================================
+    spo_indication                      string                              `Indicatie Special Basis Onderwijs`_  Indication of type of special education
+    so                                  integer                             SO                                    Special education.
+    spo                                 integer                             SBAO                                  Special primary education.
+    vso                                 integer                             SVO                                   Special secondary education.
+    =================================== =================================== ===================================== ======================================================================================================
 
 .. _spo_per_cluster:
 
@@ -699,14 +700,14 @@ SPOStudentsPerCluster
 
 .. table::
 
-    ========================= ======== ===================================================================================================== ======================================================================================================
-    Field                     Type     Original term                                                                                         Description
-    ========================= ======== ===================================================================================================== ======================================================================================================
-    cluster_1                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for visually handicapped students
-    cluster_2                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for auditory / communicatively disabled students: deaf, hard of hearing, severe speech difficulties.
-    cluster_3                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for pupils with physical and / or intellectual disabilities: very difficult learning, protracted illness with physical disabilities.
-    cluster_4                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for pupils with psychiatric disorders and severe learning and / or behavioral problems, chronically ill students without disabilities and students associated with university-associated institutes that provide assistance to children with complex learning, behavioral or emotional problems (*Pedologisch Instituut*).
-    ========================= ======== ===================================================================================================== ======================================================================================================
+    ========================= ======== ===================== ======================================================================================================
+    Field                     Type     Original term         Description
+    ========================= ======== ===================== ======================================================================================================
+    cluster_1                 integer  `Cluster`_            Number of pupils in schools for visually handicapped students
+    cluster_2                 integer  `Cluster`_            Number of pupils in schools for auditory / communicatively disabled students: deaf, hard of hearing, severe speech difficulties.
+    cluster_3                 integer  `Cluster`_            Number of pupils in schools for pupils with physical and / or intellectual disabilities: very difficult learning, protracted illness with physical disabilities.
+    cluster_4                 integer  `Cluster`_            Number of pupils in schools for pupils with psychiatric disorders and severe learning and / or behavioral problems, chronically ill students without disabilities and students associated with university-associated institutes that provide assistance to children with complex learning, behavioral or emotional problems (*Pedologisch Instituut*).
+    ========================= ======== ===================== ======================================================================================================
 
 
 .. _dustrespo:
