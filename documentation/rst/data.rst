@@ -37,6 +37,14 @@ DUO publishes many different datasets, each of these datasets has a different "r
 
    Currently DUO updates general information (addresses, names, phone numbers, etc.) of educational institutions on a monthly basis. Unfortunately, historical information is not provided. This means that for some reference years the API contains information such as the financial indicators and dropouts of a school, but does not include the address or name. A plausible explanation is that because of mergers or bankruptcies the school no longer exists in recent files.
 
+.. _`COROP-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+.. _`Onderwijsgebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+.. _`Nodaal gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+.. _`Rmc-regio`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+.. _`Rpa-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+.. _`Wgr-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
+
+
 .. _duovoboard:
 
 vo_board
@@ -71,6 +79,7 @@ vo_school
 ^^^^^^^^^
 **Source:** `Voortgezet onderwijs - Adressen - 01. Adressen hoofdvestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/hoofdvestigingen.asp>`_
 
+
 .. table::
 
     =================================== =================================== =================================== ==========================================================================
@@ -79,34 +88,34 @@ vo_school
     address                             :ref:`duoaddress`                                                       Address of this school.
     board_id                            integer                                                                 Identifier (assigned by :ref:`duodata`) of the board of this school.
     brin                                string                                                                  "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
-    corop_area                          string                              COROP-gebied                        A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+    corop_area                          string                              `COROP-gebied`_                     A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.
     corop_area_code                     integer                                                                 Identifier of the corop_area.
     correspondence_address              :ref:`duoaddress`                                                       Correspondence address of this school.
     denomination                        string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
     dropouts_per_year                   array of :ref:`dropout`                                                 Array of :ref:`dropout`, where each item represents the dropouts for a specific year, per school year.
     dropouts_per_year_reference_date    date                                Peildatum                           Date the dropouts source file was published at http://data.duo.nl.
     dropouts_per_year_url               string                                                                  URL to the dropouts source file at http://data.duo.nl.
-    education_area                      string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+    education_area                      string                              `Onderwijsgebied`_                  Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.
     education_area_code                 integer                                                                 Identifier of the education_area.
     education_structures                array                                                                   An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
     meta                                :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
     municipality                        string                                                                  The name of the municipality this branch is located in.
     municipality_code                   integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
     name                                string                                                                  Name of the school.
-    nodal_area                          string                              Nodaal gebied                       Area defined for the planning of distribution of secondary schools. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+    nodal_area                          string                              `Nodaal gebied`_                    Area defined for the planning of distribution of secondary schools.
     nodal_area_code                     integer                                                                 Identifier of the nodal_area.
     phone                               string                                                                  Phone number of the school.
     province                            string                                                                  The province [#provinces]_ this branch is situated in.
-    reference_year                      integer                             Peiljaar                                    Year the schools source file was published.
-    rmc_region                          string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+    reference_year                      integer                             Peiljaar                            Year the schools source file was published.
+    rmc_region                          string                              `Rmc-regio`_                        Area that is used for the coordination of school dropouts.
     rmc_region_code                     integer                                                                 Identifier of the rmc_region.
-    rpa_area                            string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+    rpa_area                            string                              `Rpa-gebied`_                       Area defined to cluster information on the labour market.
     rpa_area_code                       integer                                                                 Identifier of the rpa_area.
     students_prognosis                  array of :ref:`students_prognosis`                                      Prognosis of the number of students, per year
     students_prognosis_reference_date   date                                Peildatum                           Date the source file was published at http://data.duo.nl
     students_prognosis_url              string                                                                  URL of the source file.
     website                             string                                                                  Website of this school.
-    wgr_area                            string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
+    wgr_area                            string                              `Wgr-gebied`_                       Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_.
     wgr_area_code                       integer                                                                 Identifier of the wgr_area.
     =================================== =================================== =================================== ==========================================================================
 
@@ -125,11 +134,11 @@ vo_branch
     board_id                                integer                                                                 Identifier (assigned by :ref:`duodata`) of the board of this branch.
     branch_id                               integer                                                                 Identifier (assigned by :ref:`duodata`) of this branch.
     brin                                    string                                                                  "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
-    corop_area                              string                              COROP-gebied                        A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+    corop_area                              string                              `COROP-gebied`_                     A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.
     corop_area_code                         integer                                                                 Identifier of the corop_area.
     correspondence_address                  :ref:`duoaddress`                                                       Correspondence address of this branch.
     denomination                            string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
-    education_area                          string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+    education_area                          string                              `Onderwijsgebied`_                  Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.
     education_area_code                     integer                                                                 Identifier of the education_area.
     education_structures                    array                                                                   An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
     havo_exam_grades_per_course             array of :ref:`gradespercourse`     Cijfers per vak per jaar            Grades per course per year for the HAVO section of this school.
@@ -139,14 +148,14 @@ vo_branch
     municipality                            string                                                                  The name of the municipality this branch is located in.
     municipality_code                       integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
     name                                    string                                                                  Name of the school.
-    nodal_area                              string                              Nodaal gebied                       Area defined for the planning of distribution of secondary schools. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+    nodal_area                              string                              `Nodaal gebied`_                    Area defined for the planning of distribution of secondary schools.
     nodal_area_code                         integer                                                                 Identifier of the nodal_area.
     phone                                   string                                                                  Phone number of the school.
     province                                string                                                                  The province [#provinces]_ this branch is situated in.
     reference_year                          integer                             Peiljaar                            Year the schools source file was published.
-    rmc_region                              string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+    rmc_region                              string                              `Rmc-regio`_                        Area that is used for the coordination of school dropouts.
     rmc_region_code                         integer                                                                 Identifier of the rmc_region.
-    rpa_area                                string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+    rpa_area                                string                              `Rpa-gebied`_                       Area defined to cluster information on the labour market.
     rpa_area_code                           integer                                                                 Identifier of the rpa_area.
     student_residences                      :ref:`duostdres`                                                        Array of :ref:`duostdres`, where each item contains the distribution of students from a given municipality over the years in this branch.
     student_residences_reference_date       date                                Peildatum                           Date the student residences source file was published at http://data.duo.nl
@@ -167,7 +176,7 @@ vo_branch
     vwo_exam_grades_reference_date          date
     vwo_exam_grades_reference_url           string                                                                  URL to the vmbo exam grades per course source file at http://data.duo.nl/
     website                                 string                                                                  Website of this school.
-    wgr_area                                string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
+    wgr_area                                string                              `Wgr-gebied`_                       Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_.
     wgr_area_code                           integer                                                                 Identifier of the wgr_area.
     ======================================= =================================== =================================== ======================================================================
 
@@ -216,30 +225,30 @@ po_school
     address                                     :ref:`duoaddress`                                                       Address of this school.
     board_id                                    integer                             Bevoegd gezag nummer                Identifier (assigned by :ref:`duodata`) of the board of this school.
     brin                                        string                                                                  "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
-    corop_area                                  string                              COROP-gebied                        A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+    corop_area                                  string                              `COROP-gebied`_                     A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.
     corop_area_code                             integer                                                                 Identifier of the corop_area.
     correspondence_address                      :ref:`duoaddress`                                                       Correspondence address of this school.
     denomination                                string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
-    education_area                              string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+    education_area                              string                              `Onderwijsgebied`_                  Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.
     education_area_code                         integer                                                                 Identifier of the education_area.
     meta                                        :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
     municipality                                string                                                                  The name of the municipality this branch is located in.
     municipality_code                           integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
     name                                        string                                                                  Name of the school.
-    nodal_area                                  string                              Nodaal gebied                       Area defined for the planning of distribution of secondary schools. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+    nodal_area                                  string                              `Nodaal gebied`_                    Area defined for the planning of distribution of secondary schools.
     nodal_area_code                             integer                                                                 Identifier of the nodal_area.
     phone                                       string                                                                  Phone number of the school.
     province                                    string                                                                  The province [#provinces]_ this branch is situated in.
     reference_year                              integer                             Peiljaar                            Year the schools source file was published.
-    rmc_region                                  string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+    rmc_region                                  string                              `Rmc-regio`_                        Area that is used for the coordination of school dropouts.
     rmc_region_code                             integer                                                                 Identifier of the rmc_region.
-    rpa_area                                    string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+    rpa_area                                    string                              `Rpa-gebied`_                       Area defined to cluster information on the labour market.
     rpa_area_code                               integer                                                                 Identifier of the rpa_area.
     spo_students_per_cluster                    dict of :ref:`spo_per_cluster`                                          Number of pupils in special education, per special education cluster.
     spo_students_per_cluster_reference_date     date                                                                    Date the source file was published at http://data.duo.nl
     spo_students_per_cluster_reference_url      string                                                                  URL of the source file.
     website                                     string                                                                  Website of this school.
-    wgr_area                                    string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
+    wgr_area                                    string                              `Wgr-gebied`_                       Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_.
     wgr_area_code                               integer                                                                 Identifier of the wgr_area.
     =========================================== =================================== =================================== ==========================================================================
 
@@ -261,17 +270,17 @@ po_branch
     board_id                                            integer                                                                 Identifier (assigned by :ref:`duodata`) of the board of this branch.
     branch_id                                           integer                                                                 Identifier (assigned by :ref:`duodata`) of this branch.
     brin                                                string                                                                  "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
-    corop_area                                          string                              COROP-gebied                        A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+    corop_area                                          string                              `COROP-gebied`_                     A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.
     corop_area_code                                     integer                                                                 Identifier of the corop_area.
     correspondence_address                              :ref:`duoaddress`                                                       Correspondence address of this branch.
     denomination                                        string                                                                  In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
-    education_area                                      string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+    education_area                                      string                              Onderwijsgebied                     Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.
     education_area_code                                 integer                                                                 Identifier of the education_area.
     meta                                                :ref:`duometa`                                                          Metadata, such as date of scrape and whether this item passed validation.
     municipality                                        string                                                                  The name of the municipality this branch is located in.
     municipality_code                                   integer                                                                 Identifier (assigned by CBS [#cbs]_) to this municipality.
     name                                                string                                                                  Name of the school.
-    nodal_area                                          string                              Nodaal gebied                       Area defined for the planning of distribution of secondary schools. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+    nodal_area                                          string                              `Nodaal gebied`_                    Area defined for the planning of distribution of secondary schools.
     nodal_area_code                                     integer                                                                 Identifier of the nodal_area.
     phone                                               string                                                                  Phone number of the school.
     province                                            string                                                                  The province [#provinces]_ this branch is situated in.
@@ -279,9 +288,9 @@ po_branch
     student_residences_reference_date                   date                                Peiljaar                            Date the source file was published at http://data.duo.nl
     student_residences_reference_url                    string                                                                  URL of the source file.
     reference_year                                      integer                             Peiljaar                            Year the schools source file was published.
-    rmc_region                                          string                              Rmc-regio                           Area that is used for the coordination of school dropouts. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+    rmc_region                                          string                              `Rmc-regio`_                        Area that is used for the coordination of school dropouts.
     rmc_region_code                                     integer                                                                 Identifier of the rmc_region.
-    rpa_area                                            string                              Rpa-gebied                          Area defined to cluster information on the labour market. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+    rpa_area                                            string                              `Rpa-gebied`_                       Area defined to cluster information on the labour market.
     rpa_area_code                                       integer                                                                 Identifier of the rpa_area.
     website                                             string                                                                  Website of this school.
     students_by_origin                                  array of :ref:`students_by_origin`                                      Number of studentes born in countries other than The Netherlands by country. Only availabe in 2009 as collecting of this data has been stopped since 2010.
@@ -302,7 +311,7 @@ po_branch
     students_by_advice                                  array of :ref:`students_by_advice`                                      Number of students by secondary education level recommendation made upon leaving primary school
     students_by_advice_reference_date                   date                                                                    Date the source file was published at http://data.duo.nl
     students_by_advice_reference_url                    string                                                                  URL of the source file.
-    wgr_area                                            string                              Wgr-gebied                          Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_. *Source:* http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied.
+    wgr_area                                            string                              `Wgr-gebied`_                       Cluster of municipalities per collaborating region according to the "Wet gemeenschappelijke regelingen" [#wgr_law]_.
     wgr_area_code                                       integer                                                                 Identifier of the wgr_area.
     =================================================== =================================== =================================== ======================================================================
 
