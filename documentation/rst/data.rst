@@ -44,6 +44,7 @@ vo_board
 **Source:** `Voortgezet onderwijs - Adressen - 03. Adressen hoofdbesturen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/besturen.asp>`_
 
 .. table::
+
     ================================================ =================================== =================================== =============================================================
     Field                                            Type                                Original term                       Description
     ================================================ =================================== =================================== =============================================================
@@ -71,6 +72,7 @@ vo_school
 **Source:** `Voortgezet onderwijs - Adressen - 01. Adressen hoofdvestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/hoofdvestigingen.asp>`_
 
 .. table::
+
     =================================== =================================== =================================== ==========================================================================
     Field                               Type                                Original term                       Description
     =================================== =================================== =================================== ==========================================================================
@@ -115,6 +117,7 @@ vo_branch
 **Source:** `Voortgezet onderwijs - Adressen - 02. Adressen alle vestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/vestigingen.asp>`_
 
 .. table::
+
     ======================================= =================================== =================================== ======================================================================
     Field                                   Type                                Original term                       Description
     ======================================= =================================== =================================== ======================================================================
@@ -175,6 +178,7 @@ po_board
 **Source:** `Primair onderwijs - Adressen - 05. Bevoegde gezagen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/po_adressen05.asp>`_
 
 .. table::
+
     =================================================== =================================== =================================== =============================================================
     Field                                               Type                                Original term                       Description
     =================================================== =================================== =================================== =============================================================
@@ -205,6 +209,7 @@ po_school
 **Source:** `Primair onderwijs - Adressen - 01. Hoofdvestigingen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/hoofdvestigingen.asp>`_
 
 .. table::
+
     =========================================== =================================== =================================== ==========================================================================
     Field                                       Type                                Original term                       Description
     =========================================== =================================== =================================== ==========================================================================
@@ -245,6 +250,7 @@ po_branch
 **Source:** `Primair onderwijs - Adressen - 03. Alle vestigingen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/vest_bo.asp>`_
 
 .. table::
+
     =================================================== =================================== =================================== ======================================================================
     Field                                               Type                                Original term                       Description
     =================================================== =================================== =================================== ======================================================================
@@ -304,9 +310,10 @@ po_branch
 
 paocollaboration
 ^^^^^^^^^^^^^^^^
-**Source:** `Passend onderwijs - Adressen - 01. Adressen samenwerkingsverbanden lichte ondersteuning primair onderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/passendow/Adressen/Adressen/passend_po_1.asp>`
+**Source:** `Passend onderwijs - Adressen - 01. Adressen samenwerkingsverbanden lichte ondersteuning primair onderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/passendow/Adressen/Adressen/passend_po_1.asp>`_
 
 .. table::
+
     ================================================ =================================== =================================== =============================================================
     Field                                            Type                                Original term                       Description
     ================================================ =================================== =================================== =============================================================
@@ -327,6 +334,7 @@ Address
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -346,6 +354,7 @@ AddressComponent
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -361,6 +370,7 @@ This dict has three keys *student_weight_0.0*, *student_weight_0.3* and *student
 **Source:** `Primair onderwijs - Leerlingen - 03. Leerlingen basisonderwijs naar leerlinggewicht en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp>`_
 
 .. table::
+
     =================================== ================ ==========================================================================
     Field                               Type             Description
     =================================== ================ ==========================================================================
@@ -385,6 +395,7 @@ Dropout
 **Source:** `Voortijdig schoolverlaten - Voortijdig schoolverlaten - 02. Vsv in het voortgezet onderwijs per vo instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vschoolverlaten/vsvers/vsv_voortgezet.asp>`_
 
 .. table::
+
     ======================================= =================================== =================================== ======================================================================
     Field                                   Type                                Original term                       Description
     ======================================= =================================== =================================== ======================================================================
@@ -405,6 +416,7 @@ EduTypes
 **Source:** `Primair onderwijs - Leerlingen - 07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen7.asp>`_
 
 .. table::
+
     =========== ========== ================ =============================
     Field       Type       Original term    Description
     =========== ========== ================ =============================
@@ -421,6 +433,7 @@ ExamGrades
 **Source:** `Voortgezet onderwijs - Leerlingen - 07. Geslaagden, gezakten en gemiddelde examencijfers per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp>`_
 
 .. table::
+
     =================================== =================================== =================================== ==========================================================================
     Field                               Type                                Original term                       Description
     =================================== =================================== =================================== ==========================================================================
@@ -445,6 +458,7 @@ FinancialIndicator
 **Source:** `Voortgezet onderwijs - Financiën - 15. Kengetallen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/Financien/Financien/Kengetallen.asp>`_
 
 .. table::
+
     ======================================= =============================== ======================================== =====================================================================
     Field                                   Type                            Original term                            Description
     ======================================= =============================== ======================================== =====================================================================
@@ -484,6 +498,7 @@ GradesPerCourse
 **Source:** `10. Examenkandidaten vwo en examencijfers per vak per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp>`_
 
 .. table::
+
     ======================================================= ========================== ========================= ======================================================================
     Field                                                   Type                       Original term             Description
     ======================================================= ========================== ========================= ======================================================================
@@ -512,6 +527,7 @@ Graduation
 **Source:** `Voortgezet onderwijs - Leerlingen - 06. Examenkandidaten en geslaagden <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp>`_
 
 .. table::
+
     ==================== ===================================== =================================== ======================================================================
     Field                Type                                  Original term                       Description
     ==================== ===================================== =================================== ======================================================================
@@ -532,6 +548,7 @@ Belongs to :ref:`graduationdepartment`.
 **Source:** `Voortgezet onderwijs - Leerlingen - 06. Examenkandidaten en geslaagden <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp>`_
 
 .. table::
+
     =================== =================================== =================================== ======================================================================
     Field               Type                                Original term                       Description
     =================== =================================== =================================== ======================================================================
@@ -559,6 +576,7 @@ GeoLocation
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -573,6 +591,7 @@ GeoViewport
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -587,6 +606,7 @@ Meta
 **Source:** `OpenOnderwijs scrapers <http://api.openonderwijsdata.nl/>`_
 
 .. table::
+
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
@@ -605,6 +625,7 @@ The level of education [#edu_in_holland]_ that the primary school recommended th
 **Source:** `Primair onderwijs - Leerlingen - 12. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar schooladvies <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/Schooladvies.asp>`_
 
 .. table::
+
     =================================== =================================== =================================== ======================================================================================================
     Field                               Type                                Original term                       Description
     =================================== =================================== =================================== ======================================================================================================
@@ -620,6 +641,7 @@ The level of education [#edu_in_holland]_ that the primary school recommended th
     havo_vwo                            integer                             HAVO-VWO                            Number of students with HAVO-VWO advice
     vwo                                 integer                             VWO                                 Number of students with VWO advice
     unknown                             integer                             ONBEKEND                            Number of students with unknown advice
+    =================================== =================================== =================================== ======================================================================================================
 
 .. _spo_by_birthyear:
 
@@ -633,11 +655,13 @@ SPOStudentsByBirthyear
 **Source:** `Primair onderwijs - Leerlingen - 05. Leerlingen speciaal (basis)onderwijs naar geboortejaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen5.asp>`_
 
 .. table::
+
     =================================== =================================== =================================== ======================================================================================================
     Field                               Type                                Original term                       Description
     =================================== =================================== =================================== ======================================================================================================
     birthyear                           integer                                                                 Year of birth
     students                            integer                                                                 Number of students born in this year
+    =================================== =================================== =================================== ======================================================================================================
 
 .. _spo_by_edu_type:
 
@@ -647,6 +671,7 @@ SPOStudentsByEduType
 **Source:** `Primair onderwijs - Leerlingen - 06. Leerlingen speciaal (basis)onderwijs naar onderwijssoort <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen6.asp>`_
 
 .. table::
+
     =================================== =================================== ======================================================================================================================================================= ======================================================================================================
     Field                               Type                                Original term                                                                                                                                           Description
     =================================== =================================== ======================================================================================================================================================= ======================================================================================================
@@ -654,15 +679,17 @@ SPOStudentsByEduType
     so                                  integer                             SO                                                                                                                                                      Special education.
     spo                                 integer                             SBAO                                                                                                                                                    Special primary education.
     vso                                 integer                             SVO                                                                                                                                                     Special secondary education.
+    =================================== =================================== ======================================================================================================================================================= ======================================================================================================
 
 .. _spo_per_cluster:
 
 SPOStudentsPerCluster
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 **Source:** `Primair onderwijs - Leerlingen - 04. Leerlingen speciaal onderwijs naar cluster <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen4.asp>`_
 
 .. table::
+
     ========================= ======== ===================================================================================================== ======================================================================================================
     Field                     Type     Original term                                                                                         Description
     ========================= ======== ===================================================================================================== ======================================================================================================
@@ -670,6 +697,7 @@ SPOStudentsPerCluster
     cluster_2                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for auditory / communicatively disabled students: deaf, hard of hearing, severe speech difficulties.
     cluster_3                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for pupils with physical and / or intellectual disabilities: very difficult learning, protracted illness with physical disabilities.
     cluster_4                 integer  `Cluster <http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster>`_  Number of pupils in schools for pupils with psychiatric disorders and severe learning and / or behavioral problems, chronically ill students without disabilities and students associated with university-associated institutes that provide assistance to children with complex learning, behavioral or emotional problems (*Pedologisch Instituut*).
+    ========================= ======== ===================================================================================================== ======================================================================================================
 
 
 .. _dustrespo:
@@ -681,6 +709,7 @@ Number of pupils per age group (up to 25, as special education is included).
 **Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp>`_
 
 .. table::
+
     ========= ========================== ================== ==========================================================================
     Field     Type                       Original term      Description
     ========= ========================== ================== ==========================================================================
@@ -694,6 +723,7 @@ StudentResidence
 ^^^^^^^^^^^^^^^^
 
 .. table::
+
     ========= ========================== ================== ==========================================================================
     Field     Type                       Original term      Description
     ========= ========================== ================== ==========================================================================
@@ -709,12 +739,14 @@ StudentPrognosis
 **Source:** `Primair onderwijs - Leerlingen - 11. Prognose aantal leerlingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp>`_
 
 .. table::
+
     ================ ========================== ==========================================================================
     Field            Type                       Description
     ================ ========================== ==========================================================================
     year             integer                    Prognosis is for this year
     structure        string                     Level of education [#edu_in_holland]_.
     students         integer                    Number of students
+    ================ ========================== ==========================================================================
 
 .. _students_by_origin:
 
@@ -725,6 +757,7 @@ Number of students born in countries other than The Netherlands, by country.
 **Source:** `Primair onderwijs - Leerlingen - 09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp>`_
 
 .. table::
+
     =================================== ================= ===================================
     Field                               Type              Description
     =================================== ================= ===================================
@@ -739,6 +772,7 @@ StudentResidence
 **Source:** `Voortgezet onderwijs - Leerlingen - 02. Leerlingen per vestiging naar postcode leerling en leerjaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp>`_
 
 .. table::
+
     =================================== =================================== =================================== ==========================================================================
     Field                               Type                                Original term                       Description
     =================================== =================================== =================================== ==========================================================================
@@ -761,6 +795,7 @@ StudentPerStructure
 **Source:** `Voortgezet onderwijs - Leerlingen - 01. Leerlingen per vestiging naar onderwijstype, lwoo indicatie, sector, afdeling, opleiding <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp>`_
 
 .. table::
+
     =================================== ====================== ==========================================================================
     Field                               Type                   Description
     =================================== ====================== ==========================================================================
@@ -786,19 +821,22 @@ StudentsByYear
 **Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/leerjaar.asp>`_
 
 .. table::
+
     =================================== ====================== ==========================================================================
     Field                               Type                   Description
     =================================== ====================== ==========================================================================
     year_*n*                            integer                Number of students for year *n* (including special education) .
+    =================================== ====================== ==========================================================================
 
 
 .. _studentweights:
 
 StudentWeights
 ^^^^^^^^^^^^^^
-**Source:** `Primair onderwijs - Leerlingen - 01. Leerlingen basisonderwijs naar leerlinggewicht en per vestiging het schoolgewicht en impulsgebied <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp>`_`_
+**Source:** `Primair onderwijs - Leerlingen - 01. Leerlingen basisonderwijs naar leerlinggewicht en per vestiging het schoolgewicht en impulsgebied <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp>`_
 
 .. table::
+
     =================================== =================================== =================================== ==========================================================================
     Field                               Type                                Original term                       Description
     =================================== =================================== =================================== ==========================================================================
@@ -818,6 +856,7 @@ Vensters voor Verantwoording
 vo_branch
 ^^^^^^^^^
 .. table::
+
     =================================== =================================== ========================================================================================================
     Field                               Type                                Description
     =================================== =================================== ========================================================================================================
@@ -861,6 +900,7 @@ Address
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -880,6 +920,7 @@ AddressComponent
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -894,6 +935,7 @@ Costs
 ^^^^^
 
 .. table::
+
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
@@ -909,6 +951,7 @@ CostsPerYear
 ^^^^^^^^^^^^
 
 .. table::
+
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
@@ -925,6 +968,7 @@ EduHoursPerStudent
 ^^^^^^^^^^^^^^^^^^
 
 .. table::
+
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
@@ -940,6 +984,7 @@ EduHoursPerStructure
 ^^^^^^^^^^^^^^^^^^^^
 
 .. table::
+
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
@@ -955,6 +1000,7 @@ GeoLocation
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -969,6 +1015,7 @@ GeoViewport
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -982,6 +1029,7 @@ Indicator
 ^^^^^^^^^
 
 .. table::
+
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
@@ -995,6 +1043,7 @@ Meta
 ^^^^
 
 .. table::
+
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
@@ -1010,6 +1059,7 @@ Satisfaction
 ^^^^^^^^^^^^
 
 .. table::
+
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
@@ -1031,6 +1081,7 @@ The Inspectie voor het Onderwijs [#owinsp]_ is tasked with inspecting Dutch scho
 vo_branch
 ^^^^^^^^^
 .. table::
+
     ======================================================= =================================== ========================================================================================================
     Field                                                   Type                                Description
     ======================================================= =================================== ========================================================================================================
@@ -1063,6 +1114,7 @@ vo_branch
 po_branch
 ^^^^^^^^^
 .. table::
+
     ======================================================= =================================== ========================================================================================================
     Field                                                   Type                                Description
     ======================================================= =================================== ========================================================================================================
@@ -1084,6 +1136,7 @@ Address
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1103,6 +1156,7 @@ AddressComponent
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1116,6 +1170,7 @@ AddressComponent
 AverageExamGrades
 ^^^^^^^^^^^^^^^^^
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1130,6 +1185,7 @@ AverageExamGrades
 CurrentRating
 ^^^^^^^^^^^^^
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1146,6 +1202,7 @@ CurrentRating
 ExamParticipationPerProfile
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. table::
+
     ========================================= =================================== ==========================================================================
     Field                                     Type                                Description
     ========================================= =================================== ==========================================================================
@@ -1159,6 +1216,7 @@ ExamParticipationPerProfile
 FirstYearComposition
 ^^^^^^^^^^^^^^^^^^^^
 .. table::
+
     ========================================= =================================== ==========================================================================
     Field                                     Type                                Description
     ========================================= =================================== ==========================================================================
@@ -1173,6 +1231,7 @@ FirstYearComposition
 FirstYearPerformance
 ^^^^^^^^^^^^^^^^^^^^
 .. table::
+
     ========================================= =================================== ==========================================================================
     Field                                     Type                                Description
     ========================================= =================================== ==========================================================================
@@ -1190,6 +1249,7 @@ GeoLocation
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1204,6 +1264,7 @@ GeoViewport
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1216,6 +1277,7 @@ GeoViewport
 HistoricalRating
 ^^^^^^^^^^^^^^^^
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1230,6 +1292,7 @@ Meta
 ^^^^
 
 .. table::
+
     =================================== =================================== ======================================================================================================
     Field                               Type                                Description
     =================================== =================================== ======================================================================================================
@@ -1245,6 +1308,7 @@ PerformanceAssessments
 ^^^^^^^^^^^^^^^^^^^^^^
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1258,6 +1322,7 @@ PrimarySchoolAdvices
 ^^^^^^^^^^^^^^^^^^^^
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1271,6 +1336,7 @@ PrimarySchoolAdvice
 ^^^^^^^^^^^^^^^^^^^
 
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1283,6 +1349,7 @@ PrimarySchoolAdvice
 Report
 ^^^^^^
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1297,6 +1364,7 @@ Report
 StraightToGraduation
 ^^^^^^^^^^^^^^^^^^^^
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
@@ -1310,6 +1378,7 @@ StraightToGraduation
 StraightToThirdYear
 ^^^^^^^^^^^^^^^^^^^
 .. table::
+
     =================================== =================================== ==========================================================================
     Field                               Type                                Description
     =================================== =================================== ==========================================================================
