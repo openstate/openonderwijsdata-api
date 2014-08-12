@@ -18,18 +18,24 @@ class Exporter(object):
 
 
 class ElasticSearchExporter(Exporter):
-    def __init__(self, crawl_started_at, index, doctype, url):
+    def __init__(self, crawl_started_at, index, doctype, url, index_suffix=None):
         super(ElasticSearchExporter, self).__init__(crawl_started_at, index,
             doctype)
 
         self.url = url
         self.es = rawes.Elastic(self.url)
+        self.index_suffix = index_suffix
 
     def save(self, item, doc_id=None):
-        if doc_id:
-            url = '%s/%s/%s' % (self.index, self.doctype, doc_id)
+        if self.index_suffix is not None:
+            suffix = '_' + self.index_suffix
         else:
-            url = '%s/%s/%s' % (self.index, self.doctype, uuid1())
+            suffix = ''
+
+        if doc_id:
+            url = '%s%s/%s/%s' % (self.index, suffix, self.doctype, doc_id)
+        else:
+            url = '%s%s/%s/%s' % (self.index, suffix, self.doctype, uuid1())
 
         self.es.put(url, data=json.dumps(item, sort_keys=True))
 

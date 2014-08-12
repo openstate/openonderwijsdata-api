@@ -12,17 +12,24 @@ api = restful.Api(app)
 
 es = rawes.Elastic(ES_URL)
 
+def get_alias_from_index(index_name):
+    """ The indexes are named as `alias_suffix` """
+    return index_name.split("1",1)[0]
 
 def format_es_single_doc(es_doc):
     return {
         '_type': es_doc['_type'],
-        '_index': es_doc['_index'],
+        '_index': get_alias_from_index(es_doc['_index']),
         '_id': es_doc['_id'],
         '_source': es_doc['_source']
     }
 
 
 def format_es_search_results(es_results):
+    # convert index results to aliasses
+    for hit in es_results['hits']['hits']:
+        hit['_index'] = get_alias_from_index(hit['_index'])
+
     return {
         'total': es_results['hits']['total'],
         'took': es_results['took'],
@@ -329,12 +336,16 @@ class GetDocument(restful.Resource):
         if doc_type not in ES_DOCUMENT_TYPES_PER_INDEX[index]:
             abort(400, message='Doctype "%s" does not exist in index "%s"'
                                % (doc_type, index))
-
+ 
         try:
             doc = es.get('%s/%s/%s' % (index, doc_type, doc_id))
         except rawes.elastic_exception.ElasticException, error:
             if error.status_code == 404:
                 abort(404, message='The requested document does not exist')
+            else:
+                print(error)
+
+
 
         return format_es_single_doc(doc)
 
