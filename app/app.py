@@ -14,7 +14,7 @@ es = rawes.Elastic(ES_URL)
 
 def get_alias_from_index(index_name):
     """ The indexes are named as `alias_suffix` """
-    return index_name.split("1",1)[0]
+    return index_name.split("_",1)[0]
 
 def format_es_single_doc(es_doc):
     return {
