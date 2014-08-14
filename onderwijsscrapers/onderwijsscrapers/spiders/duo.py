@@ -12,14 +12,17 @@ from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
+from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
+                                     DuoPoBoard, DuoPoSchool, DuoPoBranch,
+                                     DuoPaoCollaboration)
 
+locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
 
 class DuoSpider(BaseSpider):
     """ Duo spider """
-    def __init__(self):
-        self.requests = {}
+    def __init__(self, url_filter=None, *args, **kwargs):
+        self.url_filter = url_filter
 
     def start_requests(self):
 
@@ -28,7 +31,7 @@ class DuoSpider(BaseSpider):
                 'http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/' + url, 
                 # lambda self, response: self.parse_cvs(self, response, parse_row)
                 parse_row
-            ) for url,parse_row in self.requests.items()
+            ) for url,parse_row in self.requests.items() if (self.url_filter is None or url is self.url_filter)
         ]
 
 
@@ -153,7 +156,7 @@ def int_or_none(value):
 class DuoVoBoardsSpider(DuoSpider):
     name = 'duo_vo_boards'
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.requests = {
             'vo/adressen/Adressen/besturen.asp':
                 self.parse_boards,
@@ -162,6 +165,7 @@ class DuoVoBoardsSpider(DuoSpider):
             'vo/leerlingen/Leerlingen/vo_leerlingen4.asp':
                 self.parse_vavo_students,
         }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_boards(self, response):
         """
@@ -317,7 +321,7 @@ class DuoVoBoardsSpider(DuoSpider):
 class DuoVoSchoolsSpider(DuoSpider):
     name = 'duo_vo_schools'
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.requests = {
             'vo/adressen/Adressen/hoofdvestigingen.asp':
                 self.parse_schools,
@@ -330,6 +334,7 @@ class DuoVoSchoolsSpider(DuoSpider):
             'passendow/Adressen/Adressen/passend_vo_8.asp':
                 self.parse_pao_collaboration,
         }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_schools(self, response):
         """
@@ -586,7 +591,7 @@ class DuoVoSchoolsSpider(DuoSpider):
 class DuoVoBranchesSpider(DuoSpider):
     name = 'duo_vo_branches'
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.requests = {
             'vo/adressen/Adressen/vestigingen.asp':
                 self.parse_branches,
@@ -609,6 +614,7 @@ class DuoVoBranchesSpider(DuoSpider):
             'vo/leerlingen/Leerlingen/vo_leerlingen5.asp':
                 self.parse_students_by_finegrained_structure,
         }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_branches(self, response):
         """
@@ -1484,7 +1490,7 @@ class DuoVoBranchesSpider(DuoSpider):
 class DuoPoBoardsSpider(DuoSpider):
     name = 'duo_po_boards'
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.requests = {
             'po/adressen/Adressen/po_adressen05.asp':
                 self.parse_po_boards,
@@ -1493,6 +1499,7 @@ class DuoPoBoardsSpider(DuoSpider):
             'po/Leerlingen/Leerlingen/po_leerlingen7.asp':
                 self.parse_po_education_type,
         }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_po_boards(self, response):
         """
@@ -1672,7 +1679,7 @@ class DuoPoBoardsSpider(DuoSpider):
 class DuoPoSchoolsSpider(DuoSpider):
     name = 'duo_po_schools'
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.requests = {
             'po/adressen/Adressen/hoofdvestigingen.asp':
                 self.parse_po_schools,
@@ -1683,6 +1690,7 @@ class DuoPoSchoolsSpider(DuoSpider):
             'passendow/Adressen/Adressen/passend_po_4.asp':
                 self.parse_pao_collaboration,
         }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_po_schools(self, response):
         """
@@ -1867,7 +1875,7 @@ class DuoPoSchoolsSpider(DuoSpider):
 class DuoPoBranchesSpider(DuoSpider):
     name = 'duo_po_branches'
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.requests = {
             'po/adressen/Adressen/vest_bo.asp':
                 self.parse_po_branches,
@@ -1888,6 +1896,7 @@ class DuoPoBranchesSpider(DuoSpider):
             'po/Leerlingen/Leerlingen/Schooladvies.asp':
                 self.parse_po_students_by_advice,
         }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_po_branches(self, response):
         """
@@ -2495,7 +2504,7 @@ class DuoPoBranchesSpider(DuoSpider):
 class DuoPaoCollaborationsSpider(DuoSpider):
     name = 'duo_pao_collaborations'
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.requests = {
             'passendow/Adressen/Adressen/passend_po_1.asp':
                 self.parse_collaborations,
@@ -2506,6 +2515,7 @@ class DuoPaoCollaborationsSpider(DuoSpider):
             'passendow/Adressen/Adressen/passend_vo_7.asp':
                 self.parse_collaborations,
         }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_collaborations(self, response):
         """
