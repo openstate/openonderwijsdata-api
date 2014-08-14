@@ -5,9 +5,9 @@ import xlrd
 from datetime import datetime
 from os import devnull
 from zipfile import ZipFile
+from collections import defaultdict
 
 import requests
-from scrapy.conf import settings
 from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
@@ -17,6 +17,69 @@ from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
                                      DuoPaoCollaboration)
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
+
+
+class DuoSpider(BaseSpider):
+    """ Duo spider """
+    def __init__(self, url_filter=None, *args, **kwargs):
+        self.url_filter = url_filter
+
+    def start_requests(self):
+
+        return [
+            Request(
+                'http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/' + url, 
+                # lambda self, response: self.parse_cvs(self, response, parse_row)
+                parse_row
+            ) for url,parse_row in self.requests.items() if (self.url_filter is None or url is self.url_filter)
+        ]
+
+
+    # # lambda self, response: self.parse_cvs(response, parse_row)
+    # def parse_cvs(self, response, parse_row):
+    #     """
+    #     Parse the CVS function
+    #     `parse_row` returns a scrapy item
+    #     """
+
+    #     for csv_url, reference_date in find_available_csvs(response).iteritems():
+    #         reference_year = reference_date.year
+    #         reference_date = str(reference_date)
+    #         yield parse_row(row)
+
+    # # lambda self, response: self.parse_cvs_seperate(response, parse_row, DuoPoSchool, 'po_lo_collaboration')
+    # # def some_parse_row(row):
+    # #     yield row['BRIN'], {
+    # #         'brin' : \
+    # #             row['BRIN NUMMER']
+    # #         'po_lo_collaboration' : \
+    # #             row['ADMINISTRATIENUMMER']
+    # #     }
+    # def parse_cvs_separate(self, response, parse_row, itemtype, setname):
+    #     """
+    #     Parse the CVS function
+    #     `parse_row` returns an index & dict for separate dataset
+    #     """
+
+    #     for csv_url, reference_date in find_available_csvs(response).iteritems():
+    #         reference_year = reference_date.year
+    #         reference_date = str(reference_date)
+    #         items = defaultdict(list)
+
+    #         # Collect all items
+    #         for row in parse_csv_file(csv_url):
+    #             k,v = parse_row(row)
+    #             items[k].append(v)
+
+    #         # Create objects for items
+    #         for value in items.values():
+    #             value.update({
+    #                 'reference_year' = reference_year,
+    #                 setname+'_reference_url' = csv_url,
+    #                 setname+'_reference_date' = reference_date,
+    #             })
+    #             yield itemtype(value)
+
 
 
 def find_available_csvs(response):
@@ -33,6 +96,41 @@ def find_available_csvs(response):
         available_csvs['http://duo.nl%s' % csv_url] = ref_date
     return available_csvs
 
+def find_available_zips(response):
+    """ Get all URLS of ZIP files on the DUO page """
+    hxs = HtmlXPathSelector(response)
+    available_zips = {}
+    zips = hxs.select('//tr[.//a[contains(@href, ".zip")]]')
+    for zip_file in zips:
+        ref_date = zip_file.select('./td[1]/span/text()').extract()
+        ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
+
+        zip_url = zip_file.select('.//a/@href').re(r'(.*\.zip)')[0]
+
+        available_zips['http://duo.nl%s' % zip_url] = ref_date
+    return available_zips
+
+def extract_csv_files(zip_url):
+    zip_file = requests.get(zip_url)
+
+    csv_files = []
+    zfiles = ZipFile(cStringIO.StringIO(zip_file.content))
+    for zfile in zfiles.filelist:
+        xls = cStringIO.StringIO(zfiles.read(zfile))
+        # Suppress warnings as the xls files are wrongly initialized.
+        with open(devnull, 'w') as OUT:
+            wb = xlrd.open_workbook(file_contents=xls.read(), logfile=OUT)
+        sh = wb.sheet_by_index(0)
+        data = []
+        for rownum in xrange(sh.nrows):
+            data.append(sh.row_values(rownum))
+        data = [[unicode(x) for x in row] for row in data]
+        data = [';'.join(row) for row in data]
+        data = '\n'.join(data)
+        csv_files.append(csv.DictReader(cStringIO.StringIO(data.encode('utf8')), delimiter=';'))
+
+    return csv_files
+
 def parse_csv_file(csv_url):
     """ Download and parse CSV file """
     csv_file = requests.get(csv_url)
@@ -41,7 +139,6 @@ def parse_csv_file(csv_url):
                   .decode('cp1252').encode('utf8')), delimiter=';')
     # todo: is this a dict or an iterator? can we do (whitespace) preprocessing here?
     return csv_file
-
 
 def int_or_none(value):
     """
@@ -53,27 +150,27 @@ def int_or_none(value):
     except ValueError:
         return None
 
-class DuoVoBoards(BaseSpider):
+
+
+
+class DuoVoBoardsSpider(DuoSpider):
     name = 'duo_vo_boards'
 
-    def start_requests(self):
-        return [
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vo/adressen/Adressen/besturen.asp',
-            #         self.parse_boards),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vo/Financien/Financien/Kengetallen.asp',
-            #         self.parse_financial_key_indicators),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen4.asp',
-                    self.parse_vavo_students),
-        ]
+    def __init__(self, *args, **kwargs):
+        self.requests = {
+            'vo/adressen/Adressen/besturen.asp':
+                self.parse_boards,
+            'vo/Financien/Financien/Kengetallen.asp':
+                self.parse_financial_key_indicators,
+            'vo/leerlingen/Leerlingen/vo_leerlingen4.asp':
+                self.parse_vavo_students,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_boards(self, response):
         """
         Parse "03. Adressen bevoegde gezagen"
         """
-
         for csv_url, reference_date in find_available_csvs(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
@@ -100,11 +197,8 @@ class DuoVoBoards(BaseSpider):
                 else:
                     board['correspondence_address']['street'] = None
 
-                if row['POSTCODE CORRESPONDENTIEADRES']:
-                    board['correspondence_address']['zip_code'] = row[
-                        'POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
-                else:
-                    board['correspondence_address']['zip_code'] = None
+                board['correspondence_address']['zip_code'] = row[
+                        'POSTCODE CORRESPONDENTIEADRES'].replace(' ', '') or None
 
                 board['correspondence_address']['city'] = row[
                         'PLAATSNAAM CORRESPONDENTIEADRES'] or None
@@ -119,11 +213,7 @@ class DuoVoBoards(BaseSpider):
 
                 board['denomination'] = row['DENOMINATIE'] or None
 
-                if row['ADMINISTRATIEKANTOORNUMMER']:
-                    board['administrative_office_id'] = \
-                        int(row['ADMINISTRATIEKANTOORNUMMER'])
-                else:
-                    board['administrative_office_id'] = None
+                board['administrative_office_id'] = int_or_none(row['ADMINISTRATIEKANTOORNUMMER'])
 
                 board['reference_year'] = reference_year
                 board['ignore_id_fields'] = ['reference_year']
@@ -228,27 +318,23 @@ class DuoVoBoards(BaseSpider):
                 )
                 yield school
 
-class DuoVoSchools(BaseSpider):
+class DuoVoSchoolsSpider(DuoSpider):
     name = 'duo_vo_schools'
 
-    def start_requests(self):
-        return [
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vo/adressen/Adressen/hoofdvestigingen.asp',
-            #         self.parse_schools),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vschoolverlaten/vsv_voortgezet.asp',
-            #         self.parse_dropouts),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp',
-            #         self.parse_students_prognosis),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_vo_6.asp',
-                    self.parse_vo_lo_collaboration),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_vo_8.asp',
-                    self.parse_pao_collaboration),
-        ]
+    def __init__(self, *args, **kwargs):
+        self.requests = {
+            'vo/adressen/Adressen/hoofdvestigingen.asp':
+                self.parse_schools,
+            'vschoolverlaten/vsv_voortgezet.asp':
+                self.parse_dropouts,
+            'vo/leerlingen/Leerlingen/vo_leerlingen11.asp':
+                self.parse_students_prognosis,
+            'passendow/Adressen/Adressen/passend_vo_6.asp':
+                self.parse_vo_lo_collaboration,
+            'passendow/Adressen/Adressen/passend_vo_8.asp':
+                self.parse_pao_collaboration,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_schools(self, response):
         """
@@ -502,42 +588,33 @@ class DuoVoSchools(BaseSpider):
                 yield school
 
 
-class DuoVoBranchesSpider(BaseSpider):
+class DuoVoBranchesSpider(DuoSpider):
     name = 'duo_vo_branches'
 
-    def start_requests(self):
-        return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/adressen/Adressen/vestigingen.asp',
-                    self.parse_branches),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp',
-                    self.parse_student_residences),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp',
-                     self.parse_students_per_branch),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp',
-                    self.student_graduations),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp',
-                    self.student_exam_grades),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen8.asp',
-                    self.vmbo_exam_grades_per_course),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen9.asp',
-                    self.havo_exam_grades_per_course),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp',
-                    self.vwo_exam_grades_per_course),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen3.asp',
-                    self.parse_vavo_students),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/vo/leerlingen/Leerlingen/vo_leerlingen5.asp',
-                    self.parse_students_by_finegrained_structure),
-        ]
+    def __init__(self, *args, **kwargs):
+        self.requests = {
+            'vo/adressen/Adressen/vestigingen.asp':
+                self.parse_branches,
+            'vo/leerlingen/Leerlingen/vo_leerlingen2.asp':
+                self.parse_student_residences,
+            'vo/leerlingen/Leerlingen/vo_leerlingen1.asp':
+                 self.parse_students_per_branch,
+            'vo/leerlingen/Leerlingen/vo_leerlingen6.asp':
+                self.student_graduations,
+            'vo/leerlingen/Leerlingen/vo_leerlingen7.asp':
+                self.student_exam_grades,
+            'vo/leerlingen/Leerlingen/vo_leerlingen8.asp':
+                self.vmbo_exam_grades_per_course,
+            'vo/leerlingen/Leerlingen/vo_leerlingen9.asp':
+                self.havo_exam_grades_per_course,
+            'vo/leerlingen/Leerlingen/vo_leerlingen10.asp':
+                self.vwo_exam_grades_per_course,
+            'vo/leerlingen/Leerlingen/vo_leerlingen3.asp':
+                self.parse_vavo_students,
+            'vo/leerlingen/Leerlingen/vo_leerlingen5.asp':
+                self.parse_students_by_finegrained_structure,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_branches(self, response):
         """
@@ -1409,21 +1486,20 @@ class DuoVoBranchesSpider(BaseSpider):
                 )
                 yield school
 
-class DuoPoBoards(BaseSpider):
+
+class DuoPoBoardsSpider(DuoSpider):
     name = 'duo_po_boards'
 
-    def start_requests(self):
-        return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/adressen/Adressen/po_adressen05.asp',
-                    self.parse_po_boards),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Financien/Jaarrekeninggegevens/'
-                    'Kengetallen.asp', self.parse_po_financial_key_indicators),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/po_leerlingen7.asp',
-                    self.parse_po_education_type)
-        ]
+    def __init__(self, *args, **kwargs):
+        self.requests = {
+            'po/adressen/Adressen/po_adressen05.asp':
+                self.parse_po_boards,
+            'po/Financien/Jaarrekeninggegevens/Kengetallen.asp': 
+                self.parse_po_financial_key_indicators,
+            'po/Leerlingen/Leerlingen/po_leerlingen7.asp':
+                self.parse_po_education_type,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_po_boards(self, response):
         """
@@ -1600,25 +1676,21 @@ class DuoPoBoards(BaseSpider):
                 )
                 yield board
 
-
-class DuoPoSchools(BaseSpider):
+class DuoPoSchoolsSpider(DuoSpider):
     name = 'duo_po_schools'
 
-    def start_requests(self):
-        return [
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/adressen/Adressen/hoofdvestigingen.asp',
-            #         self.parse_po_schools),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen4.asp',
-            #         self.parse_spo_students_per_cluster),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/passendow/Adressen/Adressen/passend_po_2.asp',
-            #         self.parse_po_lo_collaboration),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_po_4.asp',
-                    self.parse_pao_collaboration),
-        ]
+    def __init__(self, *args, **kwargs):
+        self.requests = {
+            'po/adressen/Adressen/hoofdvestigingen.asp':
+                self.parse_po_schools,
+            'po/Leerlingen/Leerlingen/po_leerlingen4.asp':
+                self.parse_spo_students_per_cluster,
+            'passendow/Adressen/Adressen/passend_po_2.asp':
+                self.parse_po_lo_collaboration,
+            'passendow/Adressen/Adressen/passend_po_4.asp':
+                self.parse_pao_collaboration,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_po_schools(self, response):
         """
@@ -1800,39 +1872,31 @@ class DuoPoSchools(BaseSpider):
                 )
                 yield school
 
-class DuoPoBranchesSpider(BaseSpider):
+class DuoPoBranchesSpider(DuoSpider):
     name = 'duo_po_branches'
 
-    def start_requests(self):
-        return [
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/adressen/Adressen/vest_bo.asp',
-            #         self.parse_po_branches),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp',
-            #         self.parse_po_student_weight),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp',
-            #         self.parse_po_student_age),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp',
-            #         self.parse_po_born_outside_nl),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp',
-            #         self.parse_po_pupil_zipcode_by_age),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/leerjaar.asp',
-            #         self.parse_po_student_year),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen5.asp',
-            #         self.parse_spo_students_by_birthyear),
-            # Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-            #         'databestanden/po/Leerlingen/Leerlingen/po_leerlingen6.asp',
-            #         self.parse_spo_students_by_edu_type),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/po/Leerlingen/Leerlingen/Schooladvies.asp',
-                    self.parse_po_students_by_advice),
-        ]
+    def __init__(self, *args, **kwargs):
+        self.requests = {
+            'po/adressen/Adressen/vest_bo.asp':
+                self.parse_po_branches,
+            'po/Leerlingen/Leerlingen/po_leerlingen1.asp':
+                self.parse_po_student_weight,
+            'po/Leerlingen/Leerlingen/po_leerlingen3.asp':
+                self.parse_po_student_age,
+            'po/Leerlingen/Leerlingen/po_leerlingen9.asp':
+                self.parse_po_born_outside_nl,
+            'po/Leerlingen/Leerlingen/po_leerlingen11.asp':
+                self.parse_po_pupil_zipcode_by_age,
+            'po/Leerlingen/Leerlingen/leerjaar.asp':
+                self.parse_po_student_year,
+            'po/Leerlingen/Leerlingen/po_leerlingen5.asp':
+                self.parse_spo_students_by_birthyear,
+            'po/Leerlingen/Leerlingen/po_leerlingen6.asp':
+                self.parse_spo_students_by_edu_type,
+            'po/Leerlingen/Leerlingen/Schooladvies.asp':
+                self.parse_po_students_by_advice,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_po_branches(self, response):
         """
@@ -2133,43 +2197,14 @@ class DuoPoBranchesSpider(BaseSpider):
         Primair onderwijs > Leerlingen
         Parse "11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd"
         """
-        hxs = HtmlXPathSelector(response)
 
         # For some reason, DUO decided to create a seperate file for each
         # municipality, zip them and only provide xls files.
-        available_zips = {}
-        zips = hxs.select('//tr[.//a[contains(@href, ".zip")]]')
-        for zip_file in zips:
-            ref_date = zip_file.select('./td[1]/span/text()').extract()
-            ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-            zip_url = zip_file.select('.//a/@href').re(r'(.*\.zip)')[0]
-
-            available_zips['http://duo.nl%s' % zip_url] = ref_date
-
-        for zip_url, reference_date in available_zips.iteritems():
+        for zip_url, reference_date in find_available_zips(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
 
-            zip_file = requests.get(zip_url)
-
-            csv_files = []
-            zfiles = ZipFile(cStringIO.StringIO(zip_file.content))
-            for zfile in zfiles.filelist:
-                xls = cStringIO.StringIO(zfiles.read(zfile))
-                # Suppress warnings as the xls files are wrongly initialized.
-                with open(devnull, 'w') as OUT:
-                    wb = xlrd.open_workbook(file_contents=xls.read(), logfile=OUT)
-                sh = wb.sheet_by_index(0)
-                data = []
-                for rownum in xrange(sh.nrows):
-                    data.append(sh.row_values(rownum))
-                data = [[unicode(x) for x in row] for row in data]
-                data = [';'.join(row) for row in data]
-                data = '\n'.join(data)
-                csv_files.append(csv.DictReader(cStringIO.StringIO(data.encode('utf8')), delimiter=';'))
-
-            for csv_file in csv_files:
+            for csv_file in extract_csv_files(zip_url):
                 school_ids = {}
                 student_residences = {}
 
@@ -2433,7 +2468,7 @@ class DuoPoBranchesSpider(BaseSpider):
                 }
 
 
-                students_by_advice = {
+                spo_students_by_advice = {
                     # TODO intOrNone
                     'vso' : int(row['VSO'] or 0),
                     'pro' : int(row['PrO'] or 0),
@@ -2452,38 +2487,35 @@ class DuoPoBranchesSpider(BaseSpider):
                 if school_id not in students_by_advice_per_school:
                     students_by_advice_per_school[school_id] = []
 
-                students_by_advice_per_school[school_id].append(students_by_advice)
+                students_by_advice_per_school[school_id].append(spo_students_by_advice)
 
             for school_id, per_school in students_by_advice_per_school.iteritems():
                 school = DuoPoBranch(
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
-                    students_by_advice_reference_url=csv_url,
-                    students_by_advice_reference_date=reference_date,
-                    students_by_advice=per_school
+                    spo_students_by_advice_reference_url=csv_url,
+                    spo_students_by_advice_reference_date=reference_date,
+                    spo_students_by_advice=per_school
                 )
                 yield school
 
 
-class DuoPaoCollaborationsSpider(BaseSpider):
+class DuoPaoCollaborationsSpider(DuoSpider):
     name = 'duo_pao_collaborations'
 
-    def start_requests(self):
-        return [
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_po_1.asp',
-                    self.parse_collaborations),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_po_3.asp',
-                    self.parse_collaborations),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_vo_1.asp',
-                    self.parse_collaborations),
-            Request('http://data.duo.nl/organisatie/open_onderwijsdata/'
-                    'databestanden/passendow/Adressen/Adressen/passend_vo_7.asp',
-                    self.parse_collaborations),
-        ]
+    def __init__(self, *args, **kwargs):
+        self.requests = {
+            'passendow/Adressen/Adressen/passend_po_1.asp':
+                self.parse_collaborations,
+            'passendow/Adressen/Adressen/passend_po_3.asp':
+                self.parse_collaborations,
+            'passendow/Adressen/Adressen/passend_vo_1.asp':
+                self.parse_collaborations,
+            'passendow/Adressen/Adressen/passend_vo_7.asp':
+                self.parse_collaborations,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_collaborations(self, response):
         """
@@ -2531,3 +2563,4 @@ class DuoPaoCollaborationsSpider(BaseSpider):
                 collaboration['ignore_id_fields'] = ['reference_year']
 
                 yield collaboration
+

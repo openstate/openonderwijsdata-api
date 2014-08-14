@@ -155,7 +155,6 @@ class VavoStudents(SequenceSchema):
     vavo_students = VavoStudents()
 
 class StudentsByAdvice(MappingSchema):
-    # TODO: 
     vso = SchemaNode(Int()) # `VSO`
     pro = SchemaNode(Int()) # `PrO`
     vmbo_bl = SchemaNode(Int()) # `VMBO BL`
