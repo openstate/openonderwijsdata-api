@@ -361,7 +361,7 @@ class DuoPaoCollaboration(Item):
 
     # TODO: reference_url, reference_date
 
-    collaboration = Field()  #SAMENWERKINGSVERBAND
+    name = Field()  #SAMENWERKINGSVERBAND
     collaboration_id = Field()  #ADMINISTRATIENUMMER
     address = Field() #ADRES, POSTCODE, PLAATSNAAM
     correspondence_address = Field() #CORRESPONDENTIEADRES, 

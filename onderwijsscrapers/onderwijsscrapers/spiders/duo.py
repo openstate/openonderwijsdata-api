@@ -25,13 +25,12 @@ class DuoSpider(BaseSpider):
         self.url_filter = url_filter
 
     def start_requests(self):
-
         return [
             Request(
                 'http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/' + url, 
                 # lambda self, response: self.parse_cvs(self, response, parse_row)
                 parse_row
-            ) for url,parse_row in self.requests.items() if (self.url_filter is None or url is self.url_filter)
+            ) for url,parse_row in self.requests.items() if (self.url_filter is None or url == self.url_filter)
         ]
 
 
@@ -42,7 +41,7 @@ class DuoSpider(BaseSpider):
     #     `parse_row` returns a scrapy item
     #     """
 
-    #     for csv_url, reference_date in find_available_csvs(response).iteritems():
+    #     for csv_url, reference_date in find_available_datasets(response).iteritems():
     #         reference_year = reference_date.year
     #         reference_date = str(reference_date)
     #         yield parse_row(row)
@@ -61,7 +60,7 @@ class DuoSpider(BaseSpider):
     #     `parse_row` returns an index & dict for separate dataset
     #     """
 
-    #     for csv_url, reference_date in find_available_csvs(response).iteritems():
+    #     for csv_url, reference_date in find_available_datasets(response).iteritems():
     #         reference_year = reference_date.year
     #         reference_date = str(reference_date)
     #         items = defaultdict(list)
@@ -82,33 +81,19 @@ class DuoSpider(BaseSpider):
 
 
 
-def find_available_csvs(response):
-    """ Get all URLS of CSV files on the DUO page """
+def find_available_datasets(response, extension='csv'):
+    """ Get all URLS of files with a certain extension on the DUO page """
     hxs = HtmlXPathSelector(response)
-    available_csvs = {}
-    csvs = hxs.select('//tr[.//a[contains(@href, ".csv")]]')
-    for csv_file in csvs:
-        ref_date = csv_file.select('./td[1]/span/text()').extract()
+    available_datasets = {}
+    datasets = hxs.select('//tr[.//a[contains(@href, ".%s")]]' % extension)
+    for dataset_file in datasets:
+        ref_date = dataset_file.select('./td[1]/span/text()').extract()
         ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
 
-        csv_url = csv_file.select('.//a/@href').re(r'(.*\.csv)')[0]
+        dataset_url = dataset_file.select('.//a/@href').re(r'(.*\.%s)' % extension)[0]
 
-        available_csvs['http://duo.nl%s' % csv_url] = ref_date
-    return available_csvs
-
-def find_available_zips(response):
-    """ Get all URLS of ZIP files on the DUO page """
-    hxs = HtmlXPathSelector(response)
-    available_zips = {}
-    zips = hxs.select('//tr[.//a[contains(@href, ".zip")]]')
-    for zip_file in zips:
-        ref_date = zip_file.select('./td[1]/span/text()').extract()
-        ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
-
-        zip_url = zip_file.select('.//a/@href').re(r'(.*\.zip)')[0]
-
-        available_zips['http://duo.nl%s' % zip_url] = ref_date
-    return available_zips
+        available_datasets['http://duo.nl%s' % dataset_url] = ref_date
+    return available_datasets
 
 def extract_csv_files(zip_url):
     zip_file = requests.get(zip_url)
@@ -116,20 +101,37 @@ def extract_csv_files(zip_url):
     csv_files = []
     zfiles = ZipFile(cStringIO.StringIO(zip_file.content))
     for zfile in zfiles.filelist:
-        xls = cStringIO.StringIO(zfiles.read(zfile))
-        # Suppress warnings as the xls files are wrongly initialized.
-        with open(devnull, 'w') as OUT:
-            wb = xlrd.open_workbook(file_contents=xls.read(), logfile=OUT)
-        sh = wb.sheet_by_index(0)
+        for sheet in parse_xls_sheets_from_content(zfiles.read(zfile)).values():
+            csv_files.append(sheet)
+
+    return csv_files
+
+def parse_xls_sheets_from_content(content):
+    """ Download and parse CSV content """
+    xls = cStringIO.StringIO(content)
+
+    # Suppress warnings as the xls files are wrongly initialized.
+    with open(devnull, 'w') as OUT:
+        wb = xlrd.open_workbook(file_contents=xls.read(), logfile=OUT)
+
+    sheets = {}
+    for sheet_name in wb.sheet_names():
+        sh = wb.sheet_by_name(sheet_name)
         data = []
         for rownum in xrange(sh.nrows):
             data.append(sh.row_values(rownum))
         data = [[unicode(x) for x in row] for row in data]
         data = [';'.join(row) for row in data]
         data = '\n'.join(data)
-        csv_files.append(csv.DictReader(cStringIO.StringIO(data.encode('utf8')), delimiter=';'))
 
-    return csv_files
+        sheets[sheet_name] = csv.DictReader(cStringIO.StringIO(data.encode('utf8')), delimiter=';')
+    return sheets
+
+def parse_xls_sheets_from_url(xls_url):
+    """ Download and parse CSV file """
+    xls_file = requests.get(xls_url)
+    # don't specify encoding
+    return parse_xls_sheets_from_content(xls_file.content)
 
 def parse_csv_file(csv_url):
     """ Download and parse CSV file """
@@ -171,7 +173,7 @@ class DuoVoBoardsSpider(DuoSpider):
         """
         Parse "03. Adressen bevoegde gezagen"
         """
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             for row in parse_csv_file(csv_url):
@@ -250,7 +252,7 @@ class DuoVoBoardsSpider(DuoSpider):
             'WERKKAPITAAL': 'operating_capital',
         }
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             indicators_per_board = {}
@@ -290,7 +292,7 @@ class DuoVoBoardsSpider(DuoSpider):
         Parse "04 Leerlingen per bestuur en denominatie (vavo apart)"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             vavo_students_per_school = {}
@@ -358,7 +360,7 @@ class DuoVoSchoolsSpider(DuoSpider):
             'RMC-REGIO NAAM': 'rmc_region'
         }
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             for row in parse_csv_file(csv_url):
@@ -415,7 +417,7 @@ class DuoVoSchoolsSpider(DuoSpider):
         Parse: "02. Vsv in het voortgezet onderwijs per vo instelling"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             dropouts_per_school = {}
@@ -463,7 +465,7 @@ class DuoVoSchoolsSpider(DuoSpider):
         Parse: "11. Prognose aantal leerlingen"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             students_prognosis_per_school = {}
@@ -510,7 +512,7 @@ class DuoVoSchoolsSpider(DuoSpider):
         Parse "06. Adressen instellingen per samenwerkingsverband lichte ondersteuning, voortgezet onderwijs"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             vo_lo_collaboration_per_school = {}
@@ -554,7 +556,7 @@ class DuoVoSchoolsSpider(DuoSpider):
         Parse "08. Adressen instellingen per samenwerkingsverband passend onderwijs, voortgezet onderwijs"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             pao_collaboration_per_school = {}
@@ -621,7 +623,7 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "02. Adressen alle vestigingen"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             for row in parse_csv_file(csv_url):
@@ -719,7 +721,7 @@ class DuoVoBranchesSpider(DuoSpider):
         indicatie, sector, afdeling, opleiding"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             student_educations = {}
@@ -812,7 +814,7 @@ class DuoVoBranchesSpider(DuoSpider):
         leerjaar"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             student_residences = {}
@@ -860,7 +862,7 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "06. Examenkandidaten en geslaagden"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -985,7 +987,7 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "07. Geslaagden, gezakten en gemiddelde examencijfers per instelling"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -1065,7 +1067,7 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "08. Examenkandidaten vmbo en examencijfers per vak per instelling"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -1174,7 +1176,7 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "09. Examenkandidaten havo en examencijfers per vak per instelling"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -1282,7 +1284,7 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "10. Examenkandidaten vwo en examencijfers per vak per instelling"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -1389,7 +1391,7 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "Leerlingen per vestiging en bevoegd gezag (vavo apart)"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -1432,7 +1434,7 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "05. Leerlingen per samenwerkingsverband en onderwijstype"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -1507,7 +1509,7 @@ class DuoPoBoardsSpider(DuoSpider):
         Parse "05. Bevoegde gezagen basisonderwijs"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             for row in parse_csv_file(csv_url):
@@ -1591,7 +1593,7 @@ class DuoPoBoardsSpider(DuoSpider):
             'WERKKAPITAAL': 'operating_capital',
         }
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             indicators_per_board = {}
@@ -1636,7 +1638,7 @@ class DuoPoBoardsSpider(DuoSpider):
 
         possible_edu_types = ['BAO', 'SBAO', 'SO', 'VSO']
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             students_per_edu_type = {}
@@ -1715,7 +1717,7 @@ class DuoPoSchoolsSpider(DuoSpider):
             'RMC-REGIO NAAM': 'rmc_region'
         }
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             for row in parse_csv_file(csv_url):
@@ -1770,7 +1772,7 @@ class DuoPoSchoolsSpider(DuoSpider):
         Parse "04. Leerlingen speciaal onderwijs naar cluster"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             spo_students_per_cluster_per_school = {}
@@ -1800,7 +1802,7 @@ class DuoPoSchoolsSpider(DuoSpider):
         Parse "02. Adressen instellingen per samenwerkingsverband lichte ondersteuning, primair onderwijs"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             po_lo_collaboration_per_school = {}
@@ -1839,7 +1841,7 @@ class DuoPoSchoolsSpider(DuoSpider):
         Parse "04. Adressen instellingen per samenwerkingsverband passend onderwijs, primair onderwijs"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             pao_collaboration_per_school = {}
@@ -1904,7 +1906,7 @@ class DuoPoBranchesSpider(DuoSpider):
         Parse "03. Alle vestigingen basisonderwijs"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             for row in parse_csv_file(csv_url):
@@ -2004,7 +2006,7 @@ class DuoPoBranchesSpider(DuoSpider):
                    vestiging het schoolgewicht en impulsgebied"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -2072,7 +2074,7 @@ class DuoPoBranchesSpider(DuoSpider):
         Parse "02. Leerlingen basisonderwijs naar leeftijd"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -2148,7 +2150,7 @@ class DuoPoBranchesSpider(DuoSpider):
         Parse "09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -2200,7 +2202,7 @@ class DuoPoBranchesSpider(DuoSpider):
 
         # For some reason, DUO decided to create a seperate file for each
         # municipality, zip them and only provide xls files.
-        for zip_url, reference_date in find_available_zips(response).iteritems():
+        for zip_url, reference_date in find_available_datasets(response, extension='zip').iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
 
@@ -2259,7 +2261,7 @@ class DuoPoBranchesSpider(DuoSpider):
         Parse "11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -2322,7 +2324,7 @@ class DuoPoBranchesSpider(DuoSpider):
         Parse: "05. Leerlingen speciaal (basis)onderwijs naar geboortejaar"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
 
@@ -2370,7 +2372,7 @@ class DuoPoBranchesSpider(DuoSpider):
         Parse "06. Leerlingen speciaal (basis)onderwijs naar onderwijssoort"
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -2436,7 +2438,7 @@ class DuoPoBranchesSpider(DuoSpider):
         TODO: compare to owinsp PRIMARY_SCHOOL_ADVICES_STRUCTURES
         """
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             school_ids = {}
@@ -2527,10 +2529,10 @@ class DuoPaoCollaborationsSpider(DuoSpider):
         """
         # Fields that do not need additonal processing
         collaboration_fields = {
-            'SAMENWERKINGSVERBAND': 'collaboration'
+            'SAMENWERKINGSVERBAND': 'name'
         }
 
-        for csv_url, reference_date in find_available_csvs(response).iteritems():
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
             reference_year = reference_date.year
             reference_date = str(reference_date)
             for row in parse_csv_file(csv_url):
