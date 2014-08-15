@@ -243,6 +243,11 @@ class DuoPoBoard(Item):
     students_per_edu_type_reference_date = Field()
     students_per_edu_type = Field()
 
+    # Contents of "01. Onderwijspersoneel in aantal personen"
+    staff_reference_url = Field()
+    staff_reference_date = Field()
+    staff = Field()
+
 
 class DuoPoSchool(SchoolItem):
     ignore_id_fields = Field()
@@ -282,6 +287,11 @@ class DuoPoSchool(SchoolItem):
     pao_collaboration_reference_url = Field()
     pao_collaboration_reference_date = Field()
     pao_collaboration = Field()
+
+    # Contents of "01. Onderwijspersoneel in aantal personen"
+    staff_reference_url = Field()
+    staff_reference_date = Field()
+    staff = Field()
 
 
 class DuoPoBranch(SchoolItem):
