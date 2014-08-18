@@ -1888,75 +1888,78 @@ class DuoPoSchoolsSpider(DuoSpider):
 
             sheets = parse_xls_sheets_from_url(xls_url)
             for i,row in enumerate(sheets['per owtype-bestuur-brin-functie']):
-                if i<100:
-                    brinnr = row.pop('BRIN NUMMER', None)
-                    if brinnr == 'bovenschools':
-                        brinnr = None
+                brinnr = row.pop('BRIN NUMMER', None)
+                if brinnr == 'bovenschools':
+                    brinnr = None
 
-                    boardnr = int(float(row.pop('BEVOEGD GEZAG', None)))
-                    fg = row.pop('FUNCTIEGROEP', None)
+                boardnr = int(float(row.pop('BEVOEGD GEZAG', None)))
+                fg = row.pop('FUNCTIEGROEP', None)
 
-                    # loop over all rows, filtering key names
-                    for key, val in row.items():
-                        key = key.split()
-                        if key[-1].isdigit() and len(key[-1]) == 4:
-                            
-                            year = int(key[-1])
-                            db_key = (year, brinnr, boardnr)
+                # loop over all rows, filtering key names
+                for key, val in row.items():
+                    key = key.split()
+                    if key[-1].isdigit() and len(key[-1]) == 4:
+                        
+                        year = int(key[-1])
+                        db_key = (year, brinnr, boardnr)
 
-                            if db_key not in staff_per_school:
-                                staff_per_school[db_key] = {}
-                            if fg not in staff_per_school[db_key]:
-                                staff_per_school[db_key][fg] = {}
+                        if db_key not in staff_per_school:
+                            staff_per_school[db_key] = {}
+                        if fg not in staff_per_school[db_key]:
+                            staff_per_school[db_key][fg] = {}
 
-                            # missing values are starred, for privacy reasons
-                            if val != '*':
-                                if key[:-1] == ['PERSONEN']:
-                                    staff_per_school[db_key][fg]['staff'] = int(float(val or 0))
+                        # missing values are starred, for privacy reasons
+                        if val != '*':
+                            if key[:-1] == ['PERSONEN']:
+                                staff_per_school[db_key][fg]['staff'] = int(float(val or 0))
 
-                                if key[:-1] == ['MANNEN']:
-                                    staff_per_school[db_key][fg]['staff_male'] = int(float(val or 0))
-                                if key[:-1] == ['VROUWEN']:
-                                    staff_per_school[db_key][fg]['staff_female'] = int(float(val or 0))
-                                if key[:-1] == ['GESLACHT', 'ONBEKEND']:
-                                    staff_per_school[db_key][fg]['staff_gender_unknown'] = int(float(val or 0))
+                            if key[:-1] == ['MANNEN']:
+                                staff_per_school[db_key][fg]['staff_male'] = int(float(val or 0))
+                            if key[:-1] == ['VROUWEN']:
+                                staff_per_school[db_key][fg]['staff_female'] = int(float(val or 0))
+                            if key[:-1] == ['GESLACHT', 'ONBEKEND']:
+                                staff_per_school[db_key][fg]['staff_gender_unknown'] = int(float(val or 0))
 
-                                # mean ages: 0 means missing
-                                if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD']:
-                                    staff_per_school[db_key][fg]['age_mean'] = float(val or 0) or None
-                                if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'MAN']:
-                                    staff_per_school[db_key][fg]['age_mean_male'] = float(val or 0) or None
-                                if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'VROUW']:
-                                    staff_per_school[db_key][fg]['age_mean_female'] = float(val or 0) or None
-                                # ['LEEFTIJD', 'ONBEKEND'] # skip unknown ages, almost always zero
+                            # mean ages: 0 means missing
+                            if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD']:
+                                staff_per_school[db_key][fg]['age_mean'] = float(val or 0) or None
+                            if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'MAN']:
+                                staff_per_school[db_key][fg]['age_mean_male'] = float(val or 0) or None
+                            if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'VROUW']:
+                                staff_per_school[db_key][fg]['age_mean_female'] = float(val or 0) or None
 
-                                if key[:-1] == ['GEMIDDELDE', "FTE'S"]:
-                                    staff_per_school[db_key][fg]['workload_mean'] = float(val or 0)
+                            if key[:-1] == ['GEMIDDELDE', "FTE'S"]:
+                                staff_per_school[db_key][fg]['workload_mean'] = float(val or 0)
 
-                                if key[:-1] == ['PERSONEN', 'IN', 'TIJDELIJKE', 'DIENST']:
-                                    staff_per_school[db_key][fg]['staff_workload_temp'] = int(float(val or 0))
-                                if key[:-1] == ['PERSONEN', 'IN', 'VASTE', 'DIENST']:
-                                    staff_per_school[db_key][fg]['staff_workload_perm'] = int(float(val or 0))
+                            if key[:-1] == ['PERSONEN', 'IN', 'TIJDELIJKE', 'DIENST']:
+                                staff_per_school[db_key][fg]['staff_workload_temp'] = int(float(val or 0))
+                            if key[:-1] == ['PERSONEN', 'IN', 'VASTE', 'DIENST']:
+                                staff_per_school[db_key][fg]['staff_workload_perm'] = int(float(val or 0))
 
-                                if 'staff_workload' not in staff_per_school[db_key][fg]:
-                                    staff_per_school[db_key][fg]['staff_workload'] = []
-                                if key[0] == 'PERSONEN' and key[-2] == "FTE'S":
-                                    key_range = '>%s' % key[-3] if key[1] == 'MEER' else ''.join(key[1:-2])
-                                    staff_per_school[db_key][fg]['staff_workload'].append({
-                                        'range': key_range, 
-                                        'count': int(float(val or 0)),
-                                    })
+                            if 'staff_workload' not in staff_per_school[db_key][fg]:
+                                staff_per_school[db_key][fg]['staff_workload'] = []
+                            if key[0] == 'PERSONEN' and key[-2] == "FTE'S":
+                                key_range = '>%s' % key[-3] if key[1] == 'MEER' else ''.join(key[1:-2])
+                                staff_per_school[db_key][fg]['staff_workload'].append({
+                                    'range': key_range, 
+                                    'count': int(float(val or 0)),
+                                })
 
-                                if 'staff_age' not in staff_per_school[db_key][fg]:
-                                    staff_per_school[db_key][fg]['staff_age'] = []
-                                if key[0] == 'PERSONEN' and key[-2] == 'JAAR':
-                                    key_range = '>%s' % key[-3] if key[1] == 'OUDER' \
-                                           else '<%s' % key[-3] if key[1] == 'JONGER' \
-                                           else ''.join(key[1:-2])
-                                    staff_per_school[db_key][fg]['staff_age'].append({
-                                        'range': key_range, 
-                                        'count': int(float(val or 0)),
-                                    })
+                            if 'staff_age' not in staff_per_school[db_key][fg]:
+                                staff_per_school[db_key][fg]['staff_age'] = []
+                            if key[0] == 'PERSONEN' and key[-2] == 'JAAR':
+                                key_range = '>%s' % key[-3] if key[1] == 'OUDER' \
+                                       else '<%s' % key[-3] if key[1] == 'JONGER' \
+                                       else ''.join(key[1:-2])
+                                staff_per_school[db_key][fg]['staff_age'].append({
+                                    'range': key_range, 
+                                    'count': int(float(val or 0)),
+                                })
+                            if key[:-1] == ['LEEFTIJD', 'ONBEKEND']: # unknown ages, almost always zero
+                                staff_per_school[db_key][fg]['staff_age'].append({
+                                    'range': '?', 
+                                    'count': int(float(val or 0)),
+                                })
 
 
             for (year, brinnr, boardnr), per_school in staff_per_school.iteritems():
@@ -1972,15 +1975,7 @@ class DuoPoSchoolsSpider(DuoSpider):
                         staff_reference_date=reference_date,
                         staff=per_school_fgs
                     )
-                # else:
-                #     school = DuoPoBoard(
-                #         board_id=boardnr,
-                #         reference_year=year,
-                #         staff_reference_url=xls_url,
-                #         staff_reference_date=reference_date,
-                #         staff=per_school
-                #     )
-                yield school
+                    yield school
 
 
 class DuoPoBranchesSpider(DuoSpider):
