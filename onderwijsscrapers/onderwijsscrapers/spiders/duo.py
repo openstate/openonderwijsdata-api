@@ -1547,9 +1547,9 @@ def get_po_staff_people(xls_url, with_brin=True):
                             staff_per_year[year]['workload_mean'] = float(val or 0)
 
                         if key[:-1] == ['PERSONEN', 'IN', 'TIJDELIJKE', 'DIENST']:
-                            staff_per_year[year]['staff_workload_temp'] = int(float(val or 0))
+                            staff_per_year[year]['staff_temp'] = int(float(val or 0))
                         if key[:-1] == ['PERSONEN', 'IN', 'VASTE', 'DIENST']:
-                            staff_per_year[year]['staff_workload_perm'] = int(float(val or 0))
+                            staff_per_year[year]['staff_perm'] = int(float(val or 0))
 
                         if 'staff_workload' not in staff_per_year[year]:
                             staff_per_year[year]['staff_workload'] = []
@@ -1588,6 +1588,105 @@ def get_po_staff_people(xls_url, with_brin=True):
 
     return staff_per_school
 
+def get_po_staff_fte(xls_url, with_brin=True):
+    """
+    Primair onderwijs > Personeel
+    Parse "02. Onderwijspersoneel in aantal fte"
+
+    Both on school and board level
+
+    returns dict of `{(year, brin/board id): {staff dict}}`
+    """
+    staff_per_school = {}
+
+    sheets = parse_xls_sheets_from_url(xls_url)
+    for row in sheets['per owtype-bestuur-brin-functie']:
+        brinnr = row.pop('BRIN NUMMER', None).strip()
+        boardnr = int(float(row.pop('BEVOEGD GEZAG', None)))
+
+        item_id = None
+        if with_brin and brinnr != 'bovenschools':
+            item_id = brinnr
+        if (not with_brin) and brinnr == 'bovenschools':
+            item_id = boardnr
+        
+        if item_id is not None:
+            fg = row.pop('FUNCTIEGROEP', None)
+            staff_per_year = {}
+
+            # loop over all rows, filtering key names
+            for key, val in row.items():
+                key = key.split()
+                if key[-1].isdigit() and len(key[-1]) == 4:
+                    
+                    year = int(key[-1])
+                    if year not in staff_per_year:
+                        staff_per_year[year] = {}
+
+                    # missing values are starred, for privacy reasons
+                    if val != '*':
+                        if key[:-1] == ["FTE'S"]:
+                            staff_per_year[year]['fte'] = float(val or 0)
+
+                        if key[:-1] == ["FTE'S", 'MANNEN']:
+                            staff_per_year[year]['fte_male'] = float(val or 0)
+                        if key[:-1] == ["FTE'S", 'VROUWEN']:
+                            staff_per_year[year]['fte_female'] = float(val or 0)
+                        if key[:-1] == ["FTE'S", 'GESLACHT', 'ONBEKEND']:
+                            staff_per_year[year]['fte_gender_unknown'] = float(val or 0)
+
+                        # These fields are already present in staff_people
+                        # mean ages: 0 means missing
+                        # if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD']:
+                        #     staff_per_year[year]['age_mean'] = float(val or 0) or None
+                        # if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'MAN']:
+                        #     staff_per_year[year]['age_mean_male'] = float(val or 0) or None
+                        # if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'VROUW']:
+                        #     staff_per_year[year]['age_mean_female'] = float(val or 0) or None
+                        # if key[:-1] == ['GEMIDDELDE', "FTE'S"]:
+                        #     staff_per_year[year]['workload_mean'] = float(val or 0)
+
+                        if key[:-1] == ["FTE'S", 'PERSONEN', 'IN', 'TIJDELIJKE', 'DIENST']:
+                            staff_per_year[year]['fte_temp'] = float(val or 0)
+                        if key[:-1] == ["FTE'S", 'PERSONEN', 'IN', 'VASTE', 'DIENST']:
+                            staff_per_year[year]['fte_perm'] = float(val or 0)
+
+                        if 'fte_workload' not in staff_per_year[year]:
+                            staff_per_year[year]['fte_workload'] = []
+                        if key[0:1] == ["FTE'S", 'PERSONEN'] and key[-2] == "FTE'S":
+                            key_range = '>%s' % key[-3] if key[2] == 'MEER' else ''.join(key[2:-2])
+                            staff_per_year[year]['fte_workload'].append({
+                                'range': key_range, 
+                                'fte': float(val or 0),
+                            })
+
+                        if 'fte_age' not in staff_per_year[year]:
+                            staff_per_year[year]['fte_age'] = []
+                        if key[0:1] == ["FTE'S", 'PERSONEN'] and key[-2] == 'JAAR':
+                            key_range = '>%s' % key[-3] if key[2] == 'OUDER' \
+                                   else '<%s' % key[-3] if key[2] == 'JONGER' \
+                                   else ''.join(key[2:-2])
+                            staff_per_year[year]['fte_age'].append({
+                                'range': key_range, 
+                                'fte': float(val or 0),
+                            })
+                        if key[:-1] == ["FTE'S", 'LEEFTIJD', 'ONBEKEND']: # unknown ages, almost always zero
+                            staff_per_year[year]['fte_age'].append({
+                                'range': '?', 
+                                'fte': float(val or 0),
+                            })
+
+            # add rows per function group
+            for year, staff in staff_per_year.items():
+                if (year, item_id) not in staff_per_school:
+                    staff_per_school[(year, item_id)] = []
+
+                staff_per_school[(year, item_id)].append({
+                    'function_group': fg, 
+                    'staff': staff if staff['fte'] else {'fte': 0},
+                })
+
+    return staff_per_school
 
 
 class DuoPoBoardsSpider(DuoSpider):
@@ -1603,6 +1702,8 @@ class DuoPoBoardsSpider(DuoSpider):
                 self.parse_po_education_type,
             'po/Onderwijspersoneel/Personeel/po_personeel_personen.asp':
                 self.parse_po_staff_people,
+            'po/Onderwijspersoneel/Personeel/po_personeel_fte.asp':
+                self.parse_po_staff_fte,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -1793,7 +1894,27 @@ class DuoPoBoardsSpider(DuoSpider):
             staff_per_board = get_po_staff_people(xls_url, with_brin=False)
 
             for (year, board_id), per_board in staff_per_board.iteritems():
-                print (year, board_id)
+                board = DuoPoBoard(
+                    board_id=board_id,
+                    reference_year=year,
+                    staff_reference_url=xls_url,
+                    staff_reference_date=reference_date,
+                    staff=per_board
+                )
+                yield board
+
+    def parse_po_staff_fte(self, response):
+        """
+        Primair onderwijs > Personeel
+        Parse "02. Onderwijspersoneel in aantal fte"
+        """
+
+        for xls_url, reference_date in find_available_datasets(response, extension='xls').iteritems():
+            reference_year = reference_date.year # different years in document
+            reference_date = str(reference_date)
+            staff_per_board = get_po_staff_fte(xls_url, with_brin=False)
+
+            for (year, board_id), per_board in staff_per_board.iteritems():
                 board = DuoPoBoard(
                     board_id=board_id,
                     reference_year=year,
@@ -2022,6 +2143,26 @@ class DuoPoSchoolsSpider(DuoSpider):
                 )
                 yield school
 
+    def parse_po_staff_fte(self, response):
+        """
+        Primair onderwijs > Personeel
+        Parse "02. Onderwijspersoneel in aantal fte"
+        """
+
+        for xls_url, reference_date in find_available_datasets(response, extension='xls').iteritems():
+            reference_year = reference_date.year # different years in document
+            reference_date = str(reference_date)
+            staff_per_school = get_po_staff_fte(xls_url, with_brin=True)
+
+            for (year, brin), per_school in staff_per_school.iteritems():
+                school = DuoPoSchool(
+                    brin=brin,
+                    reference_year=year,
+                    staff_reference_url=xls_url,
+                    staff_reference_date=reference_date,
+                    staff=per_school
+                )
+                yield school
 
 class DuoPoBranchesSpider(DuoSpider):
     name = 'duo_po_branches'
