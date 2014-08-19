@@ -927,7 +927,7 @@ class DuoVoSchoolsSpider(DuoSpider):
             staff_per_school = {}
 
             sheets = parse_xls_sheets_from_url(xls_url)
-            for row in islice(sheets['per bestuur-brin-vak-graad'], 10):
+            for row in islice(sheets['per bestuur-brin-vak-graad'], None):
                 brin = row.pop('BRIN NUMMER', None).strip()
 
                 course = row.pop('VAK', None)
