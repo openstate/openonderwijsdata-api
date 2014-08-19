@@ -201,6 +201,11 @@ class DuoVoSchool(SchoolItem):
     fte_reference_date = Field()
     fte = Field()
 
+    # Contents of "03. Onderwijspersoneel in aantal personen per vak"
+    staff_per_course_reference_url = Field()
+    staff_per_course_reference_date = Field()
+    staff_per_course = Field()
+
 
 class DuoVoBoard(Item):
     ignore_id_fields = Field()

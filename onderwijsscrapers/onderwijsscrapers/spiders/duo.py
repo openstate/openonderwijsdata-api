@@ -154,6 +154,207 @@ def int_or_none(value):
         return None
 
 
+def get_staff_people(xls_url, with_brin=True):
+    """
+    Primair/Voortgezet onderwijs > Personeel
+    Parse "01. Onderwijspersoneel in aantal personen"
+
+    Both on school and board level
+
+    returns dict of `{(year, brin/board id): {staff dict}}`
+    """
+    staff_per_school = {}
+
+    sheets = parse_xls_sheets_from_url(xls_url)
+    for row in islice(sheets['per owtype-bestuur-brin-functie'], None):
+        brinnr = row.pop('BRIN NUMMER', None).strip()
+        boardnr = int(float(row.pop('BEVOEGD GEZAG', None)))
+
+        item_id = None
+        if with_brin and brinnr != 'bovenschools':
+            item_id = brinnr
+        if (not with_brin) and brinnr == 'bovenschools':
+            item_id = boardnr
+        
+        if item_id is not None:
+            fg = row.pop('FUNCTIEGROEP', None)
+            staff_per_year = {}
+
+            # loop over all rows, filtering key names and extracting year
+            for key, val in row.items():
+                key = key.split()
+                if key[-1].isdigit() and len(key[-1]) == 4:
+                    
+                    year = int(key[-1])
+                    if year not in staff_per_year:
+                        staff_per_year[year] = {}
+
+                    # missing values are starred, for privacy reasons
+                    if val != '*':
+                        if key[:-1] == ['PERSONEN']:
+                            staff_per_year[year]['staff'] = int(float(val or 0))
+
+                        if key[:-1] == ['MANNEN']:
+                            staff_per_year[year]['staff_male'] = int(float(val or 0))
+                        if key[:-1] == ['VROUWEN']:
+                            staff_per_year[year]['staff_female'] = int(float(val or 0))
+                        if key[:-1] == ['GESLACHT', 'ONBEKEND']:
+                            staff_per_year[year]['staff_gender_unknown'] = int(float(val or 0))
+
+                        # mean ages: 0 means missing
+                        if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD']:
+                            staff_per_year[year]['age_mean'] = float(val or 0) or None
+                        if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'MAN']:
+                            staff_per_year[year]['age_mean_male'] = float(val or 0) or None
+                        if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'VROUW']:
+                            staff_per_year[year]['age_mean_female'] = float(val or 0) or None
+
+                        if key[:-1] == ['GEMIDDELDE', "FTE'S"]:
+                            staff_per_year[year]['workload_mean'] = float(val or 0)
+
+                        if key[:-1] == ['PERSONEN', 'IN', 'TIJDELIJKE', 'DIENST']:
+                            staff_per_year[year]['staff_temp'] = int(float(val or 0))
+                        if key[:-1] == ['PERSONEN', 'IN', 'VASTE', 'DIENST']:
+                            staff_per_year[year]['staff_perm'] = int(float(val or 0))
+
+                        if 'staff_workload' not in staff_per_year[year]:
+                            staff_per_year[year]['staff_workload'] = []
+                        if key[0] == 'PERSONEN' and key[-2] == "FTE'S":
+                            key_range = '>%s' % key[-3] if key[1] == 'MEER' else ''.join(key[1:-2])
+                            staff_per_year[year]['staff_workload'].append({
+                                'range': key_range, 
+                                'count': int(float(val or 0)),
+                            })
+
+                        if 'staff_age' not in staff_per_year[year]:
+                            staff_per_year[year]['staff_age'] = []
+                        if key[0] == 'PERSONEN' and key[-2] == 'JAAR':
+                            key_range = '>%s' % key[-3] if key[1] == 'OUDER' \
+                                   else '<%s' % key[-3] if key[1] == 'JONGER' \
+                                   else ''.join(key[1:-2])
+                            staff_per_year[year]['staff_age'].append({
+                                'range': key_range, 
+                                'count': int(float(val or 0)),
+                            })
+                        if key[:-1] == ['LEEFTIJD', 'ONBEKEND']: # unknown ages, almost always zero
+                            staff_per_year[year]['staff_age'].append({
+                                'range': '?', 
+                                'count': int(float(val or 0)),
+                            })
+
+            # add rows per function group
+            for year, staff in staff_per_year.items():
+                if (year, item_id) not in staff_per_school:
+                    staff_per_school[(year, item_id)] = []
+
+                staff_per_school[(year, item_id)].append({
+                    'function_group': fg, 
+                    'staff': staff if staff['staff'] else {'staff': 0},
+                })
+
+    return staff_per_school
+
+def get_staff_fte(xls_url, with_brin=True):
+    """
+    Primair/Voortgezet onderwijs > Personeel
+    Parse "02. Onderwijspersoneel in aantal fte"
+
+    Both on school and board level
+
+    returns dict of `{(year, brin/board id): {staff dict}}`
+    """
+    fte_per_school = {}
+
+    sheets = parse_xls_sheets_from_url(xls_url)
+    for row in islice(sheets['per owtype-bestuur-brin-functie'], None):
+        brinnr = row.pop('BRIN NUMMER', None).strip()
+        boardnr = int(float(row.pop('BEVOEGD GEZAG', None)))
+
+        item_id = None
+        if with_brin and brinnr != 'bovenschools':
+            item_id = brinnr
+        if (not with_brin) and brinnr == 'bovenschools':
+            item_id = boardnr
+        
+        if item_id is not None:
+            fg = row.pop('FUNCTIEGROEP', None)
+            fte_per_year = {}
+
+            # loop over all rows, filtering key names and extracting year
+            for key, val in row.items():
+                key = key.split()
+                if key[-1].isdigit() and len(key[-1]) == 4:
+                    
+                    year = int(key[-1])
+                    if year not in fte_per_year:
+                        fte_per_year[year] = {}
+
+                    # missing values are starred, for privacy reasons
+                    if val != '*':
+                        if key[:-1] == ["FTE'S"]:
+                            fte_per_year[year]['fte'] = float(val or 0)
+
+                        if key[:-1] == ["FTE'S", 'MANNEN']:
+                            fte_per_year[year]['fte_male'] = float(val or 0)
+                        if key[:-1] == ["FTE'S", 'VROUWEN']:
+                            fte_per_year[year]['fte_female'] = float(val or 0)
+                        if key[:-1] == ["FTE'S", 'GESLACHT', 'ONBEKEND']:
+                            fte_per_year[year]['fte_gender_unknown'] = float(val or 0)
+
+                        # These fields are already present in staff_people
+                        # mean ages: 0 means missing
+                        # if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD']:
+                        #     fte_per_year[year]['age_mean'] = float(val or 0) or None
+                        # if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'MAN']:
+                        #     fte_per_year[year]['age_mean_male'] = float(val or 0) or None
+                        # if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'VROUW']:
+                        #     fte_per_year[year]['age_mean_female'] = float(val or 0) or None
+                        # if key[:-1] == ['GEMIDDELDE', "FTE'S"]:
+                        #     fte_per_year[year]['workload_mean'] = float(val or 0)
+
+                        if key[:-1] == ["FTE'S", 'PERSONEN', 'IN', 'TIJDELIJKE', 'DIENST']:
+                            fte_per_year[year]['fte_temp'] = float(val or 0)
+                        if key[:-1] == ["FTE'S", 'PERSONEN', 'IN', 'VASTE', 'DIENST']:
+                            fte_per_year[year]['fte_perm'] = float(val or 0)
+
+                        if 'fte_workload' not in fte_per_year[year]:
+                            fte_per_year[year]['fte_workload'] = []
+                        if key[0:1] == ["FTE'S", 'PERSONEN'] and key[-2] == "FTE'S":
+                            key_range = '>%s' % key[-3] if key[2] == 'MEER' else ''.join(key[2:-2])
+                            fte_per_year[year]['fte_workload'].append({
+                                'range': key_range, 
+                                'fte': float(val or 0),
+                            })
+
+                        if 'fte_age' not in fte_per_year[year]:
+                            fte_per_year[year]['fte_age'] = []
+                        if key[0:1] == ["FTE'S", 'PERSONEN'] and key[-2] == 'JAAR':
+                            key_range = '>%s' % key[-3] if key[2] == 'OUDER' \
+                                   else '<%s' % key[-3] if key[2] == 'JONGER' \
+                                   else ''.join(key[2:-2])
+                            fte_per_year[year]['fte_age'].append({
+                                'range': key_range, 
+                                'fte': float(val or 0),
+                            })
+                        if key[:-1] == ["FTE'S", 'LEEFTIJD', 'ONBEKEND']: # unknown ages, almost always zero
+                            fte_per_year[year]['fte_age'].append({
+                                'range': '?', 
+                                'fte': float(val or 0),
+                            })
+
+            # add rows per function group
+            for year, staff in fte_per_year.items():
+                if (year, item_id) not in fte_per_school:
+                    fte_per_school[(year, item_id)] = []
+
+                fte_per_school[(year, item_id)].append({
+                    'function_group': fg, 
+                    'fte': staff if staff['fte'] else {'fte': 0},
+                })
+
+    return fte_per_school
+
+
 
 
 class DuoVoBoardsSpider(DuoSpider):
@@ -386,6 +587,8 @@ class DuoVoSchoolsSpider(DuoSpider):
                 self.parse_vo_staff_people,
             'vo/personeel/Personeel/vo_personeel_fte.asp':
                 self.parse_vo_staff_fte,
+            'vo/personeel/Personeel/vo_personeel_3.asp':
+                self.parse_vo_staff_course,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -679,6 +882,113 @@ class DuoVoSchoolsSpider(DuoSpider):
                     fte_reference_url=xls_url,
                     fte_reference_date=reference_date,
                     fte=per_school
+                )
+                yield school
+
+    def parse_vo_staff_course(self, response):
+        """
+        Voortgezet onderwijs > Personeel
+        Parse "03. Onderwijspersoneel in aantal personen per vak"
+        """
+        INTS = {
+            'staff':
+                ['AANTAL','PERSONEN'],
+            'staff_perm':
+                ['AANTAL','PERSONEN','IN','VASTE','DIENST'],
+            'staff_temp':
+                ['AANTAL','PERSONEN','IN','TIJDELIJKE','DIENST'],
+            'staff_substitutes':
+                ['AANTAL','PERSONEN','IN','DIENST','ALS','VERVANGING'],
+            'staff_unappointed':
+                ['AANTAL','PERSONEN','IN','DIENST','ZONDER','BENOEMING'],
+            'staff_appointment_unknown':
+                ['AANTAL','PERSONEN','IN','DIENST','ALS','ONBEKEND'],
+            'staff_female':
+                ['VROUWEN'],
+            'staff_male':
+                ['MANNEN'],
+            'staff_gender_unknown':
+                ['GESLACHT','ONBEKEND'],
+        }
+        FLOATS = {
+            'age_mean':
+                ['GEMIDDELDE','LEEFTIJD'],
+            'age_mean_female':
+                ['GEMIDDELDE','LEEFTIJD','VROUW'],
+            'age_mean_male':
+                ['GEMIDDELDE','LEEFTIJD','MAN'],
+        }
+
+
+        for xls_url, reference_date in find_available_datasets(response, extension='xls').iteritems():
+            reference_year = reference_date.year # different years in document
+            reference_date = str(reference_date)
+
+            staff_per_school = {}
+
+            sheets = parse_xls_sheets_from_url(xls_url)
+            for row in islice(sheets['per bestuur-brin-vak-graad'], 10):
+                brin = row.pop('BRIN NUMMER', None).strip()
+
+                course = row.pop('VAK', None)
+                degree = row.pop('GRAAD', None)
+                staff_per_year = {}
+
+                # loop over all rows, filtering key names and extracting year
+                for key, val in row.items():
+                    key = key.split()
+                    if key[-1].isdigit() and len(key[-1]) == 4:
+                        
+                        year = int(key[-1])
+                        if year not in staff_per_year:
+                            staff_per_year[year] = {}
+
+                        # missing values are starred, for privacy reasons
+                        if val != '*':
+
+                            for k,v in INTS.items():
+                                if key[:-1] == v:
+                                    staff_per_year[year][k] = int(float(val or 0))
+
+                            for k,v in FLOATS.items():
+                                if key[:-1] == v:
+                                    staff_per_year[year][k] = float(val or 0) or None
+
+                            if 'staff_age' not in staff_per_year[year]:
+                                staff_per_year[year]['staff_age'] = []
+                            if key[0:1] == ['AANTAL', 'PERSONEN'] and key[-2] == 'JAAR':
+                                key_range = '>%s' % key[-3] if key[2] == 'OUDER' \
+                                       else '<%s' % key[-3] if key[2] == 'JONGER' \
+                                       else ''.join(key[2:-2])
+                                fte_per_year[year]['fte_age'].append({
+                                    'range': key_range, 
+                                    'count': float(val or 0),
+                                })
+                            if key[:-1] == ['LEEFTIJD', 'ONBEKEND']: # unknown ages, almost always zero
+                                staff_per_year[year]['staff_age'].append({
+                                    'range': '?', 
+                                    'count': int(float(val or 0)),
+                                })
+
+                # add rows per function group
+                for year, staff in staff_per_year.items():
+                    if (year, brin) not in staff_per_school:
+                        staff_per_school[(year, brin)] = []
+
+                    staff_per_school[(year, brin)].append({
+                        'course': course,
+                        'degree': degree,
+                        'staff': staff if staff['staff'] else {'staff': 0},
+                    })
+
+
+            for (year, brin), per_school in staff_per_school.iteritems():
+                school = DuoVoSchool(
+                    brin=brin,
+                    reference_year=year,
+                    staff_per_course_reference_url=xls_url,
+                    staff_per_course_reference_date=reference_date,
+                    staff_per_course=per_school
                 )
                 yield school
 
@@ -1579,207 +1889,6 @@ class DuoVoBranchesSpider(DuoSpider):
                     students_by_finegrained_structure=per_school
                 )
                 yield school
-
-
-def get_staff_people(xls_url, with_brin=True):
-    """
-    Primair/Voortgezet onderwijs > Personeel
-    Parse "01. Onderwijspersoneel in aantal personen"
-
-    Both on school and board level
-
-    returns dict of `{(year, brin/board id): {staff dict}}`
-    """
-    staff_per_school = {}
-
-    sheets = parse_xls_sheets_from_url(xls_url)
-    for row in islice(sheets['per owtype-bestuur-brin-functie'], None):
-        brinnr = row.pop('BRIN NUMMER', None).strip()
-        boardnr = int(float(row.pop('BEVOEGD GEZAG', None)))
-
-        item_id = None
-        if with_brin and brinnr != 'bovenschools':
-            item_id = brinnr
-        if (not with_brin) and brinnr == 'bovenschools':
-            item_id = boardnr
-        
-        if item_id is not None:
-            fg = row.pop('FUNCTIEGROEP', None)
-            staff_per_year = {}
-
-            # loop over all rows, filtering key names
-            for key, val in row.items():
-                key = key.split()
-                if key[-1].isdigit() and len(key[-1]) == 4:
-                    
-                    year = int(key[-1])
-                    if year not in staff_per_year:
-                        staff_per_year[year] = {}
-
-                    # missing values are starred, for privacy reasons
-                    if val != '*':
-                        if key[:-1] == ['PERSONEN']:
-                            staff_per_year[year]['staff'] = int(float(val or 0))
-
-                        if key[:-1] == ['MANNEN']:
-                            staff_per_year[year]['staff_male'] = int(float(val or 0))
-                        if key[:-1] == ['VROUWEN']:
-                            staff_per_year[year]['staff_female'] = int(float(val or 0))
-                        if key[:-1] == ['GESLACHT', 'ONBEKEND']:
-                            staff_per_year[year]['staff_gender_unknown'] = int(float(val or 0))
-
-                        # mean ages: 0 means missing
-                        if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD']:
-                            staff_per_year[year]['age_mean'] = float(val or 0) or None
-                        if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'MAN']:
-                            staff_per_year[year]['age_mean_male'] = float(val or 0) or None
-                        if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'VROUW']:
-                            staff_per_year[year]['age_mean_female'] = float(val or 0) or None
-
-                        if key[:-1] == ['GEMIDDELDE', "FTE'S"]:
-                            staff_per_year[year]['workload_mean'] = float(val or 0)
-
-                        if key[:-1] == ['PERSONEN', 'IN', 'TIJDELIJKE', 'DIENST']:
-                            staff_per_year[year]['staff_temp'] = int(float(val or 0))
-                        if key[:-1] == ['PERSONEN', 'IN', 'VASTE', 'DIENST']:
-                            staff_per_year[year]['staff_perm'] = int(float(val or 0))
-
-                        if 'staff_workload' not in staff_per_year[year]:
-                            staff_per_year[year]['staff_workload'] = []
-                        if key[0] == 'PERSONEN' and key[-2] == "FTE'S":
-                            key_range = '>%s' % key[-3] if key[1] == 'MEER' else ''.join(key[1:-2])
-                            staff_per_year[year]['staff_workload'].append({
-                                'range': key_range, 
-                                'count': int(float(val or 0)),
-                            })
-
-                        if 'staff_age' not in staff_per_year[year]:
-                            staff_per_year[year]['staff_age'] = []
-                        if key[0] == 'PERSONEN' and key[-2] == 'JAAR':
-                            key_range = '>%s' % key[-3] if key[1] == 'OUDER' \
-                                   else '<%s' % key[-3] if key[1] == 'JONGER' \
-                                   else ''.join(key[1:-2])
-                            staff_per_year[year]['staff_age'].append({
-                                'range': key_range, 
-                                'count': int(float(val or 0)),
-                            })
-                        if key[:-1] == ['LEEFTIJD', 'ONBEKEND']: # unknown ages, almost always zero
-                            staff_per_year[year]['staff_age'].append({
-                                'range': '?', 
-                                'count': int(float(val or 0)),
-                            })
-
-            # add rows per function group
-            for year, staff in staff_per_year.items():
-                if (year, item_id) not in staff_per_school:
-                    staff_per_school[(year, item_id)] = []
-
-                staff_per_school[(year, item_id)].append({
-                    'function_group': fg, 
-                    'staff': staff if staff['staff'] else {'staff': 0},
-                })
-
-    return staff_per_school
-
-def get_staff_fte(xls_url, with_brin=True):
-    """
-    Primair/Voortgezet onderwijs > Personeel
-    Parse "02. Onderwijspersoneel in aantal fte"
-
-    Both on school and board level
-
-    returns dict of `{(year, brin/board id): {staff dict}}`
-    """
-    fte_per_school = {}
-
-    sheets = parse_xls_sheets_from_url(xls_url)
-    for row in islice(sheets['per owtype-bestuur-brin-functie'], None):
-        brinnr = row.pop('BRIN NUMMER', None).strip()
-        boardnr = int(float(row.pop('BEVOEGD GEZAG', None)))
-
-        item_id = None
-        if with_brin and brinnr != 'bovenschools':
-            item_id = brinnr
-        if (not with_brin) and brinnr == 'bovenschools':
-            item_id = boardnr
-        
-        if item_id is not None:
-            fg = row.pop('FUNCTIEGROEP', None)
-            fte_per_year = {}
-
-            # loop over all rows, filtering key names
-            for key, val in row.items():
-                key = key.split()
-                if key[-1].isdigit() and len(key[-1]) == 4:
-                    
-                    year = int(key[-1])
-                    if year not in fte_per_year:
-                        fte_per_year[year] = {}
-
-                    # missing values are starred, for privacy reasons
-                    if val != '*':
-                        if key[:-1] == ["FTE'S"]:
-                            fte_per_year[year]['fte'] = float(val or 0)
-
-                        if key[:-1] == ["FTE'S", 'MANNEN']:
-                            fte_per_year[year]['fte_male'] = float(val or 0)
-                        if key[:-1] == ["FTE'S", 'VROUWEN']:
-                            fte_per_year[year]['fte_female'] = float(val or 0)
-                        if key[:-1] == ["FTE'S", 'GESLACHT', 'ONBEKEND']:
-                            fte_per_year[year]['fte_gender_unknown'] = float(val or 0)
-
-                        # These fields are already present in staff_people
-                        # mean ages: 0 means missing
-                        # if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD']:
-                        #     fte_per_year[year]['age_mean'] = float(val or 0) or None
-                        # if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'MAN']:
-                        #     fte_per_year[year]['age_mean_male'] = float(val or 0) or None
-                        # if key[:-1] == ['GEMIDDELDE', 'LEEFTIJD', 'VROUW']:
-                        #     fte_per_year[year]['age_mean_female'] = float(val or 0) or None
-                        # if key[:-1] == ['GEMIDDELDE', "FTE'S"]:
-                        #     fte_per_year[year]['workload_mean'] = float(val or 0)
-
-                        if key[:-1] == ["FTE'S", 'PERSONEN', 'IN', 'TIJDELIJKE', 'DIENST']:
-                            fte_per_year[year]['fte_temp'] = float(val or 0)
-                        if key[:-1] == ["FTE'S", 'PERSONEN', 'IN', 'VASTE', 'DIENST']:
-                            fte_per_year[year]['fte_perm'] = float(val or 0)
-
-                        if 'fte_workload' not in fte_per_year[year]:
-                            fte_per_year[year]['fte_workload'] = []
-                        if key[0:1] == ["FTE'S", 'PERSONEN'] and key[-2] == "FTE'S":
-                            key_range = '>%s' % key[-3] if key[2] == 'MEER' else ''.join(key[2:-2])
-                            fte_per_year[year]['fte_workload'].append({
-                                'range': key_range, 
-                                'fte': float(val or 0),
-                            })
-
-                        if 'fte_age' not in fte_per_year[year]:
-                            fte_per_year[year]['fte_age'] = []
-                        if key[0:1] == ["FTE'S", 'PERSONEN'] and key[-2] == 'JAAR':
-                            key_range = '>%s' % key[-3] if key[2] == 'OUDER' \
-                                   else '<%s' % key[-3] if key[2] == 'JONGER' \
-                                   else ''.join(key[2:-2])
-                            fte_per_year[year]['fte_age'].append({
-                                'range': key_range, 
-                                'fte': float(val or 0),
-                            })
-                        if key[:-1] == ["FTE'S", 'LEEFTIJD', 'ONBEKEND']: # unknown ages, almost always zero
-                            fte_per_year[year]['fte_age'].append({
-                                'range': '?', 
-                                'fte': float(val or 0),
-                            })
-
-            # add rows per function group
-            for year, staff in fte_per_year.items():
-                if (year, item_id) not in fte_per_school:
-                    fte_per_school[(year, item_id)] = []
-
-                fte_per_school[(year, item_id)].append({
-                    'function_group': fg, 
-                    'fte': staff if staff['fte'] else {'fte': 0},
-                })
-
-    return fte_per_school
 
 
 class DuoPoBoardsSpider(DuoSpider):
