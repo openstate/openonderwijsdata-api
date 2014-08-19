@@ -206,6 +206,11 @@ class DuoVoSchool(SchoolItem):
     staff_per_course_reference_date = Field()
     staff_per_course = Field()
 
+    # Contents of "04. Gegeven lesuren per vak"
+    time_per_course_reference_url = Field()
+    time_per_course_reference_date = Field()
+    time_per_course = Field()
+
 
 class DuoVoBoard(Item):
     ignore_id_fields = Field()

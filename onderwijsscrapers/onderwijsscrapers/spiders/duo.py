@@ -590,7 +590,7 @@ class DuoVoSchoolsSpider(DuoSpider):
             'vo/personeel/Personeel/vo_personeel_3.asp':
                 self.parse_vo_staff_course,
             'vo/personeel/Personeel/vo_personeel_4.asp':
-                self.parse_vo_staff_course_time,
+                self.parse_vo_time_per_course,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -996,7 +996,7 @@ class DuoVoSchoolsSpider(DuoSpider):
                 )
                 yield school
 
-    def parse_vo_staff_course_time(self, response):
+    def parse_vo_time_per_course(self, response):
         """
         Voortgezet onderwijs > Personeel
         Parse "04. Gegeven lesuren per vak"
@@ -1103,9 +1103,9 @@ class DuoVoSchoolsSpider(DuoSpider):
                 school = DuoVoSchool(
                     brin=brin,
                     reference_year=year,
-                    staff_per_course_reference_url=xls_url,
-                    staff_per_course_reference_date=reference_date,
-                    staff_per_course=per_school
+                    time_per_course_reference_url=xls_url,
+                    time_per_course_reference_date=reference_date,
+                    time_per_course=per_school
                 )
                 yield school
 
