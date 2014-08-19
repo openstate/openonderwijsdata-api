@@ -191,6 +191,16 @@ class DuoVoSchool(SchoolItem):
     pao_collaboration_reference_date = Field()
     pao_collaboration = Field()
 
+    # Contents of "01. Onderwijspersoneel in aantal personen"
+    staff_reference_url = Field()
+    staff_reference_date = Field()
+    staff = Field()
+
+    # Contents of "02. Onderwijspersoneel in aantal fte"
+    fte_reference_url = Field()
+    fte_reference_date = Field()
+    fte = Field()
+
 
 class DuoVoBoard(Item):
     ignore_id_fields = Field()
@@ -217,6 +227,16 @@ class DuoVoBoard(Item):
     vavo_students_reference_url = Field()
     vavo_students_reference_date = Field()
     vavo_students = Field()
+
+    # Contents of "01. Onderwijspersoneel in aantal personen"
+    staff_reference_url = Field()
+    staff_reference_date = Field()
+    staff = Field()
+
+    # Contents of "02. Onderwijspersoneel in aantal fte"
+    fte_reference_url = Field()
+    fte_reference_date = Field()
+    fte = Field()
 
 
 class DuoPoBoard(Item):
@@ -248,6 +268,10 @@ class DuoPoBoard(Item):
     staff_reference_date = Field()
     staff = Field()
 
+    # Contents of "02. Onderwijspersoneel in aantal fte"
+    fte_reference_url = Field()
+    fte_reference_date = Field()
+    fte = Field()
 
 class DuoPoSchool(SchoolItem):
     ignore_id_fields = Field()
@@ -292,6 +316,11 @@ class DuoPoSchool(SchoolItem):
     staff_reference_url = Field()
     staff_reference_date = Field()
     staff = Field()
+
+    # Contents of "02. Onderwijspersoneel in aantal fte"
+    fte_reference_url = Field()
+    fte_reference_date = Field()
+    fte = Field()
 
 
 class DuoPoBranch(SchoolItem):
