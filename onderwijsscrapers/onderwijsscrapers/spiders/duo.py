@@ -2508,6 +2508,8 @@ class DuoPoBranchesSpider(DuoSpider):
                 self.parse_spo_students_by_edu_type,
             'po/Leerlingen/Leerlingen/Schooladvies.asp':
                 self.parse_po_students_by_advice,
+            'po/Leerlingen/Leerlingen/po_leerlingen26-10.asp':
+                self.parse_po_students_in_BRON,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -3113,6 +3115,82 @@ class DuoPoBranchesSpider(DuoSpider):
                 )
                 yield school
 
+    def parse_po_students_in_BRON(self, response):
+        """
+        Primair onderwijs > Leerlingen
+        Parse "10. Leerlingen zoals geregistreerd in BRON tot 26-10-2013"
+        """
+        
+        merge_header = {
+            'Leerlingen (v)so': 3,
+            'Leerlingen bao': 2,
+            'Leerlingen sbao': 2,
+        }
+
+        def extend_to_blank(l):
+            out, ext = [], ''
+            for i in l:
+                ext = i or ext
+                out.append(ext)
+            return out
+
+        for xls_url, reference_date in find_available_datasets(response, extension='xls').iteritems():
+            reference_year = reference_date.year # different years in document
+            reference_date = str(reference_date)
+            school_ids = {}
+            students_in_BRON_per_school = {}
+
+            # download manually
+            xls_file = requests.get(xls_url)
+            xls = cStringIO.StringIO(xls_file.content)
+            with open(devnull, 'w') as OUT:
+                wb = xlrd.open_workbook(file_contents=xls.read(), logfile=OUT)
+
+            sheets = {}
+            for sheet_name in wb.sheet_names():
+                if sheet_name in merge_header:
+                    sh = wb.sheet_by_name(sheet_name)
+
+                    header = zip(*[extend_to_blank(sh.row_values(h)) for h in xrange(merge_header[sheet_name])])
+
+                    print sheet_name
+
+                    for rownum in xrange(merge_header[sheet_name], 5):#sh.nrows):
+                        data = dict(zip(header, sh.row_values(rownum)))
+                        per_school = {}
+
+                        if sheet_name == 'Leerlingen (v)so':
+                            brin = data[('', '', u'BRIN NUMMER')]
+                            branch_id = int(data[('', '', u'VESTIGINGSNUMMER')])
+                        if sheet_name == 'Leerlingen bao':
+                            brin = data[('', u'BRIN NUMMER')]
+                            branch_id = int(data[('', u'VESTIGINGSNUMMER')])
+                        if sheet_name == 'Leerlingen sbao':
+                            brin = data[('', u'BRIN NUMMER')]
+                            branch_id = int(data[('', u'VESTIGINGSNUMMER')])
+
+                        school_id = '%s-%s' % (brin, branch_id)
+                        school_ids[school_id] = {
+                            'brin': brin,
+                            'branch_id': branch_id
+                        }
+                        print school_id
+
+                        # if school_id not in students_in_BRON_per_school:
+                        #     students_in_BRON_per_school[school_id] = []
+
+                        # students_in_BRON_per_school[school_id].append(per_school)
+
+            for school_id, per_school in students_in_BRON_per_school.iteritems():
+                school = DuoPoBranch(
+                    brin=school_ids[school_id]['brin'],
+                    branch_id=school_ids[school_id]['branch_id'],
+                    reference_year=reference_year,
+                    students_in_BRON_reference_url=xls_url,
+                    students_in_BRON_reference_date=reference_date,
+                    students_in_BRON=per_school
+                )
+                yield school
 
 class DuoPaoCollaborationsSpider(DuoSpider):
     name = 'duo_pao_collaborations'

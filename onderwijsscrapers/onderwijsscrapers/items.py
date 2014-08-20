@@ -403,6 +403,11 @@ class DuoPoBranch(SchoolItem):
     spo_students_by_advice_reference_date = Field()
     spo_students_by_advice = Field()
 
+    # Contents of "10. Leerlingen zoals geregistreerd in BRON tot 26-10-2013"
+    students_in_BRON_reference_url = Field()
+    students_in_BRON_reference_date = Field()
+    students_in_BRON = Field()
+
 
 class DuoPaoCollaboration(Item):
     reference_year = Field()
