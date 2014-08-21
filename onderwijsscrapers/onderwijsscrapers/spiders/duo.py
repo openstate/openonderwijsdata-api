@@ -3120,14 +3120,59 @@ class DuoPoBranchesSpider(DuoSpider):
         Primair onderwijs > Leerlingen
         Parse "10. Leerlingen zoals geregistreerd in BRON tot 26-10-2013"
         """
-        
+        # number of header rows to merge
         merge_header = {
             'Leerlingen (v)so': 3,
             'Leerlingen bao': 2,
             'Leerlingen sbao': 2,
         }
+        translate = {
+            'Aantal bekostigd':
+                'financed',
+            'Aantal niet-bekostigd':
+                'non-financed',
+            'Actief op 1-10-13':
+                'total',
+            'Ambulante begeleiding':
+                'ambulatory_guidance',
+            'Bekostigd op 1-10-13':
+                'financed',
+            'Inschrijvingen actief op 1-10-13':
+                'total',
+            'Leerlingen teruggeplaatst tussen 1-10-2012 en 1-10-2013':
+                'reintroduced',
+            'Niet-bekostigd op 1-10-13':
+                'non-financed',
+            'Totaal aantal':
+                'total',
+            'Waarvan bekostigde inschrijvingen op 1-10-13':
+                'financed',
+            'Waarvan niet-bekostigde inschrijvingen op 1-10-13':
+                'non-financed',
+            'Inschrijvingen SO/VSO':
+                'enrollments',
+            'AANTAL LEERLINGEN TOTAAL':
+                'total',
+            'BEGELEID BO/SBO':
+                'guided_bo_bso',
+            'BEGELEID VO':
+                'guided_vo',
+            'CUMI':
+                'cumi',
+            'NOAT':
+                'noat',
+            'SOORT PRIMAIR ONDERWIJS':
+                'po_type',
+            'TERUGGEPLAATST BO/SBO':
+                'reintroduced_bo_sbo',
+            'TERUGGEPLAATST VO':
+                'reintroduced_vo',
+            'VESTIGING ACTIEF OP PEILDATUM':
+                'branch_active',
+        }
 
         def extend_to_blank(l):
+            """ Transform ['','a','','b',''] into ['','a','a','b','b'] """
             out, ext = [], ''
             for i in l:
                 ext = i or ext
@@ -3151,35 +3196,72 @@ class DuoPoBranchesSpider(DuoSpider):
                 if sheet_name in merge_header:
                     sh = wb.sheet_by_name(sheet_name)
 
+                    # merge the header rows into a list of triples
                     header = zip(*[extend_to_blank(sh.row_values(h)) for h in xrange(merge_header[sheet_name])])
+                    if merge_header[sheet_name] == 2:
+                        header = [(True,a,b) for a,b in header]
 
-                    print sheet_name
-
-                    for rownum in xrange(merge_header[sheet_name], 5):#sh.nrows):
-                        data = dict(zip(header, sh.row_values(rownum)))
+                    for rownum in xrange(merge_header[sheet_name], sh.nrows):
+                        data = sh.row_values(rownum)
                         per_school = {}
 
-                        if sheet_name == 'Leerlingen (v)so':
-                            brin = data[('', '', u'BRIN NUMMER')]
-                            branch_id = int(data[('', '', u'VESTIGINGSNUMMER')])
-                        if sheet_name == 'Leerlingen bao':
-                            brin = data[('', u'BRIN NUMMER')]
-                            branch_id = int(data[('', u'VESTIGINGSNUMMER')])
-                        if sheet_name == 'Leerlingen sbao':
-                            brin = data[('', u'BRIN NUMMER')]
-                            branch_id = int(data[('', u'VESTIGINGSNUMMER')])
+                        def row_to_dict(key, val):
+                            """ Parse the key of this row & make a nice dict """
+                            ks = key.split()
+                            if 'JAAR' in ks:
+                                return 'by_age', {
+                                    'age_range': '<%s'%ks[-2] if ks[0] == 'JONGER' \
+                                            else '>%s'%ks[0] if ks[-1] == 'OUDER' \
+                                            else '%s-%s'%(ks[0], ks[2]),
+                                    'students': val,
+                                }
+                            if ks[0] == 'GEWICHT':
+                                return 'by_weight', {
+                                    'weight': float(ks[1]),
+                                    'students': val,
+                                }
+                            return None, None
 
+                        # Loop over columns & build a translated nested dict
+                        for i,(a,b,c) in enumerate(header):
+                            a = translate[a] if a in translate else a
+                            b = translate[b] if b in translate else b
+                            if a and b:
+                                per_school[a] = {} if a not in per_school else per_school[a]
+                                per_school[a][b] = {} if b not in per_school[a] else per_school[a][b]
+                                if c in translate:
+                                    per_school[a][b][translate[c]] = int(data[i])
+                                else:
+                                    k,v = row_to_dict(c, int(data[i]))
+                                    if k:
+                                        if k not in per_school[a][b]:
+                                            per_school[a][b][k] = []
+                                        per_school[a][b][k].append(v)
+                            elif a or b:
+                                a = a or b
+                                per_school[a] = {} if a not in per_school else per_school[a]
+                                per_school[a][translate[c] if c in translate else c] = data[i]
+                            else:
+                                per_school[translate[c] if c in translate else c] = data[i]
+
+                        # un-nest the hierarchy if it's actually only 2 deep
+                        if merge_header[sheet_name] == 2:
+                            per_school = per_school[True]
+
+                        per_school['branch_active'] = (per_school['branch_active']=='ja')
+
+                        brin = per_school.pop('BRIN NUMMER')
+                        branch_id = int(per_school.pop('VESTIGINGSNUMMER'))
                         school_id = '%s-%s' % (brin, branch_id)
                         school_ids[school_id] = {
                             'brin': brin,
                             'branch_id': branch_id
                         }
-                        print school_id
 
-                        # if school_id not in students_in_BRON_per_school:
-                        #     students_in_BRON_per_school[school_id] = []
+                        if school_id not in students_in_BRON_per_school:
+                            students_in_BRON_per_school[school_id] = []
 
-                        # students_in_BRON_per_school[school_id].append(per_school)
+                        students_in_BRON_per_school[school_id].append(per_school)
 
             for school_id, per_school in students_in_BRON_per_school.iteritems():
                 school = DuoPoBranch(
