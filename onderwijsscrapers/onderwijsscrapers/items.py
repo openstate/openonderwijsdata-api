@@ -422,3 +422,13 @@ class DuoPaoCollaboration(Item):
                                      #POSTCODE CORRESPONDENTIEADRES
                                      #PLAATS CORRESPONDENTIEADRES
 
+
+class OCWPoBranch(SchoolItem):
+    reference_year = Field()
+    ignore_id_fields = Field()
+
+    vision = Field()
+    board_name = Field()
+    school_type = Field()
+    mean_finals = Field()
+

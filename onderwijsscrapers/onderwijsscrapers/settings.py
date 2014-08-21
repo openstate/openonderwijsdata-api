@@ -175,6 +175,16 @@ EXPORT_SETTINGS = {
         'index': 'duo',
         'doctype': 'pao_collaboration',
         'id_fields': ['reference_year', 'collaboration_id']
+    },
+    'ocw_po_branches': {
+        'validate': False,
+        'schema': OCWPoBranch,
+        'validation_index': 'onderwijsdata_validation',
+        'geocode': False,
+        'geocode_fields': ['address'],
+        'index': 'ocw',
+        'doctype': 'po_branch',
+        'id_fields': ['reference_year', 'brin', 'branch_id']
     }
 }
 
