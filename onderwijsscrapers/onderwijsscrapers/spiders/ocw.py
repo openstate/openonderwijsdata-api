@@ -80,11 +80,11 @@ class OCWPoBranchesSpider(BaseSpider):
                 if scores['test'] == 'lvs':
                     bl = row['VERSIE_BL_%s'%y].strip()
                     if bl and bl != 'NEE' and bl != '-':
-                        scores['bl_version'] = bl.lower()
+                        scores['bl_version'] = ' '.join(sorted(bl.lower().split()))
                         
                     rw = row['VERSIE_RW_%s'%y].strip()
                     if rw and rw != 'NEE' and rw != '-':
-                        scores['rw_version'] = rw.lower()
+                        scores['rw_version'] = ' '.join(sorted(rw.lower().split()))
 
                 if row['SCORE_JR_%s'%y] != 'minder dan 5 leerlingen':
                     for s in row['SCORE_JR_%s'%y].split('|'):
