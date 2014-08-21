@@ -74,6 +74,7 @@ from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
                             DuoPoBoard, DuoPoBranch, DuoPaoCollaboration)
 from validation.schoolvo import SchoolVOBranch
 from validation.owinsp import (OnderwijsInspectieVoBranch, OnderwijsInspectiePoBranch)
+from validation.ocw import OCWPoBranch
 
 EXPORT_SETTINGS = {
     'po.owinsp.nl': {

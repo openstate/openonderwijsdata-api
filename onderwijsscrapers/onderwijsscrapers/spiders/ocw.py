@@ -43,7 +43,7 @@ class OCWPoBranchesSpider(BaseSpider):
         sh = wb.sheet_by_index(0)
 
         head = sh.row_values(0)
-        for n in xrange(1, 10):#sh.nrows):
+        for n in xrange(1, sh.nrows):
             row = dict(zip(head, sh.row_values(n)))
 
             brin = row['BRIN']
@@ -91,18 +91,20 @@ class OCWPoBranchesSpider(BaseSpider):
                         val = s.strip().split(':')
                         if len(val) == 2:
                             k,v = val
-                            k = k.split(')')[-1]
                             k = k.lower()
+                            if "dle" in k:
+                                k = '%s_dle' % k
+                            k = k.replace('%dle ','')
                             k = k.replace('-','_')
                             k = k.replace('#','')
                             k = k.replace(' ','_')
-                            # TODO: (vhd) & (%de)
-                            v = float_or_none(v.split()[0]) if v else None
+                            v = v.split()
+                            # (vhd) & (%de)
+                            if v and len(v) > 1 and v[1][0]=='(' and v[1][-1]==')':
+                                k  = '%s_%s' % (k, v[1][1:-1].replace('%',''))
+                            v = float_or_none(v[0]) if v else None
                             if v is not None:
                                 scores[k] = v
-                        elif val[0]:
-                            print val
-                            return
 
                     for k in scores.keys():
                         if scores[k] is None:

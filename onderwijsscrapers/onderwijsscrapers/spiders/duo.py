@@ -3191,7 +3191,6 @@ class DuoPoBranchesSpider(DuoSpider):
             with open(devnull, 'w') as OUT:
                 wb = xlrd.open_workbook(file_contents=xls.read(), logfile=OUT)
 
-            sheets = {}
             for sheet_name in wb.sheet_names():
                 if sheet_name in merge_header:
                     sh = wb.sheet_by_name(sheet_name)
