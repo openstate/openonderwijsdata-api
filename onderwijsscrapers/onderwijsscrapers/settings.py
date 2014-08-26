@@ -186,7 +186,17 @@ EXPORT_SETTINGS = {
         'index': 'ocw',
         'doctype': 'po_branch',
         'id_fields': ['reference_year', 'brin', 'branch_id']
-    }
+    },
+    'dans_vo_branches': {
+        'validate': False,
+        'schema': None,
+        'validation_index': 'onderwijsdata_validation',
+        'geocode': False,
+        'geocode_fields': [],
+        'index': 'dans',
+        'doctype': 'vo_branch',
+        'id_fields': ['brin', 'branch_id']
+    },
 }
 
 # Allow all settings to be overridden by a local file that is not in

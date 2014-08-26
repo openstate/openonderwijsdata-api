@@ -441,3 +441,17 @@ class OCWPoBranch(SchoolItem):
     school_type = Field()
     mean_finals = Field()
 
+class DANSVoBranch(SchoolItem):
+    reference_year = Field()
+    ignore_id_fields = Field()
+
+    achtergrond12 = Field()
+    exvk12 = Field()
+    naw13 = Field()
+    ok2013 = Field()
+    verschilsece1012 = Field()
+    adv12 = Field()
+    idu12 = Field()
+    oordeel1113 = Field()
+    exvc12 = Field()
+    lwoo12 = Field()
