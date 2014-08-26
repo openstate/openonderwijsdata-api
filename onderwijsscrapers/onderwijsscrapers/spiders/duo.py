@@ -4,11 +4,13 @@ import locale
 import xlrd
 from datetime import datetime
 from os import devnull
+from os.path import basename
 from zipfile import ZipFile
 from collections import defaultdict
 from itertools import islice
 
 import requests
+from scrapy import log
 from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
@@ -22,8 +24,10 @@ locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
 class DuoSpider(BaseSpider):
     """ Duo spider """
-    def __init__(self, url_filter=None, *args, **kwargs):
+    def __init__(self, add_local_table=None, url_filter=None, *args, **kwargs):
         self.url_filter = url_filter
+        # a table named `<reference_date>.csv` in ISO 8601
+        self.add_local_table = add_local_table
 
     def start_requests(self):
         return [
@@ -153,6 +157,13 @@ def int_or_none(value):
     except ValueError:
         return None
 
+def extend_to_blank(l):
+    """ Transform ['','a','','b',''] into ['','a','a','b','b'] """
+    out, ext = [], ''
+    for i in l:
+        ext = i or ext
+        out.append(ext)
+    return out
 
 def get_staff_people(xls_url, with_brin=True):
     """
@@ -354,7 +365,52 @@ def get_staff_fte(xls_url, with_brin=True):
 
     return fte_per_school
 
+def get_student_flow(table, for_po=True):
+    """
+    Stroominformatie > Doorstromers
+    05. Doorstromers van primair naar voortgezet onderwijs
 
+    both relevant for po and vo
+    """
+    table = csv.DictReader(islice(table, 2, None), delimiter=';')
+    table.fieldnames = [
+        'BRIN NUMMER PO',
+        'VESTIGINGSNUMMER PO',
+        'INSTELLINGSNAAM PO',
+        'STRAATNAAM PO',
+        'PLAATSNAAM PO',
+        'BRIN NUMMER VO',
+        'VESTIGINGSNUMMER VO',
+        'INSTELLINGSNAAM VO',
+        'STRAATNAAM VO',
+        'PLAATSNAAM VO',
+        'AANTAL DOORSTROMERS',
+    ]
+
+    flow_per_branch = {}
+    for row in table:
+        po_brin = row['BRIN NUMMER PO']
+        po_branch_id = int(row['VESTIGINGSNUMMER PO'])
+        vo_brin = row['BRIN NUMMER VO']
+        vo_branch_id = int(row['VESTIGINGSNUMMER VO'])
+        if for_po:
+            if (po_brin, po_branch_id) not in flow_per_branch:
+                flow_per_branch[(po_brin, po_branch_id)] = []
+            flow_per_branch[(po_brin, po_branch_id)].append({
+                'to_vo_brin': vo_brin,
+                'to_vo_branch_id': vo_branch_id,
+                'out_flow': int(row['AANTAL DOORSTROMERS']),
+            })
+        else:
+            if (vo_brin, vo_branch_id) not in flow_per_branch:
+                flow_per_branch[(vo_brin, vo_branch_id)] = []
+            flow_per_branch[(vo_brin, vo_branch_id)].append({
+                'from_po_brin': po_brin,
+                'from_po_branch_id': po_branch_id,
+                'in_flow': int(row['AANTAL DOORSTROMERS']),
+            })
+
+    return flow_per_branch
 
 
 class DuoVoBoardsSpider(DuoSpider):
@@ -1134,6 +1190,8 @@ class DuoVoBranchesSpider(DuoSpider):
                 self.parse_vavo_students,
             'vo/leerlingen/Leerlingen/vo_leerlingen5.asp':
                 self.parse_students_by_finegrained_structure,
+            'Stroom/doorstromers/doorstromers/po_vo.asp':
+                self.parse_vo_student_flow,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -2007,6 +2065,45 @@ class DuoVoBranchesSpider(DuoSpider):
                 )
                 yield school
 
+    def parse_vo_student_flow(self, response):
+        """
+        Stroominformatie > Doorstromers
+        05. Doorstromers van primair naar voortgezet onderwijs
+        """
+
+        tables = []
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = cStringIO.StringIO(csv_file.content
+                  .decode('cp1252').encode('utf8'))
+            tables.append( (csv_file, reference_date, csv_url) )
+
+        # add local file
+        if self.add_local_table is not None:
+            try:
+                reference_date = datetime.strptime(basename(self.add_local_table), '%Y-%m-%d.csv').date()
+                tables.append( (file(self.add_local_table), reference_date, None) )
+            except Exception as ex:
+                print 'Could not add', self.add_local_table, ':',  ex
+
+        for table, reference_date, csv_url in tables:
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            flow_per_branch = get_student_flow(table, for_po=False)
+
+            for (brin, branch_id), per_school in flow_per_branch.iteritems():
+                school = DuoVoBranch(
+                    brin=brin,
+                    branch_id=branch_id,
+                    reference_year=reference_year,
+                    student_flow_reference_url=csv_url,
+                    student_flow_reference_date=reference_date,
+                    student_flow=per_school
+                )
+                yield school
+
+
 
 class DuoPoBoardsSpider(DuoSpider):
     name = 'duo_po_boards'
@@ -2510,6 +2607,8 @@ class DuoPoBranchesSpider(DuoSpider):
                 self.parse_po_students_by_advice,
             'po/Leerlingen/Leerlingen/po_leerlingen26-10.asp':
                 self.parse_po_students_in_BRON,
+            'Stroom/doorstromers/doorstromers/po_vo.asp':
+                self.parse_po_student_flow,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -3171,14 +3270,6 @@ class DuoPoBranchesSpider(DuoSpider):
                 'branch_active',
         }
 
-        def extend_to_blank(l):
-            """ Transform ['','a','','b',''] into ['','a','a','b','b'] """
-            out, ext = [], ''
-            for i in l:
-                ext = i or ext
-                out.append(ext)
-            return out
-
         for xls_url, reference_date in find_available_datasets(response, extension='xls').iteritems():
             reference_year = reference_date.year # different years in document
             reference_date = str(reference_date)
@@ -3272,6 +3363,45 @@ class DuoPoBranchesSpider(DuoSpider):
                     students_in_BRON=per_school
                 )
                 yield school
+
+    def parse_po_student_flow(self, response):
+        """
+        Stroominformatie > Doorstromers
+        05. Doorstromers van primair naar voortgezet onderwijs
+        """
+
+        tables = []
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = cStringIO.StringIO(csv_file.content
+                  .decode('cp1252').encode('utf8'))
+            tables.append( (csv_file, reference_date, csv_url) )
+
+        # add local file
+        if self.add_local_table is not None:
+            try:
+                reference_date = datetime.strptime(basename(self.add_local_table), '%Y-%m-%d.csv').date()
+                tables.append( (file(self.add_local_table), reference_date, None) )
+            except Exception as ex:
+                print 'Could not add', self.add_local_table, ':',  ex
+
+        for table, reference_date, csv_url in tables:
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            flow_per_branch = get_student_flow(table, for_po=True)
+
+            for (brin, branch_id), per_school in flow_per_branch.iteritems():
+                school = DuoPoBranch(
+                    brin=brin,
+                    branch_id=branch_id,
+                    reference_year=reference_year,
+                    student_flow_reference_url=csv_url,
+                    student_flow_reference_date=reference_date,
+                    student_flow=per_school
+                )
+                yield school
+
 
 class DuoPaoCollaborationsSpider(DuoSpider):
     name = 'duo_pao_collaborations'

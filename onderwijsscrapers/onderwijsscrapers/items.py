@@ -145,6 +145,10 @@ class DuoVoBranch(SchoolItem):
     students_by_finegrained_structure_reference_date = Field()
     students_by_finegrained_structure = Field()
 
+    # Contents of "Stroominformatie > Doorstromers > 05. Doorstromers van primair naar voortgezet onderwijs"
+    student_flow_reference_url = Field()
+    student_flow_reference_date = Field()
+    student_flow = Field()
 
 class DuoVoSchool(SchoolItem):
     education_structures = Field()  # `Onderwijsaanbod`
@@ -407,6 +411,11 @@ class DuoPoBranch(SchoolItem):
     students_in_BRON_reference_url = Field()
     students_in_BRON_reference_date = Field()
     students_in_BRON = Field()
+
+    # Contents of "Stroominformatie > Doorstromers > 05. Doorstromers van primair naar voortgezet onderwijs"
+    student_flow_reference_url = Field()
+    student_flow_reference_date = Field()
+    student_flow = Field()
 
 
 class DuoPaoCollaboration(Item):
