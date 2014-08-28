@@ -96,7 +96,7 @@ class DuoVoBranch(SchoolItem):
 
     # Contents of "02. Leerlingen per vestiging naar postcode leerling
     # en leerjaar"
-    student_residences_url = Field()
+    student_residences_reference_url = Field()
     student_residences_reference_date = Field()
     student_residences = Field()
 
@@ -174,12 +174,12 @@ class DuoVoSchool(SchoolItem):
     rmc_region_code = Field()  # `RMC REGIO CODE`
 
     # Contents of "02. Vsv in het voortgezet onderwijs per vo instelling"
-    dropouts_per_year_url = Field()
+    dropouts_per_year_reference_url = Field()
     dropouts_per_year_reference_date = Field()
     dropouts_per_year = Field()
 
     # Contents of "11. Prognose aantal leerlingen"
-    students_prognosis_url = Field()
+    students_prognosis_reference_url = Field()
     students_prognosis_reference_date = Field()
     students_prognosis = Field() # dict of prognosis[structure][year]
 
@@ -233,7 +233,7 @@ class DuoVoBoard(Item):
     administrative_office_id = Field()  # `ADMINISTRATIEKANTOORNUMMER`
 
     # Contents of "15. Kengetallen"
-    financial_key_indicators_per_year_url = Field()
+    financial_key_indicators_per_year_reference_url = Field()
     financial_key_indicators_per_year_reference_date = Field()
     financial_key_indicators_per_year = Field()
 
@@ -268,7 +268,7 @@ class DuoPoBoard(Item):
     administrative_office_id = Field()  # `ADMINISTRATIEKANTOORNUMMER`
 
     # Contents of "15. Kengetallen"
-    financial_key_indicators_per_year_url = Field()
+    financial_key_indicators_per_year_reference_url = Field()
     financial_key_indicators_per_year_reference_date = Field()
     financial_key_indicators_per_year = Field()
 

@@ -541,7 +541,7 @@ class DuoVoBoardsSpider(DuoSpider):
                 board = DuoVoBoard(
                     board_id=board_id,
                     reference_year=reference_year,
-                    financial_key_indicators_per_year_url=csv_url,
+                    financial_key_indicators_per_year_reference_url=csv_url,
                     financial_key_indicators_per_year_reference_date=reference_date,
                     financial_key_indicators_per_year=indicators
                 )
@@ -764,7 +764,7 @@ class DuoVoSchoolsSpider(DuoSpider):
             for brin, dropouts in dropouts_per_school.iteritems():
                 school = DuoVoSchool(
                     brin=brin,
-                    dropouts_per_year_url=csv_url,
+                    dropouts_per_year_reference_url=csv_url,
                     dropouts_per_year=dropouts,
                     dropouts_per_year_reference_date=reference_date,
                     reference_year=reference_year,
@@ -810,7 +810,7 @@ class DuoVoSchoolsSpider(DuoSpider):
             for brin, students_prognosis in students_prognosis_per_school.iteritems():
                 school = DuoVoSchool(
                     brin=brin,
-                    students_prognosis_url=csv_url,
+                    students_prognosis_reference_url=csv_url,
                     students_prognosis=students_prognosis,
                     students_prognosis_reference_date=reference_date,
                     reference_year=reference_year,
@@ -1427,7 +1427,7 @@ class DuoVoBranchesSpider(DuoSpider):
                     brin=school_ids[school_id]['brin'],
                     branch_id=school_ids[school_id]['branch_id'],
                     reference_year=reference_year,
-                    student_residences_url=csv_url,
+                    student_residences_reference_url=csv_url,
                     student_residences_reference_date=reference_date,
                     student_residences=residence
                 )
@@ -2244,7 +2244,7 @@ class DuoPoBoardsSpider(DuoSpider):
                 board = DuoPoBoard(
                     board_id=board_id,
                     reference_year=reference_year,
-                    financial_key_indicators_per_year_url=csv_url,
+                    financial_key_indicators_per_year_reference_url=csv_url,
                     financial_key_indicators_per_year_reference_date=reference_date,
                     financial_key_indicators_per_year=indicators
                 )
