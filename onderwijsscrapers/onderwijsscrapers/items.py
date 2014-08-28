@@ -102,7 +102,7 @@ class DuoVoBranch(SchoolItem):
 
     # Contents of "01. Leerlingen per vestiging naar onderwijstype, lwoo
     # indicatie, sector, afdeling, opleiding"
-    students_by_structure_url = Field()
+    students_by_structure_reference_url = Field()
     students_by_structure_reference_date = Field()
     students_by_structure = Field()
 
@@ -119,20 +119,20 @@ class DuoVoBranch(SchoolItem):
 
     # Contents of "08. Examenkandidaten vmbo en examencijfers per vak
     # per instelling"
-    vmbo_exam_grades_reference_url = Field()
-    vmbo_exam_grades_reference_date = Field()
+    vmbo_exam_grades_per_course_reference_url = Field()
+    vmbo_exam_grades_per_course_reference_date = Field()
     vmbo_exam_grades_per_course = Field()
 
     # Contents of "09. Examenkandidaten havo en examencijfers per vak
     # per instelling"
-    havo_exam_grades_reference_url = Field()
-    havo_exam_grades_reference_date = Field()
+    havo_exam_grades_per_course_reference_url = Field()
+    havo_exam_grades_per_course_reference_date = Field()
     havo_exam_grades_per_course = Field()
 
     # Contents of "10. Examenkandidaten vwo en examencijfers per vak
     # per instelling"
-    vwo_exam_grades_reference_url = Field()
-    vwo_exam_grades_reference_date = Field()
+    vwo_exam_grades_per_course_reference_url = Field()
+    vwo_exam_grades_per_course_reference_date = Field()
     vwo_exam_grades_per_course = Field()
 
     # Contents of "03 Leerlingen per vestiging en bestuur (vavo apart)"

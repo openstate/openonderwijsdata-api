@@ -198,7 +198,7 @@ po_board
     correspondence_address                              :ref:`duoaddress`                                                       Correspondence address of this board.
     denomination                                        string                              Denominatie                         In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
     edu_types                                           array of :ref:`edutypes`                                                Array of :ref:`edutypes`, where each item shows how many pupils are in the education types po, spo, so or svo in this board's schools.
-    edu_types_reference_date                            2013-06-22                          Peiljaar                            Date the source file was published at http://data.duo.nl
+    edu_types_reference_date                            date                                Peiljaar                            Date the source file was published at http://data.duo.nl
     edu_types_reference_url                             string                                                                  URL to the source file at http://data.duo.nl
     financial_key_indicators_per_year                   array of :ref:`finindicator`                                            Array of :ref:`finindicator`, where each item represents a set of key financial indicators for a given year.
     financial_key_indicators_per_year_reference_date    date                                Peiljaar                            Date the financial key indicator source file was published at http://data.duo.nl

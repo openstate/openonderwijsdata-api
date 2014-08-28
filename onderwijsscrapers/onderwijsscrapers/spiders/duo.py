@@ -38,51 +38,39 @@ class DuoSpider(BaseSpider):
             ) for url,parse_row in self.requests.items() if (self.url_filter is None or url == self.url_filter)
         ]
 
+    def dataset(self, response, make_item, dataset_name, parse_row):
+        """
+        Add a dataset to a DUO item
+        parse_row should return a key (like the tuple (brin, branch_id)) 
+        and one item of the dataset for this brin
 
-    # # lambda self, response: self.parse_cvs(response, parse_row)
-    # def parse_cvs(self, response, parse_row):
-    #     """
-    #     Parse the CVS function
-    #     `parse_row` returns a scrapy item
-    #     """
+        Args:
+           make_item (function): takes a key and returns a DUO item
+           dataset_name (string): name of the dataset field
+           parse_row (function): takes a row and returns a (key, dataset-item) tuple
+        """
 
-    #     for csv_url, reference_date in find_available_datasets(response).iteritems():
-    #         reference_year = reference_date.year
-    #         reference_date = str(reference_date)
-    #         yield parse_row(row)
+        # TODO: add local file loading, refactor student_flow
 
-    # # lambda self, response: self.parse_cvs_seperate(response, parse_row, DuoPoSchool, 'po_lo_collaboration')
-    # # def some_parse_row(row):
-    # #     yield row['BRIN'], {
-    # #         'brin' : \
-    # #             row['BRIN NUMMER']
-    # #         'po_lo_collaboration' : \
-    # #             row['ADMINISTRATIENUMMER']
-    # #     }
-    # def parse_cvs_separate(self, response, parse_row, itemtype, setname):
-    #     """
-    #     Parse the CVS function
-    #     `parse_row` returns an index & dict for separate dataset
-    #     """
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
 
-    #     for csv_url, reference_date in find_available_datasets(response).iteritems():
-    #         reference_year = reference_date.year
-    #         reference_date = str(reference_date)
-    #         items = defaultdict(list)
+            dataset = {}
+            for row in parse_csv_file(csv_url):
+                for key, value in parse_row(row):
+                    if key not in dataset:
+                        dataset[key] = []
+                    dataset[key].append(value)
 
-    #         # Collect all items
-    #         for row in parse_csv_file(csv_url):
-    #             k,v = parse_row(row)
-    #             items[k].append(v)
-
-    #         # Create objects for items
-    #         for value in items.values():
-    #             value.update({
-    #                 'reference_year' = reference_year,
-    #                 setname+'_reference_url' = csv_url,
-    #                 setname+'_reference_date' = reference_date,
-    #             })
-    #             yield itemtype(value)
+            for key, item in dataset.iteritems():
+                if key is not None:
+                    school = make_item(key)
+                    school['reference_year'] = reference_year
+                    school['%s_reference_url' % dataset_name] = csv_url
+                    school['%s_reference_date' % dataset_name] = reference_date
+                    school[dataset_name] = item
+                    yield school
 
 
 
@@ -164,6 +152,7 @@ def extend_to_blank(l):
         ext = i or ext
         out.append(ext)
     return out
+
 
 def get_staff_people(xls_url, with_brin=True):
     """
@@ -417,6 +406,7 @@ class DuoVoBoardsSpider(DuoSpider):
     name = 'duo_vo_boards'
 
     def __init__(self, *args, **kwargs):
+        self.make_item = lambda board_id: DuoVoBoard(board_id=board_id)
         self.requests = {
             'vo/adressen/Adressen/besturen.asp':
                 self.parse_boards,
@@ -514,18 +504,13 @@ class DuoVoBoardsSpider(DuoSpider):
             'WERKKAPITAAL': 'operating_capital',
         }
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            indicators_per_board = {}
-            for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace.
-                for key in row.keys():
-                    row[key] = row[key].strip()
-
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                row[key] = row[key].strip()
+            # Don't look at the 'Kengetallen per sector' file
+            if 'BEVOEGD GEZAG NUMMER' in row:
                 board_id = int(row['BEVOEGD GEZAG NUMMER'])
-                if board_id not in indicators_per_board:
-                    indicators_per_board[board_id] = []
 
                 indicators = {}
                 indicators['year'] = int(row['JAAR'])
@@ -535,18 +520,9 @@ class DuoVoBoardsSpider(DuoSpider):
                     indicators[ind_norm] = float(row[ind].replace('.', '')
                                                          .replace(',', '.'))
 
-                indicators_per_board[board_id].append(indicators)
+                yield board_id, indicators
 
-            for board_id, indicators in indicators_per_board.iteritems():
-                board = DuoVoBoard(
-                    board_id=board_id,
-                    reference_year=reference_year,
-                    financial_key_indicators_per_year_reference_url=csv_url,
-                    financial_key_indicators_per_year_reference_date=reference_date,
-                    financial_key_indicators_per_year=indicators
-                )
-
-                yield board
+        return self.dataset(response, self.make_item, 'financial_key_indicators_per_year', parse_row)
 
     def parse_vavo_students(self, response):
         """
@@ -554,33 +530,15 @@ class DuoVoBoardsSpider(DuoSpider):
         Parse "04 Leerlingen per bestuur en denominatie (vavo apart)"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            vavo_students_per_school = {}
+        def parse_row(row):
+            board_id = int(row['BEVOEGD GEZAG NUMMER'].strip())
+            vavo_students = {
+                'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
+                'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
+            }
+            yield board_id, vavo_students
 
-            for row in parse_csv_file(csv_url):
-
-                board_id = int(row['BEVOEGD GEZAG NUMMER'].strip())
-
-                vavo_students = {
-                    'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
-                    'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
-                }
-
-                if board_id not in vavo_students_per_school:
-                    vavo_students_per_school[board_id] = []
-                vavo_students_per_school[board_id].append(vavo_students)
-
-            for board_id, per_school in vavo_students_per_school.iteritems():
-                school = DuoVoBranch(
-                    board_id=board_id,
-                    reference_year=reference_year,
-                    vavo_students_reference_url=csv_url,
-                    vavo_students_reference_date=reference_date,
-                    vavo_students=per_school,
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'vavo_students', parse_row)
 
     def parse_vo_staff_people(self, response):
         """
@@ -628,6 +586,7 @@ class DuoVoSchoolsSpider(DuoSpider):
     name = 'duo_vo_schools'
 
     def __init__(self, *args, **kwargs):
+        self.make_item = lambda brin: DuoVoSchool(brin=brin)
         self.requests = {
             'vo/adressen/Adressen/hoofdvestigingen.asp':
                 self.parse_schools,
@@ -729,94 +688,60 @@ class DuoVoSchoolsSpider(DuoSpider):
         Parse: "02. Vsv in het voortgezet onderwijs per vo instelling"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            dropouts_per_school = {}
-            for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace and remove
-                # thousands separator ('.')
-                for key in row.keys():
-                    row[key] = row[key].strip().replace('.', '')
+        def parse_row(row):
+            # strip leading and trailing whitespace and remove
+            # thousands separator ('.')
+            for key in row.keys():
+                row[key] = row[key].strip().replace('.', '')
 
-                brin = row['BRIN NUMMER']
+            brin = row['BRIN NUMMER']
 
-                if brin not in dropouts_per_school:
-                    dropouts_per_school[brin] = []
+            dropouts = {
+                'year': int(row['JAAR']),
+                'education_structure': row['ONDERWIJSSTRUCTUUR EN LEERJAAR'],
+                'total_students': int(row['AANTAL DEELNEMERS']),
+                'total_dropouts': int(row['AANTAL VSV ERS']),
+                'dropouts_with_vmbo_diploma': int(row['AANTAL VSV ERS MET VMBO DIPLOMA']),
+                'dropouts_with_mbo1_dimploma': int(row['AANTAL VSV ERS MET MBO1 DIPLOMA']),
+                'dropouts_without_diploma': int(row['AANTAL VSV ERS ZONDER DIPLOMA'])
+            }
 
-                dropouts = {
-                    'year': int(row['JAAR']),
-                    'education_structure': row['ONDERWIJSSTRUCTUUR EN LEERJAAR'],
-                    'total_students': int(row['AANTAL DEELNEMERS']),
-                    'total_dropouts': int(row['AANTAL VSV ERS']),
-                    'dropouts_with_vmbo_diploma': int(row['AANTAL VSV ERS MET VMBO DIPLOMA']),
-                    'dropouts_with_mbo1_dimploma': int(row['AANTAL VSV ERS MET MBO1 DIPLOMA']),
-                    'dropouts_without_diploma': int(row['AANTAL VSV ERS ZONDER DIPLOMA'])
-                }
+            if row['PROFIEL'] == 'NVT':
+                dropouts['sector'] = None
+            else:
+                dropouts['sector'] = row['PROFIEL']
 
-                if row['PROFIEL'] == 'NVT':
-                    dropouts['sector'] = None
-                else:
-                    dropouts['sector'] = row['PROFIEL']
+            yield brin, dropouts
 
-                dropouts_per_school[brin].append(dropouts)
-
-            for brin, dropouts in dropouts_per_school.iteritems():
-                school = DuoVoSchool(
-                    brin=brin,
-                    dropouts_per_year_reference_url=csv_url,
-                    dropouts_per_year=dropouts,
-                    dropouts_per_year_reference_date=reference_date,
-                    reference_year=reference_year,
-                )
-
-                yield school
+        return self.dataset(response, self.make_item, 'dropouts_per_year', parse_row)
 
     def parse_students_prognosis(self, response):
         """
         Parse: "11. Prognose aantal leerlingen"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            students_prognosis_per_school = {}
-            for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace and remove
-                # thousands separator ('.')
-                for key in row.keys():
-                    row[key] = row[key].strip().replace('.', '')
+        def parse_row(row):
+            # strip leading and trailing whitespace and remove
+            # thousands separator ('.')
+            for key in row.keys():
+                row[key] = row[key].strip().replace('.', '')
 
-                brin = row['BRIN NUMMER']
+            brin = row['BRIN NUMMER']
 
-                if brin not in students_prognosis_per_school:
-                    students_prognosis_per_school[brin] = []
+            # ignoring actual data for now, only adding prognosis
+            students_prognosis = []
+            for k, v in row.iteritems():
+                row_words = k.split()
+                # k is of the form 'PROGNOSE LWOO PRO 2024'
+                if row_words[0] == 'PROGNOSE' or row_words[0]=='POGNOSE': # don't ask
+                    if v and row_words[-1].isdigit():
+                        yield brin, {
+                            'year' : int(row_words[-1]),
+                            'structure' : '_'.join(row_words[1:-1]).lower(),
+                            'students' : int(v),
+                        }
 
-                # ignoring actual data for now, only adding prognosis
-                students_prognosis = []
-                for k, v in row.iteritems():
-                    row_words = k.split()
-                    # k is of the form 'PROGNOSE LWOO PRO 2024'
-                    if row_words[0] == 'PROGNOSE' or row_words[0]=='POGNOSE': # don't ask
-                        if row_words[-1].isdigit():
-                            students_prognosis.append({
-                                'year' : int(row_words[-1]),
-                                'structure' : '_'.join(row_words[1:-1]).lower(),
-                                'students' : int(v),
-                            })
-
-                students_prognosis_per_school[brin].append(students_prognosis)
-
-            for brin, students_prognosis in students_prognosis_per_school.iteritems():
-                school = DuoVoSchool(
-                    brin=brin,
-                    students_prognosis_reference_url=csv_url,
-                    students_prognosis=students_prognosis,
-                    students_prognosis_reference_date=reference_date,
-                    reference_year=reference_year,
-                )
-
-                yield school
+        return self.dataset(response, self.make_item, 'students_prognosis', parse_row)
 
     def parse_vo_lo_collaboration(self, response):
         """
@@ -824,43 +749,27 @@ class DuoVoSchoolsSpider(DuoSpider):
         Parse "06. Adressen instellingen per samenwerkingsverband lichte ondersteuning, voortgezet onderwijs"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            vo_lo_collaboration_per_school = {}
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
 
-            for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace.
-                for key in row.keys():
-                    value = (row[key] or '').strip()
-                    row[key] = value or None
-                    row[key.strip()] = value or None
+            if row.has_key('BRINNUMMER'):
+                row['BRIN NUMMER'] = row['BRINNUMMER']
 
-                if row.has_key('BRINNUMMER'):
-                    row['BRIN NUMMER'] = row['BRINNUMMER']
+            brin = row['BRIN NUMMER']
+            cid = row['ADMINISTRATIENUMMER'].strip()
+            if '-' in cid:
+                int_parts = map(int_or_none, cid.split('-'))
+                if any([i == None for i in int_parts]):
+                    cid = '-'.join(map(str, int_parts))
+            collaboration = cid
 
-                brin = row['BRIN NUMMER']
-                cid = row['ADMINISTRATIENUMMER'].strip()
-                if '-' in cid:
-                    int_parts = map(int_or_none, cid.split('-'))
-                    if any([i == None for i in int_parts]):
-                        cid = '-'.join(map(str, int_parts))
-                collaboration = cid
+            yield brin, collaboration
 
-                if brin not in vo_lo_collaboration_per_school:
-                    vo_lo_collaboration_per_school[brin] = []
-
-                vo_lo_collaboration_per_school[brin].append(collaboration)
-
-            for brin, per_school in vo_lo_collaboration_per_school.iteritems():
-                school = DuoVoSchool(
-                    brin=brin,
-                    reference_year=reference_year,
-                    vo_lo_collaboration_reference_url=csv_url,
-                    vo_lo_collaboration_reference_date=reference_date,
-                    vo_lo_collaboration=per_school
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'vo_lo_collaboration', parse_row)
 
     def parse_pao_collaboration(self, response):
         """
@@ -868,38 +777,21 @@ class DuoVoSchoolsSpider(DuoSpider):
         Parse "08. Adressen instellingen per samenwerkingsverband passend onderwijs, voortgezet onderwijs"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            pao_collaboration_per_school = {}
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
 
-            for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace.
-                for key in row.keys():
-                    value = (row[key] or '').strip()
-                    row[key] = value or None
-                    row[key.strip()] = value or None
+            if row.has_key('BRINNUMMER'):
+                row['BRIN NUMMER'] = row['BRINNUMMER']
 
-                if row.has_key('BRINNUMMER'):
-                    row['BRIN NUMMER'] = row['BRINNUMMER']
+            brin = row['BRIN NUMMER']
+            collaboration = row['ADMINISTRATIENUMMER']
+            yield brin, collaboration
 
-                brin = row['BRIN NUMMER']
-                collaboration = row['ADMINISTRATIENUMMER']
-
-                if brin not in pao_collaboration_per_school:
-                    pao_collaboration_per_school[brin] = []
-
-                pao_collaboration_per_school[brin].append(collaboration)
-
-            for brin, per_school in pao_collaboration_per_school.iteritems():
-                school = DuoVoSchool(
-                    brin=brin,
-                    reference_year=reference_year,
-                    pao_collaboration_reference_url=csv_url,
-                    pao_collaboration_reference_date=reference_date,
-                    pao_collaboration=per_school
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'pao_collaboration', parse_row)
 
     def parse_vo_staff_people(self, response):
         """
@@ -1169,6 +1061,7 @@ class DuoVoBranchesSpider(DuoSpider):
     name = 'duo_vo_branches'
 
     def __init__(self, *args, **kwargs):
+        self.make_item = lambda ((brin,branch_id)): DuoVoBranch(brin=brin,branch_id=branch_id)
         self.requests = {
             'vo/adressen/Adressen/vestigingen.asp':
                 self.parse_branches,
@@ -1298,92 +1191,69 @@ class DuoVoBranchesSpider(DuoSpider):
         indicatie, sector, afdeling, opleiding"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            student_educations = {}
-            school_ids = {}
+        def parse_row(row):
+            brin = row['BRIN NUMMER'].strip()
+            branch_id =  int((row['VESTIGINGSNUMMER'] or '0')
+                             .strip().replace(row['BRIN NUMMER'], ''))
 
-            for row in parse_csv_file(csv_url):
-                school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
-                                       row['VESTIGINGSNUMMER'].strip().zfill(2))
+            education_type = {}
 
-                school_ids[school_id] = {
-                    'brin': row['BRIN NUMMER'].strip(),
-                    'branch_id': int(row['VESTIGINGSNUMMER']
-                                     .strip().replace(row['BRIN NUMMER'], ''))
-                }
-
-                if school_id not in student_educations:
-                    student_educations[school_id] = []
-
-                education_type = {}
-
-                department = row['AFDELING'].strip()
-                if department:
-                    education_type['department'] = department
-                    if education_type['department'].lower() == 'n.v.t.':
-                        education_type['department'] = None
-                else:
+            department = row['AFDELING'].strip()
+            if department:
+                education_type['department'] = department
+                if education_type['department'].lower() == 'n.v.t.':
                     education_type['department'] = None
+            else:
+                education_type['department'] = None
 
-                if row['ELEMENTCODE'].strip():
-                    education_type['elementcode'] = int(row['ELEMENTCODE']
-                                                        .strip())
-                else:
-                    education_type['elementcode'] = None
+            if row['ELEMENTCODE'].strip():
+                education_type['elementcode'] = int(row['ELEMENTCODE']
+                                                    .strip())
+            else:
+                education_type['elementcode'] = None
 
-                lwoo = row['LWOO INDICATIE'].strip().lower()
-                if lwoo:
-                    if lwoo == 'j':
-                        education_type['lwoo'] = True
-                    elif lwoo == 'n':
-                        education_type['lwoo'] = False
-                    else:
-                        education_type['lwoo'] = None
+            lwoo = row['LWOO INDICATIE'].strip().lower()
+            if lwoo:
+                if lwoo == 'j':
+                    education_type['lwoo'] = True
+                elif lwoo == 'n':
+                    education_type['lwoo'] = False
                 else:
                     education_type['lwoo'] = None
+            else:
+                education_type['lwoo'] = None
 
-                vmbo_sector = row['VMBO SECTOR'].strip()
-                if vmbo_sector:
-                    if vmbo_sector.lower() == 'n.v.t.':
-                        education_type['vmbo_sector'] = None
-                    else:
-                        education_type['vmbo_sector'] = vmbo_sector
-                else:
+            vmbo_sector = row['VMBO SECTOR'].strip()
+            if vmbo_sector:
+                if vmbo_sector.lower() == 'n.v.t.':
                     education_type['vmbo_sector'] = None
+                else:
+                    education_type['vmbo_sector'] = vmbo_sector
+            else:
+                education_type['vmbo_sector'] = None
 
-                naam = row['OPLEIDINGSNAAM'].strip()
-                education_type['education_name'] = naam or None
+            naam = row['OPLEIDINGSNAAM'].strip()
+            education_type['education_name'] = naam or None
 
-                otype = row['ONDERWIJSTYPE VO EN LEER- OF VERBLIJFSJAAR'].strip()
-                education_type['education_structure'] = otype or None
+            otype = row['ONDERWIJSTYPE VO EN LEER- OF VERBLIJFSJAAR'].strip()
+            education_type['education_structure'] = otype or None
 
-                for available_year in range(1, 7):
-                    male = int(row['LEER- OF VERBLIJFSJAAR %s - MAN'
-                               % available_year])
-                    female = int(row['LEER- OF VERBLIJFSJAAR %s - VROUW'
-                                 % available_year])
+            for available_year in range(1, 7):
+                male = int(row['LEER- OF VERBLIJFSJAAR %s - MAN'
+                           % available_year])
+                female = int(row['LEER- OF VERBLIJFSJAAR %s - VROUW'
+                             % available_year])
 
-                    education_type['year_%s' % available_year] = {
-                        'male': male,
-                        'female': female,
-                        'total': male + female
-                    }
+                education_type['year_%s' % available_year] = {
+                    'male': male,
+                    'female': female,
+                    'total': male + female
+                }
 
-                student_educations[school_id].append(education_type)
+            yield (brin, branch_id), education_type
 
-            for school_id, s_by_structure in student_educations.iteritems():
-                school = DuoVoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    students_by_structure_url=csv_url,
-                    students_by_structure_reference_date=reference_date,
-                    students_by_structure=s_by_structure
-                )
+        return self.dataset(response, self.make_item, 'students_by_structure', parse_row)
 
-                yield school
 
     def parse_student_residences(self, response):
         """
@@ -1391,48 +1261,26 @@ class DuoVoBranchesSpider(DuoSpider):
         leerjaar"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            student_residences = {}
-            school_ids = {}
-            for row in parse_csv_file(csv_url):
-                school_id = '%s-%s' % (row['BRIN NUMMER'].strip(),
-                                       row['VESTIGINGSNUMMER'].strip().zfill(2))
+        def parse_row(row):
+            brin = row['BRIN NUMMER'].strip()
+            branch_id =  int(row['VESTIGINGSNUMMER']
+                             .strip().replace(row['BRIN NUMMER'], ''))
 
-                school_ids[school_id] = {
-                    'brin': row['BRIN NUMMER'].strip(),
-                    'branch_id': int(row['VESTIGINGSNUMMER'].strip()
-                                     .replace(row['BRIN NUMMER'], ''))
-                }
+            yield (brin, branch_id), {
+                'zip_code': row['POSTCODE LEERLING'].strip(),
+                'city': row['PLAATSNAAM LEERLING'].strip().capitalize(),
+                'municipality': row['GEMEENTENAAM LEERLING'].strip(),
+                'municipality_id': int(row['GEMEENTENUMMER LEERLING'].strip()),
+                'year_1': int(row['LEER- OF VERBLIJFSJAAR 1']),
+                'year_2': int(row['LEER- OF VERBLIJFSJAAR 2']),
+                'year_3': int(row['LEER- OF VERBLIJFSJAAR 3']),
+                'year_4': int(row['LEER- OF VERBLIJFSJAAR 4']),
+                'year_5': int(row['LEER- OF VERBLIJFSJAAR 5']),
+                'year_6': int(row['LEER- OF VERBLIJFSJAAR 6'])
+            }
 
-                if school_id not in student_residences:
-                    student_residences[school_id] = []
+        return self.dataset(response, self.make_item, 'student_residences', parse_row)
 
-                student_residences[school_id].append({
-                    'zip_code': row['POSTCODE LEERLING'].strip(),
-                    'city': row['PLAATSNAAM LEERLING'].strip().capitalize(),
-                    'municipality': row['GEMEENTENAAM LEERLING'].strip(),
-                    'municipality_id': int(row['GEMEENTENUMMER LEERLING'].strip()),
-                    'year_1': int(row['LEER- OF VERBLIJFSJAAR 1']),
-                    'year_2': int(row['LEER- OF VERBLIJFSJAAR 2']),
-                    'year_3': int(row['LEER- OF VERBLIJFSJAAR 3']),
-                    'year_4': int(row['LEER- OF VERBLIJFSJAAR 4']),
-                    'year_5': int(row['LEER- OF VERBLIJFSJAAR 5']),
-                    'year_6': int(row['LEER- OF VERBLIJFSJAAR 6'])
-                })
-
-            for school_id, residence in student_residences.iteritems():
-                school = DuoVoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    student_residences_reference_url=csv_url,
-                    student_residences_reference_date=reference_date,
-                    student_residences=residence
-                )
-
-                yield school
 
     def student_graduations(self, response):
         """
@@ -1450,102 +1298,102 @@ class DuoVoBranchesSpider(DuoSpider):
                 for key in row.keys():
                     row[key.replace('\n', '')] = row[key].strip()
                     del row[key]
+                if 'BRIN NUMMER' in row:
+                    brin = row['BRIN NUMMER']
+                    branch_id = int(row['VESTIGINGSNUMMER'].replace(brin, ''))
+                    school_id = '%s-%s' % (brin, branch_id)
 
-                brin = row['BRIN NUMMER']
-                branch_id = int(row['VESTIGINGSNUMMER'].replace(brin, ''))
-                school_id = '%s-%s' % (brin, branch_id)
-
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
-
-                if school_id not in graduations_school_year:
-                    graduations_school_year[school_id] = {}
-
-                # The years present in the CVS file (keys) and the
-                # normalized form we will use (values)
-                years = {
-                    'SCHOOLJAAR 2007-2008': '2007-2008',
-                    'SCHOOLJAAR 2008-2009': '2008-2009',
-                    'SCHOOLJAAR 2009-2010': '2009-2010',
-                    'SCHOOLJAAR 2010-2011': '2010-2011',
-                    'SCHOOLJAAR 2011-2012': '2011-2012',
-                }
-
-                # Available breakdowns and their normalized form
-                breakdown = {
-                    'MAN': 'male',
-                    'VROUW': 'female',
-                    'ONBEKEND': 'unknown'
-                }
-
-                for year, y_normal in years.iteritems():
-                    if y_normal not in graduations_school_year[school_id]:
-                        # Graduation info of a single school year
-                        graduations_school_year[school_id][y_normal] = {
-                            'year': y_normal,
-                            'failed': 0,
-                            'passed': 0,
-                            'candidates': 0,
-                            'per_department': []
-                        }
-
-                    # Total number of candidates (not always present for
-                    # every year)
-                    try:
-                        candidates = row['EXAMENKANDIDATEN %s TOTAAL' % year]
-                        if candidates:
-                            candidates = int(candidates)
-                        else:
-                            continue
-                    except KeyError:
-                        candidates = 0
-                    graduations_school_year[school_id][y_normal]['candidates'] += candidates
-
-                    # Total number of successful graduations
-                    try:
-                        passed = int(row['GESLAAGDEN %s TOTAAL' % year])
-                    except KeyError:
-                        passed = 0
-                    graduations_school_year[school_id][y_normal]['passed'] += passed
-
-                    graduations_school_year[school_id][y_normal]['failed'] += (candidates - passed)
-
-                    # Graduations for a singel department, by gender
-                    department = {
-                        'education_structure': row['ONDERWIJSTYPE VO'],
-                        'department': row['OPLEIDINGSNAAM'],
-                        'inspectioncode': row['INSPECTIECODE'],
-                        'passed': {},
-                        'failed': {},
-                        'candidates': {},
+                    school_ids[school_id] = {
+                        'brin': brin,
+                        'branch_id': branch_id
                     }
 
-                    for gender, gender_normal in breakdown.iteritems():
+                    if school_id not in graduations_school_year:
+                        graduations_school_year[school_id] = {}
+
+                    # The years present in the CVS file (keys) and the
+                    # normalized form we will use (values)
+                    years = {
+                        'SCHOOLJAAR 2007-2008': '2007-2008',
+                        'SCHOOLJAAR 2008-2009': '2008-2009',
+                        'SCHOOLJAAR 2009-2010': '2009-2010',
+                        'SCHOOLJAAR 2010-2011': '2010-2011',
+                        'SCHOOLJAAR 2011-2012': '2011-2012',
+                    }
+
+                    # Available breakdowns and their normalized form
+                    breakdown = {
+                        'MAN': 'male',
+                        'VROUW': 'female',
+                        'ONBEKEND': 'unknown'
+                    }
+
+                    for year, y_normal in years.iteritems():
+                        if y_normal not in graduations_school_year[school_id]:
+                            # Graduation info of a single school year
+                            graduations_school_year[school_id][y_normal] = {
+                                'year': y_normal,
+                                'failed': 0,
+                                'passed': 0,
+                                'candidates': 0,
+                                'per_department': []
+                            }
+
+                        # Total number of candidates (not always present for
+                        # every year)
                         try:
-                            candidates = row['EXAMENKANDIDATEN %s %s' % (year,
-                                             gender)]
+                            candidates = row['EXAMENKANDIDATEN %s TOTAAL' % year]
+                            if candidates:
+                                candidates = int(candidates)
+                            else:
+                                continue
                         except KeyError:
-                            continue
+                            candidates = 0
+                        graduations_school_year[school_id][y_normal]['candidates'] += candidates
 
-                        # Skip gender if no value
-                        if not candidates:
-                            continue
-
-                        candidates = int(candidates)
-                        department['candidates'][gender_normal] = candidates
-
+                        # Total number of successful graduations
                         try:
-                            passed = int(row['GESLAAGDEN %s %s' % (year, gender)])
+                            passed = int(row['GESLAAGDEN %s TOTAAL' % year])
                         except KeyError:
-                            continue
-                        department['passed'][gender_normal] = passed
+                            passed = 0
+                        graduations_school_year[school_id][y_normal]['passed'] += passed
 
-                        failed = candidates - passed
-                        department['failed'][gender_normal] = failed
+                        graduations_school_year[school_id][y_normal]['failed'] += (candidates - passed)
 
-                    graduations_school_year[school_id][y_normal]['per_department'].append(department)
+                        # Graduations for a singel department, by gender
+                        department = {
+                            'education_structure': row['ONDERWIJSTYPE VO'],
+                            'department': row['OPLEIDINGSNAAM'],
+                            'inspectioncode': row['INSPECTIECODE'],
+                            'passed': {},
+                            'failed': {},
+                            'candidates': {},
+                        }
+
+                        for gender, gender_normal in breakdown.iteritems():
+                            try:
+                                candidates = row['EXAMENKANDIDATEN %s %s' % (year,
+                                                 gender)]
+                            except KeyError:
+                                continue
+
+                            # Skip gender if no value
+                            if not candidates:
+                                continue
+
+                            candidates = int(candidates)
+                            department['candidates'][gender_normal] = candidates
+
+                            try:
+                                passed = int(row['GESLAAGDEN %s %s' % (year, gender)])
+                            except KeyError:
+                                continue
+                            department['passed'][gender_normal] = passed
+
+                            failed = candidates - passed
+                            department['failed'][gender_normal] = failed
+
+                        graduations_school_year[school_id][y_normal]['per_department'].append(department)
 
             for school_id, graduations in graduations_school_year.iteritems():
                 school = DuoVoBranch(
@@ -1564,403 +1412,309 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "07. Geslaagden, gezakten en gemiddelde examencijfers per instelling"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            school_ids = {}
-            grades_per_school = {}
-            for row in parse_csv_file(csv_url):
-                # Remove newline chars and strip leading and trailing
-                # whitespace.
-                for key in row.keys():
-                    c_key = key.replace('\n', '')
-                    row[c_key] = row[key].strip()
+        def parse_row(row):
+            # Remove newline chars and strip leading and trailing
+            # whitespace.
+            for key in row.keys():
+                c_key = key.replace('\n', '')
+                row[c_key] = row[key].strip()
 
-                    if not row[c_key]:
-                        del row[c_key]
+                if not row[c_key]:
+                    del row[c_key]
 
-                brin = row['BRIN NUMMER']
-                branch_id = int(row['VESTIGINGSNUMMER'].replace(brin, ''))
-                school_id = '%s-%s' % (brin, branch_id)
+            brin = row['BRIN NUMMER']
+            branch_id = int(row['VESTIGINGSNUMMER'].replace(brin, ''))
 
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
+            grades = {
+                'education_structure': row['ONDERWIJSTYPE VO']
+            }
 
-                grades = {
-                    'education_structure': row['ONDERWIJSTYPE VO']
-                }
+            if 'LEERWEG VMBO' in row:
+                grades['education_structure'] += '-%s' % row['LEERWEG VMBO']
 
-                if 'LEERWEG VMBO' in row:
-                    grades['education_structure'] += '-%s' % row['LEERWEG VMBO']
+            if 'VMBO SECTOR' in row:
+                grades['vmbo_sector'] = row['VMBO SECTOR']
 
-                if 'VMBO SECTOR' in row:
-                    grades['vmbo_sector'] = row['VMBO SECTOR']
+            if 'AFDELING' in row:
+                grades['sector'] = row['AFDELING']
 
-                if 'AFDELING' in row:
-                    grades['sector'] = row['AFDELING']
+            if 'EXAMENKANDIDATEN' in row:
+                grades['candidates'] = int(row['EXAMENKANDIDATEN'])
 
-                if 'EXAMENKANDIDATEN' in row:
-                    grades['candidates'] = int(row['EXAMENKANDIDATEN'])
+            if 'GESLAAGDEN' in row:
+                grades['passed'] = int(row['GESLAAGDEN'])
 
-                if 'GESLAAGDEN' in row:
-                    grades['passed'] = int(row['GESLAAGDEN'])
+            if 'GEZAKTEN' in row:
+                grades['failed'] = int(row['GEZAKTEN'])
 
-                if 'GEZAKTEN' in row:
-                    grades['failed'] = int(row['GEZAKTEN'])
+            if 'GEMIDDELD CIJFER SCHOOLEXAMEN' in row:
+                grades['avg_grade_school_exam'] = float(row[
+                    'GEMIDDELD CIJFER SCHOOLEXAMEN'].replace(',', '.'))
 
-                if 'GEMIDDELD CIJFER SCHOOLEXAMEN' in row:
-                    grades['avg_grade_school_exam'] = float(row[
-                        'GEMIDDELD CIJFER SCHOOLEXAMEN'].replace(',', '.'))
+            if 'GEMIDDELD CIJFER CENTRAAL EXAMEN' in row:
+                grades['avg_grade_central_exam'] = float(row[
+                    'GEMIDDELD CIJFER CENTRAAL EXAMEN'].replace(',', '.'))
 
-                if 'GEMIDDELD CIJFER CENTRAAL EXAMEN' in row:
-                    grades['avg_grade_central_exam'] = float(row[
-                        'GEMIDDELD CIJFER CENTRAAL EXAMEN'].replace(',', '.'))
+            if 'GEMIDDELD CIJFER CIJFERLIJST' in row:
+                grades['avg_final_grade'] = float(row[
+                    'GEMIDDELD CIJFER CIJFERLIJST'].replace(',', '.'))
 
-                if 'GEMIDDELD CIJFER CIJFERLIJST' in row:
-                    grades['avg_final_grade'] = float(row[
-                        'GEMIDDELD CIJFER CIJFERLIJST'].replace(',', '.'))
+            yield (brin, branch_id), grades
 
-                if school_id not in grades_per_school:
-                    grades_per_school[school_id] = []
-
-                grades_per_school[school_id].append(grades)
-
-            for school_id, grades in grades_per_school.iteritems():
-                school = DuoVoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    exam_grades_reference_url=csv_url,
-                    exam_grades_reference_date=reference_date,
-                    exam_grades=grades
-                )
-
-                yield school
+        return self.dataset(response, self.make_item, 'exam_grades', parse_row)
 
     def vmbo_exam_grades_per_course(self, response):
         """
         Parse "08. Examenkandidaten vmbo en examencijfers per vak per instelling"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            school_ids = {}
-            courses_per_school = {}
-            for row in parse_csv_file(csv_url):
-                # Remove newline chars and strip leading and trailing
-                # whitespace.
-                for key in row.keys():
-                    c_key = key.replace('\n', '')
-                    row[c_key] = row[key].strip()
+        def parse_row(row):
+            # Remove newline chars and strip leading and trailing
+            # whitespace.
+            for key in row.keys():
+                c_key = key.replace('\n', '')
+                row[c_key] = row[key].strip()
 
-                    if not row[c_key]:
-                        del row[c_key]
+                if not row[c_key]:
+                    del row[c_key]
 
-                brin = row['BRIN NUMMER']
-                branch_id = int(row['VESTIGINGSNUMMER'])
-                school_id = '%s-%s' % (brin, branch_id)
+            brin = row['BRIN NUMMER']
+            branch_id = int(row['VESTIGINGSNUMMER'])
 
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
+            grades = {
+                'education_structure': '%s-%s' % (row['ONDERWIJSTYPE VO'],
+                                                  row['LEERWEG']),
+                'course_identifier': row['VAKCODE'],
+                'course_abbreviation': row['AFKORTING VAKNAAM'],
+                'course_name': row['VAKNAAM']
 
-                grades = {
-                    'education_structure': '%s-%s' % (row['ONDERWIJSTYPE VO'],
-                                                      row['LEERWEG']),
-                    'course_identifier': row['VAKCODE'],
-                    'course_abbreviation': row['AFKORTING VAKNAAM'],
-                    'course_name': row['VAKNAAM']
+            }
 
-                }
+            if 'SCHOOLEXAMEN BEOORDELING' in row:
+                grades['school_exam_rating'] = row['SCHOOLEXAMEN BEOORDELING']
 
-                if 'SCHOOLEXAMEN BEOORDELING' in row:
-                    grades['school_exam_rating'] = row['SCHOOLEXAMEN BEOORDELING']
+            if 'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING' in row:
+                grades['amount_of_school_exams_with_rating'] = int(row[
+                    'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING'])
 
-                if 'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING' in row:
-                    grades['amount_of_school_exams_with_rating'] = int(row[
-                        'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING'])
+            if 'AANTAL SCHOOLEXAMENS MET BEOORDELING MEETELLEND VOOR DIPLOMA' in row:
+                grades['amount_of_school_exams_with_rating_counting_'
+                       'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                'BEOORDELING MEETELLEND VOOR '
+                                                'DIPLOMA'])
 
-                if 'AANTAL SCHOOLEXAMENS MET BEOORDELING MEETELLEND VOOR DIPLOMA' in row:
-                    grades['amount_of_school_exams_with_rating_counting_'
-                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
-                                                    'BEOORDELING MEETELLEND VOOR '
-                                                    'DIPLOMA'])
+            if 'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER' in row:
+                grades['amount_of_school_exams_with_grades'] = int(row[
+                    'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER'])
 
-                if 'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER' in row:
-                    grades['amount_of_school_exams_with_grades'] = int(row[
-                        'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER'])
+            if 'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS' in row:
+                grades['avg_grade_school_exams'] = float(row[
+                    'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS']
+                    .replace(',', '.'))
 
-                if 'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS' in row:
-                    grades['avg_grade_school_exams'] = float(row[
-                        'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS']
-                        .replace(',', '.'))
+            if 'AANTAL SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                grades['amount_of_school_exams_with_grades_counting_'
+                       'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                'CIJFER MEETELLEND VOOR DIPLOMA'])
 
-                if 'AANTAL SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
-                    grades['amount_of_school_exams_with_grades_counting_'
-                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
-                                                    'CIJFER MEETELLEND VOOR DIPLOMA'])
+            if 'GEM. CIJFER SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                grades['avg_grade_school_exams_counting_for_diploma'] = \
+                    float(row['GEM. CIJFER SCHOOLEXAMENS MET CIJFER '
+                              'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
 
-                if 'GEM. CIJFER SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
-                    grades['avg_grade_school_exams_counting_for_diploma'] = \
-                        float(row['GEM. CIJFER SCHOOLEXAMENS MET CIJFER '
-                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+            if 'TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                grades['amount_of_central_exams'] = int(row['TOTAAL AANTAL'
+                                                            ' CENTRALE EXAMENS'])
 
-                if 'TOTAAL AANTAL CENTRALE EXAMENS' in row:
-                    grades['amount_of_central_exams'] = int(row['TOTAAL AANTAL'
-                                                                ' CENTRALE EXAMENS'])
+            if 'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                grades['avg_grade_central_exams'] = float(row[
+                    'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS']
+                    .replace(',', '.'))
 
-                if 'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS' in row:
-                    grades['avg_grade_central_exams'] = float(row[
-                        'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS']
-                        .replace(',', '.'))
+            if 'AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA' in row:
+                grades['amount_of_central_exams_counting_for_diploma'] = \
+                    int(row['AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA'])
 
-                if 'AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA' in row:
-                    grades['amount_of_central_exams_counting_for_diploma'] = \
-                        int(row['AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA'])
+            if 'GEM. CIJFER CENTRALE EXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                grades['avg_grade_central_exams_counting_for_diploma'] = \
+                    float(row['GEM. CIJFER CENTRALE EXAMENS MET CIJFER '
+                              'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
 
-                if 'GEM. CIJFER CENTRALE EXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
-                    grades['avg_grade_central_exams_counting_for_diploma'] = \
-                        float(row['GEM. CIJFER CENTRALE EXAMENS MET CIJFER '
-                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+            if 'GEM. CIJFER CIJFERLIJST' in row:
+                grades['average_grade_overall'] = float(row[
+                    'GEM. CIJFER CIJFERLIJST'].replace(',', '.'))
 
-                if 'GEM. CIJFER CIJFERLIJST' in row:
-                    grades['average_grade_overall'] = float(row[
-                        'GEM. CIJFER CIJFERLIJST'].replace(',', '.'))
+            yield (brin, branch_id), grades
 
-                if school_id not in courses_per_school:
-                    courses_per_school[school_id] = []
-
-                courses_per_school[school_id].append(grades)
-
-            for school_id, grades in courses_per_school.iteritems():
-                school = DuoVoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    vmbo_exam_grades_reference_url=csv_url,
-                    vmbo_exam_grades_reference_date=reference_date,
-                    vmbo_exam_grades_per_course=grades
-                )
-
-                yield school
+        return self.dataset(response, self.make_item, 'vmbo_exam_grades_per_course', parse_row)
 
     def havo_exam_grades_per_course(self, response):
         """
         Parse "09. Examenkandidaten havo en examencijfers per vak per instelling"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            school_ids = {}
-            courses_per_school = {}
-            for row in parse_csv_file(csv_url):
-                # Remove newline chars and strip leading and trailing
-                # whitespace.
-                for key in row.keys():
-                    c_key = key.replace('\n', '')
-                    row[c_key] = row[key].strip()
+        def parse_row(row):
 
-                    if not row[c_key]:
-                        del row[c_key]
+            # Remove newline chars and strip leading and trailing
+            # whitespace.
+            for key in row.keys():
+                c_key = key.replace('\n', '')
+                row[c_key] = row[key].strip()
 
-                brin = row['BRIN NUMMER']
-                branch_id = int(row['VESTIGINGSNUMMER'])
-                school_id = '%s-%s' % (brin, branch_id)
+                if not row[c_key]:
+                    del row[c_key]
 
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
+            brin = row['BRIN NUMMER']
+            branch_id = int(row['VESTIGINGSNUMMER'])
 
-                grades = {
-                    'education_structure': row['ONDERWIJSTYPE VO'],
-                    'course_identifier': row['VAKCODE'],
-                    'course_abbreviation': row['AFKORTING VAKNAAM'],
-                    'course_name': row['VAKNAAM']
+            grades = {
+                'education_structure': row['ONDERWIJSTYPE VO'],
+                'course_identifier': row['VAKCODE'],
+                'course_abbreviation': row['AFKORTING VAKNAAM'],
+                'course_name': row['VAKNAAM']
 
-                }
+            }
 
-                if 'SCHOOLEXAMEN BEOORDELING' in row:
-                    grades['school_exam_rating'] = row['SCHOOLEXAMEN BEOORDELING']
+            if 'SCHOOLEXAMEN BEOORDELING' in row:
+                grades['school_exam_rating'] = row['SCHOOLEXAMEN BEOORDELING']
 
-                if 'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING' in row:
-                    grades['amount_of_school_exams_with_rating'] = int(row[
-                        'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING'])
+            if 'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING' in row:
+                grades['amount_of_school_exams_with_rating'] = int(row[
+                    'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING'])
 
-                if 'AANTAL SCHOOLEXAMENS MET BEOORDELING MEETELLEND VOOR DIPLOMA' in row:
-                    grades['amount_of_school_exams_with_rating_counting_'
-                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
-                                                    'BEOORDELING MEETELLEND VOOR '
-                                                    'DIPLOMA'])
+            if 'AANTAL SCHOOLEXAMENS MET BEOORDELING MEETELLEND VOOR DIPLOMA' in row:
+                grades['amount_of_school_exams_with_rating_counting_'
+                       'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                'BEOORDELING MEETELLEND VOOR '
+                                                'DIPLOMA'])
 
-                if 'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER' in row:
-                    grades['amount_of_school_exams_with_grades'] = int(row[
-                        'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER'])
+            if 'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER' in row:
+                grades['amount_of_school_exams_with_grades'] = int(row[
+                    'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER'])
 
-                if 'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS' in row:
-                    grades['avg_grade_school_exams'] = float(row[
-                        'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS']
-                        .replace(',', '.'))
+            if 'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS' in row:
+                grades['avg_grade_school_exams'] = float(row[
+                    'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS']
+                    .replace(',', '.'))
 
-                if 'AANTAL SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
-                    grades['amount_of_school_exams_with_grades_counting_'
-                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
-                                                    'CIJFER MEETELLEND VOOR DIPLOMA'])
+            if 'AANTAL SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                grades['amount_of_school_exams_with_grades_counting_'
+                       'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                'CIJFER MEETELLEND VOOR DIPLOMA'])
 
-                if 'GEM. CIJFER SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
-                    grades['avg_grade_school_exams_counting_for_diploma'] = \
-                        float(row['GEM. CIJFER SCHOOLEXAMENS MET CIJFER '
-                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+            if 'GEM. CIJFER SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                grades['avg_grade_school_exams_counting_for_diploma'] = \
+                    float(row['GEM. CIJFER SCHOOLEXAMENS MET CIJFER '
+                              'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
 
-                if 'TOTAAL AANTAL CENTRALE EXAMENS' in row:
-                    grades['amount_of_central_exams'] = int(row['TOTAAL AANTAL'
-                                                                ' CENTRALE EXAMENS'])
+            if 'TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                grades['amount_of_central_exams'] = int(row['TOTAAL AANTAL'
+                                                            ' CENTRALE EXAMENS'])
 
-                if 'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS' in row:
-                    grades['avg_grade_central_exams'] = float(row[
-                        'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS']
-                        .replace(',', '.'))
+            if 'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                grades['avg_grade_central_exams'] = float(row[
+                    'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS']
+                    .replace(',', '.'))
 
-                if 'AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA' in row:
-                    grades['amount_of_central_exams_counting_for_diploma'] = \
-                        int(row['AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA'])
+            if 'AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA' in row:
+                grades['amount_of_central_exams_counting_for_diploma'] = \
+                    int(row['AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA'])
 
-                if 'GEM. CIJFER CENTRALE EXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
-                    grades['avg_grade_central_exams_counting_for_diploma'] = \
-                        float(row['GEM. CIJFER CENTRALE EXAMENS MET CIJFER '
-                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+            if 'GEM. CIJFER CENTRALE EXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                grades['avg_grade_central_exams_counting_for_diploma'] = \
+                    float(row['GEM. CIJFER CENTRALE EXAMENS MET CIJFER '
+                              'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
 
-                if 'GEM. CIJFER CIJFERLIJST' in row:
-                    grades['average_grade_overall'] = float(row[
-                        'GEM. CIJFER CIJFERLIJST'].replace(',', '.'))
+            if 'GEM. CIJFER CIJFERLIJST' in row:
+                grades['average_grade_overall'] = float(row[
+                    'GEM. CIJFER CIJFERLIJST'].replace(',', '.'))
 
-                if school_id not in courses_per_school:
-                    courses_per_school[school_id] = []
+            yield (brin, branch_id), grades
 
-                courses_per_school[school_id].append(grades)
-
-            for school_id, grades in courses_per_school.iteritems():
-                school = DuoVoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    havo_exam_grades_reference_url=csv_url,
-                    havo_exam_grades_reference_date=reference_date,
-                    havo_exam_grades_per_course=grades
-                )
-
-                yield school
+        return self.dataset(response, self.make_item, 'havo_exam_grades_per_course', parse_row)
 
     def vwo_exam_grades_per_course(self, response):
         """
         Parse "10. Examenkandidaten vwo en examencijfers per vak per instelling"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            school_ids = {}
-            courses_per_school = {}
-            for row in parse_csv_file(csv_url):
-                # Remove newline chars and strip leading and trailing
-                # whitespace.
-                for key in row.keys():
-                    c_key = key.replace('\n', '')
-                    row[c_key] = row[key].strip()
+        def parse_row(row):
+            # Remove newline chars and strip leading and trailing
+            # whitespace.
+            for key in row.keys():
+                c_key = key.replace('\n', '')
+                row[c_key] = row[key].strip()
 
-                    if not row[c_key]:
-                        del row[c_key]
+                if not row[c_key]:
+                    del row[c_key]
 
-                brin = row['BRIN NUMMER']
-                branch_id = int(row['VESTIGINGSNUMMER'])
-                school_id = '%s-%s' % (brin, branch_id)
+            brin = row['BRIN NUMMER']
+            branch_id = int(row['VESTIGINGSNUMMER'])
 
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
+            grades = {
+                'education_structure': row['ONDERWIJSTYPE VO'],
+                'course_identifier': row['VAKCODE'],
+                'course_abbreviation': row['AFKORTING VAKNAAM'],
+                'course_name': row['VAKNAAM']
+            }
 
-                grades = {
-                    'education_structure': row['ONDERWIJSTYPE VO'],
-                    'course_identifier': row['VAKCODE'],
-                    'course_abbreviation': row['AFKORTING VAKNAAM'],
-                    'course_name': row['VAKNAAM']
-                }
+            if 'SCHOOLEXAMEN BEOORDELING' in row:
+                grades['school_exam_rating'] = row['SCHOOLEXAMEN BEOORDELING']
 
-                if 'SCHOOLEXAMEN BEOORDELING' in row:
-                    grades['school_exam_rating'] = row['SCHOOLEXAMEN BEOORDELING']
+            if 'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING' in row:
+                grades['amount_of_school_exams_with_rating'] = int(row[
+                    'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING'])
 
-                if 'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING' in row:
-                    grades['amount_of_school_exams_with_rating'] = int(row[
-                        'TOTAAL AANTAL SCHOOLEXAMENS MET BEOORDELING'])
+            if 'AANTAL SCHOOLEXAMENS MET BEOORDELING MEETELLEND VOOR DIPLOMA' in row:
+                grades['amount_of_school_exams_with_rating_counting_'
+                       'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                'BEOORDELING MEETELLEND VOOR '
+                                                'DIPLOMA'])
 
-                if 'AANTAL SCHOOLEXAMENS MET BEOORDELING MEETELLEND VOOR DIPLOMA' in row:
-                    grades['amount_of_school_exams_with_rating_counting_'
-                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
-                                                    'BEOORDELING MEETELLEND VOOR '
-                                                    'DIPLOMA'])
+            if 'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER' in row:
+                grades['amount_of_school_exams_with_grades'] = int(row[
+                    'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER'])
 
-                if 'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER' in row:
-                    grades['amount_of_school_exams_with_grades'] = int(row[
-                        'TOTAAL AANTAL SCHOOLEXAMENS MET CIJFER'])
+            if 'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS' in row:
+                grades['avg_grade_school_exams'] = float(row[
+                    'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS']
+                    .replace(',', '.'))
 
-                if 'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS' in row:
-                    grades['avg_grade_school_exams'] = float(row[
-                        'GEM. CIJFER TOTAAL AANTAL SCHOOLEXAMENS']
-                        .replace(',', '.'))
+            if 'AANTAL SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                grades['amount_of_school_exams_with_grades_counting_'
+                       'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
+                                                'CIJFER MEETELLEND VOOR DIPLOMA'])
 
-                if 'AANTAL SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
-                    grades['amount_of_school_exams_with_grades_counting_'
-                           'for_diploma'] = int(row['AANTAL SCHOOLEXAMENS MET '
-                                                    'CIJFER MEETELLEND VOOR DIPLOMA'])
+            if 'GEM. CIJFER SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                grades['avg_grade_school_exams_counting_for_diploma'] = \
+                    float(row['GEM. CIJFER SCHOOLEXAMENS MET CIJFER '
+                              'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
 
-                if 'GEM. CIJFER SCHOOLEXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
-                    grades['avg_grade_school_exams_counting_for_diploma'] = \
-                        float(row['GEM. CIJFER SCHOOLEXAMENS MET CIJFER '
-                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+            if 'TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                grades['amount_of_central_exams'] = int(row['TOTAAL AANTAL'
+                                                            ' CENTRALE EXAMENS'])
 
-                if 'TOTAAL AANTAL CENTRALE EXAMENS' in row:
-                    grades['amount_of_central_exams'] = int(row['TOTAAL AANTAL'
-                                                                ' CENTRALE EXAMENS'])
+            if 'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS' in row:
+                grades['avg_grade_central_exams'] = float(row[
+                    'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS']
+                    .replace(',', '.'))
 
-                if 'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS' in row:
-                    grades['avg_grade_central_exams'] = float(row[
-                        'GEM. CIJFER TOTAAL AANTAL CENTRALE EXAMENS']
-                        .replace(',', '.'))
+            if 'AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA' in row:
+                grades['amount_of_central_exams_counting_for_diploma'] = \
+                    int(row['AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA'])
 
-                if 'AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA' in row:
-                    grades['amount_of_central_exams_counting_for_diploma'] = \
-                        int(row['AANTAL CENTRALE EXAMENS MEETELLEND VOOR DIPLOMA'])
+            if 'GEM. CIJFER CENTRALE EXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
+                grades['avg_grade_central_exams_counting_for_diploma'] = \
+                    float(row['GEM. CIJFER CENTRALE EXAMENS MET CIJFER '
+                              'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
 
-                if 'GEM. CIJFER CENTRALE EXAMENS MET CIJFER MEETELLEND VOOR DIPLOMA' in row:
-                    grades['avg_grade_central_exams_counting_for_diploma'] = \
-                        float(row['GEM. CIJFER CENTRALE EXAMENS MET CIJFER '
-                                  'MEETELLEND VOOR DIPLOMA'].replace(',', '.'))
+            if 'GEM. CIJFER CIJFERLIJST' in row:
+                grades['average_grade_overall'] = float(row[
+                    'GEM. CIJFER CIJFERLIJST'].replace(',', '.'))
 
-                if 'GEM. CIJFER CIJFERLIJST' in row:
-                    grades['average_grade_overall'] = float(row[
-                        'GEM. CIJFER CIJFERLIJST'].replace(',', '.'))
+            yield (brin, branch_id), grades
 
-                if school_id not in courses_per_school:
-                    courses_per_school[school_id] = []
-
-                courses_per_school[school_id].append(grades)
-
-            for school_id, grades in courses_per_school.iteritems():
-                school = DuoVoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    vwo_exam_grades_reference_url=csv_url,
-                    vwo_exam_grades_reference_date=reference_date,
-                    vwo_exam_grades_per_course=grades
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'vwo_exam_grades_per_course', parse_row)
 
     def parse_vavo_students(self, response):
         """
@@ -1968,42 +1722,17 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "Leerlingen per vestiging en bevoegd gezag (vavo apart)"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            school_ids = {}
-            vavo_students_per_school = {}
+        def parse_row(row):
+            brin = row['BRIN NUMMER'].strip()
+            branch_id = int(row['VESTIGINGSNUMMER'].strip()[-2:] or 0)
+            
+            vavo_students = {
+                'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
+                'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
+            }
+            yield (brin, branch_id), vavo_students
 
-            for row in parse_csv_file(csv_url):
-
-                brin = row['BRIN NUMMER'].strip()
-                branch_id = int(row['VESTIGINGSNUMMER'].strip()[-2:] or 0)
-                school_id = '%s-%s' % (brin, branch_id)
-
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
-
-                vavo_students = {
-                    'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
-                    'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
-                }
-
-                if school_id not in vavo_students_per_school:
-                    vavo_students_per_school[school_id] = []
-                vavo_students_per_school[school_id].append(vavo_students)
-
-            for school_id, per_school in vavo_students_per_school.iteritems():
-                school = DuoVoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    vavo_students_reference_url=csv_url,
-                    vavo_students_reference_date=reference_date,
-                    vavo_students=per_school
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'vavo_students', parse_row)
 
     def parse_students_by_finegrained_structure(self, response):
         """
@@ -2011,59 +1740,33 @@ class DuoVoBranchesSpider(DuoSpider):
         Parse "05. Leerlingen per samenwerkingsverband en onderwijstype"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            school_ids = {}
-            counts_per_school = {}
+        def parse_row(row):
+            brin = row['BRIN NUMMER'].strip()
+            branch_id = int(row['VESTIGINGSNUMMER'].strip()[-2:] or 0)
 
-            for row in parse_csv_file(csv_url):
+            # Don't make special fiends, just use all of 'em
+            fields = [
+                'Brugjaar 1-2',
+                'Engelse Stroom',
+                'HAVO lj 4-5',
+                'HAVO uitbest. aan VAVO',
+                'HAVO/VWO lj 3',
+                'Int. Baccelaureaat',
+                'Praktijkonderwijs alle vj',
+                'VMBO BL lj 3-4',
+                'VMBO GL lj 3-4',
+                'VMBO KL lj 3-4',
+                'VMBO TL lj 3-4',
+                'VMBO uitbest. aan VAVO',
+                'VMBO-MBO2 lj 3-6',
+                'VWO lj 4-6',
+                'VWO uitbest. aan VAVO',
+            ]
+            for field, count in row.items():
+                if field.strip() in fields and count:
+                    yield (brin, branch_id), {'type': field.strip(), 'count': int(count)}
 
-                brin = row['BRIN NUMMER'].strip()
-                branch_id = int(row['VESTIGINGSNUMMER'].strip()[-2:] or 0)
-                school_id = '%s-%s' % (brin, branch_id)
-
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
-
-                if school_id not in counts_per_school:
-                    counts_per_school[school_id] = []
-
-                # Don't make special fiends, just use all of 'em
-                fields = [
-                    'Brugjaar 1-2',
-                    'Engelse Stroom',
-                    'HAVO lj 4-5',
-                    'HAVO uitbest. aan VAVO',
-                    'HAVO/VWO lj 3',
-                    'Int. Baccelaureaat',
-                    'Praktijkonderwijs alle vj',
-                    'VMBO BL lj 3-4',
-                    'VMBO GL lj 3-4',
-                    'VMBO KL lj 3-4',
-                    'VMBO TL lj 3-4',
-                    'VMBO uitbest. aan VAVO',
-                    'VMBO-MBO2 lj 3-6',
-                    'VWO lj 4-6',
-                    'VWO uitbest. aan VAVO',
-                ]
-                for field, count in row.items():
-                    if field.strip() in fields and count:
-                        counts = {'type': field.strip(), 'count': int(count)}
-                        counts_per_school[school_id].append(counts)
-
-            for school_id, per_school in counts_per_school.iteritems():
-                school = DuoVoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    students_by_finegrained_structure_reference_url=csv_url,
-                    students_by_finegrained_structure_reference_date=reference_date,
-                    students_by_finegrained_structure=per_school
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'students_by_finegrained_structure', parse_row)
 
     def parse_vo_student_flow(self, response):
         """
@@ -2109,6 +1812,7 @@ class DuoPoBoardsSpider(DuoSpider):
     name = 'duo_po_boards'
 
     def __init__(self, *args, **kwargs):
+        self.make_item = lambda (board_id): DuoPoBoard(board_id=board_id)
         self.requests = {
             'po/adressen/Adressen/po_adressen05.asp':
                 self.parse_po_boards,
@@ -2213,18 +1917,14 @@ class DuoPoBoardsSpider(DuoSpider):
             'WERKKAPITAAL': 'operating_capital',
         }
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            indicators_per_board = {}
-            for row in parse_csv_file(csv_url):
-                # Strip leading and trailing whitespace from field names and values.
-                for key in row.keys():
-                    row[key.strip()] = row[key].strip()
+        def parse_row(row):
+            # Strip leading and trailing whitespace from field names and values.
+            for key in row.keys():
+                row[key.strip()] = row[key].strip()
 
+            # Don't look at the 'Kengetallen per sector' file
+            if 'BEVOEGD GEZAG NUMMER' in row:
                 board_id = int(row['BEVOEGD GEZAG NUMMER'])
-                if board_id not in indicators_per_board:
-                    indicators_per_board[board_id] = []
 
                 indicators = {}
                 indicators['year'] = int(row['JAAR'])
@@ -2238,17 +1938,10 @@ class DuoPoBoardsSpider(DuoSpider):
                     indicators[ind_norm] = float(row[ind].replace('.', '')
                                                          .replace(',', '.'))
 
-                indicators_per_board[board_id].append(indicators)
+                yield board_id, indicators
 
-            for board_id, indicators in indicators_per_board.iteritems():
-                board = DuoPoBoard(
-                    board_id=board_id,
-                    reference_year=reference_year,
-                    financial_key_indicators_per_year_reference_url=csv_url,
-                    financial_key_indicators_per_year_reference_date=reference_date,
-                    financial_key_indicators_per_year=indicators
-                )
-                yield board
+        return self.dataset(response, self.make_item, 'financial_key_indicators_per_year', parse_row)
+
 
     def parse_po_education_type(self, response):
         """
@@ -2258,45 +1951,31 @@ class DuoPoBoardsSpider(DuoSpider):
 
         possible_edu_types = ['BAO', 'SBAO', 'SO', 'VSO']
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            students_per_edu_type = {}
-            for row in parse_csv_file(csv_url):
-                # Strip leading and trailing whitespace from field names and values.
-                for key in row.keys():
-                    if row[key]:
-                        row[key.strip()] = row[key].strip()
-                    else:
-                        row[key.strip()] = '0'
+        def parse_row(row):
+            # Strip leading and trailing whitespace from field names and values.
+            for key in row.keys():
+                if row[key]:
+                    row[key.strip()] = row[key].strip()
+                else:
+                    row[key.strip()] = '0'
 
-                board_id = int(row['BEVOEGD GEZAG NUMMER'])
-                if board_id not in students_per_edu_type:
-                    students_per_edu_type[board_id] = []
+            board_id = int(row['BEVOEGD GEZAG NUMMER'])
 
-                for edu_type in possible_edu_types:
-                    if edu_type in row:
-                        if row[edu_type] == '':
-                            continue
+            for edu_type in possible_edu_types:
+                if edu_type in row:
+                    if row[edu_type] == '':
+                        continue
 
-                        if row[edu_type] == 0:
-                            continue
+                    if row[edu_type] == 0:
+                        continue
 
-                        students_per_edu_type[board_id].append({
-                            'denomination': row['DENOMINATIE'],
-                            'edu_type': edu_type,
-                            'students': int(row[edu_type].replace('.', ''))
-                        })
+                    yield board_id, {
+                        'denomination': row['DENOMINATIE'],
+                        'edu_type': edu_type,
+                        'students': int(row[edu_type].replace('.', ''))
+                    }
 
-            for board_id, e_types in students_per_edu_type.iteritems():
-                board = DuoPoBoard(
-                    board_id=board_id,
-                    reference_year=reference_year,
-                    students_per_edu_type_reference_url=csv_url,
-                    students_per_edu_type_reference_date=reference_date,
-                    students_per_edu_type=e_types
-                )
-                yield board
+        return self.dataset(response, self.make_item, 'financial_key_indicators_per_year', parse_row)
 
     def parse_po_staff_people(self, response):
         """
@@ -2344,6 +2023,7 @@ class DuoPoSchoolsSpider(DuoSpider):
     name = 'duo_po_schools'
 
     def __init__(self, *args, **kwargs):
+        self.make_item = lambda (brin): DuoPoSchool(brin=brin)
         self.requests = {
             'po/adressen/Adressen/hoofdvestigingen.asp':
                 self.parse_po_schools,
@@ -2438,29 +2118,15 @@ class DuoPoSchoolsSpider(DuoSpider):
         Parse "04. Leerlingen speciaal onderwijs naar cluster"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            spo_students_per_cluster_per_school = {}
-
-
-            for row in parse_csv_file(csv_url):
-                spo_students_per_cluster_per_school[row['BRIN NUMMER']] = {
+        def parse_row(row):
+            if 'BRIN NUMMER' in row:
+                yield row['BRIN NUMMER'], {
                     'cluster_1': int(row['CLUSTER 1']),
                     'cluster_2': int(row['CLUSTER 2']),
                     'cluster_3': int(row['CLUSTER 3']),
                     'cluster_4': int(row['CLUSTER 4']),
                 }
-
-            for brin, spo_students_per_cluster in spo_students_per_cluster_per_school.iteritems():
-                school = DuoPoSchool(
-                    brin=brin,
-                    reference_year=reference_year,
-                    spo_students_per_cluster_reference_url=csv_url,
-                    spo_students_per_cluster_reference_date=reference_date,
-                    spo_students_per_cluster=spo_students_per_cluster
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'spo_students_per_cluster', parse_row)
 
     def parse_po_lo_collaboration(self, response):
         """
@@ -2468,38 +2134,22 @@ class DuoPoSchoolsSpider(DuoSpider):
         Parse "02. Adressen instellingen per samenwerkingsverband lichte ondersteuning, primair onderwijs"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            po_lo_collaboration_per_school = {}
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
 
-            for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace.
-                for key in row.keys():
-                    value = (row[key] or '').strip()
-                    row[key] = value or None
-                    row[key.strip()] = value or None
+            if row.has_key('BRINNUMMER'):
+                row['BRIN NUMMER'] = row['BRINNUMMER']
 
-                if row.has_key('BRINNUMMER'):
-                    row['BRIN NUMMER'] = row['BRINNUMMER']
+            brin = row['BRIN NUMMER']
+            collaboration = row['ADMINISTRATIENUMMER']
 
-                brin = row['BRIN NUMMER']
-                collaboration = row['ADMINISTRATIENUMMER']
+            yield brin, collaboration
 
-                if brin not in po_lo_collaboration_per_school:
-                    po_lo_collaboration_per_school[brin] = []
-
-                po_lo_collaboration_per_school[brin].append(collaboration)
-
-            for brin, per_school in po_lo_collaboration_per_school.iteritems():
-                school = DuoPoSchool(
-                    brin=brin,
-                    reference_year=reference_year,
-                    po_lo_collaboration_reference_url=csv_url,
-                    po_lo_collaboration_reference_date=reference_date,
-                    po_lo_collaboration=per_school
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'po_lo_collaboration', parse_row)
 
     def parse_pao_collaboration(self, response):
         """
@@ -2507,38 +2157,22 @@ class DuoPoSchoolsSpider(DuoSpider):
         Parse "04. Adressen instellingen per samenwerkingsverband passend onderwijs, primair onderwijs"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            pao_collaboration_per_school = {}
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
 
-            for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace.
-                for key in row.keys():
-                    value = (row[key] or '').strip()
-                    row[key] = value or None
-                    row[key.strip()] = value or None
+            if row.has_key('BRINNUMMER'):
+                row['BRIN NUMMER'] = row['BRINNUMMER']
 
-                if row.has_key('BRINNUMMER'):
-                    row['BRIN NUMMER'] = row['BRINNUMMER']
+            brin = row['BRIN NUMMER']
+            collaboration = row['ADMINISTRATIENUMMER']
 
-                brin = row['BRIN NUMMER']
-                collaboration = row['ADMINISTRATIENUMMER']
+            yield brin, collaboration
 
-                if brin not in pao_collaboration_per_school:
-                    pao_collaboration_per_school[brin] = []
-
-                pao_collaboration_per_school[brin].append(collaboration)
-
-            for brin, per_school in pao_collaboration_per_school.iteritems():
-                school = DuoPoSchool(
-                    brin=brin,
-                    reference_year=reference_year,
-                    pao_collaboration_reference_url=csv_url,
-                    pao_collaboration_reference_date=reference_date,
-                    pao_collaboration=per_school
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'pao_collaboration', parse_row)
 
     def parse_po_staff_people(self, response):
         """
@@ -2586,6 +2220,7 @@ class DuoPoBranchesSpider(DuoSpider):
     name = 'duo_po_branches'
 
     def __init__(self, *args, **kwargs):
+        self.make_item = lambda ((brin, board_id)): DuoPoBranch(brin=brin, board_id=board_id)
         self.requests = {
             'po/adressen/Adressen/vest_bo.asp':
                 self.parse_po_branches,
@@ -2718,67 +2353,53 @@ class DuoPoBranchesSpider(DuoSpider):
                    vestiging het schoolgewicht en impulsgebied"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            school_ids = {}
-            weights_per_school = {}
+        def parse_row(row):
+            if row.has_key('VESTIGINSNUMMER'): # don't ask
+                row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
 
-            for row in parse_csv_file(csv_url):
-                # Datasets 2011 and 2012 suddenly changed these field names.
-                if row.has_key('BRINNUMMER'):
-                    row['BRIN NUMMER'] = row['BRINNUMMER']
-                if row.has_key('GEWICHT0.00'):
-                    row['GEWICHT 0'] = row['GEWICHT0.00']
-                if row.has_key('GEWICHT0.30'):
-                    row['GEWICHT 0.3'] = row['GEWICHT0.30']
-                if row.has_key('GEWICHT1.20'):
-                    row['GEWICHT 1.2'] = row['GEWICHT1.20']
+            # Datasets 2011 and 2012 suddenly changed these field names.
+            if row.has_key('BRINNUMMER'):
+                row['BRIN NUMMER'] = row['BRINNUMMER']
 
-                brin = row['BRIN NUMMER'].strip()
-                # Bypasses error coming from the 2011 dataset which contains and
-                # empty row.
-                if row['VESTIGINGSNUMMER'].strip():
-                    branch_id = int(row['VESTIGINGSNUMMER'])
-                school_id = '%s-%s' % (brin, branch_id)
+            if row.has_key('GEWICHT0.00'):
+                row['GEWICHT 0'] = row['GEWICHT0.00']
+            if row.has_key('GEWICHT0.30'):
+                row['GEWICHT 0.3'] = row['GEWICHT0.30']
+            if row.has_key('GEWICHT1.20'):
+                row['GEWICHT 1.2'] = row['GEWICHT1.20']
 
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
-
-                weights = {}
+            if row.has_key('GEWICHT 0.00'):
+                row['GEWICHT 0'] = row['GEWICHT 0.00']
+            if row.has_key('GEWICHT 0.30'):
+                row['GEWICHT 0.3'] = row['GEWICHT 0.30']
+            if row.has_key('GEWICHT 1.20'):
+                row['GEWICHT 1.2'] = row['GEWICHT 1.20']
             
-                weights['student_weight_0.0'] = int_or_none(row['GEWICHT 0'].strip())        
+            brin = row['BRIN NUMMER'].strip()
+            # Bypasses error coming from the 2011 dataset which contains and
+            # empty row.
+            if row['VESTIGINGSNUMMER'].strip():
+                branch_id = int(row['VESTIGINGSNUMMER'])
+            else:
+                branch_id = 0
 
-                weights['student_weight_0.3'] = int_or_none(row['GEWICHT 0.3'].strip())
+            weights = {
+                'student_weight_0.0': int_or_none(row['GEWICHT 0'].strip()),   
+                'student_weight_0.3': int_or_none(row['GEWICHT 0.3'].strip()),
+                'student_weight_1.2': int_or_none(row['GEWICHT 1.2'].strip()),
+                'school_weight': int_or_none(row['SCHOOLGEWICHT'].strip()),
+            }
 
-                weights['student_weight_1.2'] = int_or_none(row['GEWICHT 1.2'].strip())
+            # The 2008 dataset doesn't contain the IMPULSGEBIED field.
+            if row.has_key('IMPULSGEBIED'):
+                if row['IMPULSGEBIED'].strip():
+                    weights['impulse_area'] = bool(int(row['IMPULSGEBIED'].strip()))
+                else:
+                    weights['impulse_area'] = None
 
-                weights['school_weight'] = int_or_none(row['SCHOOLGEWICHT'].strip())
+            yield (brin, branch_id), weights
 
-                # The 2008 dataset doesn't contain the IMPULSGEBIED field.
-                if row.has_key('IMPULSGEBIED'):
-                    if row['IMPULSGEBIED'].strip():
-                        weights['impulse_area'] = bool(int(row['IMPULSGEBIED'].strip()))
-                    else:
-                        weights['impulse_area'] = None
-
-                if school_id not in weights_per_school:
-                    weights_per_school[school_id] = []
-
-                weights_per_school[school_id].append(weights)
-
-            for school_id, w_per_school in weights_per_school.iteritems():
-                school = DuoPoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    weights_per_school_reference_url=csv_url,
-                    weights_per_school_reference_date=reference_date,
-                    weights_per_school=w_per_school
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'weights_per_school', parse_row)
 
     def parse_po_student_age(self, response):
         """
@@ -2800,6 +2421,8 @@ class DuoPoBranchesSpider(DuoSpider):
                     row['GEMEENTENUMMER'] = row['GEMEENTE NUMMER']
                 if row.has_key('VESTIGINGS NUMMER'):
                     row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
+                if row.has_key('VESTIGINS NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINS NUMMER']
 
                 brin = row['BRIN NUMMER'].strip()
                 branch_id = int(row['VESTIGINGSNUMMER'])
@@ -2955,17 +2578,17 @@ class DuoPoBranchesSpider(DuoSpider):
 
                     student_residences[school_id].append(student_residence)
 
-                    for school_id, residence in student_residences.iteritems():
-                        school = DuoPoBranch(
-                            brin=school_ids[school_id]['brin'],
-                            branch_id=school_ids[school_id]['branch_id'],
-                            reference_year=reference_year,
-                            student_residences_reference_url=zip_url,
-                            student_residences_reference_date=reference_date,
-                            student_residences=residence
-                        )
+                for school_id, residence in student_residences.iteritems():
+                    school = DuoPoBranch(
+                        brin=school_ids[school_id]['brin'],
+                        branch_id=school_ids[school_id]['branch_id'],
+                        reference_year=reference_year,
+                        student_residences_reference_url=zip_url,
+                        student_residences_reference_date=reference_date,
+                        student_residences=residence
+                    )
 
-                    yield school
+                yield school
 
     def parse_po_student_year(self, response):
         """
@@ -3013,9 +2636,6 @@ class DuoPoBranchesSpider(DuoSpider):
                 # Is there a total student number from somewhere?
                 # if row['TOTAAL'].strip():
                 #         years['students'] = int(row['TOTAAL'])
-
-                if school_id not in years_per_branch:
-                    years_per_branch[school_id] = {}
 
                 years_per_branch[school_id] = years
 
@@ -3084,63 +2704,39 @@ class DuoPoBranchesSpider(DuoSpider):
         Parse "06. Leerlingen speciaal (basis)onderwijs naar onderwijssoort"
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            school_ids = {}
-            spo_students_by_edu_type_per_school = {}
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
 
-            for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace.
-                for key in row.keys():
-                    value = (row[key] or '').strip()
-                    row[key] = value or None
-                    row[key.strip()] = value or None
+            # Datasets 2011 and 2012 suddenly changed these field names.
+            if row.has_key('BRINNUMMER'):
+                row['BRIN NUMMER'] = row['BRINNUMMER']
+            if row.has_key('VESTIGINGS NUMMER'):
+                row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
+            if row.has_key('VESTIGINSNUMMER'): # don't ask
+                row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
 
-                # Datasets 2011 and 2012 suddenly changed these field names.
-                if row.has_key('BRINNUMMER'):
-                    row['BRIN NUMMER'] = row['BRINNUMMER']
-                if row.has_key('VESTIGINGS NUMMER'):
-                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
-                if row.has_key('VESTIGINSNUMMER'): # don't ask
-                    row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
+            if row.has_key('INDICATIE SPECIAAL (BASIS)ONDERWIJS'): # really now
+                row['INDICATIE SPECIAL BASIS ONDERWIJS'] = row['INDICATIE SPECIAAL (BASIS)ONDERWIJS']
 
-                if row.has_key('INDICATIE SPECIAAL (BASIS)ONDERWIJS'): # really now
-                    row['INDICATIE SPECIAL BASIS ONDERWIJS'] = row['INDICATIE SPECIAAL (BASIS)ONDERWIJS']
+            brin = row['BRIN NUMMER'].strip()
+            if row['VESTIGINGSNUMMER'].strip():
+                branch_id = int(row['VESTIGINGSNUMMER'])
+            else:
+                branch_id = 0
 
-                brin = row['BRIN NUMMER'].strip()
-                if row['VESTIGINGSNUMMER'].strip():
-                    branch_id = int(row['VESTIGINGSNUMMER'])
-                school_id = '%s-%s' % (brin, branch_id)
+            yield (brin, branch_id), {
+                'spo_indication' : row['INDICATIE SPECIAL BASIS ONDERWIJS'],
+                'spo' : int(row['SBAO'] or 0),
+                'so' : int(row['SO'] or 0),
+                'vso' : int(row['VSO'] or 0),
+            }
 
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
+        return self.dataset(response, self.make_item, 'spo_students_by_edu_type', parse_row)
 
-
-                spo_students_by_edu_type = {
-                    'spo_indication' : row['INDICATIE SPECIAL BASIS ONDERWIJS'],
-                    'spo' : int(row['SBAO'] or 0),
-                    'so' : int(row['SO'] or 0),
-                    'vso' : int(row['VSO'] or 0),
-                    }
-
-                if school_id not in spo_students_by_edu_type_per_school:
-                    spo_students_by_edu_type_per_school[school_id] = []
-
-                spo_students_by_edu_type_per_school[school_id].append(spo_students_by_edu_type)
-
-            for school_id, per_school in spo_students_by_edu_type_per_school.iteritems():
-                school = DuoPoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    spo_students_by_edu_type_reference_url=csv_url,
-                    spo_students_by_edu_type_reference_date=reference_date,
-                    spo_students_by_edu_type=per_school
-                )
-                yield school
 
     def parse_po_students_by_advice(self, response):
         """
@@ -3150,39 +2746,26 @@ class DuoPoBranchesSpider(DuoSpider):
         TODO: compare to owinsp PRIMARY_SCHOOL_ADVICES_STRUCTURES
         """
 
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-            school_ids = {}
-            students_by_advice_per_school = {}
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
 
-            for row in parse_csv_file(csv_url):
-                # strip leading and trailing whitespace.
-                for key in row.keys():
-                    value = (row[key] or '').strip()
-                    row[key] = value or None
-                    row[key.strip()] = value or None
+            # Datasets 2011 and 2012 suddenly changed these field names.
+            if row.has_key('BRINNUMMER'):
+                row['BRIN NUMMER'] = row['BRINNUMMER']
+            if row.has_key('VESTIGINGS NUMMER'):
+                row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
+            if row.has_key('VESTIGINSNUMMER'): # don't ask
+                row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
 
-                # Datasets 2011 and 2012 suddenly changed these field names.
-                if row.has_key('BRINNUMMER'):
-                    row['BRIN NUMMER'] = row['BRINNUMMER']
-                if row.has_key('VESTIGINGS NUMMER'):
-                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS NUMMER']
-                if row.has_key('VESTIGINSNUMMER'): # don't ask
-                    row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
-
+            if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER'].strip()
-                if row['VESTIGINGSNUMMER'].strip():
-                    branch_id = int(row['VESTIGINGSNUMMER'])
-                school_id = '%s-%s' % (brin, branch_id)
+                branch_id = int(row['VESTIGINGSNUMMER'].strip() or 0)
 
-                school_ids[school_id] = {
-                    'brin': brin,
-                    'branch_id': branch_id
-                }
-
-
-                spo_students_by_advice = {
+                yield (brin, branch_id), {
                     # TODO intOrNone
                     'vso' : int(row['VSO'] or 0),
                     'pro' : int(row['PrO'] or 0),
@@ -3198,21 +2781,7 @@ class DuoPoBranchesSpider(DuoSpider):
                     'unknown' : int(row['ONBEKEND'] or 0),
                     }
 
-                if school_id not in students_by_advice_per_school:
-                    students_by_advice_per_school[school_id] = []
-
-                students_by_advice_per_school[school_id].append(spo_students_by_advice)
-
-            for school_id, per_school in students_by_advice_per_school.iteritems():
-                school = DuoPoBranch(
-                    brin=school_ids[school_id]['brin'],
-                    branch_id=school_ids[school_id]['branch_id'],
-                    reference_year=reference_year,
-                    spo_students_by_advice_reference_url=csv_url,
-                    spo_students_by_advice_reference_date=reference_date,
-                    spo_students_by_advice=per_school
-                )
-                yield school
+        return self.dataset(response, self.make_item, 'spo_students_by_advice', parse_row)
 
     def parse_po_students_in_BRON(self, response):
         """
