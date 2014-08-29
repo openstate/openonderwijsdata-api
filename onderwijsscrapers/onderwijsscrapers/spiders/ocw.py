@@ -28,6 +28,15 @@ class OCWPoBranchesSpider(BaseSpider):
         ]
 
     def parse_po_finals(self, response):
+        """
+        Bijlage bij besluit op bezwaar Wob-verzoek inzake eindresultaten van leerlingen van groep 8 op basisscholen
+
+        Parses primary schools final examination scores.
+        Schools can use different test types.
+        Some test types have two parts, an RW and BL test.
+        Other test types have associated DE or VHE score variants.
+        There are two student counts, DLN and AFN.
+        """
         years =  [2010, 2011, 2012]
 
 
@@ -62,6 +71,7 @@ class OCWPoBranchesSpider(BaseSpider):
             school['board_name'] = row['bestuur'].strip()
             school['school_type'] = row['schooltype'].strip()
             yield school
+
 
             for y in years:
                 school = OCWPoBranch(brin = brin, branch_id = branch_id, reference_year = y)

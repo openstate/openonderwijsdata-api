@@ -373,6 +373,8 @@ AddressComponent
     types                               array                               Array containing classifications of this component.
     =================================== =================================== ==========================================================================
 
+.. _agesbystudentweight:
+
 AgesByStudentWeight
 ^^^^^^^^^^^^^^^^^^^
 This dict has three keys *student_weight_0.0*, *student_weight_0.3* and *student_weight_1.2*, the weights are based on the pupil's parents level of education [#weight]_.
@@ -457,7 +459,6 @@ ExamGrades
     avg_final_grade                     float                               Gemiddeld cijfer cijferlijst
     =================================== =================================== =================================== ==========================================================================
 
-.. _agesbystudentweight:
 
 .. _finindicator:
 
