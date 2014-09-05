@@ -23,6 +23,12 @@ Currently included data
     * Geo- and administrative regions (COROP, RMC, RPA, etc.)
     * General information: board id, BRIN, website, etc.
     * Dropouts (*voortijdig schoolverlaters*)
+    * Collaborations (*samenwerkingsverbanden*): Light support (*lichte ondersteuning*) & Fitting education (*passend onderwijs*)
+    * Staff numbers and FTE per age, gender, function group and employment (*onderwijspersoneel*)
+    * (PO) Special Education Students per cluster (*Leerlingen speciaal onderwijs naar cluster*)
+    * (VO) Prognosis of student numbers (*prognose aantal leerlingen*)
+    * (VO) Staff numbers per course and level, per age and gender (*onderwijspersoneel in aantal personen per gegeven vak, graad*)
+    * (VO) Teaching hours per course and level, per age and gender (*aantal gegeven lesuren per vak, graad*)
 
   * Branches (*vestigingen*)
 
@@ -31,8 +37,18 @@ Currently included data
     * General information: board id, BRIN, branch id, website, etc.
     * Origin of students per year (*Leerlingen per vestiging naar postcode leerling en leerjaar*)
     * Students per education structure (*Leerlingen per vestiging naar onderwijstype, lwoo indicatie, sector, afdeling, opleiding*)
-    * Exam candidates per year, education structure and gender (*Examenkandidaten en geslaagden*)
-    * School and central exam results per year and education structure (*Geslaagden, gezakten en gemiddelde examencijfers*)
+    * Student flow (*Doorstromers van primair naar voortgezet onderwijs*)
+    * (VO) Exam candidates per year, education structure and gender (*Examenkandidaten en geslaagden*)
+    * (VO) School and central exam results per year and education structure (*Geslaagden, gezakten en gemiddelde examencijfers*)
+    * (PO) Students per year, birthyear, education type, advice (*Leerlingen per vestiging naar leerjaar, geboortejaar, onderwijssoort, schooladvies*)
+    * (PO) Students as registered in BRON (*Basisregister Onderwijs*)
+    * (PO) Students by finegrained structure (*Leerlingen per samenwerkingsverband en onderwijstype*)
+    * (VO) Secondary education students in adult education (*voortgezet algemeen volwassenenonderwijs*) 
+
+  * Collaborations (*samenwerkingsverbanden*)
+
+    * Addresses (geocoded)
+
 
 * Onderwijsinspectie
 
@@ -49,6 +65,25 @@ Currently included data
   * Average hours of education planned and realized
   * Parent and student satisfaction suruvey results
   * School costs
+
+* Onderwijsinspectie via the Ministry of Education, Culture and Science (*Onderwijs, Cultuur en Wetenschap*)
+
+  * Primary school final examination scores (*eindresultaten van leerlingen van groep 8 op basisscholen*)
+
+* Onderwijsinspectie via DANS (*Data Archiving and Networked Services*)
+
+  * **Documented in Dutch**
+
+    * Algemene gegevens
+    * Opbrengstenoordeel
+    * Driejaarsgemiddelde van verschil tussen cijfer schoolexamen en centraal examen
+    * Opbrengstenkaart
+    * Adviesgegevens
+    * In-, door-, en uitstroomgegevens
+    * Examenkandidaten
+    * Examencijfers
+    * Leerlingen met indicatie LWOO (Leerweg Ondersteunend Onderwijs)
+    * Achtergrondgegevens
 
 Access data
 --------------------------------

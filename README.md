@@ -5,8 +5,8 @@
  - [Open Onderwijs Data homepage](http://www.openonderwijsdata.nl/)
  - [Official source code repo](https://github.com/openstate/openonderwijsdata-api/)
  - [Documentation](http://api.openonderwijsdata.nl/documentation/)
+ - [Currently included data](http://api.openonderwijsdata.nl/documentation/rst/introduction.html#currently-included-data)
  - [Issue tracker](https://github.com/openstate/openonderwijsdata-api/issues)
-
 
 ## Bugs and feature requests
 
