@@ -2220,7 +2220,7 @@ class DuoPoBranchesSpider(DuoSpider):
     name = 'duo_po_branches'
 
     def __init__(self, *args, **kwargs):
-        self.make_item = lambda ((brin, board_id)): DuoPoBranch(brin=brin, board_id=board_id)
+        self.make_item = lambda ((brin, branch_id)): DuoPoBranch(brin=brin, branch_id=branch_id)
         self.requests = {
             'po/adressen/Adressen/vest_bo.asp':
                 self.parse_po_branches,
@@ -2810,13 +2810,13 @@ class DuoPoBranchesSpider(DuoSpider):
             'Leerlingen teruggeplaatst tussen 1-10-2012 en 1-10-2013':
                 'reintroduced',
             'Niet-bekostigd op 1-10-13':
-                'non-financed',
+                'non_financed',
             'Totaal aantal':
                 'total',
             'Waarvan bekostigde inschrijvingen op 1-10-13':
                 'financed',
             'Waarvan niet-bekostigde inschrijvingen op 1-10-13':
-                'non-financed',
+                'non_financed',
             'Inschrijvingen SO/VSO':
                 'enrollments',
             'AANTAL LEERLINGEN TOTAAL':
