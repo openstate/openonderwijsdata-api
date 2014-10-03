@@ -2761,6 +2761,19 @@ class DuoPoBranchesSpider(DuoSpider):
             if row.has_key('VESTIGINSNUMMER'): # don't ask
                 row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
 
+            # 2013 changed:
+            if row.has_key('PRO'):
+                row['PrO'] = row['PRO']
+            if row.has_key('VMBO BL KL'):
+                row['VMBO BL-KL'] = row['VMBO BL KL']
+            if row.has_key('VMBO KL GT'):
+                row['VMBO KL-GT'] = row['VMBO KL GT']
+            if row.has_key('VMBO GT HAVO'):
+                row['VMBO GT-HAVO'] = row['VMBO GT HAVO']
+            if row.has_key('HAVO VWO'):
+                row['HAVO-VWO'] = row['HAVO VWO']
+
+
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER'].strip()
                 branch_id = int(row['VESTIGINGSNUMMER'].strip() or 0)
