@@ -20,7 +20,7 @@ We use [Sphinx](http://sphinx-doc.org/) to create the documentation. The source 
 
 ## Getting Started
 
-To run the code youself locally using the Elasticsearch exporter, do the following:
+To run the code yourself locally using the Elasticsearch exporter, do the following:
 
 1. Make sure up-to-date versions of Python 2 and Elasticsearch are installed, and install the dependencies in `requirements.txt`.
 2. Start elasticsearch and specify its port in `onderwijsscrapers/onderwijsscrapers/settings.py` or `local_settings.py`
