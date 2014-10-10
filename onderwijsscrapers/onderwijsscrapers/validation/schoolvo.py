@@ -1,3 +1,10 @@
+""".. _schoolvodata:
+
+Vensters voor Verantwoording
+----------------------------
+`Vensters voor Verantwoording <http://schoolvo.nl/>`_ provides VO schools with a platform where they can share data on their performance with the public. The data described here is currently **not** available to the public through the `OpenOnderwijs API <http://api.openonderwijsdata.nl/>`_.
+"""
+
 import glob
 import json
 
@@ -91,30 +98,30 @@ class SchoolVOBranch(MappingSchema):
     avg_education_hours_per_student = AverageEducationHours()
     avg_education_hours_per_student_url = SchemaNode(String(), validator=url)
     board = SchemaNode(String(), validator=Length(min=3, max=100))
-    board_id = general_rules.board_id
-    branch_id = general_rules.branch_id
-    brin = general_rules.brin
+    board_id = general_rules.board_id()
+    branch_id = general_rules.branch_id()
+    brin = general_rules.brin()
     building_img_url = SchemaNode(String(), validator=url)
     costs = Costs()
     costs_url = SchemaNode(String(), validator=url)
-    denomination = general_rules.denomination
+    denomination = general_rules.denomination()
     education_structures = general_rules.EducationStructures()
     email = SchemaNode(String(), validator=Email())
     logo_img_url = SchemaNode(String(), validator=url)
-    municipality = general_rules.municipality
-    municipality_id = general_rules.municipality_code
-    name = general_rules.name
+    municipality = general_rules.municipality()
+    municipality_id = general_rules.municipality_code()
+    name = general_rules.name()
     parent_satisfaction = Satisfactions()
     parent_satisfaction_url = SchemaNode(String(), validator=url)
-    phone = general_rules.phone
+    phone = general_rules.phone()
     profile = SchemaNode(String(), validator=Length(min=3, max=500))
-    province = general_rules.province
+    province = general_rules.province()
     schoolkompas_status_id = SchemaNode(Int(), validator=Range(min=0,\
         max=1000))
     schoolvo_code = SchemaNode(String(), validator=Length(min=14, max=14))
     student_satisfaction = Satisfactions()
     student_satisfaction_url = SchemaNode(String(), validator=url)
-    website = general_rules.website
+    website = general_rules.website()
 
 
 if __name__ == '__main__':

@@ -1,3 +1,9 @@
+""".. _owinspdata:
+
+Onderwijsinspectie
+------------------
+The Inspectie voor het Onderwijs [#owinsp]_ is tasked with inspecting Dutch schools. Since 1997, they are required to publish reports on their findings when inspecting schools.
+"""
 from colander import (MappingSchema, SequenceSchema, SchemaNode, String, Length,
                       Range, Int)
 
@@ -5,8 +11,8 @@ import general_rules
 
 
 class Report(MappingSchema):
-    date = general_rules.publication_date
-    education_structure = general_rules.education_structure
+    date = general_rules.publication_date()
+    education_structure = general_rules.education_structure()
     title = SchemaNode(String(), validator=Length(min=30, max=150))
     url = general_rules.url
 
@@ -16,8 +22,8 @@ class Reports(SequenceSchema):
 
 
 class Rating(MappingSchema):
-    date = general_rules.publication_date
-    education_structure = general_rules.education_structure
+    date = general_rules.publication_date()
+    education_structure = general_rules.education_structure()
     rating = SchemaNode(String(), validator=Length(min=4, max=20))
 
 
@@ -26,12 +32,12 @@ class RatingHistory(SequenceSchema):
 
 
 class CurrentRating(MappingSchema):
-    education_structure = general_rules.date
+    # education_structure = None # TODO
     owinsp_id = SchemaNode(Int(), validator=Range(min=0))
     owinsp_url = general_rules.url
     rating = SchemaNode(String(), validator=Length(min=4, max=20))
     rating_excerpt = SchemaNode(String(), validator=Length(min=4, max=500))
-    rating_valid_since = general_rules.publication_date
+    rating_valid_since = general_rules.publication_date()
 
 
 class CurrentRatings(SequenceSchema):
@@ -39,27 +45,27 @@ class CurrentRatings(SequenceSchema):
 
 
 class OnderwijsInspectieVoBranch(MappingSchema):
-    name = general_rules.name
-    brin = general_rules.brin
-    denomination = general_rules.denomination
+    name = general_rules.name()
+    brin = general_rules.brin()
+    denomination = general_rules.denomination()
     education_structures = general_rules.EducationStructures()
-    branch_id = general_rules.branch_id
-    board_id = general_rules.board_id
+    branch_id = general_rules.branch_id()
+    board_id = general_rules.board_id()
     address = general_rules.Address()
     website = general_rules.url
     result_card_url = general_rules.url
     reports = Reports()
     rating_history = RatingHistory()
     current_ratings = CurrentRatings()
-    board = general_rules.name
+    board = general_rules.name()
 
 
 class OnderwijsInspectiePoBranch(MappingSchema):
-    name = general_rules.name
-    brin = general_rules.brin
-    board_id = general_rules.board_id
-    denomination = general_rules.denomination
-    branch_id = general_rules.branch_id
+    name = general_rules.name()
+    brin = general_rules.brin()
+    board_id = general_rules.board_id()
+    denomination = general_rules.denomination()
+    branch_id = general_rules.branch_id()
     address = general_rules.Address()
     website = general_rules.url
     reports = Reports()
