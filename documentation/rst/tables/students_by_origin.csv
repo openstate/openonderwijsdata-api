@@ -1,3 +1,3 @@
-Field;Type;Original term;Description
-country;string;;Country students originated from
-students;integer;;The number of students originating form this country at this school
+Field,Type,Original term,Description
+country,string,,Country students originated from
+students,integer,,The number of students originating form this country at this school

@@ -1,5 +1,5 @@
-Field;Type;Original term;Description
-hours_planned;integer;;Hours of education planned by the school council [#medezeggenschapsraad]_ for the past year.
-hours_realised;integer;;Hours of education realised at the school [#medezeggenschapsraad]_ for the past year.
-year;string;;The school year the hours apply to. There are various ways in which these years are represented at `Vensters voor Verantwoording <http://schoolvo.nl>`_, but the most common is *Leerjaar <n>*.
-per_structure;array of :ref:`eduhoursstructure`;;Array of :ref:`eduhoursstructure`, representing the planning and realisation of education hours per education structure.
+Field,Type,Original term,Description
+hours_planned,integer,,Hours of education planned by the school council [#medezeggenschapsraad]_ for the past year.
+hours_realised,integer,,Hours of education realised at the school [#medezeggenschapsraad]_ for the past year.
+year,string,,"The school year the hours apply to. There are various ways in which these years are represented at `Vensters voor Verantwoording <http://schoolvo.nl>`_, but the most common is *Leerjaar <n>*."
+per_structure,array of :ref:`eduhoursstructure`,,"Array of :ref:`eduhoursstructure`, representing the planning and realisation of education hours per education structure."

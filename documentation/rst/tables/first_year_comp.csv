@@ -1,5 +1,5 @@
-Field;Type;Original term;Description
-percentage_student_combined_education;float;;Percentage of students in combined education (following multiple kinds of education)
-percentage_student_categorical_education ;float;;Percentage of students in categorical education (following one kind of education)
-combined_education_structures;array of strings;;Array containing strings representing education structures that have students following *combined* education.
-categorical_education_structures;array of strings;;Array containing strings representing education structures that have students following *categorical* education.
+Field,Type,Original term,Description
+percentage_student_combined_education,float,,Percentage of students in combined education (following multiple kinds of education)
+percentage_student_categorical_education ,float,,Percentage of students in categorical education (following one kind of education)
+combined_education_structures,array of strings,,Array containing strings representing education structures that have students following *combined* education.
+categorical_education_structures,array of strings,,Array containing strings representing education structures that have students following *categorical* education.

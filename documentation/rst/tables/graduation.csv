@@ -1,6 +1,6 @@
-Field;Type;Original term;Description
-year;string;Schooljaar;The school year the graduations applay to
-candidates;integer;;The total number of exam candidates for this school year
-passed;integer;;The number of candidates that graduated
-failed;integer;;The number of candidates that did not graduate
-per_department;array of :ref:`graduationdepartment` ;;Breakdown of the candidate and graduation results by deparment and gender
+Field,Type,Original term,Description
+year,string,Schooljaar,The school year the graduations applay to
+candidates,integer,,The total number of exam candidates for this school year
+passed,integer,,The number of candidates that graduated
+failed,integer,,The number of candidates that did not graduate
+per_department,array of :ref:`graduationdepartment` ,,Breakdown of the candidate and graduation results by deparment and gender

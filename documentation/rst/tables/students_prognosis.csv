@@ -1,4 +1,4 @@
-Field;Type;Original term;Description
-year;integer;;Prognosis is for this year
-structure;string;;Level of education [#edu_in_holland]_.
-students;integer;;Number of students
+Field,Type,Original term,Description
+year,integer,,Prognosis is for this year
+structure,string,,Level of education [#edu_in_holland]_.
+students,integer,,Number of students

@@ -1,4 +1,4 @@
-Field;Type;Original term;Description
-hours_planned;integer;;Hours of education planned by the school council [#medezeggenschapsraad]_ for the past year.
-hours_realised;integer;;Hours of education realised at the school [#medezeggenschapsraad]_ for the past year.
-structure;string;;The structure these hours apply to (*vbmo-t, havo, vwo, ...*)
+Field,Type,Original term,Description
+hours_planned,integer,,Hours of education planned by the school council [#medezeggenschapsraad]_ for the past year.
+hours_realised,integer,,Hours of education realised at the school [#medezeggenschapsraad]_ for the past year.
+structure,string,,"The structure these hours apply to (*vbmo-t, havo, vwo, ...*)"

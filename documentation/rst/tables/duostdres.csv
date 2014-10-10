@@ -1,11 +1,11 @@
-Field;Type;Original term;Description
-city;string;;The name of the city, town or village the students originate from.
-municipality;string;;The name of the municipality this branch is located in.
-municipality_code;integer;;Identifier (assigned by CBS [#cbs]_) to this municipality.
-year_1;integer;;The number of students from this location in year 1.
-year_2;integer;;The number of students from this location in year 2.
-year_3;integer;;The number of students from this location in year 3.
-year_4;integer;;The number of students from this location in year 4.
-year_5;integer;;The number of students from this location in year 5.
-year_6;integer;;The number of students from this location in year 6.
-zip_code;string;;Zip code (area) of the location the students originate from. Note that this value does not have to be a complete zipcode [#zipcodes]_, but can be somewhat anonimised (in order to preserve privacy of students) by being shortened to two digits. Also, students do not necessarily have a permanent residence.
+Field,Type,Original term,Description
+city,string,,"The name of the city, town or village the students originate from."
+municipality,string,,The name of the municipality this branch is located in.
+municipality_code,integer,,Identifier (assigned by CBS [#cbs]_) to this municipality.
+year_1,integer,,The number of students from this location in year 1.
+year_2,integer,,The number of students from this location in year 2.
+year_3,integer,,The number of students from this location in year 3.
+year_4,integer,,The number of students from this location in year 4.
+year_5,integer,,The number of students from this location in year 5.
+year_6,integer,,The number of students from this location in year 6.
+zip_code,string,,"Zip code (area) of the location the students originate from. Note that this value does not have to be a complete zipcode [#zipcodes]_, but can be somewhat anonimised (in order to preserve privacy of students) by being shortened to two digits. Also, students do not necessarily have a permanent residence."

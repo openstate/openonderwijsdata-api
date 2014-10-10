@@ -1,9 +1,9 @@
-Field;Type;Original term;Description
-dropouts_with_mbo1_diploma;integer;Aantal VSV-ers met MBO 1 diploma;Number of dropouts having a MBO 1 diploma (apprenticeship level) [#mbo1]_.
-dropouts_with_vmbo_diploma;integer;Aantal VSV-ers met VMBO diploma;Number of dropouts having a VMBO diploma [#vmbo]_.
-dropouts_without_diploma;integer;Aantal VSV-ers zonder diploma;Number of dropouts having no diploma.
-education_structure;string;;Level of education [#edu_in_holland]_.
-sector;string;profiel/sector;Package of courses a student takes in secondary education [#sectors]_ [#profiles]_.
-total_dropouts;integer;;Total dropouts for the given year at this school.
-total_students;integer;;Total students for the given year at this school.
-year;integer;;The year the dropout numbers apply to.
+Field,Type,Original term,Description
+dropouts_with_mbo1_diploma,integer,Aantal VSV-ers met MBO 1 diploma,Number of dropouts having a MBO 1 diploma (apprenticeship level) [#mbo1]_.
+dropouts_with_vmbo_diploma,integer,Aantal VSV-ers met VMBO diploma,Number of dropouts having a VMBO diploma [#vmbo]_.
+dropouts_without_diploma,integer,Aantal VSV-ers zonder diploma,Number of dropouts having no diploma.
+education_structure,string,,Level of education [#edu_in_holland]_.
+sector,string,profiel/sector,Package of courses a student takes in secondary education [#sectors]_ [#profiles]_.
+total_dropouts,integer,,Total dropouts for the given year at this school.
+total_students,integer,,Total students for the given year at this school.
+year,integer,,The year the dropout numbers apply to.

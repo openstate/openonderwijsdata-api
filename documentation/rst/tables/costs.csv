@@ -1,5 +1,5 @@
-Field;Type;Original term;Description
-documents;array;;Array containing URLs (string) to documents the school published regarding the costs for parents.
-explanation;string;;Optional explanation provided by the school.
-per_year;Array of :ref:`costsperyear`;;Many schools provide a detailed overview of the costs per year, which are described in this array.
-signed_code_of_conduct;boolean;;*True* if the school signed the code of conduct of the VO-raad [#voraad]_ regarding school costs [#coc]_.
+Field,Type,Original term,Description
+documents,array,,Array containing URLs (string) to documents the school published regarding the costs for parents.
+explanation,string,,Optional explanation provided by the school.
+per_year,Array of :ref:`costsperyear`,,"Many schools provide a detailed overview of the costs per year, which are described in this array."
+signed_code_of_conduct,boolean,,*True* if the school signed the code of conduct of the VO-raad [#voraad]_ regarding school costs [#coc]_.

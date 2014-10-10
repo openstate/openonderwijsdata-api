@@ -1,4 +1,4 @@
-Field;Type;Original term;Description
-collaboration_id;string;Administratienummer;Identification number of collaboration
-address;:ref:`duoaddress`;;Address of this collaboration.
-correspondence_address;:ref:`duoaddress`;;Correspondence address of this collaboration.
+Field,Type,Original term,Description
+collaboration_id,string,Administratienummer,Identification number of collaboration
+address,:ref:`duoaddress`,,Address of this collaboration.
+correspondence_address,:ref:`duoaddress`,,Correspondence address of this collaboration.

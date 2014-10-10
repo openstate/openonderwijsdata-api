@@ -1,33 +1,33 @@
-Field;Type;Original term;Description
-address;:ref:`duoaddress`;;Address of this school.
-board_id;integer;;Identifier (assigned by :ref:`duodata`) of the board of this school.
-brin;string;;'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long.
-corop_area;string;`COROP-gebied`_;A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.
-corop_area_code;integer;;Identifier of the corop_area.
-correspondence_address;:ref:`duoaddress`;;Correspondence address of this school.
-denomination;string;;In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
-dropouts_per_year;array of :ref:`dropout`;;Array of :ref:`dropout`, where each item represents the dropouts for a specific year, per school year.
-dropouts_per_year_reference_date;date;Peildatum;Date the dropouts source file was published at http://data.duo.nl.
-dropouts_per_year_reference_url;string;;URL to the dropouts source file at http://data.duo.nl.
-education_area;string;`Onderwijsgebied`_;Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.
-education_area_code;integer;;Identifier of the education_area.
-education_structures;array;;An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
-meta;:ref:`duometa`;;Metadata, such as date of scrape and whether this item passed validation.
-municipality;string;;The name of the municipality this branch is located in.
-municipality_code;integer;;Identifier (assigned by CBS [#cbs]_) to this municipality.
-name;string;;Name of the school.
-nodal_area;string;`Nodaal gebied`_;Area defined for the planning of distribution of secondary schools.
-nodal_area_code;integer;;Identifier of the nodal_area.
-phone;string;;Phone number of the school.
-province;string;;The province [#provinces]_ this branch is situated in.
-reference_year;integer;Peiljaar;Year the schools source file was published.
-rmc_region;string;`Rmc-regio`_;Area that is used for the coordination of school dropouts.
-rmc_region_code;integer;;Identifier of the rmc_region.
-rpa_area;string;`Rpa-gebied`_;Area defined to cluster information on the labour market.
-rpa_area_code;integer;;Identifier of the rpa_area.
-students_prognosis;array of :ref:`students_prognosis` ;;Prognosis of the number of students, per year
-students_prognosis_reference_date;date;Peildatum;Date the source file was published at http://data.duo.nl
-students_prognosis_reference_url;string;;URL of the source file.
-website;string;;Website of this school.
-wgr_area;string;`Wgr-gebied`_;Cluster of municipalities per collaborating region according to the 'Wet gemeenschappelijke regelingen' [#wgr_law]_.
-wgr_area_code;integer;;Identifier of the wgr_area.
+Field,Type,Original term,Description
+address,:ref:`duoaddress`,,Address of this school.
+board_id,integer,,Identifier (assigned by :ref:`duodata`) of the board of this school.
+brin,string,,"'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long."
+corop_area,string,`COROP-gebied`_,"A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data."
+corop_area_code,integer,,Identifier of the corop_area.
+correspondence_address,:ref:`duoaddress`,,Correspondence address of this school.
+denomination,string,,"In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here."
+dropouts_per_year,array of :ref:`dropout`,,"Array of :ref:`dropout`, where each item represents the dropouts for a specific year, per school year."
+dropouts_per_year_reference_date,date,Peildatum,Date the dropouts source file was published at http://data.duo.nl.
+dropouts_per_year_reference_url,string,,URL to the dropouts source file at http://data.duo.nl.
+education_area,string,`Onderwijsgebied`_,Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.
+education_area_code,integer,,Identifier of the education_area.
+education_structures,array,,"An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school."
+meta,:ref:`duometa`,,"Metadata, such as date of scrape and whether this item passed validation."
+municipality,string,,The name of the municipality this branch is located in.
+municipality_code,integer,,Identifier (assigned by CBS [#cbs]_) to this municipality.
+name,string,,Name of the school.
+nodal_area,string,`Nodaal gebied`_,Area defined for the planning of distribution of secondary schools.
+nodal_area_code,integer,,Identifier of the nodal_area.
+phone,string,,Phone number of the school.
+province,string,,The province [#provinces]_ this branch is situated in.
+reference_year,integer,Peiljaar,Year the schools source file was published.
+rmc_region,string,`Rmc-regio`_,Area that is used for the coordination of school dropouts.
+rmc_region_code,integer,,Identifier of the rmc_region.
+rpa_area,string,`Rpa-gebied`_,Area defined to cluster information on the labour market.
+rpa_area_code,integer,,Identifier of the rpa_area.
+students_prognosis,array of :ref:`students_prognosis` ,,"Prognosis of the number of students, per year"
+students_prognosis_reference_date,date,Peildatum,Date the source file was published at http://data.duo.nl
+students_prognosis_reference_url,string,,URL of the source file.
+website,string,,Website of this school.
+wgr_area,string,`Wgr-gebied`_,Cluster of municipalities per collaborating region according to the 'Wet gemeenschappelijke regelingen' [#wgr_law]_.
+wgr_area_code,integer,,Identifier of the wgr_area.

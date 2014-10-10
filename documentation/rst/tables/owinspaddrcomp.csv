@@ -1,4 +1,4 @@
-Field;Type;Original term;Description
-long_name;string;;Full name of this component. (*i.e. 'Nederland'*)
-short_name;string;;Abbreviated form (if applicable) of the long_name. (*i.e. 'NL'*)
-types;array;;Array containing classifications of this component.
+Field,Type,Original term,Description
+long_name,string,,Full name of this component. (*i.e. 'Nederland'*)
+short_name,string,,Abbreviated form (if applicable) of the long_name. (*i.e. 'NL'*)
+types,array,,Array containing classifications of this component.

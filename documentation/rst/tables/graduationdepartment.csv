@@ -1,16 +1,16 @@
-Field;Type;Original term;Description
-education_structure;string;ONDERWIJSTYPE VO;
-inspectioncode;string;;
-department;string;OPLEIDINGSNAAM;
-candidates;Object;;The distribution of genders of candidates participating in final exams
-- unknown;integer;;The amount of candidates of which the gender is not known
-- male;integer;;The amount of male participants
-- female;integer;;The amount of female participants
-passed;Object;;The distribution of genders of candidates that passed the final exams
-- unknown;integer;;
-- male;integer;;
-- female;integer;;
-failed;Object;;The distribution of genders of candidates that failed the final exams
-- unknown;integer;;
-- male;integer;;
-- female;integer;;
+Field,Type,Original term,Description
+education_structure,string,ONDERWIJSTYPE VO,
+inspectioncode,string,,
+department,string,OPLEIDINGSNAAM,
+candidates,Object,,The distribution of genders of candidates participating in final exams
+- unknown,integer,,The amount of candidates of which the gender is not known
+- male,integer,,The amount of male participants
+- female,integer,,The amount of female participants
+passed,Object,,The distribution of genders of candidates that passed the final exams
+- unknown,integer,,
+- male,integer,,
+- female,integer,,
+failed,Object,,The distribution of genders of candidates that failed the final exams
+- unknown,integer,,
+- male,integer,,
+- female,integer,,

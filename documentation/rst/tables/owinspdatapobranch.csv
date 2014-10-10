@@ -1,10 +1,10 @@
-Field;Type;Original term;Description
-address;:ref:`owinspaddress`;;Address of this branch
-brin;string;;'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long.
-current_ratings;:ref:`owinspcurrat`;;:ref:`owinspcurrat`, which represents the current rating of the Onderwijsinspectie [#owinsp]_.
-denomination;string;;In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
-meta;:ref:`owinspmeta`;;Metadata, such as date of scrape and whether this item passed validation.
-name;string;;Name of this branch.
-rating_history;array of :ref:`owinsprathist`;;Array of :ref:`owinsprathist`, where each item represents a rating the Onderwijsinspectie [#owinsp]_ awarded to this branch.
-reports;array of :ref:`owinspreport`;;Array of :ref:`owinspreport`, where each item represents a report of the Onderwijsinspectie [#owinsp]_ in PDF.
-website;string;;Website of this branch (optional).
+Field,Type,Original term,Description
+address,:ref:`owinspaddress`,,Address of this branch
+brin,string,,"'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long."
+current_ratings,:ref:`owinspcurrat`,,":ref:`owinspcurrat`, which represents the current rating of the Onderwijsinspectie [#owinsp]_."
+denomination,string,,"In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here."
+meta,:ref:`owinspmeta`,,"Metadata, such as date of scrape and whether this item passed validation."
+name,string,,Name of this branch.
+rating_history,array of :ref:`owinsprathist`,,"Array of :ref:`owinsprathist`, where each item represents a rating the Onderwijsinspectie [#owinsp]_ awarded to this branch."
+reports,array of :ref:`owinspreport`,,"Array of :ref:`owinspreport`, where each item represents a report of the Onderwijsinspectie [#owinsp]_ in PDF."
+website,string,,Website of this branch (optional).

@@ -1,2 +1,2 @@
-Field;Type;Original term;Description
-year_*n*;integer;;Number of students for year *n* (including special education) .
+Field,Type,Original term,Description
+year_*n*,integer,,Number of students for year *n* (including special education) .

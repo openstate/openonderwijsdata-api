@@ -1,13 +1,13 @@
-Field;Type;Original term;Description
-age_3;integer;;Number of children at age 3 in the key's weight category at this branch.
-age_4;integer;;Number of children at age 4 in the key's weight category at this branch.
-age_5;integer;;Number of children at age 5 in the key's weight category at this branch.
-age_6;integer;;Number of children at age 6 in the key's weight category at this branch.
-age_7;integer;;Number of children at age 7 in the key's weight category at this branch.
-age_8;integer;;Number of children at age 8 in the key's weight category at this branch.
-age_9;integer;;Number of children at age 9 in the key's weight category at this branch.
-age_10;integer;;Number of children at age 10 in the key's weight category at this branch.
-age_11;integer;;Number of children at age 11 in the key's weight category at this branch.
-age_12;integer;;Number of children at age 12 in the key's weight category at this branch.
-age_13;integer;;Number of children at age 13 in the key's weight category at this branch.
-age_14;integer;;Number of children at age 14 in the key's weight category at this branch.
+Field,Type,Original term,Description
+age_3,integer,,Number of children at age 3 in the key's weight category at this branch.
+age_4,integer,,Number of children at age 4 in the key's weight category at this branch.
+age_5,integer,,Number of children at age 5 in the key's weight category at this branch.
+age_6,integer,,Number of children at age 6 in the key's weight category at this branch.
+age_7,integer,,Number of children at age 7 in the key's weight category at this branch.
+age_8,integer,,Number of children at age 8 in the key's weight category at this branch.
+age_9,integer,,Number of children at age 9 in the key's weight category at this branch.
+age_10,integer,,Number of children at age 10 in the key's weight category at this branch.
+age_11,integer,,Number of children at age 11 in the key's weight category at this branch.
+age_12,integer,,Number of children at age 12 in the key's weight category at this branch.
+age_13,integer,,Number of children at age 13 in the key's weight category at this branch.
+age_14,integer,,Number of children at age 14 in the key's weight category at this branch.
