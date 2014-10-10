@@ -1,0 +1,6 @@
+Field;Type;Original term;Description
+average_grade;float;;The average satisfaction grade of this structure (*0.0 <= average_grade <= 10.0*).
+education_structure;string;;String representing the education structure [#edu_in_holland]_ this satisfaction surveys were collected for.
+indicators;array of :ref:`indicator`;;Array of :ref:`indicator`, which indicate satisfaction scores for specific indicators [#tevr_stud]_ [#tevr_par]_.
+national_grade;float;;The average grade for all these structures in the Netherlands (*0.0 <= average_grade <= 10.0*).
+source;string;;Optional string describing the origin of the survey data.

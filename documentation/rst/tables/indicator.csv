@@ -1,0 +1,3 @@
+Field;Type;Original term;Description
+grade;float;;The average grade student/parents awarded this indicator.
+indicator;string;;The indicator.

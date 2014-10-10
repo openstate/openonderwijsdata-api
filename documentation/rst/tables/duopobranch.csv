@@ -1,0 +1,51 @@
+Field;Type;Original term;Description
+address;:ref:`duoaddress`;;Address of this branch.
+ages_per_branch_by_student_weight;dict of :ref:`agesbystudentweight` ;;The number of children for each age on this branch by student weight (keys: *student_weight_0.0*, *student_weight_0.3* and *student_weight_1.2*).
+ages_per_branch_by_student_weight_reference_date;date;;Date the ages per branch by student weight source file was published at http://data.duo.nl
+ages_per_branch_by_student_weight_reference_url;string;;URL of the ages per branch by student weight source file.
+board_id;integer;;Identifier (assigned by :ref:`duodata`) of the board of this branch.
+branch_id;integer;;Identifier (assigned by :ref:`duodata`) of this branch.
+brin;string;;'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long.
+corop_area;string;`COROP-gebied`_;A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.
+corop_area_code;integer;;Identifier of the corop_area.
+correspondence_address;:ref:`duoaddress`;;Correspondence address of this branch.
+denomination;string;;In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
+education_area;string;Onderwijsgebied;Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.
+education_area_code;integer;;Identifier of the education_area.
+meta;:ref:`duometa`;;Metadata, such as date of scrape and whether this item passed validation.
+municipality;string;;The name of the municipality this branch is located in.
+municipality_code;integer;;Identifier (assigned by CBS [#cbs]_) to this municipality.
+name;string;;Name of the school.
+nodal_area;string;`Nodaal gebied`_;Area defined for the planning of distribution of secondary schools.
+nodal_area_code;integer;;Identifier of the nodal_area.
+phone;string;;Phone number of the school.
+province;string;;The province [#provinces]_ this branch is situated in.
+student_residences;array of :ref:`dustrespo`;;The number of pupils in this branch living in certain zipcodes by ages.
+student_residences_reference_date;date;Peiljaar;Date the source file was published at http://data.duo.nl
+student_residences_reference_url;string;;URL of the source file.
+reference_year;integer;Peiljaar;Year the schools source file was published.
+rmc_region;string;`Rmc-regio`_;Area that is used for the coordination of school dropouts.
+rmc_region_code;integer;;Identifier of the rmc_region.
+rpa_area;string;`Rpa-gebied`_;Area defined to cluster information on the labour market.
+rpa_area_code;integer;;Identifier of the rpa_area.
+website;string;;Website of this school.
+students_by_origin;array of :ref:`students_by_origin` ;;Number of studentes born in countries other than The Netherlands by country. Only availabe in 2009 as collecting of this data has been stopped since 2010.
+students_by_origin_reference_date;date; Peiljaar;Date the source file was published at http://data.duo.nl
+students_by_origin_reference_url;string;;URL of the source file.
+student_weights_per_branch;array of :ref:`studentweights`;;The number of children per student weight (0.0, 0.3 or 1.2), school weight and impulse area data for each branch.
+student_weights_per_branch_reference_date;date;;Date the source file was published at http://data.duo.nl
+student_weights_per_branch_reference_url;string;;URL of the source file.
+students_by_year;array of :ref:`students_by_year`;;Number of students by year
+students_by_year_reference_date;date;;Date the source file was published at http://data.duo.nl
+students_by_year_reference_url;string;;URL of the source file.
+spo_students_by_birthyear;array of :ref:`spo_by_birthyear`;;Number of students per birth year
+spo_students_by_birthyear_reference_date;date;;Date the source file was published at http://data.duo.nl
+spo_students_by_birthyear_reference_url;string;;URL of the source file.
+spo_students_by_edu_type;array of :ref:`spo_by_edu_type`;;Number of students per special education type
+spo_students_by_edu_type_reference_date;date;;Date the source file was published at http://data.duo.nl
+spo_students_by_edu_type_reference_url;string;;URL of the source file.
+students_by_advice;array of :ref:`students_by_advice` ;;Number of students by secondary education level recommendation made upon leaving primary school
+students_by_advice_reference_date;date;;Date the source file was published at http://data.duo.nl
+students_by_advice_reference_url;string;;URL of the source file.
+wgr_area;string;`Wgr-gebied`_;Cluster of municipalities per collaborating region according to the 'Wet gemeenschappelijke regelingen' [#wgr_law]_.
+wgr_area_code;integer;;Identifier of the wgr_area.

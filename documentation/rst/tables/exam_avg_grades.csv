@@ -1,0 +1,5 @@
+Field;Type;Original term;Description
+grade;float;;The average exam grade.
+compared_performance;integer;;Value between 1 and 5 comparing how 'good' this score is compared to the national average for this education structure (1 being worse, 2 being somewhat worse, 3 being average, 4 being somewhat better and 5 being better)
+education_structure;string;;Level of education [#edu_in_holland]_
+name;string;;The name of the course group this grade applies to.

@@ -1,0 +1,3 @@
+Field;Type;Original term;Description
+education_structure;string;;The structure this assessment applies to (*vbmo-t, havo, vwo, ...*)
+performance_assessment;string;;String describing the assessment. Can have a value 'voldoende' (adequate), 'onvoldoende' (inadequate), 'van 1 jaar gegevens' (data for only 1 year available) or 'geen oordeel/onvoldoende gegevens' (no assessment/not enough data).

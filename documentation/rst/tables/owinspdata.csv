@@ -1,0 +1,23 @@
+Field;Type;Original term;Description
+address;:ref:`owinspaddress`;;Address of this branch
+advice_structure_third_year;array of :ref:`advice_struct_3`;;An array of :ref:`advice_struct_3`, representing the distribution of the primary school advices students have in the third year of their education.
+board;string;;The name of the board of this school.
+board_id;integer;;Identifier (assigned by :ref:`duodata`) of the board of this branch.
+branch_id;integer;;Identifier (assigned by :ref:`duodata`) of this branch.
+brin;string;;'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long.
+composition_first_year;:ref:`first_year_comp`;;Composition of the first year of this school, distinguishing between *combined* (students from different education structures partaking in the same courses) and *categorical* (percentage of students from the same education structures).
+current_ratings;array of :ref:`owinspcurrat`;;Array of :ref:`owinspcurrat`, where each item represents the current rating of the Onderwijsinspectie [#owinsp]_.
+denomination;string;;In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.
+education_structures;array;;An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.
+exam_average_grades;array of :ref:`exam_avg_grades`;;Array of :ref:`exam_avg_grades`, showing the average exam grade per course group.
+exam_participation_per_profile;array of :ref:`exam_part_prof`;;Array of :ref:`exam_part_prof`, containing the distribution of sectors (VMBO) and profiles (HAVO/VWO) in students participating in exams.
+first_years_performance;:ref:`first_year_perf`;;Description of the performance of the school's 'onderbouw' (first years).
+meta;:ref:`owinspmeta`;;Metadata, such as date of scrape and whether this item passed validation.
+name;string;;Name of this branch.
+performance_assessments;array of :ref:`perf_ass`;;Array of :ref:`perf_ass`, indicating the 'Opbrengstenoordeel', a rating given by the Inspectie to each school, based on the performance in the first years ('onderbouw'), final years ('bovenbouw'), grades of the central examinations and the three year average of the difference between 'schoolexamens' and central examinations grades.
+rating_history;array of :ref:`owinsprathist`;;Array of :ref:`owinsprathist`, where each item represents a rating the Onderwijsinspectie [#owinsp]_ awarded to this branch.
+reports;array of :ref:`owinspreport`;;Array of :ref:`owinspreport`, where each item represents a report of the Onderwijsinspectie [#owinsp]_ in PDF.
+result_card_url;string;;URL to the result card ('opbrengstenkaart') of this branch.
+students_from_third_year_to_graduation_without_retaking;array of :ref:`straight_grad`;;Array of :ref:`straight_grad`, showing the percentage of students that go on to graduation from their third year without retaking a year, per education structure.
+students_in_third_year_without_retaking;array of :ref:`3yearnoretakes`;;Array of :ref:`3yearnoretakes`, showing the percentage of students that reach their third year without retaking a year.
+website;string;;Website of this branch (optional).

@@ -1,0 +1,5 @@
+Field;Type;Original term;Description
+po;integer;Bao;Primary education.
+so;integer;So;Special education.
+spo;integer;Sbao;Special primary education.
+vso;integer;Svo;Special secondary education.

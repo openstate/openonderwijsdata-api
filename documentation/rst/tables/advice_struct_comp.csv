@@ -1,0 +1,3 @@
+Field;Type;Original term;Description
+advice;string;;String that represents the level of education [#edu_in_holland]_ the primary school recommended the student upon leaving primary education.
+percentage_of_students;float;;Percentage of students with this advice in the third year of their education.

@@ -1,0 +1,3 @@
+Field;Type;Original term;Description
+northeast;:ref:`duogeoloc`;;Coordinates of the north-east coordinate of the viewport.
+southwest;:ref:`duogeoloc`;;Coordinates of the south-west coordinate of the viewport.

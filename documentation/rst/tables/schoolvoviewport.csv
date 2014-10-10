@@ -1,0 +1,3 @@
+Field;Type;Original term;Description
+northeast;:ref:`schoolvo_coordinates`;;Coordinates of the north-east coordinate of the viewport.
+southwest;:ref:`schoolvo_coordinates`;;Coordinates of the south-west coordinate of the viewport.
