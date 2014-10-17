@@ -52,19 +52,25 @@ class Viewport(MappingSchema):
     southwest = Coordinates()
 
 class Address(MappingSchema):
-    street = SchemaNode(String(), validator=Length(min=4, max=300))
-    city = city
-    zip_code = SchemaNode(String(), validator=Length(min=6, max=6))
-    geo_location = Coordinates()
-    geo_viewport = Viewport()
-    formatted_address = SchemaNode(String(), validator=Length(min=3, max=300))
+    """
+    **Source:** `Primair onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/default.asp>`_
+    **Source:** `Voortgezet onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/default.asp>`_
+    **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+    """
+    street = SchemaNode(String(), validator=Length(min=4, max=300),  title="Street name and number of the address of this branch.")
+    city = city( title="Name of the city or village this branch is located.")
+    zip_code = SchemaNode(String(), validator=Length(min=6, max=6),  title="Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed.")
+    geo_location = Coordinates( title="Latitude/longitude coordinates of this address.")
+    geo_viewport = Viewport( title="Latitude/longitude coordinates of the viewport for this address")
+    formatted_address = SchemaNode(String(), validator=Length(min=3, max=300),  title="Normalised address as returned by the BAG42 geocoding API [#bag42geo]_.")
 
     @colander.instantiate()
     class address_components(SequenceSchema):
         @colander.instantiate()
         class address_component(MappingSchema):
-            long_name = SchemaNode(String(), validator=Length(min=4, max=300))
-            short_name = SchemaNode(String(), validator=Length(min=4, max=300))
+            """**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_"""
+            long_name = SchemaNode(String(), validator=Length(min=4, max=300),  title="Full name of this component. (*i.e. 'Nederland'*)")
+            short_name = SchemaNode(String(), validator=Length(min=4, max=300),  title="Abbreviated form (if applicable) of the long_name. (*i.e. 'NL'*)")
             
             @colander.instantiate()
             class types(SequenceSchema):
@@ -73,23 +79,3 @@ class Address(MappingSchema):
 
 class EducationStructures(SequenceSchema):
     structure = SchemaNode(String())
-
-
-#TODO:
-#class FinancialKeyIndicatorsPerYear
-
-
-#TODO:
-#class AgesPerBranchByStudentWeight
-
-
-#TODO:
-#class WeightsPerSchool
-
-
-#TODO:
-#class EduTypes
-
-
-#TODO:
-#class PupilsByOrigins

@@ -44,6 +44,8 @@ class DuoSpider(BaseSpider):
         parse_row should return a key (like the tuple (brin, branch_id)) 
         and one item of the dataset for this brin
 
+        This is a SequenceSchema in validation
+
         Args:
            make_item (function): takes a key and returns a DUO item
            dataset_name (string): name of the dataset field
@@ -1068,7 +1070,7 @@ class DuoVoBranchesSpider(DuoSpider):
             'vo/leerlingen/Leerlingen/vo_leerlingen2.asp':
                 self.parse_student_residences,
             'vo/leerlingen/Leerlingen/vo_leerlingen1.asp':
-                 self.parse_students_per_branch,
+                 self.parse_students_by_structure,
             'vo/leerlingen/Leerlingen/vo_leerlingen6.asp':
                 self.student_graduations,
             'vo/leerlingen/Leerlingen/vo_leerlingen7.asp':
@@ -1185,7 +1187,7 @@ class DuoVoBranchesSpider(DuoSpider):
 
                 yield school
 
-    def parse_students_per_branch(self, response):
+    def parse_students_by_structure(self, response):
         """
         Parse "01. Leerlingen per vestiging naar onderwijstype, lwoo
         indicatie, sector, afdeling, opleiding"
@@ -1975,7 +1977,7 @@ class DuoPoBoardsSpider(DuoSpider):
                         'students': int(row[edu_type].replace('.', ''))
                     }
 
-        return self.dataset(response, self.make_item, 'financial_key_indicators_per_year', parse_row)
+        return self.dataset(response, self.make_item, 'edu_types', parse_row)
 
     def parse_po_staff_people(self, response):
         """
@@ -2384,9 +2386,9 @@ class DuoPoBranchesSpider(DuoSpider):
                 branch_id = 0
 
             weights = {
-                'student_weight_0.0': int_or_none(row['GEWICHT 0'].strip()),   
-                'student_weight_0.3': int_or_none(row['GEWICHT 0.3'].strip()),
-                'student_weight_1.2': int_or_none(row['GEWICHT 1.2'].strip()),
+                'student_weight_0_0': int_or_none(row['GEWICHT 0'].strip()),   
+                'student_weight_0_3': int_or_none(row['GEWICHT 0.3'].strip()),
+                'student_weight_1_2': int_or_none(row['GEWICHT 1.2'].strip()),
                 'school_weight': int_or_none(row['SCHOOLGEWICHT'].strip()),
             }
 
@@ -2462,7 +2464,7 @@ class DuoPoBranchesSpider(DuoSpider):
                     ages_per_branch_by_student_weight[school_id] = {}
 
                 if row['GEWICHT'].strip():
-                    weight = 'student_weight_%.1f' % float(row['GEWICHT'].strip().replace(',', '.'))
+                    weight = 'student_weight_%.1f' % float(row['GEWICHT'].strip().replace(',', '.').replace('.', '_'))
                 else:
                     weight = None
 

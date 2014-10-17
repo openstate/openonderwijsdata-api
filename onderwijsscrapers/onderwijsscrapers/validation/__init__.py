@@ -64,12 +64,13 @@ def generate_documentation(schema, mappinglink = '%s'):
         if typ == 'Sequence':
             field = [f for f in field][0] # should be only one
             typ = type(field.typ).__name__
+
             typname = 'array of '
             if typ != 'Mapping':
                 typname += '%s (%s)' % (field.name, typ)
         if typ == 'Mapping':
             typname += mappinglink % field.__class__.__name__
-            subdocs, subtables = generate_documentation(field.__class__)
+            subdocs, subtables = generate_documentation(field.__class__, mappinglink=mappinglink)
 
             tables = dict(tables.items() + subtables.items())
             docs = dict(docs.items() + subdocs.items())
