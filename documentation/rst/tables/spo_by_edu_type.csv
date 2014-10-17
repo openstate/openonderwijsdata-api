@@ -1,5 +1,0 @@
-Field,Type,Original term,Description
-spo_indication,string,`Indicatie Special Basis Onderwijs`_ ,Indication of type of special education
-so,integer,SO,Special education.
-spo,integer,SBAO,Special primary education.
-vso,integer,SVO,Special secondary education.

@@ -1,7 +1,0 @@
-Field,Type,Original term,Description
-education_structure,string,,"The structure this rating applies to (*vbmo-t, havo, vwo, ...*). **This value is optional**: as :ref:`owinspdatapobranch` do not have education structures, only :ref:`owinspdatavobranch` have this value."
-owinsp_id,integer,,Identifier (assigned by :ref:`owinspdata`). Use unknown.
-owinsp_url,string,,URL to the page of the branch where the rating for this education_structure was found.
-rating,string,,Rating awarded by the Onderwijsinspectie [#owinsp]_.
-rating_excerpt,string,,Excerpt of the rating report.
-rating_valid_since,date,,Date this rating went into effect.

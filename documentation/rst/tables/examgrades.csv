@@ -1,9 +1,0 @@
-Field,Type,Original term,Description
-sector,string,Afdeling,E.g. 'Cultuur en Maatschappij'
-education_structure,string,Onderwijstype VO,E.g. 'HAVO'
-candidates,integer,,The total number of exam candidates for this school year
-passed,integer,,The number of candidates that graduated
-failed,integer,,The number of candidates that did not graduate
-avg_grade_school_exam,float,Gemiddeld cijfer schoolexamen,
-avg_grade_central_exam,float,Gemiddeld cijfer centraal examen,
-avg_final_grade,float,Gemiddeld cijfer cijferlijst,

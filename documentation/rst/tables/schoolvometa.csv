@@ -1,5 +1,0 @@
-Field,Type,Original term,Description
-item_scraped_at,datetime,,The date and time this branch was scraped from the source.
-scrape_started_at,datetime,,The date and time the scrape session this item was downloaded in started.
-validated_at,datetime,,The date and time this item was validated.
-validation_result,string,,Indication whether the item passed validation.

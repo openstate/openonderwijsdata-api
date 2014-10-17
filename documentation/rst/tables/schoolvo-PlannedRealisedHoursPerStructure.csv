@@ -1,0 +1,4 @@
+Field,Type,Original term,Description
+"hours_planned","integer","","Hours Planned"
+"hours_realised","integer","","Hours Realised"
+"structure","string","","Structure"

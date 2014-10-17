@@ -1,3 +1,4 @@
+
 Data
 ====
 The data that is made available through the API originates from different sources: :ref:`duodata`, :ref:`schoolvodata` and the :ref:`owinspdata`. Each of these sources provides different types of data, from school assessments to financial figures. For each source the available fields are described, as well as the data they contain.
@@ -27,6 +28,7 @@ Note that many fields in the :ref:`duodata` dataset overlap, as these data is av
 
 For some fields the original Dutch term is included, in order to allow the API user to look up the definition of that term at the source collection.
 
+
 .. _duodata:
 
 DUO
@@ -37,433 +39,405 @@ DUO publishes many different datasets, each of these datasets has a different "r
 
    Currently DUO updates general information (addresses, names, phone numbers, etc.) of educational institutions on a monthly basis. Unfortunately, historical information is not provided. This means that for some reference years the API contains information such as the financial indicators and dropouts of a school, but does not include the address or name. A plausible explanation is that because of mergers or bankruptcies the school no longer exists in recent files.
 
-.. _`COROP-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
-.. _`Onderwijsgebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
-.. _`Nodaal gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
-.. _`Rmc-regio`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
-.. _`Rpa-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
-.. _`Wgr-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied
-.. _`Indicatie Special Basis Onderwijs`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Indicatie%20speciaal%20onderwijs
-.. _`Cluster`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster
 
-.. _duovoboard:
+.. _duo-DuoPoBoard:
 
-vo_board
-^^^^^^^^
-**Source:** `Voortgezet onderwijs - Adressen - 03. Adressen hoofdbesturen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/besturen.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/duodata.csv
-
-.. _duovoschool:
-
-vo_school
-^^^^^^^^^
-**Source:** `Voortgezet onderwijs - Adressen - 01. Adressen hoofdvestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/hoofdvestigingen.asp>`_
-
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/duovoschool.csv
-
-.. _duovobranch:
-
-vo_branch
-^^^^^^^^^
-**Source:** `Voortgezet onderwijs - Adressen - 02. Adressen alle vestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/vestigingen.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/duovobranch.csv
-
-.. _duopoboard:
-
-po_board
-^^^^^^^^
+DuoPoBoard
+^^^^^^^^^^
 **Source:** `Primair onderwijs - Adressen - 05. Bevoegde gezagen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/po_adressen05.asp>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/duopoboard.csv
+    :file: tables/duo-DuoPoBoard.csv
 
-.. _duoposchool:
 
-po_school
-^^^^^^^^^
-**Source:** `Primair onderwijs - Adressen - 01. Hoofdvestigingen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/hoofdvestigingen.asp>`_
+.. _duo-DuoPoBranch:
 
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/duoposchool.csv
-
-.. _duopobranch:
-
-po_branch
-^^^^^^^^^
+DuoPoBranch
+^^^^^^^^^^^
 **Source:** `Primair onderwijs - Adressen - 03. Alle vestigingen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/vest_bo.asp>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/duopobranch.csv
+    :file: tables/duo-DuoPoBranch.csv
 
-.. _duopaocollaboration:
 
-paocollaboration
-^^^^^^^^^^^^^^^^
+.. _duo-DuoPoSchool:
+
+DuoPoSchool
+^^^^^^^^^^^
+**Source:** `Primair onderwijs - Adressen - 01. Hoofdvestigingen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/hoofdvestigingen.asp>`_
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-DuoPoSchool.csv
+
+
+.. _duo-DuoVoBoard:
+
+DuoVoBoard
+^^^^^^^^^^
+**Source:** `Voortgezet onderwijs - Adressen - 03. Adressen hoofdbesturen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/besturen.asp>`_
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-DuoVoBoard.csv
+
+
+.. _duo-DuoVoBranch:
+
+DuoVoBranch
+^^^^^^^^^^^
+ **Source:** `Voortgezet onderwijs - Adressen - 02. Adressen alle vestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/vestigingen.asp>`_ 
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-DuoVoBranch.csv
+
+
+.. _duo-DuoVoSchool:
+
+DuoVoSchool
+^^^^^^^^^^^
+ **Source:** `Voortgezet onderwijs - Adressen - 01. Adressen hoofdvestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/hoofdvestigingen.asp>`_
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-DuoVoSchool.csv
+
+
+.. _duo-DuoPaoCollaboration:
+
+DuoPaoCollaboration
+^^^^^^^^^^^^^^^^^^^
 **Source:** `Passend onderwijs - Adressen - 01. Adressen samenwerkingsverbanden lichte ondersteuning primair onderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/passendow/Adressen/Adressen/passend_po_1.asp>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/duopaocollaboration.csv
+    :file: tables/duo-DuoPaoCollaboration.csv
 
 
-.. _duoaddress:
+.. _duo-Address:
 
 Address
 ^^^^^^^
-**Source:** `Primair onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/default.asp>`_
 
-**Source:** `Voortgezet onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/default.asp>`_
+    **Source:** `Primair onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/default.asp>`_
+    **Source:** `Voortgezet onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/default.asp>`_
+    **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+    
 
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-Address.csv
+
+
+.. _duo-address_component:
+
+address_component
+^^^^^^^^^^^^^^^^^
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/duoaddress.csv
+    :file: tables/duo-address_component.csv
 
-.. _duoaddresscomponent:
 
-AddressComponent
-^^^^^^^^^^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/duoaddresscomponent.csv
-
-.. _agesbystudentweight:
+.. _duo-AgesByStudentWeight:
 
 AgesByStudentWeight
 ^^^^^^^^^^^^^^^^^^^
-This dict has three keys *student_weight_0.0*, *student_weight_0.3* and *student_weight_1.2*, the weights are based on the pupil's parents level of education [#weight]_.
+
+This dict has three keys *student_weight_0_0*, *student_weight_0_3* and *student_weight_1_2*, the weights are based on the pupil's parents level of education [#weight]_.
 
 **Source:** `Primair onderwijs - Leerlingen - 03. Leerlingen basisonderwijs naar leerlinggewicht en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen3.asp>`_
+    
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/agesbystudentweight.csv
+    :file: tables/duo-AgesByStudentWeight.csv
 
-.. _dropout:
 
-Dropout
+.. _duo-Coordinates:
+
+Coordinates
+^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-Coordinates.csv
+
+
+.. _duo-department:
+
+department
+^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-department.csv
+
+
+.. _duo-dropout:
+
+dropout
 ^^^^^^^
 **Source:** `Voortijdig schoolverlaten - Voortijdig schoolverlaten - 02. Vsv in het voortgezet onderwijs per vo instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vschoolverlaten/vsvers/vsv_voortgezet.asp>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/dropout.csv
-
-.. _edutypes:
-
-EduTypes
-^^^^^^^^
-**Source:** `Primair onderwijs - Leerlingen - 07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen7.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/edutypes.csv
-
-.. _examgrades:
-
-ExamGrades
-^^^^^^^^^^
-**Source:** `Voortgezet onderwijs - Leerlingen - 07. Geslaagden, gezakten en gemiddelde examencijfers per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen7.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/examgrades.csv
+    :file: tables/duo-dropout.csv
 
 
-.. _finindicator:
-
-FinancialIndicator
-^^^^^^^^^^^^^^^^^^
-**Source:** `Primair onderwijs - Financiën - 15. Kengetallen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Financien/Jaarrekeninggegevens/Kengetallen.asp>`_
-
-**Source:** `Voortgezet onderwijs - Financiën - 15. Kengetallen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/Financien/Financien/Kengetallen.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/finindicator.csv
-
-.. _gradespercourse:
+.. _duo-GradesPerCourse:
 
 GradesPerCourse
 ^^^^^^^^^^^^^^^
+
 **Source:** `08. Examenkandidaten vmbo en examencijfers per vak per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen8.asp>`_
 
 **Source:** `09. Examenkandidaten havo en examencijfers per vak per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen9.asp>`_
 
 **Source:** `10. Examenkandidaten vwo en examencijfers per vak per instelling <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen10.asp>`_
+    
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/gradespercourse.csv
+    :file: tables/duo-GradesPerCourse.csv
 
 
-.. _graduation:
+.. _duo-graduation:
 
-Graduation
+graduation
 ^^^^^^^^^^
 **Source:** `Voortgezet onderwijs - Leerlingen - 06. Examenkandidaten en geslaagden <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/graduation.csv
+    :file: tables/duo-graduation.csv
 
 
-.. _graduationdepartment:
+.. _duo-GraudationDepartmentCandidates:
 
-GraduationPerDepartment
-^^^^^^^^^^^^^^^^^^^^^^^
-Belongs to :ref:`graduationdepartment`.
-
-**Source:** `Voortgezet onderwijs - Leerlingen - 06. Examenkandidaten en geslaagden <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen6.asp>`_
+GraudationDepartmentCandidates
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/graduationdepartment.csv
+    :file: tables/duo-GraudationDepartmentCandidates.csv
 
-.. _duogeoloc:
 
-GeoLocation
-^^^^^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+.. _duo-spo_students_by_birthyear:
+
+spo_students_by_birthyear
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/duogeoloc.csv
+    :file: tables/duo-spo_students_by_birthyear.csv
 
-.. _duogeoviewport:
 
-GeoViewport
-^^^^^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+.. _duo-spo_students_by_edu_type:
+
+spo_students_by_edu_type
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/duogeoviewport.csv
+    :file: tables/duo-spo_students_by_edu_type.csv
 
-.. _duometa:
 
-Meta
-^^^^
-**Source:** `OpenOnderwijs scrapers <http://api.openonderwijsdata.nl/>`_
+.. _duo-spo_students_per_cluster:
+
+spo_students_per_cluster
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/duometa.csv
-
-.. _students_by_advice:
-
-StudentsByAdvice
-^^^^^^^^^^^^^^^^
-
-The level of education [#edu_in_holland]_ that the primary school recommended the student upon leaving primary education
-**Source:** `Primair onderwijs - Leerlingen - 12. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar schooladvies <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/Schooladvies.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/students_by_advice.csv
-
-.. _spo_by_birthyear:
-
-SPOStudentsByBirthyear
-^^^^^^^^^^^^^^^^^^^^^^
-
-.. spo_law 
-.. spo_edu_type
-.. spo_cluster
-
-**Source:** `Primair onderwijs - Leerlingen - 05. Leerlingen speciaal (basis)onderwijs naar geboortejaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen5.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/spo_by_birthyear.csv
-
-.. _spo_by_edu_type:
-
-SPOStudentsByEduType
-^^^^^^^^^^^^^^^^^^^^
-
-**Source:** `Primair onderwijs - Leerlingen - 06. Leerlingen speciaal (basis)onderwijs naar onderwijssoort <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen6.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/spo_by_edu_type.csv
-
-.. _spo_per_cluster:
-
-SPOStudentsPerCluster
-^^^^^^^^^^^^^^^^^^^^^
-
-**Source:** `Primair onderwijs - Leerlingen - 04. Leerlingen speciaal onderwijs naar cluster <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen4.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/spo_per_cluster.csv
+    :file: tables/duo-spo_students_per_cluster.csv
 
 
-.. _dustrespo:
+.. _duo-student_residence:
 
-StudentResidences
+student_residence
 ^^^^^^^^^^^^^^^^^
+
 Number of pupils per age group (up to 25, as special education is included).
 
 **Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen primair onderwijs per gemeente naar postcode leerling en leeftijd <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen11.asp>`_
+        
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/dustrespo.csv
+    :file: tables/duo-student_residence.csv
 
-.. _duostpores:
 
-StudentResidence
-^^^^^^^^^^^^^^^^
+.. _duo-students_by_advice:
+
+students_by_advice
+^^^^^^^^^^^^^^^^^^
+
+The level of education [#edu_in_holland]_ that the primary school recommended the student upon leaving primary education
+**Source:** `Primair onderwijs - Leerlingen - 12. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar schooladvies <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/Schooladvies.asp>`_
+        
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/duostpores.csv
+    :file: tables/duo-students_by_advice.csv
 
-.. _students_prognosis:
 
-StudentPrognosis
-^^^^^^^^^^^^^^^^
+.. _duo-students_by_finegrained_structure:
 
-**Source:** `Primair onderwijs - Leerlingen - 11. Prognose aantal leerlingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp>`_
+students_by_finegrained_structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/students_prognosis.csv
+    :file: tables/duo-students_by_finegrained_structure.csv
 
-.. _students_by_origin:
 
-StudentsByOrigin
-^^^^^^^^^^^^^^^^
-Number of students born in countries other than The Netherlands, by country.
+.. _duo-students_by_structure:
 
-**Source:** `Primair onderwijs - Leerlingen - 09. Leerlingen basisonderwijs met een niet-Nederlandse achtergrond naar geboorteland <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen9.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/students_by_origin.csv
-
-.. _duostdres:
-
-StudentResidence
-^^^^^^^^^^^^^^^^
-**Source:** `Voortgezet onderwijs - Leerlingen - 02. Leerlingen per vestiging naar postcode leerling en leerjaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen2.asp>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/duostdres.csv
-
-.. _duostdstruct:
-
-StudentPerStructure
-^^^^^^^^^^^^^^^^^^^
+students_by_structure
+^^^^^^^^^^^^^^^^^^^^^
 **Source:** `Voortgezet onderwijs - Leerlingen - 01. Leerlingen per vestiging naar onderwijstype, lwoo indicatie, sector, afdeling, opleiding <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/duostdstruct.csv
+    :file: tables/duo-students_by_structure.csv
 
-.. _students_by_year:
 
-StudentsByYear
-^^^^^^^^^^^^^^
+.. _duo-students_by_year:
 
+students_by_year
+^^^^^^^^^^^^^^^^
 **Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/leerjaar.asp>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/students_by_year.csv
+    :file: tables/duo-students_by_year.csv
 
 
-.. _studentweights:
+.. _duo-students_prognosis:
 
-StudentWeights
-^^^^^^^^^^^^^^
-**Source:** `Primair onderwijs - Leerlingen - 01. Leerlingen basisonderwijs naar leerlinggewicht en per vestiging het schoolgewicht en impulsgebied <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen1.asp>`_
+students_prognosis
+^^^^^^^^^^^^^^^^^^
+**Source:** `Primair onderwijs - Leerlingen - 11. Prognose aantal leerlingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/studentweights.csv
+    :file: tables/duo-students_prognosis.csv
+
+
+.. _duo-StudentsByAge:
+
+StudentsByAge
+^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-StudentsByAge.csv
+
+
+.. _duo-StudentsEnrolledInStructure:
+
+StudentsEnrolledInStructure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-StudentsEnrolledInStructure.csv
+
+
+.. _duo-vavo_students:
+
+vavo_students
+^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-vavo_students.csv
+
+
+.. _duo-Viewport:
+
+Viewport
+^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-Viewport.csv
+
+
+.. _duo-weights_per_school:
+
+weights_per_school
+^^^^^^^^^^^^^^^^^^
+**Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/leerjaar.asp>`_
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/duo-weights_per_school.csv
 
 .. _schoolvodata:
 
@@ -471,139 +445,143 @@ Vensters voor Verantwoording
 ----------------------------
 `Vensters voor Verantwoording <http://schoolvo.nl/>`_ provides VO schools with a platform where they can share data on their performance with the public. The data described here is currently **not** available to the public through the `OpenOnderwijs API <http://api.openonderwijsdata.nl/>`_.
 
-vo_branch
-^^^^^^^^^
+
+.. _schoolvo-SchoolVOBranch:
+
+SchoolVOBranch
+^^^^^^^^^^^^^^
+
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/schoolvodata.csv
+    :file: tables/schoolvo-SchoolVOBranch.csv
 
 
-.. _schoolvoaddress:
+.. _schoolvo-Address:
 
 Address
 ^^^^^^^
+
+    **Source:** `Primair onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/default.asp>`_
+    **Source:** `Voortgezet onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/default.asp>`_
+    **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+    
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/schoolvo-Address.csv
+
+
+.. _schoolvo-address_component:
+
+address_component
+^^^^^^^^^^^^^^^^^
 **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/schoolvoaddress.csv
+    :file: tables/schoolvo-address_component.csv
 
-.. _schoolvoaddrcomp:
 
-AddressComponent
-^^^^^^^^^^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+.. _schoolvo-Coordinates:
+
+Coordinates
+^^^^^^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/schoolvoaddrcomp.csv
+    :file: tables/schoolvo-Coordinates.csv
 
-.. _costs:
+
+.. _schoolvo-CostPerYear:
+
+CostPerYear
+^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/schoolvo-CostPerYear.csv
+
+
+.. _schoolvo-Costs:
 
 Costs
 ^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/costs.csv
+    :file: tables/schoolvo-Costs.csv
 
-.. _costsperyear:
 
-CostsPerYear
-^^^^^^^^^^^^
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/costsperyear.csv
-
-.. _eduhours:
-
-EduHoursPerStudent
-^^^^^^^^^^^^^^^^^^
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/eduhours.csv
-
-.. _eduhoursstructure:
-
-EduHoursPerStructure
-^^^^^^^^^^^^^^^^^^^^
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/eduhoursstructure.csv
-
-.. _schoolvo_coordinates:
-
-GeoLocation
-^^^^^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/schoolvo_coordinates.csv
-
-.. _schoolvoviewport:
-
-GeoViewport
-^^^^^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/schoolvoviewport.csv
-
-.. _indicator:
+.. _schoolvo-Indicator:
 
 Indicator
 ^^^^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/indicator.csv
+    :file: tables/schoolvo-Indicator.csv
 
-.. _schoolvometa:
 
-Meta
-^^^^
+.. _schoolvo-PlannedRealisedHoursPerStructure:
+
+PlannedRealisedHoursPerStructure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/schoolvometa.csv
+    :file: tables/schoolvo-PlannedRealisedHoursPerStructure.csv
 
-.. _satisfaction:
+
+.. _schoolvo-PlannedRealisedHoursPerYear:
+
+PlannedRealisedHoursPerYear
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/schoolvo-PlannedRealisedHoursPerYear.csv
+
+
+.. _schoolvo-Satisfaction:
 
 Satisfaction
 ^^^^^^^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/satisfaction.csv
+    :file: tables/schoolvo-Satisfaction.csv
+
+
+.. _schoolvo-Viewport:
+
+Viewport
+^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/schoolvo-Viewport.csv
 
 .. _owinspdata:
 
@@ -611,209 +589,143 @@ Onderwijsinspectie
 ------------------
 The Inspectie voor het Onderwijs [#owinsp]_ is tasked with inspecting Dutch schools. Since 1997, they are required to publish reports on their findings when inspecting schools.
 
-.. _owinspdatavobranch:
 
-vo_branch
-^^^^^^^^^
+.. _owinsp-OnderwijsInspectiePoBranch:
+
+OnderwijsInspectiePoBranch
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/owinspdata.csv
+    :file: tables/owinsp-OnderwijsInspectiePoBranch.csv
 
-.. _owinspdatapobranch:
 
-po_branch
-^^^^^^^^^
+.. _owinsp-OnderwijsInspectieVoBranch:
+
+OnderwijsInspectieVoBranch
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. table::
+
+    ======================================================= =================================== ========================================================================================================
+    Field                                                   Type                                Description
+    ======================================================= =================================== ========================================================================================================
+    advice_structure_third_year                             array of :ref:`advice_struct_3`     An array of :ref:`advice_struct_3`, representing the distribution of the primary school advices students have in the third year of their education.
+    board_id                                                integer                             Identifier (assigned by :ref:`duodata`) of the board of this branch.
+    branch_id                                               integer                             Identifier (assigned by :ref:`duodata`) of this branch.
+    brin                                                    string                              "Basis Registratie Instellingen-nummer", identifier of the school this branch belongs to. Alphanumeric, four characters long.
+    composition_first_year                                  :ref:`first_year_comp`              Composition of the first year of this school, distinguishing between *combined* (students from different education structures partaking in the same courses) and *categorical* (percentage of students from the same education structures).
+    exam_average_grades                                     array of :ref:`exam_avg_grades`     Array of :ref:`exam_avg_grades`, showing the average exam grade per course group.
+    exam_participation_per_profile                          array of :ref:`exam_part_prof`      Array of :ref:`exam_part_prof`, containing the distribution of sectors (VMBO) and profiles (HAVO/VWO) in students participating in exams.
+    first_years_performance                                 :ref:`first_year_perf`              Description of the performance of the school's "onderbouw" (first years).
+    meta                                                    :ref:`owinspmeta`                   Metadata, such as date of scrape and whether this item passed validation.
+    performance_assessments                                 array of :ref:`perf_ass`            Array of :ref:`perf_ass`, indicating the "Opbrengstenoordeel", a rating given by the Inspectie to each school, based on the performance in the first years ("onderbouw"), final years ("bovenbouw"), grades of the central examinations and the three year average of the difference between "schoolexamens" and central examinations grades.
+    reports                                                 array of :ref:`owinspreport`        Array of :ref:`owinspreport`, where each item represents a report of the Onderwijsinspectie [#owinsp]_ in PDF.
+    students_from_third_year_to_graduation_without_retaking array of :ref:`straight_grad`       Array of :ref:`straight_grad`, showing the percentage of students that go on to graduation from their third year without retaking a year, per education structure.
+    students_in_third_year_without_retaking                 array of :ref:`3yearnoretakes`      Array of :ref:`3yearnoretakes`, showing the percentage of students that reach their third year without retaking a year.
+    ======================================================= =================================== ========================================================================================================
+
+    
+
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/owinspdatapobranch.csv
+    :file: tables/owinsp-OnderwijsInspectieVoBranch.csv
 
-.. _owinspaddress:
+
+.. _owinsp-Address:
 
 Address
 ^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
+    **Source:** `Primair onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/default.asp>`_
+    **Source:** `Voortgezet onderwijs - Adressen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/default.asp>`_
+    **Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+    
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/owinspaddress.csv
+    :file: tables/owinsp-Address.csv
 
-.. _owinspaddrcomp:
 
-AddressComponent
-^^^^^^^^^^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+.. _owinsp-address_component:
 
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/owinspaddrcomp.csv
-
-.. _exam_avg_grades:
-
-AverageExamGrades
+address_component
 ^^^^^^^^^^^^^^^^^
+**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/exam_avg_grades.csv
+    :file: tables/owinsp-address_component.csv
 
-.. _owinspcurrat:
+
+.. _owinsp-Coordinates:
+
+Coordinates
+^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 1, 1, 1, 100
+    :header-rows: 1
+    :file: tables/owinsp-Coordinates.csv
+
+
+.. _owinsp-CurrentRating:
 
 CurrentRating
 ^^^^^^^^^^^^^
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/owinspcurrat.csv
-
-.. _exam_part_prof:
-
-ExamParticipationPerProfile
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/exam_part_prof.csv
-
-.. _first_year_comp:
-
-FirstYearComposition
-^^^^^^^^^^^^^^^^^^^^
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/first_year_comp.csv
-
-.. _first_year_perf:
-
-FirstYearPerformance
-^^^^^^^^^^^^^^^^^^^^
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/first_year_perf.csv
-
-FirstYearsPerformance
-
-.. _owinsp_coordinates:
-
-GeoLocation
-^^^^^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/owinsp_coordinates.csv
+    :file: tables/owinsp-CurrentRating.csv
 
-.. _owinspgeoviewport:
 
-GeoViewport
-^^^^^^^^^^^
-**Source:** `BAG42 Geocoding service <http://calendar42.com/bag42/>`_
+.. _owinsp-Rating:
+
+Rating
+^^^^^^
 
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/owinspgeoviewport.csv
+    :file: tables/owinsp-Rating.csv
 
-.. _owinsprathist:
 
-HistoricalRating
-^^^^^^^^^^^^^^^^
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/owinsprathist.csv
-
-.. _owinspmeta:
-
-Meta
-^^^^
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/owinspmeta.csv
-
-.. _perf_ass:
-
-PerformanceAssessments
-^^^^^^^^^^^^^^^^^^^^^^
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/perf_ass.csv
-
-.. _advice_struct_3:
-
-PrimarySchoolAdvices
-^^^^^^^^^^^^^^^^^^^^
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/advice_struct_3.csv
-
-.. _advice_struct_comp:
-
-PrimarySchoolAdvice
-^^^^^^^^^^^^^^^^^^^
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/advice_struct_comp.csv
-
-.. _owinspreport:
+.. _owinsp-Report:
 
 Report
 ^^^^^^
+
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/owinspreport.csv
+    :file: tables/owinsp-Report.csv
 
-.. _straight_grad:
 
-StraightToGraduation
-^^^^^^^^^^^^^^^^^^^^
+.. _owinsp-Viewport:
+
+Viewport
+^^^^^^^^
+
 .. csv-table::
     :delim: ,
-    :widths: 2, 1, 3, 10
+    :widths: 1, 1, 1, 100
     :header-rows: 1
-    :file: tables/straight_grad.csv
+    :file: tables/owinsp-Viewport.csv
 
-.. _3yearnoretakes:
-
-StraightToThirdYear
-^^^^^^^^^^^^^^^^^^^
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/3yearnoretakes.csv
 
 **Footnotes**
 

@@ -1,5 +1,0 @@
-Field,Type,Original term,Description
-date,date,,Date the report was published by the Onderwijsinspectie [#owinsp]_.
-education_structure,string,,"The structure this rating applies to (*vbmo-t, havo, vwo, ...*)"
-title,string,,Title of the report.
-url,string,,URL to the full report in PDF.

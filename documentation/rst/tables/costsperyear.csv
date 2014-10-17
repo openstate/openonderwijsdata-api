@@ -1,6 +1,0 @@
-Field,Type,Original term,Description
-amount_euro,float,,Costs in € (euro) for this year.
-explanation,string,,"Optional explanation of the details of the costs (*for a labcoat, for travel, ...*)"
-link,string,,Optional URL to a document detailing costs.
-other_costs,boolean,,"Indication whether parents should expect additional costs, other than the costs mentioned here."
-year,string,,String representation of the years these costs apply to.

@@ -1,4 +1,0 @@
-Field,Type,Original term,Description
-education_structure,string,,Level of education [#edu_in_holland]_
-percentage,float,,Percentage of all students in this education structure that graduate without retaking any year between their third and their final year.
-compared_performance,integer,,"Value between 1 and 5 comparing how 'good' this score is compared to the national average for this education structure (1 being worse, 2 being somewhat worse, 3 being average, 4 being somewhat better and 5 being better)"

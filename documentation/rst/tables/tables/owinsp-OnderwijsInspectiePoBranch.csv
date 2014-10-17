@@ -1,0 +1,10 @@
+Field,Type,Original term,Description
+"name","string","","Name"
+"brin","string","","Brin"
+"board_id","integer","","Board Id"
+"denomination","string","","Denomination"
+"branch_id","integer","","Branch Id"
+"address",":ref:`owinsp-Address`","","Address"
+"report","array of :ref:`owinsp-Report`","","Report"
+"rating","array of :ref:`owinsp-Rating`","","Rating"
+"current_rating",":ref:`owinsp-CurrentRating`","","Current Rating"

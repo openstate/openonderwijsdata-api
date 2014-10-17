@@ -1,4 +1,0 @@
-Field,Type,Original term,Description
-ratio,float,,Index describing the change of the first years performance. The starting date for this index is not known.
-compared_performance,integer,,"Value between 1 and 5 comparing how 'good' this score is compared to the national average for this education structure (1 being worse, 2 being somewhat worse, 3 being average, 4 being somewhat better and 5 being better)"
-compared_performance_category,string,,String describing to which education structure (group) this school's first years are compared.

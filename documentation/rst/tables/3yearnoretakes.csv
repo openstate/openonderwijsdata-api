@@ -1,3 +1,0 @@
-Field,Type,Original term,Description
-education_structure,string,,Level of education [#edu_in_holland]_
-percentage,float,,Percentage of all students in this education structure that reach their third year without retaking any year between their first and their third year.

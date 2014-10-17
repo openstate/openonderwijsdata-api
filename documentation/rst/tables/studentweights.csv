@@ -1,6 +1,0 @@
-Field,Type,Original term,Description
-impulse_area,boolean,Impulsgebied,"True if the branch is located in a so-called impulse area, which is an zipcode area with many families with low income or welfare. In if this is the case the branch gets extra money for each pupil."
-school_weight,integer,Schoolgewicht,Based on the student weights and results in extra money for the branch.
-student_weight_0.0,integer,,Number of pupils who's parents don't fall into the weight 0.3 or 1.2 categories.
-student_weight_0.3,integer,,"Number of pupils who's both parents didn't get education beyond lbo/vbo, 'praktijkonderwijs' or vmbo 'basis- of kaderberoepsgerichte leerweg' [#weight]_."
-student_weight_1.2,integer,,Number of pupils who's parents (one or both) didn't get education beyond 'basisonderwijs' or (v)so-zmlk [#weight]_.

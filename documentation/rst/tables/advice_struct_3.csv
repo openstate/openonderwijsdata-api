@@ -1,3 +1,0 @@
-Field,Type,Original term,Description
-primary_school_advices,Array of :ref:`advice_struct_comp` ,,"Array of :ref:`advice_struct_comp`, containing the distribution of primary school advices of students in the third year of their education."
-education_structure,string,,String that represents the level of education [#edu_in_holland]_ the primary school advice distribution applies to.

@@ -1,0 +1,4 @@
+Field,Type,Original term,Description
+"year","integer","","Year"
+"structure","string","","Structure"
+"students","integer","","Students"
