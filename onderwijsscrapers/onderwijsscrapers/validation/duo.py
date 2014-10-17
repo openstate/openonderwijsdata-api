@@ -139,18 +139,19 @@ class StudentsEnrolledInStructure(MappingSchema):
 class StudentsByStructure(SequenceSchema):
     @colander.instantiate()
     class students_by_structure(MappingSchema):
-        department = SchemaNode(String(), validator=Length(min=3, max=300))
-        education_name = SchemaNode(String(), validator=Length(min=3, max=300))
-        education_structure = general_rules.education_structure()
+        """**Source:** `Voortgezet onderwijs - Leerlingen - 01. Leerlingen per vestiging naar onderwijstype, lwoo indicatie, sector, afdeling, opleiding <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen1.asp>`_"""
+        department = SchemaNode(String(), validator=Length(min=3, max=300),  title="Optional. Department of a vmbo track.")
+        education_name = SchemaNode(String(), validator=Length(min=3, max=300),  title="Name of the education programme.")
+        education_structure = general_rules.education_structure( title="Level of education [#edu_in_holland]_.")
         elementcode = SchemaNode(Int(), validator=Range(min=0))
-        lwoo = SchemaNode(Boolean())
-        vmbo_sector = SchemaNode(String(), validator=Length(min=3, max=300))
-        year_1 = StudentsEnrolledInStructure()
-        year_2 = StudentsEnrolledInStructure()
-        year_3 = StudentsEnrolledInStructure()
-        year_4 = StudentsEnrolledInStructure()
-        year_5 = StudentsEnrolledInStructure()
-        year_6 = StudentsEnrolledInStructure()
+        lwoo = SchemaNode(Boolean(),  title="Indicates whether this sector supports 'Leerwegondersteunend onderwijs', for students who need additional guidance [#lwoo]_.")
+        vmbo_sector = SchemaNode(String(), validator=Length(min=3, max=300),  title="Vmbo sector [#sectors]_.")
+        year_1 = StudentsEnrolledInStructure( title="Distribution of male and female students for year 1.")
+        year_2 = StudentsEnrolledInStructure( title="Distribution of male and female students for year 2.")
+        year_3 = StudentsEnrolledInStructure( title="Distribution of male and female students for year 3.")
+        year_4 = StudentsEnrolledInStructure( title="Distribution of male and female students for year 4.")
+        year_5 = StudentsEnrolledInStructure( title="Distribution of male and female students for year 5.")
+        year_6 = StudentsEnrolledInStructure( title="Distribution of male and female students for year 6.")
 
 
 class StudentsByAge(MappingSchema):
@@ -222,10 +223,21 @@ class GradesPerCourse(MappingSchema):
 class WeightsPerSchool(SequenceSchema):
     @colander.instantiate()
     class weights_per_school(MappingSchema):
-        student_weight_0_0 = SchemaNode(Int() )
-        student_weight_0_3 = SchemaNode(Int() )
-        student_weight_1_2 = SchemaNode(Int() )
-        school_weight = SchemaNode(Int() )
+        """**Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/leerjaar.asp>`_"""
+        student_weight_0_0 = SchemaNode(Int() ,  title="Number of pupils who's parents don't fall into the weight 0.3 or 1.2 categories.")
+        student_weight_0_3 = SchemaNode(Int() ,  title="Number of pupils who's both parents didn't get education beyond lbo/vbo, 'praktijkonderwijs' or vmbo 'basis- of kaderberoepsgerichte leerweg' [#weight]_.")
+        student_weight_1_2 = SchemaNode(Int() ,  title="Number of pupils who's parents (one or both) didn't get education beyond 'basisonderwijs' or (v)so-zmlk [#weight]_.")
+        school_weight = SchemaNode(Int() ,  title="Based on the student weights and results in extra money for the branch.")
+        school_weight.orig = "Schoolgewicht"
+        impulse_area = SchemaNode(Boolean(),  title="True if the branch is located in a so-called impulse area, which is an zipcode area with many families with low income or welfare. In if this is the case the branch gets extra money for each pupil.")
+        impulse_area.orig = "Impulsgebied"
+
+
+class StudentsByYear(SequenceSchema):
+    @colander.instantiate()
+    class students_by_year(MappingSchema):
+        """**Source:** `Primair onderwijs - Leerlingen - 11. Leerlingen (speciaal) basisonderwijs per schoolvestiging naar leerjaar <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/leerjaar.asp>`_"""
+        year_n = SchemaNode(Int(), title="Number of students for year *n* (including special education) .")
 
 
 #TODO:
@@ -236,9 +248,9 @@ class StudentPrognosis(SequenceSchema):
     @colander.instantiate()
     class students_prognosis(MappingSchema):
         """**Source:** `Primair onderwijs - Leerlingen - 11. Prognose aantal leerlingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/leerlingen/Leerlingen/vo_leerlingen11.asp>`_"""
-        year = SchemaNode(Int() title="Prognosis is for this year")
-        structure = SchemaNode(String() title="Level of education [#edu_in_holland]_.")
-        students = SchemaNode(Int() title="Number of students")
+        year = SchemaNode(Int(), title="Prognosis is for this year")
+        structure = SchemaNode(String(), title="Level of education [#edu_in_holland]_.")
+        students = SchemaNode(Int(), title="Number of students")
 
 
 
@@ -371,7 +383,6 @@ class DuoVoBranch(MappingSchema):
     education_area.orig = "`Onderwijsgebied`_"
     education_area_code = general_rules.education_area_code( title="Identifier of the education_area." )
     education_structures = general_rules.EducationStructures( title="An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school." )
-    students_by_structure = StudentsByStructure( title="Distribution of students by education structure and gender." )
     municipality = general_rules.municipality( title="The name of the municipality this branch is located in." )
     municipality_code = general_rules.municipality_code( title="Identifier (assigned by CBS [#cbs]_) to this municipality." )
     nodal_area = general_rules.nodal_area( title="Area defined for the planning of distribution of secondary schools." )
@@ -412,7 +423,7 @@ class DuoVoBranch(MappingSchema):
     student_residences_reference_date.orig = "Peildatum"
     student_residences_reference_url = general_rules.reference_url( title="URL of the student residences source file." )
 
-    # students_by_structure
+    students_by_structure = StudentsByStructure( title="Distribution of students by education structure and gender." )
     students_by_structure_reference_date = SchemaNode(Date(), missing=True)
     students_by_structure_url = general_rules.website()
 
@@ -668,6 +679,10 @@ class DuoPoBranch(MappingSchema):
     # students_in_BRON = StudentsInBRON()
     students_in_BRON_reference_url = general_rules.website()
     students_in_BRON_reference_date = SchemaNode(Date(), missing=True)
+
+    students_by_year = StudentsByYear()
+    students_by_year_reference_url = general_rules.website()
+    students_by_year_reference_date = SchemaNode(Date(), missing=True)
 
 
 class DuoPaoCollaboration(MappingSchema):
