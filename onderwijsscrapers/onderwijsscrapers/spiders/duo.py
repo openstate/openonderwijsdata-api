@@ -656,7 +656,7 @@ class DuoVoSchoolsSpider(DuoSpider):
                                          row['HUISNUMMER-TOEVOEGING '
                                              'CORRESPONDENTIEADRES']),
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
-                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
+                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
                 }
 
                 school['municipality_code'] = int_or_none(row['GEMEENTENUMMER'])
@@ -2094,7 +2094,7 @@ class DuoPoSchoolsSpider(DuoSpider):
                                          row['HUISNUMMER-TOEVOEGING '
                                              'CORRESPONDENTIEADRES']),
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
-                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
+                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
                 }
 
                 school['municipality_code'] = int(row['GEMEENTENUMMER'])
