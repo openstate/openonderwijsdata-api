@@ -3,4 +3,5 @@
 *.db
 .DS_Store
 .coverage
+app/static/bower_components
 onderwijsscrapers/onderwijsscrapers/local_settings.py
