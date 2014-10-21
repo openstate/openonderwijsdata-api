@@ -1,6 +1,5 @@
 # Open Onderwijs Data API
 
-
 ## Important links
  - [Open Onderwijs Data homepage](http://www.openonderwijsdata.nl/)
  - [Official source code repo](https://github.com/openstate/openonderwijsdata-api/)
@@ -16,22 +15,21 @@ Have a bug or a feature request? Please first read the [issue guidelines](https:
 
 The documentation of the Open Onderwijs Data API can be found at [api.openonderwijsdata.nl/documentation](http://api.openonderwijsdata.nl/documentation/). This documentation is for working with the requests and the data available via [the API itself](http://api.openonderwijsdata.nl/).
 
-We use [Sphinx](http://sphinx-doc.org/) to create the documentation. The source files are included in this repo under the `documentation` directory.  
+We use [Sphinx](http://sphinx-doc.org/) to create the documentation. The source files are included in this repo under the `documentation` directory.
 
 ## Getting Started
 
 To run the code yourself locally using the Elasticsearch exporter, do the following:
 
-1. Make sure up-to-date versions of Python 2 and Elasticsearch are installed, and install the dependencies in `requirements.txt`.
-2. Start elasticsearch and specify its port in `onderwijsscrapers/onderwijsscrapers/settings.py` or `local_settings.py`
+1. Make sure up-to-date versions of Python 2, [bower](http://www.bower.io) and [Elasticsearch](http://www.elasticsearch.org/) are installed, and install the dependencies in `requirements.txt` (Protip: use `pip install -r requirements.txt`).
+2. Start elasticsearch and specify its port in `onderwijsscrapers/onderwijsscrapers/settings.py` or `local_settings.py`.
 3. Navigate your terminal to `onderwijsscrapers/` and run the scrapy spider for the datasets you're interested in:
 
 	```
 		scrapy crawl <spider-name>
 	```
-
-4.  Run `app/app.py` to expose the API locally on your machine.
-
+4. Install client-side dependencies with `bower install`.
+5. Run `app/app.py` to start the webserver and browse the API locally on your machine (http://localhost:5001/)
 
 ## Contributing
 
@@ -39,4 +37,6 @@ Please read through our [contributing guidelines](https://github.com/openstate/o
 
 ## Copyright and license
 
-The Open Onderwijs Data API code is distributed under the [GNU Lesser General Public License v3](https://www.gnu.org/licenses/lgpl.html). The OOD documentation is released under the  [Creative Commons Attribution 4.0 International license](http://creativecommons.org/licenses/by/4.0/).
+The Open Onderwijs Data API code is distributed under the [GNU Lesser General Public License v3](https://www.gnu.org/licenses/lgpl.html).
+
+The OOD documentation is released under the  [Creative Commons Attribution 4.0 International license](http://creativecommons.org/licenses/by/4.0/).
