@@ -311,6 +311,8 @@ class SPOStudentsByEduType(SequenceSchema):
         so.orig = "SO"
         vso = SchemaNode(Int(),  title="Special secondary education.")
         vso.orig = "SVO"
+        vso = SchemaNode(Int(),  title="Special education and special secondary education.")
+        vso.orig = "(V)SO"
 
 class StudentsByEduType():
     """**Source:** `Primair onderwijs - Leerlingen - 07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/Leerlingen/Leerlingen/po_leerlingen7.asp>`_"""
@@ -318,7 +320,7 @@ class StudentsByEduType():
     class students_by_edu_type(MappingSchema):
         denomination = general_rules.denomination()
         students = SchemaNode(Int(), title="Number of students")
-        edu_types = SchemaNode(String(), validator=colander.OneOf(['BAO', 'SBAO', 'SO', 'VSO']), title="Edu type, in BAO, SBAO, SO, VSO")
+        edu_types = SchemaNode(String(), validator=colander.OneOf(['BAO', 'SBAO', 'SO', 'VSO', '(V)SO']), title="Edu type, in BAO, SBAO, SO, VSO, (V)SO")
 
 # TODO
 # class StudentsInBRON(MappingSchema):
