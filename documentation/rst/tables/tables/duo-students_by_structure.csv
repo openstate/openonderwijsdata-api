@@ -1,0 +1,13 @@
+Field,Type,Original term,Description
+"department","string","","Department"
+"education_name","string","","Education Name"
+"education_structure","string","","Education Structure"
+"elementcode","integer","","Elementcode"
+"lwoo","boolean","","Lwoo"
+"vmbo_sector","string","","Vmbo Sector"
+"year_1",":ref:`duo-StudentsEnrolledInStructure`","","Year 1"
+"year_2",":ref:`duo-StudentsEnrolledInStructure`","","Year 2"
+"year_3",":ref:`duo-StudentsEnrolledInStructure`","","Year 3"
+"year_4",":ref:`duo-StudentsEnrolledInStructure`","","Year 4"
+"year_5",":ref:`duo-StudentsEnrolledInStructure`","","Year 5"
+"year_6",":ref:`duo-StudentsEnrolledInStructure`","","Year 6"

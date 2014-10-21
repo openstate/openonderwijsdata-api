@@ -1,0 +1,6 @@
+Field,Type,Original term,Description
+"male","integer","","Male"
+"female","integer","","Female"
+"unkown","integer","","Unkown"
+"department","string","OPLEIDINGSNAAM","Department"
+"education_structure","string","ONDERWIJSTYPE VO","Education Structure"

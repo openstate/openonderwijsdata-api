@@ -4,6 +4,7 @@ from datetime import datetime
 import pytz
 from colander import Invalid
 
+import inspect
 
 def validate(schema, index, doctype, doc_id, item):
     validated_at = datetime.utcnow().replace(tzinfo=pytz.utc)\
@@ -42,3 +43,44 @@ def validate(schema, index, doctype, doc_id, item):
     validation['messages'] = messages
 
     return item, validation
+
+def generate_documentation(schema, mappinglink = '%s'):
+    """ Generate docs that describe the schema """
+    name = schema.__name__ if inspect.isclass(schema) else schema.name
+    doc = ''
+    if schema.__doc__:
+        doc += schema.__doc__ + '\n'
+
+    tables = {}
+    docs = {}
+
+    # Build the table for this schema    
+    table = 'Field,Type,Original term,Description\n'
+    schema = schema() if inspect.isclass(schema) else schema
+    for field in schema:
+        orig = field.orig if hasattr(field, 'orig') else ''
+        typ = type(field.typ).__name__
+        typname = ''
+        if typ == 'Sequence':
+            field = [f for f in field][0] # should be only one
+            typ = type(field.typ).__name__
+
+            typname = 'array of '
+            if typ != 'Mapping':
+                typname += '%s (%s)' % (field.name, typ)
+        if typ == 'Mapping':
+            typname += mappinglink % field.__class__.__name__
+            subdocs, subtables = generate_documentation(field.__class__, mappinglink=mappinglink)
+
+            tables = dict(tables.items() + subtables.items())
+            docs = dict(docs.items() + subdocs.items())
+
+        if not typname:
+            typname = typ.lower()
+
+        table +=  '"%s"\n'% '","'.join([field.name, typname, orig, field.title])
+
+    tables[name] = table
+    docs[name] = doc
+
+    return docs, tables

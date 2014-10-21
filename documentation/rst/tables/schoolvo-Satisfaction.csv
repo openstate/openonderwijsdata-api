@@ -1,0 +1,5 @@
+Field,Type,Original term,Description
+"average_grade","float","","The average satisfaction grade of this structure (*0.0 <= average_grade <= 10.0*)."
+"national_grade","float","","The average grade for all these structures in the Netherlands (*0.0 <= average_grade <= 10.0*)."
+"education_structure","string","","String representing the education structure [#edu_in_holland]_ this satisfaction surveys were collected for."
+"indicator","array of :ref:`schoolvo-Indicator`","","Indicator"

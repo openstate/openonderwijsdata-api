@@ -1,0 +1,4 @@
+Field,Type,Original term,Description
+"date","date","","Date this rating was awarded."
+"education_structure","string","","The structure this rating applies to (*vbmo-t, havo, vwo, ...*)"
+"rating","string","","Rating awarded by the Onderwijsinspectie [#owinsp]_."
