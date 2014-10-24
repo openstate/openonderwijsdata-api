@@ -1,0 +1,11 @@
+Field,Type,Original term,Description
+"address",":ref:`owinsp-Address`","","Address of this branch"
+"board_id","integer","","Board Id"
+"branch_id","integer","","Branch Id"
+"brin","string","","'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long."
+"current_rating",":ref:`owinsp-CurrentRating`","","Current Rating"
+"denomination","string","","In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here."
+"name","string","","Name of this branch."
+"rating","array of :ref:`owinsp-Rating`","","Rating"
+"report","array of :ref:`owinsp-Report`","","Report"
+"website","string","","Website of this branch (optional)."

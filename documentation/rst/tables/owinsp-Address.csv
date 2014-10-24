@@ -1,0 +1,8 @@
+Field,Type,Original term,Description
+"street","string","","Street name and number of the address of this branch."
+"city","string","","Name of the city or village this branch is located."
+"zip_code","string","","Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed."
+"geo_location",":ref:`owinsp-Coordinates`","","Latitude/longitude coordinates of this address."
+"geo_viewport",":ref:`owinsp-Viewport`","","Latitude/longitude coordinates of the viewport for this address"
+"formatted_address","string","","Normalised address as returned by the BAG42 geocoding API [#bag42geo]_."
+"address_component","array of :ref:`owinsp-address_component`","","Address Component"

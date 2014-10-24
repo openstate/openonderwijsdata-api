@@ -1,0 +1,6 @@
+Field,Type,Original term,Description
+"owinsp_id","integer","","Owinsp Id"
+"owinsp_url","string","","Owinsp Url"
+"rating","string","","Rating"
+"rating_excerpt","string","","Rating Excerpt"
+"rating_valid_since","date","","Rating Valid Since"

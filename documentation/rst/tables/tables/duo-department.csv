@@ -1,0 +1,4 @@
+Field,Type,Original term,Description
+"candidates",":ref:`duo-GraudationDepartmentCandidates`","","The total number of exam candidates for this school year"
+"failed",":ref:`duo-GraudationDepartmentCandidates`","","The number of candidates that did not graduate"
+"passed",":ref:`duo-GraudationDepartmentCandidates`","","The number of candidates that graduated"
