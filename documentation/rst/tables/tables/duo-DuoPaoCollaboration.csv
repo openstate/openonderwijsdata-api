@@ -1,5 +1,0 @@
-Field,Type,Original term,Description
-"address",":ref:`duo-Address`","","Address of this collaboration."
-"correspondence_address",":ref:`duo-Address`","","Correspondence address of this collaboration."
-"collaboration_id","string","Administratienummer","Identification number of collaboration"
-"reference_year","integer","","Reference Year"

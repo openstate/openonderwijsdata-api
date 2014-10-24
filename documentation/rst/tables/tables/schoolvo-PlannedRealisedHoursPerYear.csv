@@ -1,5 +1,0 @@
-Field,Type,Original term,Description
-"hours_planned","integer","","Hours Planned"
-"hours_realised","integer","","Hours Realised"
-"year","string","","Year"
-"average_hour_per_structure","array of :ref:`schoolvo-PlannedRealisedHoursPerStructure`","","Average Hour Per Structure"

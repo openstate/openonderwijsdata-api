@@ -1,6 +1,0 @@
-Field,Type,Original term,Description
-"candidates","integer","","The total number of exam candidates for this school year"
-"failed","integer","","The number of candidates that did not graduate"
-"passed","integer","","The number of candidates that graduated"
-"department","array of :ref:`duo-department`","","Department"
-"year","string","Schooljaar","The school year the graduations applay to"

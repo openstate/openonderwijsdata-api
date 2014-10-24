@@ -1,4 +1,0 @@
-Field,Type,Original term,Description
-"long_name","string","","Full name of this component. (*i.e. 'Nederland'*)"
-"short_name","string","","Abbreviated form (if applicable) of the long_name. (*i.e. 'NL'*)"
-"address_type","array of address_type (String)","","Address Type"

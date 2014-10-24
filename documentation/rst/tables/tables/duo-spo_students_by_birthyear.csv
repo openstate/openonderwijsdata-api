@@ -1,3 +1,0 @@
-Field,Type,Original term,Description
-"birthyear","integer","","Year of birth"
-"students","integer","","Number of students born in this year"

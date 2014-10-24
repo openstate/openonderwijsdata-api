@@ -1,5 +1,0 @@
-Field,Type,Original term,Description
-"average_grade","float","","Average Grade"
-"national_grade","float","","National Grade"
-"education_structure","string","","Education Structure"
-"indicator","array of :ref:`schoolvo-Indicator`","","Indicator"

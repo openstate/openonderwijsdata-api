@@ -1,5 +1,0 @@
-Field,Type,Original term,Description
-"spo_indication","string","`Indicatie Special Basis Onderwijs`_ ","Indication of type of special education"
-"sbao","integer","","Sbao"
-"so","integer","SO","Special education."
-"vso","integer","SVO","Special secondary education."

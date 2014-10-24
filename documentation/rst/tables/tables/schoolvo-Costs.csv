@@ -1,5 +1,0 @@
-Field,Type,Original term,Description
-"explanation","string","","Explanation"
-"document","array of document (String)","","Document"
-"signed_code_of_conduct","boolean","","Signed Code Of Conduct"
-"cost_per_year","array of :ref:`schoolvo-CostPerYear`","","Cost Per Year"

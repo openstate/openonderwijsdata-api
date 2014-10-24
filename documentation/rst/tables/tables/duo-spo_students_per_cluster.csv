@@ -1,5 +1,0 @@
-Field,Type,Original term,Description
-"cluster_1","integer","`Cluster`_","Number of pupils in schools for visually handicapped students"
-"cluster_2","integer","`Cluster`_","Number of pupils in schools for auditory / communicatively disabled students: deaf, hard of hearing, severe speech difficulties."
-"cluster_3","integer","`Cluster`_","Number of pupils in schools for pupils with physical and / or intellectual disabilities: very difficult learning, protracted illness with physical disabilities."
-"cluster_4","integer","`Cluster`_","Number of pupils in schools for pupils with psychiatric disorders and severe learning and / or behavioral problems, chronically ill students without disabilities and students associated with university-associated institutes that provide assistance to children with complex learning, behavioral or emotional problems (*Pedologisch Instituut*)."

@@ -1,6 +1,0 @@
-Field,Type,Original term,Description
-"amount_euro","integer","","Amount Euro"
-"explanation","string","","Explanation"
-"link","string","","Link"
-"other_costs","boolean","","Other Costs"
-"year","string","","Year"
