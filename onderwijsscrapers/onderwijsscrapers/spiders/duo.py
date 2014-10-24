@@ -17,7 +17,7 @@ from scrapy.selector import HtmlXPathSelector
 
 from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
                                      DuoPoBoard, DuoPoSchool, DuoPoBranch,
-                                     DuoPaoCollaboration)
+                                     DuoPaoCollaboration, DuoMboBoard)
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
@@ -3063,3 +3063,55 @@ class DuoPaoCollaborationsSpider(DuoSpider):
                 collaboration['ignore_id_fields'] = ['reference_year']
 
                 yield collaboration
+
+
+
+class DuoMboBoardSpider(DuoSpider):
+    name = 'duo_mbo_boards'
+
+    def __init__(self, *args, **kwargs):
+        self.make_item = lambda (board_id): DuoMboBoard(board_id=board_id)
+        self.requests = {
+            'mbo_/adressen/Adressen/bevoegde_gezagen.asp':
+                self.parse_mbo_boards,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
+
+    def parse_mbo_boards(self, response):
+        """
+        Middelbaar beroepsonderwijs > Adressen bevoegde gezagen
+        Parse "02. Adressen bevoegde gezagen"
+        """
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                yield DuoMboBoard(
+                    reference_year = reference_year,
+                    board_id = int(row['BEVOEGD GEZAG NUMMER']),
+
+                    address = {
+                        'street': '%s %s' % (row['STRAATNAAM'],
+                                             row['HUISNUMMER-TOEVOEGING']),
+                        'zip_code': row['POSTCODE'].replace(' ', ''),
+                        'city': row['PLAATSNAAM']
+                    },
+                    administrative_office_id = int(row['ADMINISTRATIEKANTOORNUMMER']),
+                    correspondence_address = {
+                        'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                                             row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
+                        'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
+                    },
+                    denomination = row['DENOMINATIE'],
+                    municipality = row['GEMEENTENAAM'],
+                    municipality_code = int(row['GEMEENTENUMMER']),
+                    name = row['BEVOEGD GEZAG NAAM'],
+                    phone = row['TELEFOONNUMMER'],
+                    website = row['INTERNETADRES'],
+                )
+

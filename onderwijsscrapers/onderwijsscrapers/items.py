@@ -431,6 +431,21 @@ class DuoPaoCollaboration(Item):
                                      #POSTCODE CORRESPONDENTIEADRES
                                      #PLAATS CORRESPONDENTIEADRES
 
+class DuoMboBoard(Item):
+    reference_year = Field()
+    ignore_id_fields = Field()
+    
+    address = Field()
+    administrative_office_id = Field()
+    board_id = Field()
+    correspondence_address = Field()
+    denomination = Field()
+    municipality = Field()
+    municipality_code = Field()
+    name = Field()
+    phone = Field()
+    website = Field()
+
 
 class OCWPoBranch(SchoolItem):
     reference_year = Field()

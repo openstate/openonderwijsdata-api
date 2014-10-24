@@ -696,6 +696,19 @@ class DuoPaoCollaboration(MappingSchema):
     reference_year = general_rules.reference_year()
 
 
+class DuoMboBoard(MappingSchema):
+    """**Source:** `Middelbaar beroepsonderwijs - Adressen - 02. Adressen bevoegde gezagen <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/adressen/Adressen/bevoegde_gezagen.asp>`_"""
+    address = general_rules.Address( title="Address of this board.")
+    administrative_office_id = SchemaNode(Int(),  title="Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances.")
+    board_id  = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of this board." )
+    correspondence_address = general_rules.Address( title="Correspondence address of this board.")
+    denomination = general_rules.denomination()
+    municipality = general_rules.municipality()
+    municipality_code = general_rules.municipality_code()
+    name = general_rules.name( title="Name of the board." )
+    phone = general_rules.phone( title="Phone number of the board." )
+    website = general_rules.url( title="Website of this board." )
+
 errors = []
 def validate():
     schema = DuoVoBranch()
