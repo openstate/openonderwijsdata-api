@@ -32,7 +32,7 @@ class DuoSpider(BaseSpider):
     def start_requests(self):
         return [
             Request(
-                'http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/' + url, 
+                'http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/' + url,
                 # lambda self, response: self.parse_cvs(self, response, parse_row)
                 parse_row
             ) for url,parse_row in self.requests.items() if (self.url_filter is None or url == self.url_filter)
@@ -41,7 +41,7 @@ class DuoSpider(BaseSpider):
     def dataset(self, response, make_item, dataset_name, parse_row):
         """
         Add a dataset to a DUO item
-        parse_row should return a key (like the tuple (brin, branch_id)) 
+        parse_row should return a key (like the tuple (brin, branch_id))
         and one item of the dataset for this brin
 
         This is a SequenceSchema in validation
@@ -139,10 +139,10 @@ def parse_csv_file(csv_url):
 
 def int_or_none(value):
     """
-        Try to make `value` an int. If the string is not a number, 
+        Try to make `value` an int. If the string is not a number,
         or empty, return None.
     """
-    try: 
+    try:
         return int(value)
     except ValueError:
         return None
@@ -177,7 +177,7 @@ def get_staff_people(xls_url, with_brin=True):
             item_id = brinnr
         if (not with_brin) and brinnr == 'bovenschools':
             item_id = boardnr
-        
+
         if item_id is not None:
             fg = row.pop('FUNCTIEGROEP', None)
             staff_per_year = {}
@@ -186,7 +186,7 @@ def get_staff_people(xls_url, with_brin=True):
             for key, val in row.items():
                 key = key.split()
                 if key[-1].isdigit() and len(key[-1]) == 4:
-                    
+
                     year = int(key[-1])
                     if year not in staff_per_year:
                         staff_per_year[year] = {}
@@ -224,7 +224,7 @@ def get_staff_people(xls_url, with_brin=True):
                         if key[0] == 'PERSONEN' and key[-2] == "FTE'S":
                             key_range = '>%s' % key[-3] if key[1] == 'MEER' else ''.join(key[1:-2])
                             staff_per_year[year]['staff_workload'].append({
-                                'range': key_range, 
+                                'range': key_range,
                                 'count': int(float(val or 0)),
                             })
 
@@ -235,12 +235,12 @@ def get_staff_people(xls_url, with_brin=True):
                                    else '<%s' % key[-3] if key[1] == 'JONGER' \
                                    else ''.join(key[1:-2])
                             staff_per_year[year]['staff_age'].append({
-                                'range': key_range, 
+                                'range': key_range,
                                 'count': int(float(val or 0)),
                             })
                         if key[:-1] == ['LEEFTIJD', 'ONBEKEND']:
                             staff_per_year[year]['staff_age'].append({
-                                'range': '?', 
+                                'range': '?',
                                 'count': int(float(val or 0)),
                             })
 
@@ -250,7 +250,7 @@ def get_staff_people(xls_url, with_brin=True):
                     staff_per_school[(year, item_id)] = []
 
                 staff_per_school[(year, item_id)].append({
-                    'function_group': fg, 
+                    'function_group': fg,
                     'staff': staff if staff['staff'] else {'staff': 0},
                 })
 
@@ -277,7 +277,7 @@ def get_staff_fte(xls_url, with_brin=True):
             item_id = brinnr
         if (not with_brin) and brinnr == 'bovenschools':
             item_id = boardnr
-        
+
         if item_id is not None:
             fg = row.pop('FUNCTIEGROEP', None)
             fte_per_year = {}
@@ -286,7 +286,7 @@ def get_staff_fte(xls_url, with_brin=True):
             for key, val in row.items():
                 key = key.split()
                 if key[-1].isdigit() and len(key[-1]) == 4:
-                    
+
                     year = int(key[-1])
                     if year not in fte_per_year:
                         fte_per_year[year] = {}
@@ -324,7 +324,7 @@ def get_staff_fte(xls_url, with_brin=True):
                         if key[0:2] == ["FTE'S", 'PERSONEN'] and key[-2] == "FTE'S":
                             key_range = '>%s' % key[-3] if key[2] == 'MEER' else ''.join(key[2:-2])
                             fte_per_year[year]['fte_workload'].append({
-                                'range': key_range, 
+                                'range': key_range,
                                 'fte': float(val or 0),
                             })
 
@@ -335,12 +335,12 @@ def get_staff_fte(xls_url, with_brin=True):
                                    else '<%s' % key[-3] if key[2] == 'JONGER' \
                                    else ''.join(key[2:-2])
                             fte_per_year[year]['fte_age'].append({
-                                'range': key_range, 
+                                'range': key_range,
                                 'fte': float(val or 0),
                             })
                         if key[:-1] == ["FTE'S", 'LEEFTIJD', 'ONBEKEND']:
                             fte_per_year[year]['fte_age'].append({
-                                'range': '?', 
+                                'range': '?',
                                 'fte': float(val or 0),
                             })
 
@@ -350,7 +350,7 @@ def get_staff_fte(xls_url, with_brin=True):
                     fte_per_school[(year, item_id)] = []
 
                 fte_per_school[(year, item_id)].append({
-                    'function_group': fg, 
+                    'function_group': fg,
                     'fte': staff if staff['fte'] else {'fte': 0},
                 })
 
@@ -656,7 +656,7 @@ class DuoVoSchoolsSpider(DuoSpider):
                                          row['HUISNUMMER-TOEVOEGING '
                                              'CORRESPONDENTIEADRES']),
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
-                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
+                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
                 }
 
                 school['municipality_code'] = int_or_none(row['GEMEENTENUMMER'])
@@ -890,7 +890,7 @@ class DuoVoSchoolsSpider(DuoSpider):
                 for key, val in row.items():
                     key = key.split()
                     if key[-1].isdigit() and len(key[-1]) == 4:
-                        
+
                         year = int(key[-1])
                         if year not in staff_per_year:
                             staff_per_year[year] = {}
@@ -913,14 +913,14 @@ class DuoVoSchoolsSpider(DuoSpider):
                                        else '<%s' % key[-3] if key[2] == 'JONGER' \
                                        else ''.join(key[2:-2])
                                 staff_per_year[year]['staff_age'].append({
-                                    'age_range': key_range, 
+                                    'age_range': key_range,
                                     'count': int(float(val or 0)),
                                 })
                             if key[:-1] == ['LEEFTIJD', 'ONBEKEND']:
                                 if 'staff_age' not in staff_per_year[year]:
                                     staff_per_year[year]['staff_age'] = []
                                 staff_per_year[year]['staff_age'].append({
-                                    'age_range': '?', 
+                                    'age_range': '?',
                                     'count': int(float(val or 0)),
                                 })
 
@@ -1001,7 +1001,7 @@ class DuoVoSchoolsSpider(DuoSpider):
                 for key, val in row.items():
                     key = key.split()
                     if key[-1].isdigit() and len(key[-1]) == 4:
-                        
+
                         year = int(key[-1])
                         if year not in time_per_year:
                             time_per_year[year] = {}
@@ -1024,14 +1024,14 @@ class DuoVoSchoolsSpider(DuoSpider):
                                        else '<%s' % key[-3] if key[3] == 'JONGER' \
                                        else ''.join(key[3:-2])
                                 time_per_year[year]['time_by_staff_age'].append({
-                                    'staff_age': key_range, 
+                                    'staff_age': key_range,
                                     'time': int(float(val or 0)),
                                 })
                             if key[:-1] == ['AANTAL','LESUREN','PERSONEEL','LEEFTIJD', 'ONBEKEND']:
                                 if 'time_by_staff_age' not in time_per_year[year]:
                                     time_per_year[year]['time_by_staff_age'] = []
                                 time_per_year[year]['time_by_staff_age'].append({
-                                    'staff_age': '?', 
+                                    'staff_age': '?',
                                     'time': int(float(val or 0)),
                                 })
 
@@ -1727,7 +1727,7 @@ class DuoVoBranchesSpider(DuoSpider):
         def parse_row(row):
             brin = row['BRIN NUMMER'].strip()
             branch_id = int(row['VESTIGINGSNUMMER'].strip()[-2:] or 0)
-            
+
             vavo_students = {
                 'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
                 'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
@@ -1818,7 +1818,9 @@ class DuoPoBoardsSpider(DuoSpider):
         self.requests = {
             'po/adressen/Adressen/po_adressen05.asp':
                 self.parse_po_boards,
-            'po/Financien/Jaarrekeninggegevens/Kengetallen.asp': 
+            'po/adressen/Adressen/po_adressen06.asp':
+                self.parse_po_boards,
+            'po/Financien/Jaarrekeninggegevens/Kengetallen.asp':
                 self.parse_po_financial_key_indicators,
             'po/Leerlingen/Leerlingen/po_leerlingen7.asp':
                 self.parse_po_education_type,
@@ -1833,6 +1835,7 @@ class DuoPoBoardsSpider(DuoSpider):
         """
         Primair onderwijs > Adressen
         Parse "05. Bevoegde gezagen basisonderwijs"
+        Parse "06. Bevoegde gezagen speciaal (basis)onderwijs"
         """
 
         for csv_url, reference_date in find_available_datasets(response).iteritems():
@@ -1951,7 +1954,7 @@ class DuoPoBoardsSpider(DuoSpider):
         Parse "07. Leerlingen primair onderwijs per bevoegd gezag naar denominatie en onderwijssoort"
         """
 
-        possible_edu_types = ['BAO', 'SBAO', 'SO', 'VSO']
+        possible_edu_types = ['BAO', 'SBAO', 'SO', 'VSO', '(V)SO']
 
         def parse_row(row):
             # Strip leading and trailing whitespace from field names and values.
@@ -2029,6 +2032,8 @@ class DuoPoSchoolsSpider(DuoSpider):
         self.requests = {
             'po/adressen/Adressen/hoofdvestigingen.asp':
                 self.parse_po_schools,
+            'po/adressen/Adressen/speciaal.asp':
+                self.parse_po_schools,
             'po/Leerlingen/Leerlingen/po_leerlingen4.asp':
                 self.parse_spo_students_per_cluster,
             'passendow/Adressen/Adressen/passend_po_2.asp':
@@ -2046,6 +2051,7 @@ class DuoPoSchoolsSpider(DuoSpider):
         """
         Primair onderwijs > Adressen
         Parse: "01. Hoofdvestigingen basisonderwijs"
+        Parse: "02. Hoofdvestigingen speciaal (basis)onderwijs"
         """
 
         # Fields that do not need additonal processing
@@ -2088,7 +2094,7 @@ class DuoPoSchoolsSpider(DuoSpider):
                                          row['HUISNUMMER-TOEVOEGING '
                                              'CORRESPONDENTIEADRES']),
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
-                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES']
+                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
                 }
 
                 school['municipality_code'] = int(row['GEMEENTENUMMER'])
@@ -2226,6 +2232,8 @@ class DuoPoBranchesSpider(DuoSpider):
         self.requests = {
             'po/adressen/Adressen/vest_bo.asp':
                 self.parse_po_branches,
+            'po/adressen/Adressen/vest_sbo.asp':
+                self.parse_po_branches,
             'po/Leerlingen/Leerlingen/po_leerlingen1.asp':
                 self.parse_po_student_weight,
             'po/Leerlingen/Leerlingen/po_leerlingen3.asp':
@@ -2253,6 +2261,7 @@ class DuoPoBranchesSpider(DuoSpider):
         """
         Primair onderwijs > Adressen
         Parse "03. Alle vestigingen basisonderwijs"
+        Parse "04. Alle vestigingen speciaal (basis)onderwijs"
         """
 
         for csv_url, reference_date in find_available_datasets(response).iteritems():
@@ -2264,6 +2273,10 @@ class DuoPoBranchesSpider(DuoSpider):
                 # Correct this field name which has a trailing space.
                 if row.has_key('VESTIGINGSNAAM '):
                     row['VESTIGINGSNAAM'] = row['VESTIGINGSNAAM ']
+
+                # In the special education set, it does not have a space
+                if row.has_key('BRINNUMMER'):
+                    row['BRIN NUMMER'] = row['BRINNUMMER']
 
                 school['reference_year'] = reference_year
                 school['ignore_id_fields'] = ['reference_year']
@@ -2283,10 +2296,10 @@ class DuoPoBranchesSpider(DuoSpider):
 
                 school['board_id'] = int_or_none(row['BEVOEGD GEZAG NUMMER'].strip())
 
-                if row['BRIN NUMMER'].strip():
+                if row.has_key('BRIN NUMMER'):
                     school['brin'] = row['BRIN NUMMER'].strip()
 
-                if row['VESTIGINGSNUMMER'].strip():
+                if row.has_key('VESTIGINGSNUMMER').strip():
                     school['branch_id'] = int(row['VESTIGINGSNUMMER']
                                               .strip()
                                               .replace(row['BRIN NUMMER'], ''))
@@ -2376,7 +2389,7 @@ class DuoPoBranchesSpider(DuoSpider):
                 row['GEWICHT 0.3'] = row['GEWICHT 0.30']
             if row.has_key('GEWICHT 1.20'):
                 row['GEWICHT 1.2'] = row['GEWICHT 1.20']
-            
+
             brin = row['BRIN NUMMER'].strip()
             # Bypasses error coming from the 2011 dataset which contains and
             # empty row.
@@ -2386,7 +2399,7 @@ class DuoPoBranchesSpider(DuoSpider):
                 branch_id = 0
 
             weights = {
-                'student_weight_0_0': int_or_none(row['GEWICHT 0'].strip()),   
+                'student_weight_0_0': int_or_none(row['GEWICHT 0'].strip()),
                 'student_weight_0_3': int_or_none(row['GEWICHT 0.3'].strip()),
                 'student_weight_1_2': int_or_none(row['GEWICHT 1.2'].strip()),
                 'school_weight': int_or_none(row['SCHOOLGEWICHT'].strip()),
@@ -2680,7 +2693,7 @@ class DuoPoBranchesSpider(DuoSpider):
                 # Should this be in root, or spo_students_by_birthyear?
                 branch['spo_law'] = row['AANDUIDING WET']
                 branch['spo_edu_type'] = row['SOORT PRIMAIR ONDERWIJS'] # possibly multiple with slash
-                branch['spo_cluster'] = row['CLUSTER'] # i hope they don't use slashes                
+                branch['spo_cluster'] = row['CLUSTER'] # i hope they don't use slashes
 
                 # ignoring total
                 students_by_birthyear = []
@@ -2692,14 +2705,14 @@ class DuoPoBranchesSpider(DuoSpider):
                             'birthyear' : int(row_words[-1]),
                             'students' : int(v),
                         })
-                        
+
 
                 branch['spo_students_by_birthyear'] = students_by_birthyear
                 branch['spo_students_by_birthyear_reference_url'] = csv_url
                 branch['spo_students_by_birthyear_reference_date'] = reference_date
 
                 yield branch
-    
+
     def parse_spo_students_by_edu_type(self, response):
         """
         Primair onderwijs > Leerlingen
@@ -2735,6 +2748,7 @@ class DuoPoBranchesSpider(DuoSpider):
                 'spo' : int(row['SBAO'] or 0),
                 'so' : int(row['SO'] or 0),
                 'vso' : int(row['VSO'] or 0),
+                'vso_so' : int(row['(V)SO'] or 0),
             }
 
         return self.dataset(response, self.make_item, 'spo_students_by_edu_type', parse_row)
@@ -3022,7 +3036,7 @@ class DuoPaoCollaborationsSpider(DuoSpider):
             for row in parse_csv_file(csv_url):
 
                 collaboration = DuoPaoCollaboration()
-                
+
                 cid = row['ADMINISTRATIENUMMER'].strip()
                 if '-' in cid:
                     int_parts = map(int_or_none, cid.split('-'))
@@ -3049,4 +3063,3 @@ class DuoPaoCollaborationsSpider(DuoSpider):
                 collaboration['ignore_id_fields'] = ['reference_year']
 
                 yield collaboration
-

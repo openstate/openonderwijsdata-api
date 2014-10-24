@@ -1,4 +1,4 @@
-colander
+colander==1.0b1
 scrapy
 Sphinx
 sphinxcontrib-httpdomain
