@@ -478,7 +478,7 @@ class DuoVoSchool(MappingSchema):
     denomination = general_rules.denomination( title="In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.")
     corop_area = general_rules.corop_area( title="A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.")
     corop_area.orig = "`COROP-gebied`_"
-    corop_area_code = general_rules.corop_area( title="Identifier of the corop_area.")
+    corop_area_code = general_rules.corop_area_code( title="Identifier of the corop_area.")
     education_area = general_rules.education_area( title="Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.")
     education_area.orig = "`Onderwijsgebied`_"
     education_area_code = general_rules.education_area_code( title="Identifier of the education_area.")
@@ -564,7 +564,7 @@ class DuoPoSchool(MappingSchema):
     denomination = general_rules.denomination( title="In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.")
     corop_area = general_rules.corop_area( title="A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.")
     corop_area.orig = "`COROP-gebied`_"
-    corop_area_code = general_rules.corop_area( title="Identifier of the corop_area.")
+    corop_area_code = general_rules.corop_area_code( title="Identifier of the corop_area.")
     education_area = general_rules.education_area( title="Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.")
     education_area.orig = "`Onderwijsgebied`_"
     education_area_code = general_rules.education_area_code( title="Identifier of the education_area.")
