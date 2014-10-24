@@ -2296,10 +2296,10 @@ class DuoPoBranchesSpider(DuoSpider):
 
                 school['board_id'] = int_or_none(row['BEVOEGD GEZAG NUMMER'].strip())
 
-                if row.has_key('BRIN NUMMER'):
+                if row['BRIN NUMMER'].strip():
                     school['brin'] = row['BRIN NUMMER'].strip()
 
-                if row.has_key('VESTIGINGSNUMMER').strip():
+                if row.has_key('VESTIGINGSNUMMER') and row['VESTIGINGSNUMMER'].strip():
                     school['branch_id'] = int(row['VESTIGINGSNUMMER']
                                               .strip()
                                               .replace(row['BRIN NUMMER'], ''))
