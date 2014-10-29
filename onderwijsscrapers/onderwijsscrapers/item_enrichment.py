@@ -1,7 +1,7 @@
 from time import sleep
 
 from scrapy import log
-import requests
+import httplib, urllib,json, requests
 
 
 def bag42_geocode(address):
@@ -14,21 +14,25 @@ def bag42_geocode(address):
     payload = []
     for field in address_fields:
         if field in address and address[field] is not None:
-            payload.append(address[field])
+            payload.append(urllib.quote(address[field]))
+
+    payload_data = "address=" + ';'.join(payload)
 
     try:
-        resp = requests.get('http://bag42.nl/api/v0/geocode/json',
-                            params={'address': ' '.join(payload)})
+        conn = httplib.HTTPConnection('bag42.nl')
+        conn.request('GET', "/api/v0/geocode/json?" + payload_data)
+        resp = conn.getresponse()
     except requests.exceptions.ConnectionError:
         sleep(2)
-        resp = requests.get('http://bag42.nl/api/v0/geocode/json',
-                            params={'address': ' '.join(payload)})
+        conn = httplib.HTTPConnection('bag42.nl')
+        conn.request('GET', "/api/v0/geocode/json?" + payload_data)
+        resp = conn.getresponse()
 
     try:
-        result = resp.json()
+        result = json.loads(resp.read())
     except:
         print resp.text
-        log.msg('Unable to decode JSON object: %s' % resp.text, level=log.ERROR)
+        log.msg('Unable to decode JSON object: %s' % resp.read(), level=log.ERROR)
         return None
     if result['status'] != 'OK':
         log.msg('Unable to geocode address %s' % address, level=log.WARNING)
@@ -101,7 +105,7 @@ def nominatim_geocode(address):
     # OSM wants us to sleep for a second between requests
     sleep(1)
 
-    print result
+    return result
 
     # If our previous search did not return any matches, try again with
     # a less restrictive appraoch (i.e. search without a zipcode)
