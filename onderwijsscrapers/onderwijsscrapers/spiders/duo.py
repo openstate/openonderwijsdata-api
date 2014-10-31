@@ -2124,15 +2124,17 @@ class DuoPoSchoolsSpider(DuoSpider):
         """
         Primair onderwijs > Leerlingen
         Parse "04. Leerlingen speciaal onderwijs naar cluster"
+
+        This dataset contains information per branch, but the branch number is not specified.
         """
 
         def parse_row(row):
             if 'BRIN NUMMER' in row:
                 yield row['BRIN NUMMER'], {
-                    'cluster_1': int(row['CLUSTER 1']),
-                    'cluster_2': int(row['CLUSTER 2']),
-                    'cluster_3': int(row['CLUSTER 3']),
-                    'cluster_4': int(row['CLUSTER 4']),
+                    'cluster_1': int(row['CLUSTER 1'] or 0),
+                    'cluster_2': int(row['CLUSTER 2'] or 0),
+                    'cluster_3': int(row['CLUSTER 3'] or 0),
+                    'cluster_4': int(row['CLUSTER 4'] or 0),
                 }
         return self.dataset(response, self.make_item, 'spo_students_per_cluster', parse_row)
 
@@ -2743,16 +2745,19 @@ class DuoPoBranchesSpider(DuoSpider):
             else:
                 branch_id = 0
 
-            yield (brin, branch_id), {
+            per_branch = {
                 'spo_indication' : row['INDICATIE SPECIAL BASIS ONDERWIJS'],
                 'spo' : int(row['SBAO'] or 0),
                 'so' : int(row['SO'] or 0),
                 'vso' : int(row['VSO'] or 0),
-                'vso_so' : int(row['(V)SO'] or 0),
             }
 
-        return self.dataset(response, self.make_item, 'spo_students_by_edu_type', parse_row)
+            if '(V)SO' in row:
+                per_branch['vso_so'] = int(row['(V)SO'] or 0)
 
+            yield (brin, branch_id), per_branch
+
+        return self.dataset(response, self.make_item, 'spo_students_by_edu_type', parse_row)
 
     def parse_po_students_by_advice(self, response):
         """
