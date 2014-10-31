@@ -264,8 +264,9 @@ class FineGrainedStructureStudents(SequenceSchema):
 class VavoStudents(SequenceSchema):
     @colander.instantiate()
     class vavo_students(MappingSchema):
-         non_vavo = SchemaNode(Int()) # `AANTAL LEERLINGEN`
-         vavo = SchemaNode(Int()) # `AANTAL VO LEERLINGEN UITBESTEED AAN VAVO`
+         """ Students who are registered in secondary education, but are in an adult education program, can still graduate with a secondary education degree (*Rutte - regeling*) """
+         non_vavo = SchemaNode(Int(), title="Number of non-vavo students") # `AANTAL LEERLINGEN`
+         vavo = SchemaNode(Int(), title="Number of students delegated to adult education") # `AANTAL VO LEERLINGEN UITBESTEED AAN VAVO`
          # (there's also a TOTAAL AANTAL LEERLINGEN sum column that we ignore)
 
 class StudentsByAdvice(SequenceSchema):
