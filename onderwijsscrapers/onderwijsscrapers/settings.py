@@ -72,7 +72,7 @@ EXPORT_METHODS = {
 
 from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
                             DuoPoBoard, DuoPoBranch, DuoPaoCollaboration, 
-                            DuoMboBoard)
+                            DuoMboBoard, DuoMboInstitution)
 from validation.schoolvo import SchoolVOBranch
 from validation.owinsp import (OnderwijsInspectieVoBranch, OnderwijsInspectiePoBranch)
 from validation.ocw import OCWPoBranch
@@ -185,8 +185,18 @@ EXPORT_SETTINGS = {
         'geocode': False,
         'geocode_fields': ['address', 'correspondence_address'],
         'index': 'duo',
-        'doctype': 'mbo_branch',
+        'doctype': 'mbo_board',
         'id_fields': ['reference_year', 'board_id']
+    },
+    'duo_mbo_institutions': {
+        'validate': True,
+        'schema': DuoMboInstitution,
+        'validation_index': 'onderwijsdata_validation',
+        'geocode': False,
+        'geocode_fields': ['address', 'correspondence_address'],
+        'index': 'duo',
+        'doctype': 'mbo_institution',
+        'id_fields': ['reference_year', 'brin']
     },
     'ocw_po_branches': {
         'validate': False,

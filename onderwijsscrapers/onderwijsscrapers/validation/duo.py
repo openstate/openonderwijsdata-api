@@ -369,8 +369,28 @@ class SPOStudentsByBirthyear(SequenceSchema):
 
 
 
+class DuoAreaSchema(MappingSchema):
+    corop_area = general_rules.corop_area( title="A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data." )
+    corop_area.orig = "`COROP-gebied`_"
+    corop_area_code = general_rules.corop_area_code( title="Identifier of the corop_area." )
+    education_area = general_rules.education_area( title="Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education." )
+    education_area.orig = "`Onderwijsgebied`_"
+    education_area_code = general_rules.education_area_code( title="Identifier of the education_area." )
+    nodal_area = general_rules.nodal_area( title="Area defined for the planning of distribution of secondary schools." )
+    nodal_area.orig = "`Nodaal gebied`_"
+    nodal_area_code = general_rules.nodal_area_code( title="Identifier of the nodal_area." )
+    rmc_region = general_rules.rmc_region( title="Area that is used for the coordination of school dropouts.")
+    rmc_region.orig = "`Rmc-regio`_"
+    rmc_region_code = general_rules.rmc_region_code( title="Identifier of the rmc_region.")
+    rpa_area = general_rules.rpa_area( title="Area defined to cluster information on the labour market.")
+    rpa_area.orig = "`Rpa-gebied`_"
+    rpa_area_code = general_rules.rpa_area_code( title="Identifier of the rpa_area.")
+    wgr_area = general_rules.wgr_area( title="Cluster of municipalities per collaborating region according to the 'Wet gemeenschappelijke regelingen' [#wgr_law]_.")
+    wgr_area.orig = "`Wgr-gebied`_"
+    wgr_area_code = general_rules.wgr_area_code( title="Identifier of the wgr_area.")
 
-class DuoVoBranch(MappingSchema):
+
+class DuoVoBranch(DuoAreaSchema, MappingSchema):
     """ **Source:** `Voortgezet onderwijs - Adressen - 02. Adressen alle vestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/vestigingen.asp>`_ """
     address = general_rules.Address( title="Address of this branch." )
     correspondence_address = general_rules.Address( title="Correspondence address of this branch." )
@@ -378,33 +398,15 @@ class DuoVoBranch(MappingSchema):
     branch_id = general_rules.branch_id( title="Identifier (assigned by :ref:`duodata`) of this branch." )
     board_id = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of the board of this branch." )
     brin = general_rules.brin( title="'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long." )
-    corop_area = general_rules.corop_area( title="A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data." )
-    corop_area.orig = "`COROP-gebied`_"
-    corop_area_code = general_rules.corop_area_code( title="Identifier of the corop_area." )
     denomination = general_rules.denomination( title="In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here." )
-    education_area = general_rules.education_area( title="Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education." )
-    education_area.orig = "`Onderwijsgebied`_"
-    education_area_code = general_rules.education_area_code( title="Identifier of the education_area." )
     education_structures = general_rules.EducationStructures( title="An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school." )
     municipality = general_rules.municipality( title="The name of the municipality this branch is located in." )
     municipality_code = general_rules.municipality_code( title="Identifier (assigned by CBS [#cbs]_) to this municipality." )
-    nodal_area = general_rules.nodal_area( title="Area defined for the planning of distribution of secondary schools." )
-    nodal_area.orig = "`Nodaal gebied`_"
-    nodal_area_code = general_rules.nodal_area_code( title="Identifier of the nodal_area." )
     phone = general_rules.phone( title="Phone number of the school." )
     province = general_rules.province( title="The province [#provinces]_ this branch is situated in." )
     reference_year = general_rules.reference_year( title="Year the schools source file was published." )
     reference_year.orig = "Peiljaar"
-    rmc_region = general_rules.rmc_region( title="Area that is used for the coordination of school dropouts." )
-    rmc_region.orig = "`Rmc-regio`_"
-    rmc_region_code = general_rules.rmc_region_code( title="Identifier of the rmc_region." )
-    rpa_area = general_rules.rpa_area( title="Area defined to cluster information on the labour market." )
-    rpa_area.orig = "`Rpa-gebied`_"
-    rpa_area_code = general_rules.rpa_area_code( title="Identifier of the rpa_area." )
     website = general_rules.url( title="Website of this school." )
-    wgr_area = general_rules.wgr_area( title="Cluster of municipalities per collaborating region according to the 'Wet gemeenschappelijke regelingen' [#wgr_law]_." )
-    wgr_area.orig = "`Wgr-gebied`_"
-    wgr_area_code = general_rules.wgr_area_code( title="Identifier of the wgr_area." )
 
 
     vavo_students_reference_url = general_rules.website()
@@ -470,39 +472,21 @@ class DuoVoBoard(MappingSchema):
     vavo_students = VavoStudents()
 
 
-class DuoVoSchool(MappingSchema):
+class DuoVoSchool(DuoAreaSchema, MappingSchema):
     """ **Source:** `Voortgezet onderwijs - Adressen - 01. Adressen hoofdvestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/hoofdvestigingen.asp>`_"""
     address = general_rules.Address( title="Address of this school.")
     correspondence_address = general_rules.Address( title="Correspondence address of this school.")
     board_id = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of the board of this school.")
     brin = general_rules.brin( title="'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long.")
     denomination = general_rules.denomination( title="In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.")
-    corop_area = general_rules.corop_area( title="A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.")
-    corop_area.orig = "`COROP-gebied`_"
-    corop_area_code = general_rules.corop_area_code( title="Identifier of the corop_area.")
-    education_area = general_rules.education_area( title="Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.")
-    education_area.orig = "`Onderwijsgebied`_"
-    education_area_code = general_rules.education_area_code( title="Identifier of the education_area.")
     education_structures = general_rules.EducationStructures( title="An array of strings, where each string represents the level of education [#edu_in_holland]_ (education structure) that is offered at this school.")
     municipality = general_rules.municipality( title="The name of the municipality this branch is located in.")
     municipality_code = general_rules.municipality_code( title="Identifier (assigned by CBS [#cbs]_) to this municipality.")
-    nodal_area = general_rules.nodal_area( title="Area defined for the planning of distribution of secondary schools.")
-    nodal_area.orig = "`Nodaal gebied`_"
-    nodal_area_code = general_rules.nodal_area_code( title="Identifier of the nodal_area.")
     phone = general_rules.phone( title="Phone number of the school.")
     province = general_rules.province( title="The province [#provinces]_ this branch is situated in.")
     reference_year = general_rules.reference_year( title="Year the schools source file was published.")
     reference_year.orig = "Peiljaar"
-    rmc_region = general_rules.rmc_region( title="Area that is used for the coordination of school dropouts.")
-    rmc_region.orig = "`Rmc-regio`_"
-    rmc_region_code = general_rules.rmc_region_code( title="Identifier of the rmc_region.")
-    rpa_area = general_rules.rpa_area( title="Area defined to cluster information on the labour market.")
-    rpa_area.orig = "`Rpa-gebied`_"
-    rpa_area_code = general_rules.rpa_area_code( title="Identifier of the rpa_area.")
     website = general_rules.url( title="Website of this school.")
-    wgr_area = general_rules.wgr_area( title="Cluster of municipalities per collaborating region according to the 'Wet gemeenschappelijke regelingen' [#wgr_law]_.")
-    wgr_area.orig = "`Wgr-gebied`_"
-    wgr_area_code = general_rules.wgr_area_code( title="Identifier of the wgr_area.")
 
     students_prognosis = StudentPrognosis()
     students_prognosis_reference_date = SchemaNode(Date(), missing=True,  title="Date the source file was published at http://data.duo.nl")
@@ -555,7 +539,7 @@ class DuoPoBoard(MappingSchema):
     # edu_types_reference_url
 
 
-class DuoPoSchool(MappingSchema):
+class DuoPoSchool(DuoAreaSchema, MappingSchema):
     """**Source:** `Primair onderwijs - Adressen - 01. Hoofdvestigingen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/hoofdvestigingen.asp>`_"""
     address = general_rules.Address( title="Address of this school.")
     correspondence_address = general_rules.Address( title="Correspondence address of this school.")
@@ -563,32 +547,14 @@ class DuoPoSchool(MappingSchema):
     board_id.orig = "Bevoegd gezag nummer"
     brin = general_rules.brin( title="'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long.")
     denomination = general_rules.denomination( title="In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.")
-    corop_area = general_rules.corop_area( title="A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.")
-    corop_area.orig = "`COROP-gebied`_"
-    corop_area_code = general_rules.corop_area_code( title="Identifier of the corop_area.")
-    education_area = general_rules.education_area( title="Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.")
-    education_area.orig = "`Onderwijsgebied`_"
-    education_area_code = general_rules.education_area_code( title="Identifier of the education_area.")
     municipality = general_rules.municipality( title="The name of the municipality this branch is located in.")
     municipality_code = general_rules.municipality_code( title="Identifier (assigned by CBS [#cbs]_) to this municipality.")
     name = general_rules.name( title="Name of the school.")
-    nodal_area = general_rules.nodal_area( title="Area defined for the planning of distribution of secondary schools.")
-    nodal_area.orig = "`Nodaal gebied`_"
-    nodal_area_code = general_rules.nodal_area_code( title="Identifier of the nodal_area.")
     phone = general_rules.phone( title="Phone number of the school.")
     province = general_rules.province( title="The province [#provinces]_ this branch is situated in.")
     reference_year = general_rules.reference_year( title="Year the schools source file was published.")
     reference_year.orig = "Peiljaar"
-    rmc_region = general_rules.rmc_region( title="Area that is used for the coordination of school dropouts.")
-    rmc_region.orig = "`Rmc-regio`_"
-    rmc_region_code = general_rules.rmc_region_code( title="Identifier of the rmc_region.")
-    rpa_area = general_rules.rpa_area( title="Area defined to cluster information on the labour market.")
-    rpa_area.orig = "`Rpa-gebied`_"
-    rpa_area_code = general_rules.rpa_area_code( title="Identifier of the rpa_area.")
     website = general_rules.website( title="Website of this school.")
-    wgr_area = general_rules.wgr_area( title="Cluster of municipalities per collaborating region according to the 'Wet gemeenschappelijke regelingen' [#wgr_law]_.")
-    wgr_area.orig = "`Wgr-gebied`_"
-    wgr_area_code = general_rules.wgr_area_code( title="Identifier of the wgr_area.")
 
     spo_students_per_cluster = SPOStudentsPerCluster( title="Number of pupils in special education, per special education cluster.")
     spo_students_per_cluster_reference_date = SchemaNode(Date(), missing=True,  title="Date the source file was published at http://data.duo.nl")
@@ -603,7 +569,7 @@ class DuoPoSchool(MappingSchema):
     pao_collaboration = general_rules.collaboration_id()
 
 
-class DuoPoBranch(MappingSchema):
+class DuoPoBranch(DuoAreaSchema, MappingSchema):
     """**Source:** `Primair onderwijs - Adressen - 03. Alle vestigingen basisonderwijs <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/po/adressen/Adressen/vest_bo.asp>`_"""
     address = general_rules.Address( title="Address of this branch.")
     correspondence_address = general_rules.Address( title="Correspondence address of this branch.")
@@ -611,29 +577,11 @@ class DuoPoBranch(MappingSchema):
     branch_id = general_rules.branch_id( title="Identifier (assigned by :ref:`duodata`) of this branch.")
     board_id = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of the board of this branch.")
     brin = general_rules.brin( title="'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long.")
-    corop_area = general_rules.corop_area( title="A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data.")
-    corop_area.orig = "`COROP-gebied`_"
-    corop_area_code = general_rules.corop_area_code( title="Identifier of the corop_area.")
     denomination = general_rules.denomination( title="In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.")
-    education_area = general_rules.education_area( title="Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.")
-    education_area.orig = "Onderwijsgebied"
-    education_area_code = general_rules.education_area_code( title="Identifier of the education_area.")
     municipality = general_rules.municipality( title="The name of the municipality this branch is located in.")
     municipality_code = general_rules.municipality_code( title="Identifier (assigned by CBS [#cbs]_) to this municipality.")
-    nodal_area = general_rules.nodal_area( title="Area defined for the planning of distribution of secondary schools.")
-    nodal_area.orig = "`Nodaal gebied`_"
-    nodal_area_code = general_rules.nodal_area_code( title="Identifier of the nodal_area.")
     phone = general_rules.phone( title="Phone number of the school.")
     province = general_rules.province( title="The province [#provinces]_ this branch is situated in.")
-    rmc_region = general_rules.rmc_region( title="Area that is used for the coordination of school dropouts.")
-    rmc_region.orig = "`Rmc-regio`_"
-    rmc_region_code = general_rules.rmc_region_code( title="Identifier of the rmc_region.")
-    rpa_area = general_rules.rpa_area( title="Area defined to cluster information on the labour market.")
-    rpa_area.orig = "`Rpa-gebied`_"
-    rpa_area_code = general_rules.rpa_area_code( title="Identifier of the rpa_area.")
-    wgr_area = general_rules.wgr_area( title="Cluster of municipalities per collaborating region according to the 'Wet gemeenschappelijke regelingen' [#wgr_law]_.")
-    wgr_area.orig = "`Wgr-gebied`_"
-    wgr_area_code = general_rules.wgr_area_code( title="Identifier of the wgr_area.")
     website = general_rules.url( title="Website of this school.")
     reference_year = general_rules.reference_year( title="Year the schools source file was published.")
     reference_year.orig = "Peiljaar"
@@ -710,6 +658,22 @@ class DuoMboBoard(MappingSchema):
     phone = general_rules.phone( title="Phone number of the board." )
     website = general_rules.url( title="Website of this board." )
 
+class DuoMboInstitution(DuoAreaSchema, MappingSchema):
+    """**Source:** `Middelbaar beroepsonderwijs - Adressen - 01. Adressen instellingen <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/adressen/Adressen/instellingen.asp>`_"""
+    brin = general_rules.brin( title="'Basis Registratie Instellingen-nummer', identifier of the institution. Alphanumeric, four characters long.")
+    board_id  = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of the board of this institution." )
+    correspondence_address = general_rules.Address( title="Correspondence address of this institution.")
+    denomination = general_rules.denomination()
+    municipality = general_rules.municipality()
+    municipality_code = general_rules.municipality_code()
+    address = general_rules.Address( title="Address of this institution.")
+    name = general_rules.name( title="Name of the institution." )
+    phone = general_rules.phone( title="Phone number of the institution." )
+    mbo_institution_kind = SchemaNode(String())
+    mbo_institution_kind_code = SchemaNode(String())
+    website = general_rules.website( title="Website of this institution.")
+
+    
 errors = []
 def validate():
     schema = DuoVoBranch()

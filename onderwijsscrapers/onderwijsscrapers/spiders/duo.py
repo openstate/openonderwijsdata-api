@@ -17,7 +17,7 @@ from scrapy.selector import HtmlXPathSelector
 
 from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
                                      DuoPoBoard, DuoPoSchool, DuoPoBranch,
-                                     DuoPaoCollaboration, DuoMboBoard)
+                                     DuoPaoCollaboration, DuoMboBoard, DuoMboInstitution)
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
@@ -1256,7 +1256,6 @@ class DuoVoBranchesSpider(DuoSpider):
 
         return self.dataset(response, self.make_item, 'students_by_structure', parse_row)
 
-
     def parse_student_residences(self, response):
         """
         Parse "02. Leerlingen per vestiging naar postcode leerling en
@@ -1282,7 +1281,6 @@ class DuoVoBranchesSpider(DuoSpider):
             }
 
         return self.dataset(response, self.make_item, 'student_residences', parse_row)
-
 
     def student_graduations(self, response):
         """
@@ -3120,3 +3118,65 @@ class DuoMboBoardSpider(DuoSpider):
                     website = row['INTERNETADRES'],
                 )
 
+class DuoMboInstitutionSpider(DuoSpider):
+    name = 'duo_mbo_institutions'
+
+    def __init__(self, *args, **kwargs):
+        self.make_item = lambda (brin): DuoMboInstitution(brin=brin)
+        self.requests = {
+            'mbo_/adressen/Adressen/instellingen.asp':
+                self.parse_mbo_institutions,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
+
+    def parse_mbo_institutions(self, response):
+        """
+        Middelbaar beroepsonderwijs > Adressen bevoegde gezagen
+        Parse "02. Adressen bevoegde gezagen"
+        """
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                yield DuoMboInstitution(
+                    reference_year = reference_year,
+
+                    brin = row['BRIN NUMMER'],
+                    board_id = row['BEVOEGD GEZAG NUMMER'],
+                    corop_area = row['COROPGEBIED NAAM'],
+                    corop_area_code = int(row['COROPGEBIED CODE']),
+                    correspondence_address =  {
+                        'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                                             row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
+                        'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
+                    },
+                    denomination = row['DENOMINATIE'],
+                    municipality = row['GEMEENTENAAM'],
+                    municipality_code = int(row['GEMEENTENUMMER']),
+                    adress = {
+                        'street': '%s %s' % (row['STRAATNAAM'],
+                                             row['HUISNUMMER-TOEVOEGING']),
+                        'zip_code': row['POSTCODE'].replace(' ', ''),
+                        'city': row['PLAATSNAAM']
+                    },
+                    name = row['INSTELLINGSNAAM '], #space!
+                    nodal_area = row['NODAAL GEBIED NAAM'],
+                    nodal_area_code = int(row['NODAAL GEBIED CODE']),
+                    education_area = row['ONDERWIJSGEBIED NAAM '], #space!
+                    education_area_code = int(row['ONDERWIJSGEBIED CODE']),
+                    rpa_area = row['RPA-GEBIED NAAM'],
+                    rpa_area_code = int(row['RPA-GEBIED CODE']),
+                    rmc_region = row['RMC-REGIO NAAM '], #space!
+                    rmc_region_code = int(row['RMC-REGIO CODE ']), #space!
+                    phone = row['TELEFOONNUMMER'],
+                    website = row['INTERNETADRES'],
+                    wgr_area = row['NAAM WGR-GEBIED'],
+                    wgr_area_code = int(row['WGR-GEBIED CODE']),
+                    mbo_institution_kind = row['MBO INSTELLINGSSOORT - NAAM'],
+                    mbo_institution_kind_code = row['MBO INSTELLINGSOORT - CODE'],
+                )
