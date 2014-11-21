@@ -1,4 +1,5 @@
-from collections import namedtuple
+from collections import namedtuple, defaultdict
+import re
 """
 	A Codebook describes the data in a table.
 
@@ -36,52 +37,92 @@ class Codebook(dict):
         """ Parse a table """
         UniqueKey = self.unique_key
 
+        # Associate each head index with some fields and head-value matches
+        unkeyed_per_head = defaultdict(list)
+        keyed_per_head = defaultdict(list)
+        for i,head in enumerate(heads):
+            for fieldname, field in self.iteritems():
+                if field.source:
+                    m = re.match(field.source, head)
+                    # add non-trivial matches
+                    if m and fieldname:
+                        if field.keyed:
+                            keyed_per_head[i].append((fieldname, m.groupdict()))
+                        else:
+                            unkeyed_per_head[i].append((fieldname, m.groupdict()))
+
         def get_value(v, typ, sub1=None, sub2=None):
             """ Transform a value with a regex and type it """
             try:
                 if sub1 is not None and sub2 is not None:
                     v = re.sub(sub1, sub2, v)
-                return self.datatypes[typ](v)
+                yield self.datatypes[typ](v)
             except ValueError:
-                return None
+                return
 
-        def field_and_value_iter(row, indexed_fields):
+        def fields_and_values(row, indexed_fields):
             """ Generate fields for this row and the associated values """
             for i, fields in indexed_fields.iteritems():
                 for (field, groups) in fields:
-                    field_value = get_value(row[i], self[field].type)
-                    if field_value is not None:
-                        
-                        nest_key = {}
-                        for nest_name, nest_val in groups.iteritems():
-                            nest_val = get_value(nest_val, self[nest_name].type)
-                            if nest_val is not None:
-                                nest_key[nest_name] = nest_val
-                        
+                    # Every cell in this row can give us some fields,
+                    # and nesting values that come from the heads themselves
+                    for field_value in get_value(row[i], self[field].type):
+                        nest_key = { name: nest_val
+                            for name, nest_str in groups.iteritems()
+                            for nest_val in get_value(nest_str, self[name].type)
+                        }
                         yield field, field_value, nest_key
 
-        def collect_dataset(rows, (keyed_per_head, unkeyed_per_head)):
-            """ Group data by unique key  """
-            dataset = defaultdict(dict)
-            for row in rows:
-                root_key = {}
-                # fill root_key with keyed fields
-                for field, value, nest_key in field_and_value_iter(row, keyed_per_head):
-                    # keyed fields shouldn't have groups
-                    root_key[field] = value
+        # Group data by unique key
+        dataset = defaultdict(dict)
+        for row in rows:
+            root_key = {}
+            # fill root_key with keyed fields
+            for field, value, nest_key in fields_and_values(row, keyed_per_head):
+                # keyed fields shouldn't have groups
+                root_key[field] = value
 
-                # parse rest of fields
-                for field, value, nest_key in field_and_value_iter(row, unkeyed_per_head):
-                    if nest_key:
-                        nest_key = dict(root_key.items()+nest_key.items())
-                        dataset[UniqueKey(**nest_key)][field] = value
+            # parse rest of fields
+            for field, value, nest_key in fields_and_values(row, unkeyed_per_head):
+                if nest_key:
+                    nest_key.update(root_key)
+                    dataset[UniqueKey(**nest_key)][field] = value
+                else:
+                    # add rooted
+                    dataset[UniqueKey(**root_key)][field] = value
+        
+        def selectnest(items, header):
+            """ Transform a list of dicts to a dist nested by `header` """
+            # Basically nested named GROUP BY
+            # https://github.com/mbostock/d3/wiki/Arrays#-nest
+            h = header.pop(0)
+            # h = self[head].keyed
+            out, per = {}, []
+            if header: # recursive
+                collect = defaultdict(list)
+                for i in items:
+                    collect[i[h]].append(i)
+                for k, nested in collect.iteritems():
+                    i = selectnest(nested, list(header))
+                    if k is None:
+                        i.pop(h)
+                        out.update(i)
                     else:
-                        # add rooted
-                        dataset[UniqueKey(**root_key)][field] = value
-            return dataset
+                        per.append(i)
+            else: # base
+                for i in items:
+                    if i[h] is None:
+                        i.pop(h)
+                        out.update(i)
+                    else:
+                        per.append(i)
+            if per:
+                out['per_%s' % h] = per
+            return out
 
-        return collect_dataset(rows, associate_heads(heads))
-
+        dataset = (dict(k.items() + v.items()) for k,v in dataset.iteritems())
+        nesting_stack = sorted(self.keyed_fields, key=lambda k: int(self[k].keyed))
+        return selectnest(dataset, nesting_stack)
 
 
 

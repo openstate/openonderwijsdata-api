@@ -218,6 +218,16 @@ EXPORT_SETTINGS = {
         'doctype': 'vo_branch',
         'id_fields': ['brin', 'branch_id']
     },
+    'roa_surveys': {
+        'validate': False,
+        'schema': None,
+        'validation_index': 'onderwijsdata_validation',
+        'geocode': False,
+        'geocode_fields': [],
+        'index': 'roa',
+        'doctype': 'survey',
+        'id_fields': ['code']
+    },
 }
 
 # Allow all settings to be overridden by a local file that is not in

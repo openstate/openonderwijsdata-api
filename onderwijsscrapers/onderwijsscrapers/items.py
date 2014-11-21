@@ -1,5 +1,5 @@
-from scrapy.item import Item, Field
-
+from scrapy.item import Item, Field, DictItem
+from collections import defaultdict
 
 class SchoolItem(Item):
     name = Field()  # `naam`
@@ -498,3 +498,6 @@ class DANSVoBranch(SchoolItem):
     oordeel1113 = Field()
     exvc12 = Field()
     lwoo12 = Field()
+
+class ROASurvey(dict, Item):
+    pass

@@ -1,7 +1,7 @@
 field;repl;description;type;keyed;source;pattern
-"code";;"Administrative code";"F8.0 numeric 8 positions, no decimals";1;"admcode";
-"administrative";;"Administrative variables";;;"administrative";
-"administrative.case_id";;"Case ID number";"F15.0, numeric 15 positions, no decimals";;"case_id";
-"administrative.qmode";;"Questionnaire mode";"F1.0 - numeric, 1 position, no decimals";;"qmode";
-"administrative.qyear";;"Year of conducting the survey";"F4.0 - numeric, 4 position, no decimals";;"qyear";
-"administrative.wf";;"Weight";"F8.2 numeric 8 positions, 2 decimals";;"wf";
+"code";;"Administrative code";int;1;"admcode";
+"administrative";;"Administrative variables";;;;
+"administrative.case_id";;"Case ID number";int;;"case_id";
+"administrative.qmode";;"Questionnaire mode";int;;"qmode";
+"administrative.qyear";;"Year of conducting the survey";int;;"qyear";
+"administrative.wf";;"Weight";int;;"wf";
