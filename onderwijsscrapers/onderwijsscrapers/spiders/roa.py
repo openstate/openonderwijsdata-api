@@ -9,10 +9,6 @@ import urlparse, urllib
 from onderwijsscrapers.items import ROASurvey
 
 
-book = 'codebooks/roa/slgsd.csv'
-field_dicts = list(csv.DictReader(open(book), delimiter=';'))
-table_fields = Codebook(field_dicts, {'int': int})
-
 source = os.path.abspath('../../../data/roa/roa-data.csv')
 
 class ROASurveySpider(BaseSpider):
@@ -28,6 +24,10 @@ class ROASurveySpider(BaseSpider):
         ]
 
     def parse_roa_results(self, response):
+        book = 'codebooks/roa/slgsd.csv'
+        field_dicts = list(csv.DictReader(open(book), delimiter=';'))
+        table_fields = Codebook(field_dicts, {'int': int})
+
         with open(source, 'r') as f:
             heads = (
                 f.readline()

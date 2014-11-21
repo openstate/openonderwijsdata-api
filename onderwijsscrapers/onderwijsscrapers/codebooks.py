@@ -91,31 +91,32 @@ class Codebook(dict):
                     # add rooted
                     dataset[UniqueKey(**root_key)][field] = value
         
+
+        def nested_set(dic, keys, value):
+            for key in keys[:-1]:
+                dic = dic.setdefault(key, {})
+            dic[keys[-1]] = value
+
         def selectnest(items, header):
             """ Transform a list of dicts to a dist nested by `header` """
             # Basically nested named GROUP BY
-            # https://github.com/mbostock/d3/wiki/Arrays#-nest
+            # similar to https://github.com/mbostock/d3/wiki/Arrays#-nest
             h = header.pop(0)
-            # h = self[head].keyed
             out, per = {}, []
-            if header: # recursive
+            if header: # recursive case
                 collect = defaultdict(list)
                 for i in items:
                     collect[i[h]].append(i)
-                for k, nested in collect.iteritems():
-                    i = selectnest(nested, list(header))
-                    if k is None:
-                        i.pop(h)
-                        out.update(i)
-                    else:
-                        per.append(i)
-            else: # base
-                for i in items:
-                    if i[h] is None:
-                        i.pop(h)
-                        out.update(i)
-                    else:
-                        per.append(i)
+                items = (selectnest(i, list(header)) for i in collect.values())
+            for i in items:
+                i_ = {}
+                for k,v in i.iteritems():
+                    nested_set(i_, k.split('.'), v)
+                if i_[h] is None:
+                    i_.pop(h)
+                    out.update(i_)
+                else:
+                    per.append(i_)
             if per:
                 out['per_%s' % h] = per
             return out
