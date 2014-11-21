@@ -19,10 +19,22 @@ import re
             description, etc ...
 """
 
-Field = namedtuple('Field', ['type', 'source', 'keyed', 'pattern', 'repl', 'description'])
+def generate_unique_key(keyed_fields, name='UniqueKey'):
+    class UniqueKey(namedtuple(name, list(keyed_fields))):
+        """ A named tuple, with default None value  """
+        def __new__(cls, **kwargs):
+            kwargs = { f:kwargs.get(f, None) for f in keyed_fields }
+            return super(UniqueKey, cls).__new__(cls, **kwargs)
+        def items(self):
+            return zip(self._fields, self)
+    return UniqueKey
+
+fields = ['type', 'source', 'keyed', 'pattern', 'repl', 'description']
+Field = generate_unique_key(fields, name='Field')
 
 class Codebook(dict):
-    def __init__(self, field_dicts, datatypes):
+    def __init__(self, name, field_dicts, datatypes):
+        self.name = name
         # Load the fields file
         for rule in field_dicts:
             name = rule.pop('field', None)
@@ -100,25 +112,36 @@ class Codebook(dict):
         def selectnest(items, header):
             """ Transform a list of dicts to a dist nested by `header` """
             # Basically nested named GROUP BY
-            # similar to https://github.com/mbostock/d3/wiki/Arrays#-nest
+            # https://github.com/mbostock/d3/wiki/Arrays#-nest
             h = header.pop(0)
-            out, per = {}, []
+            out = {}
+            per = []
             if header: # recursive case
                 collect = defaultdict(list)
                 for i in items:
-                    collect[i[h]].append(i)
-                items = (selectnest(i, list(header)) for i in collect.values())
-            for i in items:
-                i_ = {}
-                for k,v in i.iteritems():
-                    nested_set(i_, k.split('.'), v)
-                if i_[h] is None:
-                    i_.pop(h)
-                    out.update(i_)
-                else:
-                    per.append(i_)
+                    collect[i.pop(h)].append(i)
+                for key, nested in collect.items():
+                    i = selectnest(nested, list(header))
+                    i_ = {}
+                    for k,v in i.iteritems():
+                        nested_set(i_, k.split('.'), v)
+                    if key is None:
+                        out.update(i_)
+                    else:
+                        i_[h] = key
+                        per.append(i_)
+            else: # base case
+                for i in items:
+                    i_ = {}
+                    for k,v in i.iteritems():
+                        nested_set(i_, k.split('.'), v)
+                    if i_[h] is None: # add items to root
+                        i_.pop(h)
+                        out.update(i_)
+                    else:
+                        per.append(i_) # add items to the group list
             if per:
-                out['per_%s' % h] = per
+                out['%s_per_%s' % (self.name, h)] = per
             return out
 
         dataset = (dict(k.items() + v.items()) for k,v in dataset.iteritems())
@@ -126,13 +149,3 @@ class Codebook(dict):
         return selectnest(dataset, nesting_stack)
 
 
-
-def generate_unique_key(keyed_fields):
-    class UniqueKey(namedtuple('UniqueKey', list(keyed_fields))):
-        """ A named tuple, with default None value  """
-        def __new__(cls, **kwargs):
-            kwargs = { f:kwargs.get(f, None) for f in keyed_fields }
-            return super(UniqueKey, cls).__new__(cls, **kwargs)
-        def items(self):
-            return zip(self._fields, self)
-    return UniqueKey

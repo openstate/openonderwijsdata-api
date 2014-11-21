@@ -1,7 +1,7 @@
 from codebooks import Codebook
 import csv
 from itertools import islice, groupby
-from scrapy.spider import BaseSpider
+from scrapy.spider import Spider
 from scrapy.http import Request
 import os
 import urlparse, urllib
@@ -11,7 +11,7 @@ from onderwijsscrapers.items import ROASurvey
 
 source = os.path.abspath('../../../data/roa/roa-data.csv')
 
-class ROASurveySpider(BaseSpider):
+class ROASurveySpider(Spider):
     name = 'roa_surveys'
 
     def start_requests(self):

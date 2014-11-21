@@ -5,7 +5,7 @@ import urlparse
 from scrapy.utils.url import urljoin_rfc
 
 from scrapy.conf import settings
-from scrapy.spider import BaseSpider
+from scrapy.spider import Spider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 from scrapy import log
@@ -17,7 +17,7 @@ PAGES = re.compile(r'^Pagina (\d+) van (\d+)$')
 ZIPCODE = re.compile(r'(\d{4}\s?\w{2})')
 
 
-class OWINSPSpider(BaseSpider):
+class OWINSPSpider(Spider):
     search_url = 'http://toezichtkaart.owinsp.nl/schoolwijzer/'\
                  'zoekresultaat?xl=0&p1=%%23&p2=maxpg&p3=-1&p1=%%23'\
                  '&p2=hits&p3=-1&p1=sector&p2=%%3D'\

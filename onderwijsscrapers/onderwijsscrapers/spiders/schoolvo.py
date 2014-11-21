@@ -3,7 +3,7 @@ import urllib
 
 import requests
 from scrapy.conf import settings
-from scrapy.spider import BaseSpider
+from scrapy.spider import Spider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
@@ -66,7 +66,7 @@ SCHOOLVO_FIELD_MAPPING = {
 }
 
 
-class SchoolVOSpider(BaseSpider):
+class SchoolVOSpider(Spider):
     name = 'schoolvo.nl'
 
     def get_schools(self):

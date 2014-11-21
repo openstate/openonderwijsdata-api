@@ -1,5 +1,5 @@
 import requests
-from scrapy.spider import BaseSpider
+from scrapy.spider import Spider
 from scrapy.http import Request
 from itertools import islice
 import cStringIO
@@ -14,7 +14,7 @@ def float_or_none(string):
     except Exception:
         return None
 
-class OCWPoBranchesSpider(BaseSpider):
+class OCWPoBranchesSpider(Spider):
     name = 'ocw_po_branches'
 
     def start_requests(self):

@@ -1,5 +1,5 @@
 import csv
-from scrapy.spider import BaseSpider
+from scrapy.spider import Spider
 from scrapy.http import Request
 import os
 from itertools import islice
@@ -12,7 +12,7 @@ def float_or_none(string):
     except Exception:
         return None
 
-class DANSVoBranchesSpider(BaseSpider):
+class DANSVoBranchesSpider(Spider):
     name = 'dans_vo_branches'
 
     def __init__(self, root_path=''):

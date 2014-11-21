@@ -1,0 +1,13 @@
+field;keyed;source;type;description
+brin;1;BRIN NUMMER;brin;
+year;2;;year;
+mbo_type;;TYPE MBO;mbo_type;
+qualification_level;;KWALIFICATIE NIVEAU;int;
+qualification_code;3;KWALIFICATIE CODE;int;
+qualification_name;;KWALIFICATIE NAAM;string;
+mbo_sector;;MBO SECTOR;mbo_sector;
+mbo_industry;;BEDRIJFSTAK MBO;string;
+brin_knowledge_centre_mbo;;BRIN NUMMER KENNISCENTRUM;brin;
+knowledge_centre_mbo;;NAAM KENNISCENTRUM;string;
+participant_male;;(?P<year>\d{4}) MAN;int;
+participant_female;;(?P<year>\d{4}) VROUW;int;

@@ -8,13 +8,14 @@ from os.path import basename
 from zipfile import ZipFile
 from collections import defaultdict
 from itertools import islice
+import pprint
 
 import requests
 from scrapy import log
-from scrapy.spider import BaseSpider
+from scrapy.spider import Spider
 from scrapy.http import Request
-from scrapy.selector import HtmlXPathSelector
 
+from onderwijsscrapers.codebooks import Codebook
 from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
                                      DuoPoBoard, DuoPoSchool, DuoPoBranch,
                                      DuoPaoCollaboration, DuoMboBoard, DuoMboInstitution)
@@ -22,7 +23,7 @@ from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
 
-class DuoSpider(BaseSpider):
+class DuoSpider(Spider):
     """ Duo spider """
     def __init__(self, add_local_table=None, url_filter=None, *args, **kwargs):
         self.url_filter = url_filter
@@ -78,14 +79,13 @@ class DuoSpider(BaseSpider):
 
 def find_available_datasets(response, extension='csv'):
     """ Get all URLS of files with a certain extension on the DUO page """
-    hxs = HtmlXPathSelector(response)
     available_datasets = {}
-    datasets = hxs.select('//tr[.//a[contains(@href, ".%s")]]' % extension)
+    datasets = response.xpath('//tr[.//a[contains(@href, ".%s")]]' % extension)
     for dataset_file in datasets:
-        ref_date = dataset_file.select('./td[1]/span/text()').extract()
+        ref_date = dataset_file.xpath('./td[1]/span/text()').extract()
         ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
 
-        dataset_url = dataset_file.select('.//a/@href').re(r'(.*\.%s)' % extension)[0]
+        dataset_url = dataset_file.xpath('.//a/@href').re(r'(.*\.%s)' % extension)[0]
 
         available_datasets['http://duo.nl%s' % dataset_url] = ref_date
     return available_datasets
@@ -3126,6 +3126,8 @@ class DuoMboInstitutionSpider(DuoSpider):
         self.requests = {
             'mbo_/adressen/Adressen/instellingen.asp':
                 self.parse_mbo_institutions,
+            'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp':
+                self.parse_mbo_participants_per_institution,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -3180,3 +3182,47 @@ class DuoMboInstitutionSpider(DuoSpider):
                     mbo_institution_kind = row['MBO INSTELLINGSSOORT - NAAM'],
                     mbo_institution_kind_code = row['MBO INSTELLINGSOORT - CODE'],
                 )
+
+    def parse_mbo_participants_per_institution(self, response):
+        """
+        Middelbaar beroepsonderwijs > Aantal onderwijsdeelnemers in het mbo
+        Parse "3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
+        """
+
+        # This is a Proof-of-concept for the Codebook system, will be abstracted
+        book = 'codebooks/duo/mbo_participants.csv'
+        field_dicts = list(csv.DictReader(open(book), delimiter=';'))
+        dt = {
+            'int': int,
+            'brin':str,
+            'year': int,
+            'mbo_type': str,
+            'string': str,
+            'mbo_sector': str,
+        }
+        table_fields = Codebook('participants', field_dicts, dt)
+
+        print table_fields
+
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = cStringIO.StringIO(csv_file.content
+                  .decode('cp1252').encode('utf8'))
+            heads = csv_file.readline().strip().split(';')
+            rows = islice((line.strip().split(';') for line in csv_file), 20)
+
+            data = table_fields.parse_table(heads, rows)
+
+            for inst in data['participants_per_brin']:
+                for inst_per_year in inst['participants_per_year']:
+                    year = inst_per_year.pop('year')
+                    yield DuoMboInstitution(
+                        brin=inst['brin'], 
+                        reference_year=year,
+                        **inst_per_year)
+                inst.pop('participants_per_year')
+                yield DuoMboInstitution(reference_year=reference_year, **inst)
