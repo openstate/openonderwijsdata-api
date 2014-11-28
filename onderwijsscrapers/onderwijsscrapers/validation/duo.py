@@ -7,14 +7,24 @@ DUO publishes many different datasets, each of these datasets has a different "r
 .. note::
 
    Currently DUO updates general information (addresses, names, phone numbers, etc.) of educational institutions on a monthly basis. Unfortunately, historical information is not provided. This means that for some reference years the API contains information such as the financial indicators and dropouts of a school, but does not include the address or name. A plausible explanation is that because of mergers or bankruptcies the school no longer exists in recent files.
-"""
 
+.. _`COROP-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+.. _`Onderwijsgebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+.. _`Nodaal gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+.. _`Rmc-regio`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+.. _`Rpa-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+.. _`Wgr-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied
+.. _`Indicatie Special Basis Onderwijs`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Indicatie%20speciaal%20onderwijs
+.. _`Cluster`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster
+
+"""
 from glob import glob
 import json
 from colander import (MappingSchema, SequenceSchema, SchemaNode, String, Int,
     Length, Range, Date, Invalid, Float, Boolean, OneOf)
 import colander
 import general_rules
+
 
 class FinancialKeyIndicatorsPerYear(SequenceSchema):
     @colander.instantiate()
@@ -673,16 +683,3 @@ class DuoMboInstitution(DuoAreaSchema, MappingSchema):
     mbo_institution_kind_code = SchemaNode(String())
     website = general_rules.website( title="Website of this institution.")
 
-    
-errors = []
-def validate():
-    schema = DuoVoBranch()
-
-    for path in glob('../export/duo_vo_branches/*.json'):
-        print path
-        data = json.load(open(path, 'r'))
-        try:
-            schema.deserialize(data)
-        except Invalid, e:
-            errors.append(e)
-            print e.asdict()

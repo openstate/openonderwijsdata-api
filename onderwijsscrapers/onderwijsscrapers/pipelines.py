@@ -65,6 +65,9 @@ class OnderwijsscrapersPipeline(object):
         id_fields = export_settings['id_fields']
         total_items = len(self.items.keys())
         count = 0
+        # Create colander schema for all items
+        validation_schema = export_settings['schema']()
+        
         for item_id, item in self.items.iteritems():
             universal_item = 'None-%s' % '-'.join([str(item[field]) for field in
                                                    id_fields[1:]])
@@ -95,7 +98,7 @@ class OnderwijsscrapersPipeline(object):
 
             # Validate the item is this is enabled
             if export_settings['validate']:
-                item, validation = validate(export_settings['schema'],
+                item, validation = validate(validation_schema,
                                             export_settings['index'],
                                             export_settings['doctype'],
                                             item_id, item)

@@ -32,7 +32,8 @@ For some fields the original Dutch term is included, in order to allow the API u
 
 from validation import generate_documentation
 from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
-                            DuoPoBoard, DuoPoBranch, DuoPaoCollaboration)
+                            DuoPoBoard, DuoPoBranch, DuoPaoCollaboration,
+                            DuoMboBoard, DuoMboInstitution)
 from validation.schoolvo import SchoolVOBranch
 from validation.owinsp import (OnderwijsInspectieVoBranch, OnderwijsInspectiePoBranch)
 from validation.ocw import OCWPoBranch
@@ -58,6 +59,8 @@ classes = {
         DuoPoSchool,
         DuoPoBranch,
         DuoPaoCollaboration,
+        DuoMboBoard,
+        DuoMboInstitution
     ],
     'ocw': [
         OCWPoBranch,
@@ -93,7 +96,7 @@ table_template = """
 # Generate the docs per source
 print __doc__
 print duo.__doc__
-for n in ["DuoPoBoard","DuoPoBranch","DuoPoSchool","DuoVoBoard","DuoVoBranch","DuoVoSchool","DuoPaoCollaboration"]:
+for n in ["DuoPoBoard","DuoPoBranch","DuoPoSchool","DuoVoBoard","DuoVoBranch","DuoVoSchool","DuoPaoCollaboration", "DuoMboBoard", "DuoMboInstitution"]:
     t = docs['duo'].pop(n)
     print table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'duo' }
 for n in sorted(docs['duo'].keys(), key=lambda x: x.lower()):

@@ -6,7 +6,7 @@ from colander import Invalid
 
 import inspect
 
-def validate(schema, index, doctype, doc_id, item):
+def validate(validation_schema, index, doctype, doc_id, item):
     validated_at = datetime.utcnow().replace(tzinfo=pytz.utc)\
         .strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -31,7 +31,6 @@ def validate(schema, index, doctype, doc_id, item):
     item_sorted = json.loads(item_sorted)
 
     try:
-        validation_schema = schema()
         validation_schema.deserialize(item_sorted)
     except Invalid, e:
         messages = map(lambda item: dict(field=item[0], message=item[1]),
@@ -56,13 +55,15 @@ def generate_documentation(schema, mappinglink = '%s'):
 
     # Build the table for this schema    
     table = 'Field,Type,Original term,Description\n'
-    schema = schema() if inspect.isclass(schema) else schema
+    # this typ=None is not working
+    # needs robust way to deal with schemas defined at run-time
+    schema = schema(typ=None) if inspect.isclass(schema) else schema
     for field in schema:
         orig = field.orig if hasattr(field, 'orig') else ''
         typ = type(field.typ).__name__
         typname = ''
         if typ == 'Sequence':
-            field = [f for f in field][0] # should be only one
+            field = next(f for f in field) # should be only one
             typ = type(field.typ).__name__
 
             typname = 'array of '
