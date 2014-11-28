@@ -131,6 +131,24 @@ def index():
         "size": 0
     })
 
+    counts['duo_mbo_boards'] = es.get('duo/mbo_board/_search', data={
+        "facets": {
+            "years": {
+                "terms": {"field": "reference_year", "order": "term"}
+            }
+        },
+        "size": 0
+    })
+
+    counts['duo_mbo_institutions'] = es.get('duo/mbo_institution/_search', data={
+        "facets": {
+            "years": {
+                "terms": {"field": "reference_year", "order": "term"}
+            }
+        },
+        "size": 0
+    })
+
     type_names = {
         'po_board': 'Boards (primary)',
         'vo_board': 'Boards (secondary)',
@@ -138,7 +156,10 @@ def index():
         'vo_school': 'Schools (secondary)',
         'po_branch': 'School Branches (primary)',
         'vo_branch': 'School Branches (secondary)',
-        'pao_collaboration': 'Collaborations (special)'
+        'pao_collaboration': 'Collaborations (special)',
+        'mbo_board': 'Boards (vocational)',
+        'mbo_institution': 'Institutions (vocational)',
+
     }
 
     return render_template('index.html', counts=counts, type_names=type_names)
