@@ -3,3 +3,4 @@ Field,Type,Original term,Description
 "sbao","integer","","Sbao"
 "so","integer","SO","Special education."
 "vso","integer","SVO","Special secondary education."
+"v_so","integer","(V)SO","Special education and special secondary education."

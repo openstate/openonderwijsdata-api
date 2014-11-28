@@ -1,0 +1,4 @@
+Field,Type,Original term,Description
+"qualification_code","integer","","Qualification Code"
+"participants_male","integer","","Participants Male"
+"participants_female","integer","","Participants Female"

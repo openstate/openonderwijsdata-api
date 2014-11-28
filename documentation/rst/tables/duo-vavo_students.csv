@@ -1,3 +1,3 @@
 Field,Type,Original term,Description
-"non_vavo","integer","","Non Vavo"
-"vavo","integer","","Vavo"
+"non_vavo","integer","","Number of non-vavo students"
+"vavo","integer","","Number of students delegated to adult education"

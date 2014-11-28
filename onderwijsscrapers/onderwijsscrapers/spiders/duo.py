@@ -69,7 +69,8 @@ class DuoSpider(Spider):
             for key, item in dataset.iteritems():
                 if key is not None:
                     school = make_item(key)
-                    school['reference_year'] = reference_year
+                    if 'reference_year' not in key:
+                        school['reference_year'] = reference_year
                     school['%s_reference_url' % dataset_name] = csv_url
                     school['%s_reference_date' % dataset_name] = reference_date
                     school[dataset_name] = item
@@ -3127,7 +3128,9 @@ class DuoMboInstitutionSpider(DuoSpider):
             'mbo_/adressen/Adressen/instellingen.asp':
                 self.parse_mbo_institutions,
             'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp':
-                self.parse_mbo_participants_per_institution,
+                self.parse_mbo_qualifications,
+            'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp':
+                self.parse_mbo_participants_gender,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -3182,6 +3185,54 @@ class DuoMboInstitutionSpider(DuoSpider):
                     mbo_institution_kind = row['MBO INSTELLINGSSOORT - NAAM'],
                     mbo_institution_kind_code = row['MBO INSTELLINGSOORT - CODE'],
                 )
+    
+    def parse_mbo_qualifications(self, response):
+        """
+        """
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
+            
+            if row['BRIN NUMMER']:
+                brin = row['BRIN NUMMER']
 
-    def parse_mbo_participants_per_institution(self, response):
-        return
+                yield brin, {
+                    'qualification_code': row['KWALIFICATIE CODE'],
+                    'mbo_type': row['TYPE MBO'],
+                    'qualification_level': int(row['KWALIFICATIE NIVEAU']),
+                    'qualification_name': int(row['KWALIFICATIE NAAM']),
+                    'mbo_sector': row['MBO SECTOR'],
+                    'mbo_industry': row['BEDRIJFSTAK MBO'],
+                    'brin_knowledge_centre_mbo': row['BRIN NUMMER KENNISCENTRUM'],
+                    'knowledge_centre_mbo': row['NAAM KENNISCENTRUM'],
+                }
+
+        return self.dataset(response, self.make_item, 'qualifications', parse_row)
+
+    def parse_mbo_participants_gender(self, response):
+        """
+        """
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
+            
+            if row['BRIN NUMMER']:
+                brin = row['BRIN NUMMER']
+                for year in [2009, 2010, 2011, 2012, 2013]:
+
+                    yield brin, {
+                        'reference_year': year,
+                        'qualification_code': row['KWALIFICATIE CODE'],
+                        'participants_male': int(row['%s MAN'%year] or 0),
+                        'participants_female': int(row['%s VROUW'%year] or 0),
+                    }
+
+        return self.dataset(response, self.make_item, 'participants_gender_per_qualification', parse_row)
+        
+

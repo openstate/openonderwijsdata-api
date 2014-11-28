@@ -39,6 +39,16 @@ DUO publishes many different datasets, each of these datasets has a different "r
 
    Currently DUO updates general information (addresses, names, phone numbers, etc.) of educational institutions on a monthly basis. Unfortunately, historical information is not provided. This means that for some reference years the API contains information such as the financial indicators and dropouts of a school, but does not include the address or name. A plausible explanation is that because of mergers or bankruptcies the school no longer exists in recent files.
 
+.. _`COROP-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Coropgebied
+.. _`Onderwijsgebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Onderwijsgebied
+.. _`Nodaal gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Nodaal%20gebied
+.. _`Rmc-regio`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rmc-gebied
+.. _`Rpa-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Rpa-gebied
+.. _`Wgr-gebied`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Wgr-gebied
+.. _`Indicatie Special Basis Onderwijs`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Indicatie%20speciaal%20onderwijs
+.. _`Cluster`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster
+
+
 
 .. _duo-DuoPoBoard:
 
@@ -48,7 +58,7 @@ DuoPoBoard
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoPoBoard.csv
 
@@ -61,7 +71,7 @@ DuoPoBranch
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoPoBranch.csv
 
@@ -74,7 +84,7 @@ DuoPoSchool
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoPoSchool.csv
 
@@ -87,7 +97,7 @@ DuoVoBoard
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoVoBoard.csv
 
@@ -100,7 +110,7 @@ DuoVoBranch
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoVoBranch.csv
 
@@ -113,7 +123,7 @@ DuoVoSchool
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoVoSchool.csv
 
@@ -126,9 +136,35 @@ DuoPaoCollaboration
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoPaoCollaboration.csv
+
+
+.. _duo-DuoMboBoard:
+
+DuoMboBoard
+^^^^^^^^^^^
+**Source:** `Middelbaar beroepsonderwijs - Adressen - 02. Adressen bevoegde gezagen <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/adressen/Adressen/bevoegde_gezagen.asp>`_
+
+.. csv-table::
+    :delim: ,
+    :widths: 2, 1, 3, 10
+    :header-rows: 1
+    :file: tables/duo-DuoMboBoard.csv
+
+
+.. _duo-DuoMboInstitution:
+
+DuoMboInstitution
+^^^^^^^^^^^^^^^^^
+**Source:** `Middelbaar beroepsonderwijs - Adressen - 01. Adressen instellingen <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/adressen/Adressen/instellingen.asp>`_
+
+.. csv-table::
+    :delim: ,
+    :widths: 2, 1, 3, 10
+    :header-rows: 1
+    :file: tables/duo-DuoMboInstitution.csv
 
 
 .. _duo-Address:
@@ -143,7 +179,7 @@ Address
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-Address.csv
 
@@ -156,7 +192,7 @@ address_component
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-address_component.csv
 
@@ -173,7 +209,7 @@ This dict has three keys *student_weight_0_0*, *student_weight_0_3* and *student
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-AgesByStudentWeight.csv
 
@@ -185,7 +221,7 @@ Coordinates
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-Coordinates.csv
 
@@ -197,7 +233,7 @@ department
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-department.csv
 
@@ -210,7 +246,7 @@ dropout
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-dropout.csv
 
@@ -229,7 +265,7 @@ GradesPerCourse
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-GradesPerCourse.csv
 
@@ -242,7 +278,7 @@ graduation
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-graduation.csv
 
@@ -254,9 +290,33 @@ GraudationDepartmentCandidates
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-GraudationDepartmentCandidates.csv
+
+
+.. _duo-mbo_qualifications:
+
+mbo_qualifications
+^^^^^^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 2, 1, 3, 10
+    :header-rows: 1
+    :file: tables/duo-mbo_qualifications.csv
+
+
+.. _duo-participants_gender_per_qualification:
+
+participants_gender_per_qualification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 2, 1, 3, 10
+    :header-rows: 1
+    :file: tables/duo-participants_gender_per_qualification.csv
 
 
 .. _duo-spo_students_by_birthyear:
@@ -266,7 +326,7 @@ spo_students_by_birthyear
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-spo_students_by_birthyear.csv
 
@@ -278,7 +338,7 @@ spo_students_by_edu_type
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-spo_students_by_edu_type.csv
 
@@ -290,7 +350,7 @@ spo_students_per_cluster
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-spo_students_per_cluster.csv
 
@@ -307,7 +367,7 @@ Number of pupils per age group (up to 25, as special education is included).
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-student_residence.csv
 
@@ -323,7 +383,7 @@ The level of education [#edu_in_holland]_ that the primary school recommended th
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-students_by_advice.csv
 
@@ -335,7 +395,7 @@ students_by_finegrained_structure
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-students_by_finegrained_structure.csv
 
@@ -348,7 +408,7 @@ students_by_structure
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-students_by_structure.csv
 
@@ -361,7 +421,7 @@ students_by_year
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-students_by_year.csv
 
@@ -374,7 +434,7 @@ students_prognosis
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-students_prognosis.csv
 
@@ -386,7 +446,7 @@ StudentsByAge
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-StudentsByAge.csv
 
@@ -398,7 +458,7 @@ StudentsEnrolledInStructure
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-StudentsEnrolledInStructure.csv
 
@@ -407,10 +467,11 @@ StudentsEnrolledInStructure
 
 vavo_students
 ^^^^^^^^^^^^^
+ Students who are registered in secondary education, but are in an adult education program, can still graduate with a secondary education degree (*Rutte - regeling*) 
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-vavo_students.csv
 
@@ -422,7 +483,7 @@ Viewport
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-Viewport.csv
 
@@ -435,7 +496,7 @@ weights_per_school
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-weights_per_school.csv
 
@@ -453,7 +514,7 @@ SchoolVOBranch
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-SchoolVOBranch.csv
 
@@ -470,7 +531,7 @@ Address
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-Address.csv
 
@@ -483,7 +544,7 @@ address_component
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-address_component.csv
 
@@ -495,7 +556,7 @@ Coordinates
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-Coordinates.csv
 
@@ -507,7 +568,7 @@ CostPerYear
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-CostPerYear.csv
 
@@ -519,7 +580,7 @@ Costs
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-Costs.csv
 
@@ -531,7 +592,7 @@ Indicator
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-Indicator.csv
 
@@ -543,7 +604,7 @@ PlannedRealisedHoursPerStructure
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-PlannedRealisedHoursPerStructure.csv
 
@@ -555,7 +616,7 @@ PlannedRealisedHoursPerYear
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-PlannedRealisedHoursPerYear.csv
 
@@ -567,7 +628,7 @@ Satisfaction
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-Satisfaction.csv
 
@@ -579,7 +640,7 @@ Viewport
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-Viewport.csv
 
@@ -597,7 +658,7 @@ OnderwijsInspectiePoBranch
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-OnderwijsInspectiePoBranch.csv
 
@@ -632,7 +693,7 @@ OnderwijsInspectieVoBranch
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-OnderwijsInspectieVoBranch.csv
 
@@ -649,7 +710,7 @@ Address
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-Address.csv
 
@@ -662,7 +723,7 @@ address_component
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-address_component.csv
 
@@ -674,7 +735,7 @@ Coordinates
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-Coordinates.csv
 
@@ -686,7 +747,7 @@ CurrentRating
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-CurrentRating.csv
 
@@ -698,7 +759,7 @@ Rating
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-Rating.csv
 
@@ -710,7 +771,7 @@ Report
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-Report.csv
 
@@ -722,7 +783,7 @@ Viewport
 
 .. csv-table::
     :delim: ,
-    :widths: 1, 1, 1, 100
+    :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-Viewport.csv
 

@@ -375,8 +375,34 @@ class SPOStudentsByBirthyear(SequenceSchema):
         students = SchemaNode(Int(), title="Number of students born in this year")
 
 
+class MboQualifications(SequenceSchema):
+    """**Source:** `3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"""
+    @colander.instantiate()
+    class mbo_qualifications(MappingSchema):
+        qualification_code = SchemaNode(Int(), title="")
+        qualification_code.orig = 'Kwalificatie Code'
+        mbo_type = SchemaNode(String(), title="")
+        mbo_type.orig = 'Type Mbo'
+        qualification_level = SchemaNode(Int(), title="")
+        qualification_level.orig = 'Kwalificatie Niveau'
+        qualification_name = SchemaNode(String(), title="")
+        qualification_name.orig = 'Kwalificatie Naam'
+        mbo_sector = SchemaNode(String(), title="")
+        mbo_sector.orig = 'Mbo Sector'
+        mbo_industry = SchemaNode(String(), title="")
+        mbo_industry.orig = 'Bedrijfstak Mbo'
+        brin_knowledge_centre_mbo = general_rules.brin(title="Brin code of the knowledge center associated with this institution")
+        brin_knowledge_centre_mbo.orig = 'Brin Nummer Kenniscentrum'
+        knowledge_centre_mbo = SchemaNode(String(),title="Name of the knowledge center associated with this institution")
+        knowledge_centre_mbo.orig = 'Naam Kenniscentrum'
 
-
+class MboParticipantsGenderPerQualification(SequenceSchema):
+    """**Source:** `3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"""
+    @colander.instantiate()
+    class participants_gender_per_qualification(MappingSchema):
+        qualification_code = SchemaNode(Int())
+        participants_male = SchemaNode(Int())
+        participants_female = SchemaNode(Int())
 
 
 class DuoAreaSchema(MappingSchema):
@@ -682,4 +708,12 @@ class DuoMboInstitution(DuoAreaSchema, MappingSchema):
     mbo_institution_kind = SchemaNode(String())
     mbo_institution_kind_code = SchemaNode(String())
     website = general_rules.website( title="Website of this institution.")
+
+    qualifications = MboQualifications()
+    qualifications_reference_url = general_rules.website()
+    qualifications_reference_date = SchemaNode(Date(), missing=True)
+
+    participants_gender_per_qualification = MboParticipantsGenderPerQualification()
+    participants_gender_per_qualification_reference_url = general_rules.website()
+    participants_gender_per_qualification_reference_date = SchemaNode(Date(), missing=True)
 
