@@ -5,6 +5,7 @@ import xlrd
 from datetime import datetime
 from os import devnull
 from os.path import basename
+import os
 from zipfile import ZipFile
 from collections import defaultdict
 from itertools import islice
@@ -3190,7 +3191,9 @@ class DuoMboInstitutionSpider(DuoSpider):
         """
 
         # This is a Proof-of-concept for the Codebook system, will be abstracted
-        book = 'codebooks/duo/mbo_participants.csv'
+        book = '../codebooks/duo/mbo_participants_gender.csv'
+        book = os.path.normpath(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), book))
         field_dicts = list(csv.DictReader(open(book), delimiter=';'))
         dt = {
             'int': int,

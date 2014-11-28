@@ -1,4 +1,3 @@
-from codebooks import Codebook
 import csv
 from itertools import islice, groupby
 from scrapy.spider import Spider
@@ -6,6 +5,7 @@ from scrapy.http import Request
 import os
 import urlparse, urllib
 
+from onderwijsscrapers.codebooks import Codebook
 from onderwijsscrapers.items import ROASurvey
 
 

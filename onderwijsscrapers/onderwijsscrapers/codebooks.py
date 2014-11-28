@@ -1,8 +1,13 @@
 from collections import namedtuple, defaultdict
 import re
+from colander import SchemaNode, Mapping, Sequence
+import colander
 """
 	A Codebook describes the data in a table.
 
+    This module is still a proof-of-concept and needs major refactoring.
+    The fields are now stored as a flat dict, but we'd like to move to
+    a nested underlying representation.
 
 	fields: dict<field object>
 	field: object<source info>
@@ -34,6 +39,9 @@ Field = generate_unique_key(fields, name='Field')
 
 class Codebook(dict):
     def __init__(self, name, field_dicts, datatypes):
+        """
+        Create a codebook from a list of fields.
+        """
         self.name = name
         # Load the fields file
         for rule in field_dicts:
@@ -44,6 +52,25 @@ class Codebook(dict):
         self.unique_key = generate_unique_key(self.keyed_fields)
 
         self.datatypes = datatypes
+
+        # nested representation
+        def add_to_nested(key, val, thedict, nest_stack):
+            n = nest_stack.pop()
+            per = '%s_per_%s'%(self.name, n)
+            if per not in thedict:
+                thedict[per] = { n: self[n] }
+            if nest_stack:
+                add_to_nested(key, val, thedict[per], nest_stack)
+            else:
+                thedict[per][key] = val
+
+        sourced_keys = set(n for n,r in self.iteritems() if r.keyed and r.source)
+        nest = {}
+        for n,r in self.iteritems():
+            if not r.keyed:
+                t = sourced_keys|set(k for k in self.keyed_fields if '<%s>'%k in r.source)
+                add_to_nested(n,r, nest, sorted(t, key=lambda k: -int(self[k].keyed) ))
+        self.nest = nest
 
     def parse_table(self, heads, rows):
         """ Parse a table """
@@ -148,4 +175,34 @@ class Codebook(dict):
         nesting_stack = sorted(self.keyed_fields, key=lambda k: int(self[k].keyed))
         return selectnest(dataset, nesting_stack)
 
+    def add_to_validation(self, schema):
+        """
+        Add the validation for the fields to the parent schema object
 
+        TODO: better id_fields filters
+        """
+        val_types = {
+            'int': colander.Int(),
+            'float': colander.Float()
+        }
+        def to_validator(nested, name):
+            if type(nested) == Field:
+                typ = val_types[nested.type] if nested.type in val_types else colander.String()
+                node = SchemaNode(typ=typ, name=name, missing=None )
+                node.type_doc = nested.type
+                return node
+            elif type(nested) == dict:
+                seq = SchemaNode(typ=Sequence(), name = name)
+                seq.type_doc = 'Array of %s'%name
+                out = SchemaNode(typ=Mapping() , name = name)
+                out.type_doc = name
+                for k,v in nested.iteritems():
+                    out.add(to_validator(v, k))
+                seq.add(out)
+                return seq
+        
+        # TODO: This only works for singleton id_fields
+        groupby = schema.id_fields[0]
+        for nest_name, nest in self.nest['%s_per_%s'%(self.name, groupby)].items():
+            if nest_name != groupby:
+                schema.add(to_validator(nest, nest_name))
