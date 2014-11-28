@@ -3103,7 +3103,7 @@ class DuoMboBoardSpider(DuoSpider):
                         'zip_code': row['POSTCODE'].replace(' ', ''),
                         'city': row['PLAATSNAAM']
                     },
-                    administrative_office_id = int(row['ADMINISTRATIEKANTOORNUMMER']),
+                    administrative_office_id = int_or_none(row['ADMINISTRATIEKANTOORNUMMER']),
                     correspondence_address = {
                         'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                                              row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
