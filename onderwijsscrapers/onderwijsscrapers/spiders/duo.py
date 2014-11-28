@@ -3184,45 +3184,4 @@ class DuoMboInstitutionSpider(DuoSpider):
                 )
 
     def parse_mbo_participants_per_institution(self, response):
-        """
-        Middelbaar beroepsonderwijs > Aantal onderwijsdeelnemers in het mbo
-        Parse "3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
-        """
-
-        # This is a Proof-of-concept for the Codebook system, will be abstracted
-        book = 'codebooks/duo/mbo_participants.csv'
-        field_dicts = list(csv.DictReader(open(book), delimiter=';'))
-        dt = {
-            'int': int,
-            'brin':str,
-            'year': int,
-            'mbo_type': str,
-            'string': str,
-            'mbo_sector': str,
-        }
-        table_fields = Codebook('participants', field_dicts, dt)
-
-        print table_fields
-
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = cStringIO.StringIO(csv_file.content
-                  .decode('cp1252').encode('utf8'))
-            heads = csv_file.readline().strip().split(';')
-            rows = islice((line.strip().split(';') for line in csv_file), 20)
-
-            data = table_fields.parse_table(heads, rows)
-
-            for inst in data['participants_per_brin']:
-                for inst_per_year in inst['participants_per_year']:
-                    year = inst_per_year.pop('year')
-                    yield DuoMboInstitution(
-                        brin=inst['brin'], 
-                        reference_year=year,
-                        **inst_per_year)
-                inst.pop('participants_per_year')
-                yield DuoMboInstitution(reference_year=reference_year, **inst)
+        return
