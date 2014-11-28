@@ -15,7 +15,6 @@ from scrapy import log
 from scrapy.spider import Spider
 from scrapy.http import Request
 
-from onderwijsscrapers.codebooks import Codebook
 from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
                                      DuoPoBoard, DuoPoSchool, DuoPoBranch,
                                      DuoPaoCollaboration, DuoMboBoard, DuoMboInstitution)
