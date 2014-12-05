@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 """
 Data
 ====
@@ -42,6 +44,11 @@ import validation.duo as duo
 import validation.schoolvo as schoolvo
 import validation.owinsp as owinsp
 import validation.ocw as ocw
+import sys
+
+
+table_files = sys.argv[1]+'tables/%s-%s.csv'
+data_rst_file = sys.argv[1]+'data.rst'
 
 classes = {
     'owinsp': [
@@ -77,7 +84,7 @@ for source, cl in classes.items():
         docs[source] = dict(docs[source].items() + docs_.items())
         
     for name, table in tables[source].items():
-        with open('tables/%s-%s.csv'%(source, name) , 'w') as o:
+        with open(table_files % (source, name) , 'w') as o:
             o.write(table)
 
 table_template = """
@@ -94,32 +101,33 @@ table_template = """
 """
 
 # Generate the docs per source
-print __doc__
-print duo.__doc__
-for n in ["DuoPoBoard","DuoPoBranch","DuoPoSchool","DuoVoBoard","DuoVoBranch","DuoVoSchool","DuoPaoCollaboration", "DuoMboBoard", "DuoMboInstitution"]:
-    t = docs['duo'].pop(n)
-    print table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'duo' }
-for n in sorted(docs['duo'].keys(), key=lambda x: x.lower()):
-    t = docs['duo'][n]
-    print table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'duo' }
+with open(data_rst_file, 'w') as o:
+    o.write(__doc__)
+    o.write(duo.__doc__)
+    for n in ["DuoPoBoard","DuoPoBranch","DuoPoSchool","DuoVoBoard","DuoVoBranch","DuoVoSchool","DuoPaoCollaboration", "DuoMboBoard", "DuoMboInstitution"]:
+        t = docs['duo'].pop(n)
+        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'duo' })
+    for n in sorted(docs['duo'].keys(), key=lambda x: x.lower()):
+        t = docs['duo'][n]
+        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'duo' })
 
-print schoolvo.__doc__
-for n in ["SchoolVOBranch"]:
-    t = docs['schoolvo'].pop(n)
-    print table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'schoolvo' }
-for n in sorted(docs['schoolvo'].keys(), key=lambda x: x.lower()):
-    t = docs['schoolvo'][n]
-    print table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'schoolvo' }
+    o.write(schoolvo.__doc__)
+    for n in ["SchoolVOBranch"]:
+        t = docs['schoolvo'].pop(n)
+        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'schoolvo' })
+    for n in sorted(docs['schoolvo'].keys(), key=lambda x: x.lower()):
+        t = docs['schoolvo'][n]
+        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'schoolvo' })
 
-print owinsp.__doc__
-for n in ["OnderwijsInspectiePoBranch", "OnderwijsInspectieVoBranch"]:
-    t = docs['owinsp'].pop(n)
-    print table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'owinsp' }
-for n in sorted(docs['owinsp'].keys(), key=lambda x: x.lower()):
-    t = docs['owinsp'][n]
-    print table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'owinsp' }
+    o.write(owinsp.__doc__)
+    for n in ["OnderwijsInspectiePoBranch", "OnderwijsInspectieVoBranch"]:
+        t = docs['owinsp'].pop(n)
+        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'owinsp' })
+    for n in sorted(docs['owinsp'].keys(), key=lambda x: x.lower()):
+        t = docs['owinsp'][n]
+        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'owinsp' })
 
-print """
+    o.write("""
 **Footnotes**
 
 .. [#schoolbestuur] http://nl.wikipedia.org/wiki/Schoolbestuur
@@ -145,4 +153,4 @@ print """
 .. [#centralexams] http://nl.wikipedia.org/wiki/Centraal_examen
 .. [#schoolexams] http://nl.wikipedia.org/wiki/Schoolexamen
 .. [#weight] http://www.rijksoverheid.nl/onderwerpen/leerachterstand/vraag-en-antwoord/wat-is-de-gewichtenregeling-in-het-basisonderwijs.html
-"""
+""")
