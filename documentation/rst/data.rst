@@ -28,7 +28,6 @@ Note that many fields in the :ref:`duodata` dataset overlap, as these data is av
 
 For some fields the original Dutch term is included, in order to allow the API user to look up the definition of that term at the source collection.
 
-
 .. _duodata:
 
 DUO
@@ -49,7 +48,6 @@ DUO publishes many different datasets, each of these datasets has a different "r
 .. _`Cluster`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster
 
 
-
 .. _duo-DuoPoBoard:
 
 DuoPoBoard
@@ -61,7 +59,6 @@ DuoPoBoard
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoPoBoard.csv
-
 
 .. _duo-DuoPoBranch:
 
@@ -75,7 +72,6 @@ DuoPoBranch
     :header-rows: 1
     :file: tables/duo-DuoPoBranch.csv
 
-
 .. _duo-DuoPoSchool:
 
 DuoPoSchool
@@ -87,7 +83,6 @@ DuoPoSchool
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoPoSchool.csv
-
 
 .. _duo-DuoVoBoard:
 
@@ -101,7 +96,6 @@ DuoVoBoard
     :header-rows: 1
     :file: tables/duo-DuoVoBoard.csv
 
-
 .. _duo-DuoVoBranch:
 
 DuoVoBranch
@@ -113,7 +107,6 @@ DuoVoBranch
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoVoBranch.csv
-
 
 .. _duo-DuoVoSchool:
 
@@ -127,7 +120,6 @@ DuoVoSchool
     :header-rows: 1
     :file: tables/duo-DuoVoSchool.csv
 
-
 .. _duo-DuoPaoCollaboration:
 
 DuoPaoCollaboration
@@ -139,7 +131,6 @@ DuoPaoCollaboration
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoPaoCollaboration.csv
-
 
 .. _duo-DuoMboBoard:
 
@@ -153,7 +144,6 @@ DuoMboBoard
     :header-rows: 1
     :file: tables/duo-DuoMboBoard.csv
 
-
 .. _duo-DuoMboInstitution:
 
 DuoMboInstitution
@@ -165,7 +155,6 @@ DuoMboInstitution
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-DuoMboInstitution.csv
-
 
 .. _duo-Address:
 
@@ -183,7 +172,6 @@ Address
     :header-rows: 1
     :file: tables/duo-Address.csv
 
-
 .. _duo-address_component:
 
 address_component
@@ -195,7 +183,6 @@ address_component
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-address_component.csv
-
 
 .. _duo-AgesByStudentWeight:
 
@@ -213,7 +200,6 @@ This dict has three keys *student_weight_0_0*, *student_weight_0_3* and *student
     :header-rows: 1
     :file: tables/duo-AgesByStudentWeight.csv
 
-
 .. _duo-Coordinates:
 
 Coordinates
@@ -224,7 +210,6 @@ Coordinates
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-Coordinates.csv
-
 
 .. _duo-department:
 
@@ -237,7 +222,6 @@ department
     :header-rows: 1
     :file: tables/duo-department.csv
 
-
 .. _duo-dropout:
 
 dropout
@@ -249,7 +233,6 @@ dropout
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-dropout.csv
-
 
 .. _duo-GradesPerCourse:
 
@@ -269,7 +252,6 @@ GradesPerCourse
     :header-rows: 1
     :file: tables/duo-GradesPerCourse.csv
 
-
 .. _duo-graduation:
 
 graduation
@@ -282,7 +264,6 @@ graduation
     :header-rows: 1
     :file: tables/duo-graduation.csv
 
-
 .. _duo-GraudationDepartmentCandidates:
 
 GraudationDepartmentCandidates
@@ -293,19 +274,6 @@ GraudationDepartmentCandidates
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-GraudationDepartmentCandidates.csv
-
-
-.. _duo-mbo_qualifications:
-
-mbo_qualifications
-^^^^^^^^^^^^^^^^^^
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/duo-mbo_qualifications.csv
-
 
 .. _duo-participants_gender_per_qualification:
 
@@ -318,6 +286,27 @@ participants_gender_per_qualification
     :header-rows: 1
     :file: tables/duo-participants_gender_per_qualification.csv
 
+.. _duo-participants_per_grade_year_and_qualification:
+
+participants_per_grade_year_and_qualification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 2, 1, 3, 10
+    :header-rows: 1
+    :file: tables/duo-participants_per_grade_year_and_qualification.csv
+
+.. _duo-qualifications:
+
+qualifications
+^^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 2, 1, 3, 10
+    :header-rows: 1
+    :file: tables/duo-qualifications.csv
 
 .. _duo-spo_students_by_birthyear:
 
@@ -330,7 +319,6 @@ spo_students_by_birthyear
     :header-rows: 1
     :file: tables/duo-spo_students_by_birthyear.csv
 
-
 .. _duo-spo_students_by_edu_type:
 
 spo_students_by_edu_type
@@ -342,7 +330,6 @@ spo_students_by_edu_type
     :header-rows: 1
     :file: tables/duo-spo_students_by_edu_type.csv
 
-
 .. _duo-spo_students_per_cluster:
 
 spo_students_per_cluster
@@ -353,7 +340,6 @@ spo_students_per_cluster
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-spo_students_per_cluster.csv
-
 
 .. _duo-student_residence:
 
@@ -371,7 +357,6 @@ Number of pupils per age group (up to 25, as special education is included).
     :header-rows: 1
     :file: tables/duo-student_residence.csv
 
-
 .. _duo-students_by_advice:
 
 students_by_advice
@@ -387,7 +372,6 @@ The level of education [#edu_in_holland]_ that the primary school recommended th
     :header-rows: 1
     :file: tables/duo-students_by_advice.csv
 
-
 .. _duo-students_by_finegrained_structure:
 
 students_by_finegrained_structure
@@ -398,7 +382,6 @@ students_by_finegrained_structure
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-students_by_finegrained_structure.csv
-
 
 .. _duo-students_by_structure:
 
@@ -412,7 +395,6 @@ students_by_structure
     :header-rows: 1
     :file: tables/duo-students_by_structure.csv
 
-
 .. _duo-students_by_year:
 
 students_by_year
@@ -424,7 +406,6 @@ students_by_year
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-students_by_year.csv
-
 
 .. _duo-students_prognosis:
 
@@ -438,7 +419,6 @@ students_prognosis
     :header-rows: 1
     :file: tables/duo-students_prognosis.csv
 
-
 .. _duo-StudentsByAge:
 
 StudentsByAge
@@ -450,7 +430,6 @@ StudentsByAge
     :header-rows: 1
     :file: tables/duo-StudentsByAge.csv
 
-
 .. _duo-StudentsEnrolledInStructure:
 
 StudentsEnrolledInStructure
@@ -461,7 +440,6 @@ StudentsEnrolledInStructure
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-StudentsEnrolledInStructure.csv
-
 
 .. _duo-vavo_students:
 
@@ -475,7 +453,6 @@ vavo_students
     :header-rows: 1
     :file: tables/duo-vavo_students.csv
 
-
 .. _duo-Viewport:
 
 Viewport
@@ -486,7 +463,6 @@ Viewport
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-Viewport.csv
-
 
 .. _duo-weights_per_school:
 
@@ -499,13 +475,11 @@ weights_per_school
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-weights_per_school.csv
-
 .. _schoolvodata:
 
 Vensters voor Verantwoording
 ----------------------------
 `Vensters voor Verantwoording <http://schoolvo.nl/>`_ provides VO schools with a platform where they can share data on their performance with the public. The data described here is currently **not** available to the public through the `OpenOnderwijs API <http://api.openonderwijsdata.nl/>`_.
-
 
 .. _schoolvo-SchoolVOBranch:
 
@@ -517,7 +491,6 @@ SchoolVOBranch
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-SchoolVOBranch.csv
-
 
 .. _schoolvo-Address:
 
@@ -535,7 +508,6 @@ Address
     :header-rows: 1
     :file: tables/schoolvo-Address.csv
 
-
 .. _schoolvo-address_component:
 
 address_component
@@ -548,7 +520,6 @@ address_component
     :header-rows: 1
     :file: tables/schoolvo-address_component.csv
 
-
 .. _schoolvo-Coordinates:
 
 Coordinates
@@ -559,7 +530,6 @@ Coordinates
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-Coordinates.csv
-
 
 .. _schoolvo-CostPerYear:
 
@@ -572,7 +542,6 @@ CostPerYear
     :header-rows: 1
     :file: tables/schoolvo-CostPerYear.csv
 
-
 .. _schoolvo-Costs:
 
 Costs
@@ -583,7 +552,6 @@ Costs
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-Costs.csv
-
 
 .. _schoolvo-Indicator:
 
@@ -596,7 +564,6 @@ Indicator
     :header-rows: 1
     :file: tables/schoolvo-Indicator.csv
 
-
 .. _schoolvo-PlannedRealisedHoursPerStructure:
 
 PlannedRealisedHoursPerStructure
@@ -607,7 +574,6 @@ PlannedRealisedHoursPerStructure
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-PlannedRealisedHoursPerStructure.csv
-
 
 .. _schoolvo-PlannedRealisedHoursPerYear:
 
@@ -620,7 +586,6 @@ PlannedRealisedHoursPerYear
     :header-rows: 1
     :file: tables/schoolvo-PlannedRealisedHoursPerYear.csv
 
-
 .. _schoolvo-Satisfaction:
 
 Satisfaction
@@ -632,7 +597,6 @@ Satisfaction
     :header-rows: 1
     :file: tables/schoolvo-Satisfaction.csv
 
-
 .. _schoolvo-Viewport:
 
 Viewport
@@ -643,13 +607,11 @@ Viewport
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/schoolvo-Viewport.csv
-
 .. _owinspdata:
 
 Onderwijsinspectie
 ------------------
 The Inspectie voor het Onderwijs [#owinsp]_ is tasked with inspecting Dutch schools. Since 1997, they are required to publish reports on their findings when inspecting schools.
-
 
 .. _owinsp-OnderwijsInspectiePoBranch:
 
@@ -661,7 +623,6 @@ OnderwijsInspectiePoBranch
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-OnderwijsInspectiePoBranch.csv
-
 
 .. _owinsp-OnderwijsInspectieVoBranch:
 
@@ -697,7 +658,6 @@ OnderwijsInspectieVoBranch
     :header-rows: 1
     :file: tables/owinsp-OnderwijsInspectieVoBranch.csv
 
-
 .. _owinsp-Address:
 
 Address
@@ -714,7 +674,6 @@ Address
     :header-rows: 1
     :file: tables/owinsp-Address.csv
 
-
 .. _owinsp-address_component:
 
 address_component
@@ -727,7 +686,6 @@ address_component
     :header-rows: 1
     :file: tables/owinsp-address_component.csv
 
-
 .. _owinsp-Coordinates:
 
 Coordinates
@@ -738,7 +696,6 @@ Coordinates
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-Coordinates.csv
-
 
 .. _owinsp-CurrentRating:
 
@@ -751,7 +708,6 @@ CurrentRating
     :header-rows: 1
     :file: tables/owinsp-CurrentRating.csv
 
-
 .. _owinsp-Rating:
 
 Rating
@@ -762,7 +718,6 @@ Rating
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-Rating.csv
-
 
 .. _owinsp-Report:
 
@@ -775,7 +730,6 @@ Report
     :header-rows: 1
     :file: tables/owinsp-Report.csv
 
-
 .. _owinsp-Viewport:
 
 Viewport
@@ -786,7 +740,6 @@ Viewport
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/owinsp-Viewport.csv
-
 
 **Footnotes**
 
@@ -813,4 +766,3 @@ Viewport
 .. [#centralexams] http://nl.wikipedia.org/wiki/Centraal_examen
 .. [#schoolexams] http://nl.wikipedia.org/wiki/Schoolexamen
 .. [#weight] http://www.rijksoverheid.nl/onderwerpen/leerachterstand/vraag-en-antwoord/wat-is-de-gewichtenregeling-in-het-basisonderwijs.html
-

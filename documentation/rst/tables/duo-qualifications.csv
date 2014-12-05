@@ -1,8 +1,8 @@
 Field,Type,Original term,Description
-"qualification_code","integer","Kwalificatie Code",""
+"qualification_code","integer","Kwalificatie Code","Unique code for the program and level"
 "mbo_type","string","Type Mbo",""
-"qualification_level","integer","Kwalificatie Niveau",""
-"qualification_name","string","Kwalificatie Naam",""
+"qualification_level","integer","Kwalificatie Niveau","Qualification Level"
+"qualification_name","string","Kwalificatie Naam","Name for the program and level combination"
 "mbo_sector","string","Mbo Sector",""
 "mbo_industry","string","Bedrijfstak Mbo",""
 "brin_knowledge_centre_mbo","string","Brin Nummer Kenniscentrum","Brin code of the knowledge center associated with this institution"

@@ -1,4 +1,4 @@
 Field,Type,Original term,Description
-"qualification_code","integer","","Qualification Code"
-"participants_male","integer","","Participants Male"
-"participants_female","integer","","Participants Female"
+"qualification_code","integer","","Unique code for the program and level"
+"participants_male","integer","","Number of male participants"
+"participants_female","integer","","Number of female participants"

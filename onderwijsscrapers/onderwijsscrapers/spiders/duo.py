@@ -7,7 +7,7 @@ from os import devnull
 from os.path import basename
 from zipfile import ZipFile
 from collections import defaultdict
-from itertools import islice
+from itertools import islice, chain
 import pprint
 
 import requests
@@ -40,11 +40,14 @@ class DuoSpider(Spider):
 
     def dataset(self, response, make_item, dataset_name, parse_row):
         """
-        Add a dataset to a DUO item
+        Parse a file that has a whole table (not just one value) per DUO item.
+        It adds that dataset as an array of objects.
+        This is a SequenceSchema in validation.
+
         parse_row should return a key (like the tuple (brin, branch_id))
         and one item of the dataset for this brin
 
-        This is a SequenceSchema in validation
+        If `reference_year` is defined in the item, add it for that year.
 
         Args:
            make_item (function): takes a key and returns a DUO item
@@ -61,15 +64,19 @@ class DuoSpider(Spider):
             dataset = {}
             for row in parse_csv_file(csv_url):
                 for key, value in parse_row(row):
-                    if key not in dataset:
-                        dataset[key] = []
-                    dataset[key].append(value)
+                    # Allow separate years
+                    year = value.pop('reference_year', None)
+                    if (year, key) not in dataset:
+                        dataset[(year, key)] = []
+                    dataset[(year, key)].append(value)
 
-            for key, item in dataset.iteritems():
+            for (year, key), item in dataset.iteritems():
                 if key is not None:
                     school = make_item(key)
-                    if 'reference_year' not in key:
+                    if year is None:
                         school['reference_year'] = reference_year
+                    else:
+                        school['reference_year'] = year
                     school['%s_reference_url' % dataset_name] = csv_url
                     school['%s_reference_date' % dataset_name] = reference_date
                     school[dataset_name] = item
@@ -3127,9 +3134,9 @@ class DuoMboInstitutionSpider(DuoSpider):
             'mbo_/adressen/Adressen/instellingen.asp':
                 self.parse_mbo_institutions,
             'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp':
-                self.parse_mbo_qualifications,
-            'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp':
                 self.parse_mbo_participants_gender,
+            'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname8.asp':
+                self.parse_mbo_participants_grade_year,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -3184,11 +3191,15 @@ class DuoMboInstitutionSpider(DuoSpider):
                     mbo_institution_kind = row['MBO INSTELLINGSSOORT - NAAM'],
                     mbo_institution_kind_code = row['MBO INSTELLINGSOORT - CODE'],
                 )
-    
-    def parse_mbo_qualifications(self, response):
+
+    def parse_mbo_participants_gender(self, response):
         """
+        Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
+        Parse "3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
+        
+        For participants per qualification
         """
-        def parse_row(row):
+        def qualifications(row):
             # strip leading and trailing whitespace.
             for key in row.keys():
                 value = (row[key] or '').strip()
@@ -3199,20 +3210,46 @@ class DuoMboInstitutionSpider(DuoSpider):
                 brin = row['BRIN NUMMER']
 
                 yield brin, {
-                    'qualification_code': row['KWALIFICATIE CODE'],
+                    'qualification_code': int(row['KWALIFICATIE CODE']),
                     'mbo_type': row['TYPE MBO'],
-                    'qualification_level': int(row['KWALIFICATIE NIVEAU']),
-                    'qualification_name': int(row['KWALIFICATIE NAAM']),
+                    'qualification_level': int(row['KWALIFICATIENIVEAU']),
+                    'qualification_name': row['KWALIFICATIE NAAM'],
                     'mbo_sector': row['MBO SECTOR'],
                     'mbo_industry': row['BEDRIJFSTAK MBO'],
                     'brin_knowledge_centre_mbo': row['BRIN NUMMER KENNISCENTRUM'],
                     'knowledge_centre_mbo': row['NAAM KENNISCENTRUM'],
                 }
 
-        return self.dataset(response, self.make_item, 'qualifications', parse_row)
+        def gender(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
+            
+            if row['BRIN NUMMER']:
+                brin = row['BRIN NUMMER']
+                for year in [2009, 2010, 2011, 2012, 2013]:
 
-    def parse_mbo_participants_gender(self, response):
+                    m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
+                    if m or f:
+                        yield brin, {
+                            'reference_year': year,
+                            'qualification_code': int(row['KWALIFICATIE CODE']),
+                            'participants_male': m,
+                            'participants_female': f,
+                        }
+
+        return chain(
+            self.dataset(response, self.make_item, 'qualifications', qualifications),
+            self.dataset(response, self.make_item, 'participants_gender_per_qualification', gender)
+        )
+        
+    def parse_mbo_participants_grade_year(self, response):
         """
+        Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
+        Parse "8. Per instelling, bestuur, gemeente, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, verblijfsjaar"
+
         """
         def parse_row(row):
             # strip leading and trailing whitespace.
@@ -3225,13 +3262,15 @@ class DuoMboInstitutionSpider(DuoSpider):
                 brin = row['BRIN NUMMER']
                 for year in [2009, 2010, 2011, 2012, 2013]:
 
-                    yield brin, {
-                        'reference_year': year,
-                        'qualification_code': row['KWALIFICATIE CODE'],
-                        'participants_male': int(row['%s MAN'%year] or 0),
-                        'participants_female': int(row['%s VROUW'%year] or 0),
-                    }
+                    participants = int(row[str(year)] or 0)
+                    if participants:
+                        yield brin, {
+                            'reference_year': year,
+                            'qualification_code': int(row['KWALIFICATIE CODE']),
+                            'grade_year': int(row['VERBLIJFSJAAR MBO']),
+                            'participants': participants,
+                        }
 
-        return self.dataset(response, self.make_item, 'participants_gender_per_qualification', parse_row)
+        return self.dataset(response, self.make_item, 'participants_per_grade_year_and_qualification', parse_row)
         
 
