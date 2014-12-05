@@ -1,0 +1,4 @@
+Field,Type,Original term,Description
+"qualification_code","integer","","Unique code for the program and level"
+"graduates_male","integer","","Number of male graduates"
+"graduates_female","integer","","Number of female graduates"

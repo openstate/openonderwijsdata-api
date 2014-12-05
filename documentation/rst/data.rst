@@ -252,6 +252,17 @@ GradesPerCourse
     :header-rows: 1
     :file: tables/duo-GradesPerCourse.csv
 
+.. _duo-graduates_per_qualification:
+
+graduates_per_qualification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 2, 1, 3, 10
+    :header-rows: 1
+    :file: tables/duo-graduates_per_qualification.csv
+
 .. _duo-graduation:
 
 graduation
@@ -275,17 +286,6 @@ GraudationDepartmentCandidates
     :header-rows: 1
     :file: tables/duo-GraudationDepartmentCandidates.csv
 
-.. _duo-participants_gender_per_qualification:
-
-participants_gender_per_qualification
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. csv-table::
-    :delim: ,
-    :widths: 2, 1, 3, 10
-    :header-rows: 1
-    :file: tables/duo-participants_gender_per_qualification.csv
-
 .. _duo-participants_per_grade_year_and_qualification:
 
 participants_per_grade_year_and_qualification
@@ -296,6 +296,17 @@ participants_per_grade_year_and_qualification
     :widths: 2, 1, 3, 10
     :header-rows: 1
     :file: tables/duo-participants_per_grade_year_and_qualification.csv
+
+.. _duo-participants_per_qualification:
+
+participants_per_qualification
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. csv-table::
+    :delim: ,
+    :widths: 2, 1, 3, 10
+    :header-rows: 1
+    :file: tables/duo-participants_per_qualification.csv
 
 .. _duo-qualifications:
 

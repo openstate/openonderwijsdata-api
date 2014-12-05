@@ -396,10 +396,10 @@ class MboQualifications(SequenceSchema):
         knowledge_centre_mbo = SchemaNode(String(),title="Name of the knowledge center associated with this institution")
         knowledge_centre_mbo.orig = 'Naam Kenniscentrum'
 
-class MboParticipantsGenderPerQualification(SequenceSchema):
+class MboParticipantsPerQualification(SequenceSchema):
     """**Source:** `3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp>`"""
     @colander.instantiate()
-    class participants_gender_per_qualification(MappingSchema):
+    class participants_per_qualification(MappingSchema):
         qualification_code = SchemaNode(Int(), title="Unique code for the program and level")
         participants_male = SchemaNode(Int(), title="Number of male participants")
         participants_female = SchemaNode(Int(), title="Number of female participants")
@@ -413,6 +413,14 @@ class MboParticipantsPerGradeYearAndQualification(SequenceSchema):
         grade_year = SchemaNode(Int(), title="The grade year that the students are in (years of education completed +1)")
         participants = SchemaNode(Int(), title="Number of participants")
 
+
+class MboGraduatesPerQualification(SequenceSchema):
+    """**Source:** `3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp>`"""
+    @colander.instantiate()
+    class graduates_per_qualification(MappingSchema):
+        qualification_code = SchemaNode(Int(), title="Unique code for the program and level")
+        graduates_male = SchemaNode(Int(), title="Number of male graduates")
+        graduates_female = SchemaNode(Int(), title="Number of female graduates")
 
 class DuoAreaSchema(MappingSchema):
     corop_area = general_rules.corop_area( title="A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data." )
@@ -722,10 +730,14 @@ class DuoMboInstitution(DuoAreaSchema, MappingSchema):
     qualifications_reference_url = general_rules.website()
     qualifications_reference_date = SchemaNode(Date(), missing=True)
 
-    participants_gender_per_qualification = MboParticipantsGenderPerQualification(title="The number of students per qualification, per gender")
-    participants_gender_per_qualification_reference_url = general_rules.website(title="URL of the source file.")
-    participants_gender_per_qualification_reference_date = SchemaNode(Date(), missing=True, title="Date the source file was published at http://data.duo.nl")
+    participants_per_qualification = MboParticipantsPerQualification(title="The number of students per qualification, per gender")
+    participants_per_qualification_reference_url = general_rules.website(title="URL of the source file.")
+    participants_per_qualification_reference_date = SchemaNode(Date(), missing=True, title="Date the source file was published at http://data.duo.nl")
 
-    participants_per_grade_year_and_qualification = MboParticipantsPerGradeYearAndQualification(title="The number o    f students per grade year and qualification")
+    participants_per_grade_year_and_qualification = MboParticipantsPerGradeYearAndQualification(title="The number of students per grade year and qualification")
     participants_per_grade_year_and_qualification_reference_url = general_rules.website(title="URL of the source file.")
     participants_per_grade_year_and_qualification_reference_date = SchemaNode(Date(), missing=True, title="Date the source file was published at http://data.duo.nl")
+
+    graduates_per_qualification = MboGraduatesPerQualification(title="The number of graduated students per qualification, per gender")
+    graduates_per_qualification_reference_url = general_rules.website(title="URL of the source file.")
+    graduates_per_qualification_reference_date = SchemaNode(Date(), missing=True, title="Date the source file was published at http://data.duo.nl")

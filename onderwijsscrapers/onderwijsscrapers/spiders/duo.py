@@ -3138,9 +3138,11 @@ class DuoMboInstitutionSpider(DuoSpider):
             'mbo_/adressen/Adressen/instellingen.asp':
                 self.parse_mbo_institutions,
             'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp':
-                self.parse_mbo_participants_gender,
+                self.parse_mbo_participants,
             'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname8.asp':
                 self.parse_mbo_participants_grade_year,
+            'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname12.asp':
+                self.parse_mbo_graduates,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -3197,7 +3199,7 @@ class DuoMboInstitutionSpider(DuoSpider):
                     mbo_institution_kind_code = row['MBO INSTELLINGSOORT - CODE'],
                 )
 
-    def parse_mbo_participants_gender(self, response):
+    def parse_mbo_participants(self, response):
         """
         Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
         Parse "3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
@@ -3247,13 +3249,13 @@ class DuoMboInstitutionSpider(DuoSpider):
                 # Qualifications
                 for brin, value in qualifications(row):
                     if (reference_year, brin) not in dataset:
-                        dataset[(reference_year, brin)] = {'qualifications':[], 'participants':[]}
+                        dataset[(reference_year, brin)] = {'qualifications':[], 'participants_per_qualification':[]}
                     dataset[(reference_year, brin)]['qualifications'].append(value)
                 # Participants
                 for key, value in participants(row):
                     if key not in dataset:
-                        dataset[key] = {'qualifications':[], 'participants':[]}
-                    dataset[key]['participants'].append(value)
+                        dataset[key] = {'qualifications':[], 'participants_per_qualification':[]}
+                    dataset[key]['participants_per_qualification'].append(value)
 
             for (year, key), item in dataset.iteritems():
                 if key is not None:
@@ -3293,4 +3295,31 @@ class DuoMboInstitutionSpider(DuoSpider):
 
         return self.dataset(response, self.make_item, 'participants_per_grade_year_and_qualification', parse_row)
         
+    def parse_mbo_graduates(self, response):
+        """
+        Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
+        Parse "10. Gediplomeerden per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
 
+        """
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
+            
+            if row['BRIN NUMMER']:
+                brin = row['BRIN NUMMER']
+                for year in [2009, 2010, 2011, 2012, 2013]:
+
+                    m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
+                    if m or f:
+                        yield brin, {
+                            'reference_year': year,
+                            'qualification_code': int(row['KWALIFICATIE CODE']),
+                            'graduate_male': m,
+                            'graduate_female': f,
+                        }
+
+        return self.dataset(response, self.make_item, 'graduates_per_qualification', parse_row)
+        
