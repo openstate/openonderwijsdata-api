@@ -49,6 +49,8 @@ class DuoSpider(Spider):
 
         If `reference_year` is defined in the item, add it for that year.
 
+        TODO: generalize for multiple datasets per row
+
         Args:
            make_item (function): takes a key and returns a DUO item
            dataset_name (string): name of the dataset field
@@ -3102,6 +3104,8 @@ class DuoMboBoardSpider(DuoSpider):
 
                 yield DuoMboBoard(
                     reference_year = reference_year,
+                    ignore_id_fields = ['reference_year'],
+
                     board_id = int(row['BEVOEGD GEZAG NUMMER']),
 
                     address = {
@@ -3155,6 +3159,7 @@ class DuoMboInstitutionSpider(DuoSpider):
 
                 yield DuoMboInstitution(
                     reference_year = reference_year,
+                    ignore_id_fields = ['reference_year'],
 
                     brin = row['BRIN NUMMER'],
                     board_id = row['BEVOEGD GEZAG NUMMER'],
@@ -3197,15 +3202,9 @@ class DuoMboInstitutionSpider(DuoSpider):
         Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
         Parse "3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
         
-        For participants per qualification
+        For qualifications and participants per qualification
         """
         def qualifications(row):
-            # strip leading and trailing whitespace.
-            for key in row.keys():
-                value = (row[key] or '').strip()
-                row[key] = value or None
-                row[key.strip()] = value or None
-            
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
 
@@ -3220,30 +3219,51 @@ class DuoMboInstitutionSpider(DuoSpider):
                     'knowledge_centre_mbo': row['NAAM KENNISCENTRUM'],
                 }
 
-        def gender(row):
-            # strip leading and trailing whitespace.
-            for key in row.keys():
-                value = (row[key] or '').strip()
-                row[key] = value or None
-                row[key.strip()] = value or None
-            
+        def participants(row):
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
                 for year in [2009, 2010, 2011, 2012, 2013]:
 
                     m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
                     if m or f:
-                        yield brin, {
-                            'reference_year': year,
+                        yield (year, brin), {
                             'qualification_code': int(row['KWALIFICATIE CODE']),
                             'participants_male': m,
                             'participants_female': f,
                         }
 
-        return chain(
-            self.dataset(response, self.make_item, 'qualifications', qualifications),
-            self.dataset(response, self.make_item, 'participants_gender_per_qualification', gender)
-        )
+        # Two datasets for one file, no fancy abstraction yet
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            dataset = {}
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = (row[key] or '').strip()
+                    row[key] = value or None
+                    row[key.strip()] = value or None
+                # Qualifications
+                for brin, value in qualifications(row):
+                    if (reference_year, brin) not in dataset:
+                        dataset[(reference_year, brin)] = {'qualifications':[], 'participants':[]}
+                    dataset[(reference_year, brin)]['qualifications'].append(value)
+                # Participants
+                for key, value in participants(row):
+                    if key not in dataset:
+                        dataset[key] = {'qualifications':[], 'participants':[]}
+                    dataset[key]['participants'].append(value)
+
+            for (year, key), item in dataset.iteritems():
+                if key is not None:
+                    school = self.make_item(key)
+                    school['reference_year'] = year
+                    for dataset_name in item:
+                        school['%s_reference_url' % dataset_name] = csv_url
+                        school['%s_reference_date' % dataset_name] = reference_date
+                        school[dataset_name] = item[dataset_name]
+                    yield school
         
     def parse_mbo_participants_grade_year(self, response):
         """
