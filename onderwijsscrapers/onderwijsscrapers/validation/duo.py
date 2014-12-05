@@ -415,7 +415,7 @@ class MboParticipantsPerGradeYearAndQualification(SequenceSchema):
 
 
 class MboGraduatesPerQualification(SequenceSchema):
-    """**Source:** `3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp>`"""
+    """**Source:** `10. Gediplomeerden per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname12.asp>`"""
     @colander.instantiate()
     class graduates_per_qualification(MappingSchema):
         qualification_code = SchemaNode(Int(), title="Unique code for the program and level")
