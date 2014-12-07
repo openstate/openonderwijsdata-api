@@ -450,6 +450,8 @@ class DuoVoBoardsSpider(DuoSpider):
                 board['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
                                          row['HUISNUMMER-TOEVOEGING']),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'zip_code': row['POSTCODE'].replace(' ', ''),
                     'city': row['PLAATSNAAM']
                 }
@@ -459,6 +461,8 @@ class DuoVoBoardsSpider(DuoSpider):
                     board['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'])
+                    board['correspondence_address']['street_name'] = row['STRAATNAAM CORRESPONDENTIEADRES']
+                    board['correspondence_address']['street_number'] = row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']
                 else:
                     board['correspondence_address']['street'] = None
 
@@ -656,6 +660,8 @@ class DuoVoSchoolsSpider(DuoSpider):
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
                                          row['HUISNUMMER-TOEVOEGING']),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'city': row['PLAATSNAAM'],
                     'zip_code': row['POSTCODE'].replace(' ', '')
                 }
@@ -664,6 +670,8 @@ class DuoVoSchoolsSpider(DuoSpider):
                     'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                                          row['HUISNUMMER-TOEVOEGING '
                                              'CORRESPONDENTIEADRES']),
+                    'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
                     'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
                 }
@@ -1116,6 +1124,8 @@ class DuoVoBranchesSpider(DuoSpider):
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'].strip(),
                                          row['HUISNUMMER-TOEVOEGING'].strip()),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'city': row['PLAATSNAAM'].strip(),
                     'zip_code': row['POSTCODE'].strip().replace(' ', '')
                 }
@@ -1153,6 +1163,8 @@ class DuoVoBranchesSpider(DuoSpider):
                     school['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'].strip(),
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'].strip())
+                    school['correspondence_address']['street_name'] = row['STRAATNAAM CORRESPONDENTIEADRES']
+                    school['correspondence_address']['street_number'] = row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']
                 else:
                     school['correspondence_address']['street'] = None
 
@@ -1859,6 +1871,8 @@ class DuoPoBoardsSpider(DuoSpider):
                 board['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
                                          row['HUISNUMMER-TOEVOEGING']),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'zip_code': row['POSTCODE'].replace(' ', ''),
                     'city': row['PLAATSNAAM']
                 }
@@ -1868,6 +1882,8 @@ class DuoPoBoardsSpider(DuoSpider):
                     board['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'])
+                    board['correspondence_address']['street_name'] = row['STRAATNAAM CORRESPONDENTIEADRES']
+                    board['correspondence_address']['street_number'] = row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']
                 else:
                     board['correspondence_address']['street'] = None
 
@@ -2092,6 +2108,8 @@ class DuoPoSchoolsSpider(DuoSpider):
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
                                          row['HUISNUMMER-TOEVOEGING']),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'city': row['PLAATSNAAM'],
                     'zip_code': row['POSTCODE'].replace(' ', '')
                 }
@@ -2100,6 +2118,8 @@ class DuoPoSchoolsSpider(DuoSpider):
                     'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                                          row['HUISNUMMER-TOEVOEGING '
                                              'CORRESPONDENTIEADRES']),
+                    'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
                     'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
                 }
@@ -2293,6 +2313,8 @@ class DuoPoBranchesSpider(DuoSpider):
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'].strip(),
                                          row['HUISNUMMER-TOEVOEGING'].strip()),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'city': row['PLAATSNAAM'].strip(),
                     'zip_code': row['POSTCODE'].strip().replace(' ', '')
                 }
@@ -2324,6 +2346,8 @@ class DuoPoBranchesSpider(DuoSpider):
                     school['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'].strip(),
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'].strip())
+                    school['correspondence_address']['street_name'] = row['STRAATNAAM CORRESPONDENTIEADRES']
+                    school['correspondence_address']['street_number'] = row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']
                 else:
                     school['correspondence_address']['street'] = None
 
@@ -3118,6 +3142,8 @@ class DuoMboBoardSpider(DuoSpider):
                     correspondence_address = {
                         'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                                              row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                        'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
                         'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
                         'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
                     },
@@ -3170,6 +3196,8 @@ class DuoMboInstitutionSpider(DuoSpider):
                     correspondence_address =  {
                         'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                                              row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                        'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
                         'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
                         'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
                     },
@@ -3203,7 +3231,7 @@ class DuoMboInstitutionSpider(DuoSpider):
         """
         Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
         Parse "3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
-        
+
         For qualifications and participants per qualification
         """
         def qualifications(row):
@@ -3266,7 +3294,7 @@ class DuoMboInstitutionSpider(DuoSpider):
                         school['%s_reference_date' % dataset_name] = reference_date
                         school[dataset_name] = item[dataset_name]
                     yield school
-        
+
     def parse_mbo_participants_grade_year(self, response):
         """
         Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
@@ -3279,7 +3307,7 @@ class DuoMboInstitutionSpider(DuoSpider):
                 value = (row[key] or '').strip()
                 row[key] = value or None
                 row[key.strip()] = value or None
-            
+
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
                 for year in [2009, 2010, 2011, 2012, 2013]:
@@ -3294,7 +3322,7 @@ class DuoMboInstitutionSpider(DuoSpider):
                         }
 
         return self.dataset(response, self.make_item, 'participants_per_grade_year_and_qualification', parse_row)
-        
+
     def parse_mbo_graduates(self, response):
         """
         Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
@@ -3307,7 +3335,7 @@ class DuoMboInstitutionSpider(DuoSpider):
                 value = (row[key] or '').strip()
                 row[key] = value or None
                 row[key.strip()] = value or None
-            
+
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
                 for year in [2009, 2010, 2011, 2012, 2013]:
@@ -3322,4 +3350,3 @@ class DuoMboInstitutionSpider(DuoSpider):
                         }
 
         return self.dataset(response, self.make_item, 'graduates_per_qualification', parse_row)
-        
