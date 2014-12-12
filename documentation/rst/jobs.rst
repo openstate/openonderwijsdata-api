@@ -66,7 +66,7 @@ The fields in the JobFeed dataset are described below. These are temporarily onl
 API
 ---
 
-.. http:get:: /api/v1/search
+.. http:get:: /api/v2/job_search
 
    Search for multiple document types across multiple indexes. By default we search in all indexes for all available document types.
 
@@ -135,7 +135,7 @@ API
         ]
       }
 
-.. http:get:: /api/v1/get_document/(str:index)/(str:doctype)/(str:doc_id)
+.. http:get:: /api/v2/job_doc/(str:index)/(str:doctype)/(str:doc_id)
 
    This method can be used to retrieve a single document, provided that you know the document's index, type and id.
 
