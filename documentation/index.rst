@@ -13,6 +13,7 @@ OpenOnderwijs API Documentation
 
    rst/introduction
    rst/data
+   rst/jobs
    rst/validation
    rst/api
    rst/todo
