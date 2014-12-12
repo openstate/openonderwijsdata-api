@@ -4,6 +4,8 @@ from flask.ext.restful import abort, reqparse
 import rawes
 import re
 
+from jobfeed import JobFeed
+
 from settings import (ES_URL, ES_INDEXES, ES_DOCUMENT_TYPES_PER_INDEX,
                       ES_DOCUMENT_TYPES, ES_VALIDATION_RESULTS_INDEX)
 
@@ -11,6 +13,9 @@ app = Flask(__name__)
 api = restful.Api(app)
 
 es = rawes.Elastic(ES_URL)
+
+# Add the jobfeed endpoints
+jobfeed = JobFeed(api)
 
 def get_alias_from_index(index_name):
     """ The indexes are named as `alias_suffix` """
@@ -404,6 +409,8 @@ api.add_resource(Search, '/api/v1/search')
 api.add_resource(GetDocument, '/api/v1/get_document/<index>/<doc_type>/<doc_id>')
 api.add_resource(GetValidationResults, '/api/v1/get_validation_results/'
                                        '<index>/<doc_type>/<doc_id>')
+
+
 
 
 if __name__ == "__main__":
