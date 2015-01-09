@@ -450,17 +450,23 @@ class ExportTable(restful.Resource):
 
         # get nested keys from mapping
         mapping = es.get('%s/%s/_mapping'% (index, doc_type))
-        mapping = mapping[mapping.keys()[0]]['mappings'][doc_type]
-        def maptree(t, nest):
-            for n, prop in t['properties'].iteritems():
-                if 'properties' in prop:
-                    for m in maptree(prop, nest+[n]):
-                        yield m
-                else:
-                    yield nest+[n]
-        keys = ['.'.join(k) for k in maptree(mapping, []) if (k[0] in keys) or not keys]
+        if mapping.keys():
+            mapping = mapping[mapping.keys()[0]]['mappings'][doc_type]
+            def maptree(t, nest):
+                for n, prop in t['properties'].iteritems():
+                    if 'properties' in prop:
+                        for m in maptree(prop, nest+[n]):
+                            yield m
+                    else:
+                        yield nest+[n]
+            keys = ['.'.join(k) for k in maptree(mapping, []) if (k[0] in keys) or not keys]
+        else:
+            keys = []
 
         tree = es.get('%s/%s/_search'% (index, doc_type), data=query)
+        if not tree['hits']['hits']:
+            abort(400, message='No documents of type "%s" in index "%s"'
+                               % (doc_type, index))
 
         if filetype == 'json':
             tree = [hit['_source'] for hit in tree['hits']['hits']]
