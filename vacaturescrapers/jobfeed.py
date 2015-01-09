@@ -25,13 +25,17 @@ for job in islice(jobs, None):
 	for f in job:
 		text = f.text
 		if text is not None:
-			if any(s in f.tag for s in ['possible_startersjob']):
-				text = bool(text)
-			if any(s in f.tag for s in ['_id','_min','_max']) or f.tag=='sic':
-				text = int(text)
-			if f.tag in ['expired_at', 'date']:
-				text = datetime.strptime( text, "%Y-%m-%d" )
-			body[f.tag] = text
+			try:
+				if any(s in f.tag for s in ['possible_startersjob']):
+					text = bool(text)
+				if any(s in f.tag for s in ['_id','_min','_max']) or f.tag=='sic':
+					text = int(float(text))
+				if f.tag in ['expired_at', 'date']:
+					text = datetime.strptime( text, "%Y-%m-%d" )
+				body[f.tag] = text
+			except:
+				pass
+			
 	es.index(index=index, doc_type='job', body=body)
 
 esi = elasticsearch.client.IndicesClient(es)
