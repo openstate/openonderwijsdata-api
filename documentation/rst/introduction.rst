@@ -89,6 +89,8 @@ Access data
 --------------------------------
 The :doc:`api` section describes how the data in the OpenOnderwijs API can be accessed through a REST interface.
 
+The data is also available for export. Through ``http://api.openonderwijsdata.nl/export/<index>/<doc_type>.<filetype>``, you can download the data in different formats. With the ``fields`` parameter, you can filter with a comma-separated list of the fields that you want. For instance, http://api.openonderwijsdata.nl/export/duo/po_board.csv?fields=board_id,name gives you the names of the Primary Education Boards from the DUO data source, in comma-separated value format.
+
 Alternatively, `Mark Marijnissen <http://www.madebymark.nl/>`_ made a tool available on GitHub (https://github.com/markmarijnissen/openonderwijs-csv) that pulls data from the API and merges that data into CSV files.
 
 API features
