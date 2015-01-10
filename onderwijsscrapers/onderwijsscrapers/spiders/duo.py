@@ -3206,7 +3206,7 @@ class DuoMboInstitutionSpider(DuoSpider):
                     denomination = row['DENOMINATIE'],
                     municipality = row['GEMEENTENAAM'],
                     municipality_code = int(row['GEMEENTENUMMER']),
-                    adress = {
+                    address = {
                         'street': '%s %s' % (row['STRAATNAAM'],
                                              row['HUISNUMMER-TOEVOEGING']),
                         'zip_code': row['POSTCODE'].replace(' ', ''),
@@ -3398,7 +3398,7 @@ class DuoHoInstitutionsSpider(DuoSpider):
                     denomination = row['DENOMINATIE'],
                     municipality = row['GEMEENTENAAM'],
                     municipality_code = int(row['GEMEENTENUMMER']),
-                    adress = {
+                    address = {
                         'street': '%s %s' % (row['STRAATNAAM'],
                                              row['HUISNUMMER-TOEVOEGING']),
                         'zip_code': row['POSTCODE'].replace(' ', ''),
