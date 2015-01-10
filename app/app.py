@@ -149,6 +149,24 @@ def index():
         "size": 0
     })
 
+    counts['duo_ho_boards'] = es.get('duo/ho_board/_search', data={
+        "facets": {
+            "years": {
+                "terms": {"field": "reference_year", "order": "term"}
+            }
+        },
+        "size": 0
+    })
+
+    counts['duo_ho_institutions'] = es.get('duo/ho_institution/_search', data={
+        "facets": {
+            "years": {
+                "terms": {"field": "reference_year", "order": "term"}
+            }
+        },
+        "size": 0
+    })
+
     type_names = {
         'po_board': 'Boards (primary)',
         'vo_board': 'Boards (secondary)',
@@ -159,7 +177,8 @@ def index():
         'pao_collaboration': 'Collaborations (special)',
         'mbo_board': 'Boards (vocational)',
         'mbo_institution': 'Institutions (vocational)',
-
+        'ho_board': 'Boards (vocational)',
+        'ho_institution': 'Institutions (vocational)',
     }
 
     return render_template('index.html', counts=counts, type_names=type_names)
@@ -357,7 +376,7 @@ class GetDocument(restful.Resource):
         if doc_type not in ES_DOCUMENT_TYPES_PER_INDEX[index]:
             abort(400, message='Doctype "%s" does not exist in index "%s"'
                                % (doc_type, index))
- 
+
         try:
             doc = es.get('%s/%s/%s' % (index, doc_type, doc_id))
         except rawes.elastic_exception.ElasticException, error:
