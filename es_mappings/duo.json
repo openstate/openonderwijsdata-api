@@ -2668,5 +2668,203 @@
         }
       }
     }
+    {
+    "ho_institution": {
+        "properties": {
+            "adress": {
+                "properties": {
+                    "city": {
+                        "type": "string"
+                    },
+                    "street": {
+                        "type": "string"
+                    },
+                    "zip_code": {
+                        "type": "string"
+                    }
+                }
+            },
+            "board_id": {
+                "type": "string"
+            },
+            "brin": {
+                "type": "string"
+            },
+            "corop_area": {
+                "type": "string"
+            },
+            "corop_area_code": {
+                "type": "long"
+            },
+            "correspondence_address": {
+                "properties": {
+                    "city": {
+                        "type": "string"
+                    },
+                    "street": {
+                        "type": "string"
+                    },
+                    "street_name": {
+                        "type": "string"
+                    },
+                    "street_number": {
+                        "type": "string"
+                    },
+                    "zip_code": {
+                        "type": "string"
+                    }
+                }
+            },
+            "denomination": {
+                "type": "string"
+            },
+            "education_area": {
+                "type": "string"
+            },
+            "education_area_code": {
+                "type": "long"
+            },
+            "ho_type": {
+                "type": "string"
+            },
+            "meta": {
+                "properties": {
+                    "item_scraped_at": {
+                        "type": "date",
+                        "format": "dateOptionalTime"
+                    },
+                    "scrape_started_at": {
+                        "type": "date",
+                        "format": "dateOptionalTime"
+                    }
+                }
+            },
+            "municipality": {
+                "type": "string"
+            },
+            "municipality_code": {
+                "type": "long"
+            },
+            "name": {
+                "type": "string"
+            },
+            "nodal_area": {
+                "type": "string"
+            },
+            "nodal_area_code": {
+                "type": "long"
+            },
+            "phone": {
+                "type": "string"
+            },
+            "reference_year": {
+                "type": "long"
+            },
+            "rmc_region": {
+                "type": "string"
+            },
+            "rmc_region_code": {
+                "type": "long"
+            },
+            "rpa_area": {
+                "type": "string"
+            },
+            "rpa_area_code": {
+                "type": "long"
+            },
+            "website": {
+                "type": "string"
+            },
+            "wgr_area": {
+                "type": "string"
+            },
+            "wgr_area_code": {
+                "type": "long"
+            }
+        }
+    },
+    "ho_board": {
+        "properties": {
+            "address": {
+                "properties": {
+                    "city": {
+                        "type": "string"
+                    },
+                    "street": {
+                        "type": "string"
+                    },
+                    "zip_code": {
+                        "type": "string"
+                    }
+                }
+            },
+            "administrative_office_id": {
+                "type": "long"
+            },
+            "board_id": {
+                "type": "long"
+            },
+            "correspondence_address": {
+                "properties": {
+                    "city": {
+                        "type": "string"
+                    },
+                    "street": {
+                        "type": "string"
+                    },
+                    "street_name": {
+                        "type": "string"
+                    },
+                    "street_number": {
+                        "type": "string"
+                    },
+                    "zip_code": {
+                        "type": "string"
+                    }
+                }
+            },
+            "denomination": {
+                "type": "string"
+            },
+            "meta": {
+                "properties": {
+                    "item_scraped_at": {
+                        "type": "date",
+                        "format": "dateOptionalTime"
+                    },
+                    "scrape_started_at": {
+                        "type": "date",
+                        "format": "dateOptionalTime"
+                    },
+                    "validated_at": {
+                        "type": "date",
+                        "format": "dateOptionalTime"
+                    },
+                    "validation_result": {
+                        "type": "string"
+                    }
+                }
+            },
+            "municipality": {
+                "type": "string"
+            },
+            "municipality_code": {
+                "type": "long"
+            },
+            "name": {
+                "type": "string"
+            },
+            "phone": {
+                "type": "string"
+            },
+            "reference_year": {
+                "type": "long"
+            },
+            "website": {
+                "type": "string"
+            }
+        }
+    }
+    }
   }
 }

@@ -17,7 +17,9 @@ from scrapy.http import Request
 
 from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
                                      DuoPoBoard, DuoPoSchool, DuoPoBranch,
-                                     DuoPaoCollaboration, DuoMboBoard, DuoMboInstitution)
+                                     DuoPaoCollaboration, DuoMboBoard, DuoMboInstitution,
+                                     DuoHoBoard, DuoHoInstitution
+                                     )
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
@@ -3350,3 +3352,129 @@ class DuoMboInstitutionSpider(DuoSpider):
                         }
 
         return self.dataset(response, self.make_item, 'graduates_per_qualification', parse_row)
+
+class DuoHoInstitutionsSpider(DuoSpider):
+    name = 'duo_ho_institutions'
+
+    def __init__(self, *args, **kwargs):
+        self.make_item = lambda (brin): DuoHoInstitution(brin=brin)
+        self.requests = {
+            'ho/adressen_ho/adressen/adressen_instellingen.asp':
+                self.parse_hbo_university_addresses,
+            # 'ho/adressen_ho/adressen/pabo.asp':
+            #     self.parse_pabo_addresses,
+        }
+        DuoHoSpider.__init__(self, *args, **kwargs)
+
+    def parse_hbo_university_addresses(self, response):
+        """
+        Parse: "01. Adressen hbo instellingen en universiteiten"
+        """
+
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                yield DuoHoInstitution(
+                    reference_year = reference_year,
+                    ignore_id_fields = ['reference_year'],
+                    ho_type = row['SOORT HO'],
+                    brin = row['BRIN NUMMER'],
+                    board_id = row['BEVOEGD GEZAG NUMMER'],
+                    corop_area = row['COROPGEBIED NAAM'],
+                    corop_area_code = int(row['COROPGEBIED CODE']),
+                    correspondence_address =  {
+                        'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                                             row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                        'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
+                        'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
+                        'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
+                    },
+                    denomination = row['DENOMINATIE'],
+                    municipality = row['GEMEENTENAAM'],
+                    municipality_code = int(row['GEMEENTENUMMER']),
+                    adress = {
+                        'street': '%s %s' % (row['STRAATNAAM'],
+                                             row['HUISNUMMER-TOEVOEGING']),
+                        'zip_code': row['POSTCODE'].replace(' ', ''),
+                        'city': row['PLAATSNAAM']
+                    },
+                    name = row['INSTELLINGSNAAM'],
+                    nodal_area = row['NODAAL GEBIED NAAM'],
+                    nodal_area_code = int(row['NODAAL GEBIED CODE']),
+                    education_area = row['ONDERWIJSGEBIED NAAM'],
+                    education_area_code = int(row['ONDERWIJSGEBIED CODE']),
+                    rpa_area = row['RPA-GEBIED NAAM'],
+                    rpa_area_code = int(row['RPA-GEBIED CODE']),
+                    rmc_region = row['RMC-REGIO NAAM'],
+                    rmc_region_code = int(row['RMC-REGIO CODE']),
+                    phone = row['TELEFOONNUMMER'],
+                    website = row['INTERNETADRES'],
+                    wgr_area = row['WGR-GEBIED NAAM'],
+                    wgr_area_code = int(row['WGR-GEBIED CODE']),
+                )
+
+    def parse_pabo_addresses(self, response):
+        """
+        Parse: "02. Adressen pabo instellingen"
+        """
+
+        return self.dataset(response, self.make_item, 'dropouts_per_year', parse_row)
+
+class DuoHoBoardsSpider(DuoSpider):
+    name = 'duo_ho_boards'
+
+    def __init__(self, *args, **kwargs):
+        self.make_item = lambda (board_id): DuoHoBoard(board_id=board_id)
+        self.requests = {
+            'ho/adressen_ho/adressen/adressen_bg.asp':
+                self.parse_ho_boards
+        }
+        DuoHoSpider.__init__(self, *args, **kwargs)
+
+    def parse_ho_boards(self, response):
+        """
+        Hoger onderwijs > Adressen > Adressen
+        Parse "03. Adressen bevoegde gezagen"
+        """
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                yield DuoHoBoard(
+                    reference_year = reference_year,
+                    ignore_id_fields = ['reference_year'],
+
+                    board_id = int(row['BEVOEGD GEZAG NUMMER']),
+
+                    address = {
+                        'street': '%s %s' % (row['STRAATNAAM'],
+                                             row['HUISNUMMER-TOEVOEGING']),
+                        'zip_code': row['POSTCODE'].replace(' ', ''),
+                        'city': row['PLAATSNAAM']
+                    },
+                    administrative_office_id = int_or_none(row['ADMINISTRATIEKANTOORNUMMER']),
+                    correspondence_address = {
+                        'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                                             row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                        'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
+                        'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
+                        'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
+                    },
+                    denomination = row['DENOMINATIE'],
+                    municipality = row['GEMEENTENAAM'],
+                    municipality_code = int(row['GEMEENTENUMMER']) if row['GEMEENTENUMMER'] != '' else '',
+                    name = row['BEVOEGD GEZAG NAAM'],
+                    phone = row['TELEFOONNUMMER'],
+                    website = row['INTERNETADRES'],
+                )

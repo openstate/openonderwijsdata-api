@@ -20,6 +20,8 @@ DuoPoBranch = FlexibleItem
 DuoPaoCollaboration = FlexibleItem
 DuoMboBoard = FlexibleItem
 DuoMboInstitution = FlexibleItem
+DuoHoBoard = FlexibleItem
+DuoHoInstitution = FlexibleItem
 
 OCWPoBranch = FlexibleItem
 DANSVoBranch = FlexibleItem
