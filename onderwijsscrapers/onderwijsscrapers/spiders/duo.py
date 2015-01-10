@@ -3364,7 +3364,7 @@ class DuoHoInstitutionsSpider(DuoSpider):
             # 'ho/adressen_ho/adressen/pabo.asp':
             #     self.parse_pabo_addresses,
         }
-        DuoHoSpider.__init__(self, *args, **kwargs)
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_hbo_university_addresses(self, response):
         """
@@ -3435,7 +3435,7 @@ class DuoHoBoardsSpider(DuoSpider):
             'ho/adressen_ho/adressen/adressen_bg.asp':
                 self.parse_ho_boards
         }
-        DuoHoSpider.__init__(self, *args, **kwargs)
+        DuoSpider.__init__(self, *args, **kwargs)
 
     def parse_ho_boards(self, response):
         """
