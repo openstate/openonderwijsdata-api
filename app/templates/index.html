@@ -91,12 +91,30 @@
 			</ul>
 			<li><span><abbr title="Mbo Instellingen">Mbo Institutions</abbr></span></li>
 			<ul>
-			{% for year in counts['duo_mbo_institutions']['facets']['years']['terms'] %}
+				{% for year in counts['duo_mbo_institutions']['facets']['years']['terms'] %}
+					<li>
+						<span>{{ year['term'] }}</span>
+						<span class="badge pull-right">{{ year['count'] }}</span>
+					</li>
+				{% endfor %}
+			</ul>
+			<li><span><abbr title="Hoger Onderwijs Bevoegde Gezagen">Ho Boards</abbr></span></li>
+			<ul>
+				{% for year in counts['duo_ho_boards']['facets']['years']['terms'] %}
 				<li>
 					<span>{{ year['term'] }}</span>
 					<span class="badge pull-right">{{ year['count'] }}</span>
 				</li>
-			{% endfor %}
+				{% endfor %}
+			</ul>
+			<li><span><abbr title="Hoger Onderwijs Instellingen">Ho Institutions</abbr></span></li>
+			<ul>
+				{% for year in counts['duo_ho_institutions']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+				{% endfor %}
 			</ul>
 		</ul>
 	</div>
