@@ -22,7 +22,7 @@ from colander import (MappingSchema, SequenceSchema, SchemaNode, String, Int,
     Length, Range, Date, Invalid, Float, Boolean, OneOf)
 import colander
 import general_rules
-from onderwijsscrapers.codebooks import Codebook
+from onderwijsscrapers.codebooks import Codebook, load_codebook
 
 class FinancialKeyIndicatorsPerYear(SequenceSchema):
     @colander.instantiate()
@@ -480,13 +480,13 @@ class DuoVoBoard(MappingSchema):
     vavo_students_reference_date = SchemaNode(Date(), missing=True)
     # vavo_students = VavoStudents()
     vavo_students = Codebook([
-        {'field':'board_id', 'keyed':'0', 'source':'BEVOEGD GEZAG NUMMER','type':'int'},
-        {'field':'vavo', 'keyed':'', 'source':'AANTAL LEERLINGEN','type':'int'},
+        {'field':'board_id', 'keyed':'0', 'source':'BEVOEGD GEZAG NUMMER','type':'int', 'description':''},
+        {'field':'vavo', 'keyed':'', 'source':'AANTAL LEERLINGEN','type':'int', 'description':''},
     ]).schema(description='Vavo students source bla bla')
 
     staff_reference_url = general_rules.website()
     staff_reference_date = SchemaNode(Date(), missing=True)
-    # staff = CodebookSchema('duo/vo_boards_staff.csv')
+    staff = load_codebook('duo/vo_boards_staff').schema()
 
 
 class DuoVoSchool(DuoAreaSchema, MappingSchema):
@@ -693,3 +693,18 @@ class DuoMboInstitution(DuoAreaSchema, MappingSchema):
     # participants_per_grade_year_and_qualification = CodebookSchema('duo/mbo_participants_grade.csv')
     participants_per_grade_year_and_qualification_reference_url = general_rules.website()
     participants_per_grade_year_and_qualification_reference_date = SchemaNode(Date(), missing=True)
+
+if __name__ == '__main__':
+    import sys, inspect
+
+    def print_schema(sch, n=0):
+        if inspect.isclass(sch):
+            sch = sch()
+        print ' '*n, sch.name, '(%s)' % type(sch.typ).__name__
+        for s in sch:
+            if type(sch.typ).__name__ in ['Mapping', 'Sequence']:
+                print_schema(s, n+1)
+
+    for s in [DuoPoBoard, DuoPoSchool, DuoPoBranch, DuoVoBoard, DuoVoSchool, DuoVoBranch]:
+        print s.__name__
+        print_schema(s)

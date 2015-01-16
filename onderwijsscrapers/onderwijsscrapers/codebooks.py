@@ -1,16 +1,21 @@
 from collections import namedtuple, defaultdict, OrderedDict
-import csv, StringIO
+import csv, StringIO, os
 import colander
 from colander import SchemaNode
 import re
 from onderwijsscrapers.groupnested import GroupNested
+
+def load_codebook(path):
+    path = os.path.join('codebooks', '%s.csv'%path)
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+    return Codebook(csv.DictReader(open(path), delimiter=';'))
 
 default_datatypes = {
     'int': (int, colander.Int()), 
     'float': (float, colander.Float()), 
     'string': (str, colander.String())
 }
-class Field(namedtuple('Field', ['keyed','source','cast', 'typ'])):
+class Field(namedtuple('Field', ['keyed','source','cast', 'typ', 'description'])):
     __slots__ = ()
     def get_value(self, v):
         """ Transform a value with a regex and type it """
@@ -26,7 +31,10 @@ class Codebook(dict):
     def __init__(self, field_dicts, datatypes=default_datatypes):
         # Load the fields file
         for rule in field_dicts:
-            rule['cast'], rule['typ'] = datatypes[rule.pop('type', 'string')]
+            typ = rule.pop('type', 'string')
+            if typ not in datatypes:
+                typ = 'string'
+            rule['cast'], rule['typ'] = datatypes[typ]
             name = rule.pop('field', None)
             if '.' in name:
                 name = tuple(name.split('.'))
@@ -155,9 +163,9 @@ if __name__ == '__main__':
             if type(sch.typ).__name__ in ['Mapping', 'Sequence']:
                 print_schema(s, n+1)
 
-    book = """field;keyed;source;type
-board_id;0;BEVOEGD GEZAG NUMMER;int
-vavo;;AANTAL LEERLINGEN;int
+    book = """field;keyed;source;type;description
+board_id;0;BEVOEGD GEZAG NUMMER;int;
+vavo;;AANTAL LEERLINGEN;int;
 """
     table = """BEVOEGD GEZAG NUMMER;AANTAL LEERLINGEN
 1;10
@@ -172,12 +180,12 @@ vavo;;AANTAL LEERLINGEN;int
         print l
 
     # artificial
-    book = """field;keyed;source;type
-board_id;0;BEVOEGD GEZAG NUMMER;int
-reference_year;0;JAAR;int
-student_year;1;LEERJAAR;int
-vavo;;AANTAL LEERLINGEN;int
-non_vavo;;NIET VAVO;int
+    book = """field;keyed;source;type;description
+board_id;0;BEVOEGD GEZAG NUMMER;int;
+reference_year;0;JAAR;int;
+student_year;1;LEERJAAR;int;
+vavo;;AANTAL LEERLINGEN;int;
+non_vavo;;NIET VAVO;int;
 """
     table = """BEVOEGD GEZAG NUMMER;JAAR;LEERJAAR;AANTAL LEERLINGEN;NIET VAVO
 1;2014;1;10;40
@@ -190,3 +198,8 @@ non_vavo;;NIET VAVO;int
     t = csv.reader(StringIO.StringIO(table), delimiter=';')
     for l in cb.parse(next(t), t):
         print l
+
+    if sys.argv[1]:
+        cb = load_codebook(sys.argv[1])
+        print cb
+        print_schema(cb.schema(root=True))

@@ -551,26 +551,10 @@ class DuoVoBoardsSpider(DuoSpider):
 
         return self.dataset(response, self.make_item, 'financial_key_indicators_per_year', parse_row)
 
-    # def parse_vavo_students(self, response):
-    #     """
-    #     Primair onderwijs > Leerlingen
-    #     Parse "04 Leerlingen per bestuur en denominatie (vavo apart)"
-    #     """
-
-    #     def parse_row(row):
-    #         board_id = int(row['BEVOEGD GEZAG NUMMER'].strip())
-    #         vavo_students = {
-    #             'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
-    #             'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
-    #         }
-    #         yield board_id, vavo_students
-
-    #     return self.dataset(response, self.make_item, 'vavo_students', parse_row)
-    
     def parse_vavo_students(self, response):
         codebook = Codebook([
-            {'field':'board_id', 'keyed':'0', 'source':'BEVOEGD GEZAG NUMMER','type':'int'},
-            {'field':'vavo', 'keyed':'', 'source':'AANTAL LEERLINGEN','type':'int'},
+            {'field':'board_id', 'keyed':'0', 'source':'BEVOEGD GEZAG NUMMER','type':'int', 'description':''},
+            {'field':'vavo', 'keyed':'', 'source':'AANTAL LEERLINGEN','type':'int', 'description':''},
         ])
         return self.codebook_dataset(response, self.make_item, 'vavo_students', codebook)
 
@@ -1976,7 +1960,6 @@ class DuoPoBoardsSpider(DuoSpider):
                 yield board_id, indicators
 
         return self.dataset(response, self.make_item, 'financial_key_indicators_per_year', parse_row)
-
 
     def parse_po_education_type(self, response):
         """
