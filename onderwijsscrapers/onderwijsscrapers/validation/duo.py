@@ -18,13 +18,11 @@ DUO publishes many different datasets, each of these datasets has a different "r
 .. _`Cluster`: http://data.duo.nl/includes/navigatie/openbare_informatie/waargebruikt.asp?item=Cluster
 
 """
-from glob import glob
-import json
 from colander import (MappingSchema, SequenceSchema, SchemaNode, String, Int,
     Length, Range, Date, Invalid, Float, Boolean, OneOf)
 import colander
 import general_rules
-
+from onderwijsscrapers.codebooks import Codebook
 
 class FinancialKeyIndicatorsPerYear(SequenceSchema):
     @colander.instantiate()
@@ -471,15 +469,24 @@ class DuoVoBoard(MappingSchema):
     administrative_office_id = SchemaNode(Int(),  title="Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances.")
     administrative_office_id.orig = "Administratiekantoor"
     denomination = general_rules.denomination( title="In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.")
-    financial_key_indicators_per_year_reference_date = SchemaNode(Date(),  title="Date the financial key indicator source file was published at http://data.duo.nl", missing=True)
-    financial_key_indicators_per_year_reference_date.orig = "Peiljaar"
     reference_year = general_rules.reference_year( title="Year the boards source file was published")
     reference_year.orig = "Peiljaar"
     website = general_rules.website( title="URL of the webpage of the board.")
 
+    financial_key_indicators_per_year_reference_date = SchemaNode(Date(),  title="Date the financial key indicator source file was published at http://data.duo.nl", missing=True)
+    financial_key_indicators_per_year_reference_date.orig = "Peiljaar"
+
     vavo_students_reference_url = general_rules.website()
     vavo_students_reference_date = SchemaNode(Date(), missing=True)
-    vavo_students = VavoStudents()
+    # vavo_students = VavoStudents()
+    vavo_students = Codebook([
+        {'field':'board_id', 'keyed':'0', 'source':'BEVOEGD GEZAG NUMMER','type':'int'},
+        {'field':'vavo', 'keyed':'', 'source':'AANTAL LEERLINGEN','type':'int'},
+    ]).schema(description='Vavo students source bla bla')
+
+    staff_reference_url = general_rules.website()
+    staff_reference_date = SchemaNode(Date(), missing=True)
+    # staff = CodebookSchema('duo/vo_boards_staff.csv')
 
 
 class DuoVoSchool(DuoAreaSchema, MappingSchema):
@@ -683,3 +690,6 @@ class DuoMboInstitution(DuoAreaSchema, MappingSchema):
     mbo_institution_kind_code = SchemaNode(String())
     website = general_rules.website( title="Website of this institution.")
 
+    # participants_per_grade_year_and_qualification = CodebookSchema('duo/mbo_participants_grade.csv')
+    participants_per_grade_year_and_qualification_reference_url = general_rules.website()
+    participants_per_grade_year_and_qualification_reference_date = SchemaNode(Date(), missing=True)

@@ -46,6 +46,7 @@ def validate(validation_schema, index, doctype, doc_id, item):
 def generate_documentation(schema, mappinglink = '%s'):
     """ Generate docs that describe the schema """
     name = schema.__name__ if inspect.isclass(schema) else schema.name
+
     doc = ''
     if schema.__doc__:
         doc += schema.__doc__ + '\n'
@@ -55,29 +56,30 @@ def generate_documentation(schema, mappinglink = '%s'):
 
     # Build the table for this schema    
     table = 'Field,Type,Original term,Description\n'
-    # this typ=None is not working
-    # needs robust way to deal with schemas defined at run-time
     schema = schema(typ=None) if inspect.isclass(schema) else schema
     for field in schema:
-        orig = field.orig if hasattr(field, 'orig') else ''
+        orig = getattr(field, 'orig', '')
         typ = type(field.typ).__name__
         typname = ''
         if typ == 'Sequence':
             field = next(f for f in field) # should be only one
             typ = type(field.typ).__name__
-
             typname = 'array of '
-            if typ != 'Mapping':
-                typname += '%s (%s)' % (field.name, typ)
-        if typ == 'Mapping':
-            typname += mappinglink % field.__class__.__name__
-            subdocs, subtables = generate_documentation(field.__class__, mappinglink=mappinglink)
 
+        if typ == 'Mapping':
+            # if it's a specialized class, recurse into the class
+            # but for the generic class, recurse into the instance
+            if field.__class__.__name__ == 'SchemaNode':
+                typname += mappinglink % field.name
+                recurse = field
+            else:
+                typname += mappinglink % field.__class__.__name__
+                recurse = field.__class__
+            subdocs, subtables = generate_documentation(recurse, mappinglink=mappinglink)
             tables = dict(tables.items() + subtables.items())
             docs = dict(docs.items() + subdocs.items())
-
-        if not typname:
-            typname = typ.lower()
+        else:
+            typname += typ.lower()
 
         table +=  '"%s"\n'% '","'.join([field.name, typname, orig, field.title])
 

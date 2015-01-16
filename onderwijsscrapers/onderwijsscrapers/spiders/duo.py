@@ -43,6 +43,12 @@ class DuoSpider(Spider):
     def dataset(self, response, make_item, dataset_name, parse_row):
         """
         Add a dataset to a DUO item
+        Parse a file that has a whole table (not just one value) per DUO item.
+        So for example, for every school it has students per level, or something per year.
+        Or just possibly multiple values (so it can be used as single nesting).
+        It adds that dataset as an array of objects.
+        This is a SequenceSchema in validation.
+
         parse_row should return a key (like the tuple (brin, branch_id))
         and one item of the dataset for this brin
 
@@ -76,7 +82,25 @@ class DuoSpider(Spider):
                     school[dataset_name] = item
                     yield school
 
+    def codebook_dataset(self, response, make_item, dataset_name, codebook):
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
 
+            csv_file = requests.get(csv_url)
+            csv_file.encoding = 'cp1252'
+            csv_file = csv.reader(cStringIO.StringIO(csv_file.content
+                          .decode('cp1252').encode('utf8')), delimiter=';')
+
+            for key, dataset in codebook.parse(next(csv_file), csv_file):
+                if key is not None:
+                    item = self.make_item(**key)
+                    if 'reference_year' not in item:
+                        item['reference_year'] = reference_year
+                    item['%s_reference_url' % dataset_name] = csv_url
+                    item['%s_reference_date' % dataset_name] = reference_date
+                    item[dataset_name] = dataset
+                    yield item
 
 def find_available_datasets(response, extension='csv'):
     """ Get all URLS of files with a certain extension on the DUO page """
@@ -413,14 +437,14 @@ class DuoVoBoardsSpider(DuoSpider):
         self.requests = {
             'vo/adressen/Adressen/besturen.asp':
                 self.parse_boards,
-            'vo/Financien/Financien/Kengetallen.asp':
-                self.parse_financial_key_indicators,
+            # 'vo/Financien/Financien/Kengetallen.asp':
+            #     self.parse_financial_key_indicators,
             'vo/leerlingen/Leerlingen/vo_leerlingen4.asp':
                 self.parse_vavo_students,
-            'vo/personeel/Personeel/vo_personeel_personen.asp':
-                self.parse_vo_staff_people,
-            'vo/personeel/Personeel/vo_personeel_fte.asp':
-                self.parse_vo_staff_fte,
+            # 'vo/personeel/Personeel/vo_personeel_personen.asp':
+            #     self.parse_vo_staff_people,
+            # 'vo/personeel/Personeel/vo_personeel_fte.asp':
+            #     self.parse_vo_staff_fte,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -527,21 +551,28 @@ class DuoVoBoardsSpider(DuoSpider):
 
         return self.dataset(response, self.make_item, 'financial_key_indicators_per_year', parse_row)
 
+    # def parse_vavo_students(self, response):
+    #     """
+    #     Primair onderwijs > Leerlingen
+    #     Parse "04 Leerlingen per bestuur en denominatie (vavo apart)"
+    #     """
+
+    #     def parse_row(row):
+    #         board_id = int(row['BEVOEGD GEZAG NUMMER'].strip())
+    #         vavo_students = {
+    #             'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
+    #             'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
+    #         }
+    #         yield board_id, vavo_students
+
+    #     return self.dataset(response, self.make_item, 'vavo_students', parse_row)
+    
     def parse_vavo_students(self, response):
-        """
-        Primair onderwijs > Leerlingen
-        Parse "04 Leerlingen per bestuur en denominatie (vavo apart)"
-        """
-
-        def parse_row(row):
-            board_id = int(row['BEVOEGD GEZAG NUMMER'].strip())
-            vavo_students = {
-                'non_vavo' : int(row['AANTAL LEERLINGEN'] or 0),
-                'vavo' : int(row['AANTAL VO LEERLINGEN UITBESTEED AAN VAVO'] or 0),
-            }
-            yield board_id, vavo_students
-
-        return self.dataset(response, self.make_item, 'vavo_students', parse_row)
+        codebook = Codebook([
+            {'field':'board_id', 'keyed':'0', 'source':'BEVOEGD GEZAG NUMMER','type':'int'},
+            {'field':'vavo', 'keyed':'', 'source':'AANTAL LEERLINGEN','type':'int'},
+        ])
+        return self.codebook_dataset(response, self.make_item, 'vavo_students', codebook)
 
     def parse_vo_staff_people(self, response):
         """
@@ -3183,49 +3214,3 @@ class DuoMboInstitutionSpider(DuoSpider):
                     mbo_institution_kind = row['MBO INSTELLINGSSOORT - NAAM'],
                     mbo_institution_kind_code = row['MBO INSTELLINGSOORT - CODE'],
                 )
-
-    def parse_mbo_participants_per_institution(self, response):
-        """
-        Middelbaar beroepsonderwijs > Aantal onderwijsdeelnemers in het mbo
-        Parse "3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
-        """
-
-        # This is a Proof-of-concept for the Codebook system, will be abstracted
-        book = '../codebooks/duo/mbo_participants_gender.csv'
-        book = os.path.normpath(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), book))
-        field_dicts = list(csv.DictReader(open(book), delimiter=';'))
-        dt = {
-            'int': int,
-            'brin':str,
-            'year': int,
-            'mbo_type': str,
-            'string': str,
-            'mbo_sector': str,
-        }
-        table_fields = Codebook('participants', field_dicts, dt)
-
-        print table_fields
-
-        for csv_url, reference_date in find_available_datasets(response).iteritems():
-            reference_year = reference_date.year
-            reference_date = str(reference_date)
-
-            csv_file = requests.get(csv_url)
-            csv_file.encoding = 'cp1252'
-            csv_file = cStringIO.StringIO(csv_file.content
-                  .decode('cp1252').encode('utf8'))
-            heads = csv_file.readline().strip().split(';')
-            rows = islice((line.strip().split(';') for line in csv_file), 20)
-
-            data = table_fields.parse_table(heads, rows)
-
-            for inst in data['participants_per_brin']:
-                for inst_per_year in inst['participants_per_year']:
-                    year = inst_per_year.pop('year')
-                    yield DuoMboInstitution(
-                        brin=inst['brin'], 
-                        reference_year=year,
-                        **inst_per_year)
-                inst.pop('participants_per_year')
-                yield DuoMboInstitution(reference_year=reference_year, **inst)
