@@ -16,52 +16,55 @@ The fields in the JobFeed dataset are described below. These are temporarily onl
    :widths: 1, 4
    :delim: ;
 
-    id;Jobfeed vacature ID. Unieke identifier voor een vacature-posting.
-    date_found;Datum gevonden
-    title;Vacaturetitel
-    organization_name;Naam van de adverteerder
-    job_location;Standplaats van de vacature (genormaliseerd, b.v. Den Bosch => 's-Hertogenbosch).
-    job_location_id;Postcode van de standplaats (genormaliseerd, b.v. Amsterdam = 1000)
-    job_location_latitude;Geocoordinaten van de standplaats
-    job_location_longitude;Geocoordinaten van de standplaats
-    jobfeed_profession;Jobfeed beroep. Genormaliseerd op basis van de vacaturetitel naar een van de beroepen uit de Jobfeed-beroepentaxonomie
-    jobfeed_profession_id;Jobfeed beroepscode
-    jobfeed_profession_group;Jobfeed beroepsgroep
-    jobfeed_profession_group_id;Jobfeed beroepsgroepcode
-    jobfeed_profession_class;Jobfeed beroepsklasse omschrijving
-    jobfeed_profession_class_id;Jobfeed beroepsklasse code
-    source_url;De originele vacature-URL
-    source_website;Bron site (b.v. werk.nl).
-    source_type;Type bron, b.v. jobsite, bedrijfswebsite.
-    source_type_id;Type bron (ID)
-    education_level;Opleidingsniveau omschrijving (b.v. HBO). Geëxtraheerd en genormaliseerd uit de vacaturetekst indien genoemd, anders afgeleid van het genormaliseerde beroep.
-    education_level_id;Opleidingsniveau code. 
-    employment_type;Dienstverband (fulltime, parttime, parttime/fulltime). Werkuren >32 uur wordt gezien als fulltime, <=32 uur parttime.
-    employment_type_id;Dienstverband (ID)
-    contract_type;Contracttype (vast, tijdelijk, stage, …)
-    contract_type_id;Contracttype (ID)
-    working_hours;Werktijden (regelmatig/onregelmatig)
-    working_hours_id;Werktijden (ID)
-    hours_per_week_min;Aantal werkuren per week min
-    hours_per_week_max;Aantal werkuren per week max
-    salary_min;Salaris per maand min
-    salary_max;Salaris per maand max
-    experience_min;Aantal jaren werkervaring min
-    experience_max;Aantal jaren werkervaring max
-    via_intermediary;Vacature is geplaatst door een intermediair (ja/nee)
-    expired_at;Datum waarop de vacature verlopen is. D.w.z. de vacature staat niet meer online. Leeg indien de vacature nog niet verlopen is.
-    sector;Branche omschrijving van de organisatie. Afgeleid door een match van de adverteerder van de vacature met de KvK-tabel. Vacatures van intermediairs hebben altijd sector 'Arbeidsbemiddeling'
-    sector_id;Branchecode van de organisatie. 
-    org_size;Organisatiegrootte omschrijving
-    org_size_id;Organisatiegrootte (aantal medewerkers). Afgeleid door een match van de adverteerder van de vacature met de KvK-tabel. Bij vacatures van intermediairs is dit dus niet het aantal medewerkers bij de opdrachtgever.
-    sic;Standard Industry Code. In Nederland: SBI 2008
-    sic_descr;Omschrijving van SBI 2008 code
-    job_descr;Functie-omschrijving
-    employer_descr;Omschrijving werkgever
-    candidate_descr;Omschrijving kandidaat/profiel
-    conditions_descr;Omschrijving arbeidsvoorwaarden
-    application_descr;Omschrijving sollicitatieprocedure
-    fulltxt;Volledige vacaturetekst
+    id;Jobfeed job ID. Unique identifier for a job posting.
+    possible_startersjob;Indicator of possible startersjob (1 = true)
+    date_found;Date found
+    title;Vacancy title
+    organization_name;Advertiser name
+    job_location;Job location (normalized, e.g. Den Bosch => 's-Hertogenbosch)
+    job_location_id;Postal code of the job location (normalized, e.g. Amsterdam = 1000)
+    job_location_latitude;Geocoordinates of the job location
+    job_location_longitude;Geocoordinates of the job location
+    jobfeed_profession;Jobfeed profession code. Normalized based on the vacancy title to one of the professions in the Jobfeed professions taxonomy
+    jobfeed_profession_id;Jobfeed profession code
+    jobfeed_profession_group;Jobfeed profession group
+    jobfeed_profession_group_id;Jobfeed profession group code
+    jobfeed_profession_class;Jobfeed profession class
+    jobfeed_profession_class_id;Jobfeed profession class code
+    source_url;The original vacancy URL
+    source_website;"Source site (e.g. ""werk.nl"")."
+    source_type;Type of source (e.g. jobsite, company site)
+    source_type_id;Source type (ID)
+    education_level;Education level. Extracted and normalized from the vacancy text, otherwise derived from the normalized profession.
+    education_level_id;Education level code
+    employment_type;Employment type (fulltime, parttime, fulltime/parttime). Working hours >32 hours are considered fulltime, hours <=32 hours parttime.
+    employment_type_id;Employment type (ID)
+    contract_type;Contract type (permanent, temporary, internship, …)
+    contract_type_id;Contract type (ID)
+    working_hours;Working hours (regular/irregular)
+    working_hours_id;Working hours (ID)
+    hours_per_week_min;Number of hours per week min
+    hours_per_week_max;Number of hours per week max
+    salary_min;Minimum salary per month
+    salary_max;Maximum salary per month
+    experience_min;Number of years of experience min
+    experience_max;Number of years of experience max
+    via_intermediary;Job has been posted by an intermediary (yes/no)
+    expired_at;Date the vacancy expired, meaning that the vacancy is no longer online. If empty, the vacancy has not yet expired.
+    sector;Organisation sector/industry). Derived by matching the advertiser of the job to the Chamber of Commerce table. For jobs posted by intermediaries, the sector is unknown and the sector of the intermediary is returned, instead of the actual employer's sector
+    sector_id;Industry code of the organisation
+    org_size;Organisation size (number of employees). Derived by matching the advertiser of the job to the Chamber of Commerce table. For jobs posted by intermediaries, this number represents the size of the employee, not the size of the actual employer.
+    org_size_id;Organisation size (ID)
+    sic;Standard Industry Code. In The Netherlands: SBI 2008 (based on NACE)
+    sic_descr;Description of SBI 2008 code
+    job_descr;Job description
+    employer_descr;Employer description
+    candidate_descr;Candidate description
+    conditions_descr;Job conditions and benefits description
+    application_descr;Application procedure description
+    fulltxt;Full job text
+
+The full data model is available at (http://api.openonderwijsdata.nl/sources/jobfeed/datamodel.xlsx).
 
 API
 ---
