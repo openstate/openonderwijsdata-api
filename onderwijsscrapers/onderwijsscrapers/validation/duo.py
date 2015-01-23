@@ -741,3 +741,32 @@ class DuoMboInstitution(DuoAreaSchema, MappingSchema):
     graduates_per_qualification = MboGraduatesPerQualification(title="The number of graduated students per qualification, per gender")
     graduates_per_qualification_reference_url = general_rules.website(title="URL of the source file.")
     graduates_per_qualification_reference_date = SchemaNode(Date(), missing=True, title="Date the source file was published at http://data.duo.nl")
+
+class DuoHoBoard(MappingSchema):
+    """**Source:** `Hoger onderwijs - Adressen - Adressen - 03. Adressen bevoegde gezagen <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/ho/adressen_ho/adressen/adressen_bg.asp`_"""
+    ho_type = SchemaNode(String(), title="Type of higher education (hbo/wo)")
+    address = general_rules.Address( title="Address of this board.")
+    administrative_office_id = SchemaNode(Int(),  title="Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances.")
+    board_id  = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of this board." )
+    correspondence_address = general_rules.Address( title="Correspondence address of this board.")
+    denomination = general_rules.denomination()
+    municipality = general_rules.municipality()
+    municipality_code = general_rules.municipality_code()
+    name = general_rules.name( title="Name of the board." )
+    phone = general_rules.phone( title="Phone number of the board." )
+    website = general_rules.url( title="Website of this board." )
+
+
+class DuoHoInstitution(DuoAreaSchema, MappingSchema):
+    """**Source:** `Hoger onderwijs - Adressen - Adressen - 01. Adressen hbo instellingen en universiteiten <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/ho/adressen_ho/adressen/adressen_instellingen.asp`_"""
+    ho_type = SchemaNode(String(), title="Type of higher education (hbo/wo)")
+    brin = general_rules.brin( title="'Basis Registratie Instellingen-nummer', identifier of the institution. Alphanumeric, four characters long.")
+    board_id  = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of the board of this institution." )
+    correspondence_address = general_rules.Address( title="Correspondence address of this institution.")
+    denomination = general_rules.denomination()
+    municipality = general_rules.municipality()
+    municipality_code = general_rules.municipality_code()
+    address = general_rules.Address( title="Address of this institution.")
+    name = general_rules.name( title="Name of the institution." )
+    phone = general_rules.phone( title="Phone number of the institution." )
+    website = general_rules.website( title="Website of this institution.")
