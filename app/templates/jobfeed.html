@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block main %}
+
+<h3>Jobfeed</h3>
+
+<div class="">
+	<form role="form" action="/jobfeed" method="GET">
+		<div class="input-group input-group-lg">
+			<input name="q" type="search" placeholder="Enter a query" class="input-lg form-control search-query" value="{{q}}">
+			<span class="input-group-btn">
+				<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span> Search</button>
+			</span>
+		</div>
+	</form>
+</div>
+<hr>
+{% if hits %}
+	Found {{ hits.total }} documents in {{ hits.took }}ms. Showing {{ hits.show }} documents.
+	{% if args %}
+	<a href="/api/v2/job_search?{{args}}">API request</a> for this query (<a href="http://api.openonderwijsdata.nl/documentation/rst/jobs.html#api">documentation</a>).
+	{% endif %}
+	<table class="table table-striped table-condensed">
+		<thead>
+			<tr>
+				<th>foo</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for hit in hits['hits'] %}
+			<tr>
+				<td>{{ hit['_source'].title }}</td>
+				<td>{{ hit['_source'].organization_name }}</td>
+				<td>{{ hit['_source'].job_location }}</td>
+				<td>
+					<strong><a href="/api/v2/job_doc/jobfeed/job/{{ hit['_id'] }}" target="_blank">
+					{% if 'name' in hit['_source'] %}
+						{{ hit['_source'].name }}
+					{% else %}
+						{{ hit['_id'] }}
+					{% endif %}
+				</a></strong><br>
+				</td>
+				<td>{{ hit['_source'].reference_year }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+{% endif %}
+
+{% endblock %}

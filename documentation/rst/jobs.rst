@@ -75,7 +75,19 @@ API
 
    Hits are sorted by relevance based on their similarity to the query (see query parameter ``q``).
 
-   Other query parameters are listed above. 
+   Other query parameters are listed above. Additionally, you can use the following parameters for specifying the format of results:
+
+    .. csv-table::
+       :header: "Parameter", "Description"
+       :widths: 1, 4
+       :delim: ;
+
+        size;Number of results (default: 10)
+        from;Starting point for results
+        order;Order of results (``asc`` or ``desc``)
+
+
+   **Example: search for an "ict" job**
 
    .. parsed-literal::
 

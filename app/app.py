@@ -7,8 +7,6 @@ import json
 import csv
 import io
 
-from jobfeed import JobFeed
-
 from settings import (ES_URL, ES_INDEXES, ES_DOCUMENT_TYPES_PER_INDEX,
                       ES_DOCUMENT_TYPES, ES_VALIDATION_RESULTS_INDEX)
 
@@ -17,8 +15,29 @@ api = restful.Api(app)
 
 es = rawes.Elastic(ES_URL)
 
+
 # Add the jobfeed endpoints
+from jobfeed import JobFeed, JobSearch
 jobfeed = JobFeed(api)
+@app.route('/jobfeed')
+def jobfeed():
+    q = request.args.get('q') or ''
+    if ''.join(request.args.values()):
+        args = '&'.join(['%s=%s'%(k,v) for k,v in request.args.items()])
+    else:
+        args=None
+    search = JobSearch().get()
+    hits = {
+        'hits': search['hits']['hits'][:20],
+        'show': len(search['hits']['hits'][:20]),
+        'total': search['hits']['total'],
+        'took': search['took']
+    }
+    return render_template('jobfeed.html', args=args, hits=hits, q=q)
+
+@app.route('/extra')
+def extra():
+    return render_template('extra.html')
 
 def get_alias_from_index(index_name):
     """ The indexes are named as `alias_suffix` """

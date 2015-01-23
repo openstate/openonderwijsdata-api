@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block main %}
+
+<h3>Extra</h3>
+
+<!-- This page is temporary, until we decide what to do with extra data sources -->
+
+<h4>Jobs</h4>
+<ul>
+	<li><a href="/jobfeed">TextKernel Jobfeed</a>
+		<ul>
+			<li>Data from <a href="http://textkernel.com/jobfeed/">TextKernel Jobfeed</a>, the job database for HR professionals.</li>
+			<li>Available to <a href="/jobfeed">search</a> via API and <a href="http://api.openonderwijsdata.nl/sources/jobfeed/jobfeed.schoolchallenge.xml">XML download</a> (>500 mb).</li>
+			<li><a href="http://api.openonderwijsdata.nl/sources/jobfeed/datamodel.xml">Data model (xlsx)</a> and <a href="/documentation/rst/jobs.html">documentation</a>.</li>
+		</ul>
+	</li>
+</ul>
+
+<h4>Surveys</h4>
+<ul>
+	<li>ROA School leaver and graduate survey data
+		<ul>
+			<li>Data from <a href="http://roa.nl/">Research Centre for Education and the Labour Market (ROA)</a>, a research institute of the Maastricht University School of Business and Economics,.</li>
+			<li>Available for <a href="http://api.openonderwijsdata.nl/sources/roa-data/roa-data.csv">CSV download</a> (300 mb) and <a href="http://api.openonderwijsdata.nl/sources/roa-data/roa-data.sav">SAV download</a> (200 mb).</li>
+			<li><a href="http://api.openonderwijsdata.nl/sources/roa-data/roa-data-codebook.docx">Data model (docx)</a></li>
+		</ul>
+	</li>
+</ul>
+
+
+{% endblock %}

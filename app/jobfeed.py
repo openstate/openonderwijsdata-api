@@ -151,8 +151,6 @@ class JobDoc(restful.Resource):
             else:
                 print(error)
 
-
-
         return doc
 
 class JobFeed():
