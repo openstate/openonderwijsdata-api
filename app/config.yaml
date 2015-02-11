@@ -4,6 +4,7 @@ elasticsearch:
         - duo
         - schoolvo
         - onderwijsinspectie
+        - ocw
     types_per_index:
         duo:
             - vo_school
@@ -21,4 +22,6 @@ elasticsearch:
             - vo_branch
         onderwijsinspectie:
             - vo_branch
+            - po_branch
+        ocw:
             - po_branch
