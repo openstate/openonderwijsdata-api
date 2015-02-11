@@ -1,14 +1,13 @@
 from collections import namedtuple, defaultdict, OrderedDict
-import csv, StringIO, os
+import csv, re
 import colander
 from colander import SchemaNode
-import re
-from onderwijsscrapers.groupnested import GroupNested
 
+import os
 def load_codebook(path):
     path = os.path.join('codebooks', '%s.csv'%path)
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
-    return Codebook(csv.DictReader(open(path), delimiter=';'))
+    return Codebook(csv.DictReader(open(path), delimiter=','))
 
 default_datatypes = {
     'int': (int, colander.Int()), 
@@ -37,6 +36,7 @@ class Codebook(dict):
             rule['cast'], rule['typ'] = datatypes[typ]
             name = rule.pop('field', None)
             if '.' in name:
+                # Allow hierarchical fields
                 name = tuple(name.split('.'))
             if name:
                 self[name] = Field(**rule)
@@ -55,7 +55,8 @@ class Codebook(dict):
         for n,r in self.iteritems():
             if not r.keyed:
                 # add to tree by root keys and nested keys
-                nests = set(k for k in keyed_fields if '<%s>'%k in r.source)
+                # Don't allow hierarchical fields inside source
+                nests = set(k for k in keys if '<%s>'%str(k) in r.source)
                 stack = sorted(keys|nests, key=lambda k: -int(self[k].keyed))
                 nest(n,r, self.nested, stack)
 
@@ -64,10 +65,16 @@ class Codebook(dict):
     def schema(self, root=False, **kwargs):
         def to_validator(val, name=''):
             if type(val) == Field:
-                return SchemaNode(typ=val.typ, name=name, missing=None)
+                if val.description:
+                    return SchemaNode(typ=val.typ, name=name, 
+                        missing=colander.drop, title=val.description)
+                else:
+                    return SchemaNode(typ=val.typ, name=name, 
+                        missing=colander.drop)
             elif type(val) == dict:
                 seq = SchemaNode(typ=colander.Sequence(), name = 'per_%s'%name)
                 out = SchemaNode(typ=colander.Mapping() , name = name)
+                out.add(to_validator(self[name], name=name))
                 tree = {}
                 def add_tree(k):
                     """add mappings to `tree` with tuple key, return deepest"""
@@ -114,8 +121,10 @@ class Codebook(dict):
 
         # Make nested dataset for grouping values
         def no_fields(nest):
-            return {k:no_fields(v) if type(v)==dict else False
-                for k,v in nest.iteritems()}
+            return {
+                k:no_fields(v) if type(v)==dict else False
+                for k,v in nest.iteritems()
+            }
         def sortkey(k):
             return int(self[k[0]].keyed or 0)
         # store items with root-keys as key
@@ -123,10 +132,15 @@ class Codebook(dict):
 
         for row in rows:
             parse = self.parse_row(row, keyed_per_head, unkeyed_per_head)
-            for key, nest, up in parse:
-                key = [('root', self.root(**key))]
-                key += sorted(nest.items(), key=sortkey)
-                dataset[OrderedDict(key)].update(up)
+            for root, key, up in parse:
+                try:
+                    root = [('root', self.root(**root))]
+                except TypeError:
+                    print 'ERROR: Wrong root structure for', self.root.__doc__
+                    print '\t root = %s, key = %s'%(root, key)
+                    raise SystemExit
+                root += sorted(key.items(), key=sortkey)
+                dataset[OrderedDict(root)].update(up)
 
         for key, data in dataset.store['root'].iteritems():
             yield dict(key._asdict()), data.struct()
@@ -148,14 +162,17 @@ class Codebook(dict):
         for i, fieldnames in unkeyed_per_head.iteritems():
             for (fieldname, groups) in fieldnames:
                 for val in self[fieldname].get_value(row[i]):
-                    key.update({ name: nest_val
-                        for name, nest_str in groups.iteritems()
-                        for nest_val in self[name].get_value(nest_str)
-                    })
+                    # add other fields to root or n
+                    for name, nest_str in groups.iteritems():
+                        for nest_val in self[name].get_value(nest_str):
+                            if self[name].keyed == '0':
+                                root[name] = nest_val
+                            else:
+                                key[name] = nest_val
                     yield root, key, {fieldname: val}
 
 if __name__ == '__main__':
-    import sys
+    import sys, StringIO
 
     def print_schema(sch, n=0):
         print ' '*n, sch.name, '(%s)' % type(sch.typ).__name__
@@ -163,43 +180,56 @@ if __name__ == '__main__':
             if type(sch.typ).__name__ in ['Mapping', 'Sequence']:
                 print_schema(s, n+1)
 
-    book = """field;keyed;source;type;description
+    if len(sys.argv)>1:
+        cb = load_codebook(sys.argv[1])
+        print cb
+        print_schema(cb.schema(root=True))
+        from tabular_utilities import get_tables
+        from os.path import splitext
+        root, ext = splitext(sys.argv[2])
+        filt = [sys.argv[3]] if len(sys.argv)>3 else None
+        for table in get_tables(open(sys.argv[2]), ext, filt=filt):
+            rows = table.rows()
+            head = next(rows)
+            key, val = next(cb.parse(head, rows))
+            print key
+            print cb.schema(root=False).deserialize(val)
+    else:
+
+        book = """field;keyed;source;type;description
 board_id;0;BEVOEGD GEZAG NUMMER;int;
 vavo;;AANTAL LEERLINGEN;int;
 """
-    table = """BEVOEGD GEZAG NUMMER;AANTAL LEERLINGEN
+        table = """BEVOEGD GEZAG NUMMER;AANTAL LEERLINGEN
 1;10
 2;20
 """
 
-    cb = Codebook(csv.DictReader(StringIO.StringIO(book), delimiter=';'))
-    print cb
-    print_schema(cb.schema(root=True))
-    t = csv.reader(StringIO.StringIO(table), delimiter=';')
-    for l in cb.parse(next(t), t):
-        print l
+        cb = Codebook(csv.DictReader(StringIO.StringIO(book), delimiter=';'))
+        print cb
+        print_schema(cb.schema(root=True))
+        t = csv.reader(StringIO.StringIO(table), delimiter=';')
+        for l in cb.parse(next(t), t):
+            print l
 
-    # artificial
-    book = """field;keyed;source;type;description
+        # artificial
+        book = """field;keyed;source;type;description
 board_id;0;BEVOEGD GEZAG NUMMER;int;
 reference_year;0;JAAR;int;
 student_year;1;LEERJAAR;int;
 vavo;;AANTAL LEERLINGEN;int;
 non_vavo;;NIET VAVO;int;
 """
-    table = """BEVOEGD GEZAG NUMMER;JAAR;LEERJAAR;AANTAL LEERLINGEN;NIET VAVO
+        table = """BEVOEGD GEZAG NUMMER;JAAR;LEERJAAR;AANTAL LEERLINGEN;NIET VAVO
 1;2014;1;10;40
 2;2014;1;20;70
 2;2014;2;4;34
 """
-    cb = Codebook(csv.DictReader(StringIO.StringIO(book), delimiter=';'))
-    print cb
-    print_schema(cb.schema(root=True))
-    t = csv.reader(StringIO.StringIO(table), delimiter=';')
-    for l in cb.parse(next(t), t):
-        print l
-
-    if sys.argv[1]:
-        cb = load_codebook(sys.argv[1])
+        cb = Codebook(csv.DictReader(StringIO.StringIO(book), delimiter=';'))
         print cb
         print_schema(cb.schema(root=True))
+        t = csv.reader(StringIO.StringIO(table), delimiter=';')
+        for l in cb.parse(next(t), t):
+            print l
+
+        

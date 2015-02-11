@@ -26,19 +26,20 @@ locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
 class DuoSpider(Spider):
     """ Duo spider """
-    def __init__(self, add_local_table=None, url_filter=None, *args, **kwargs):
-        self.url_filter = url_filter
+    url = 'http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/'
+    def __init__(self, add_local_table=None, *args, **kwargs):
         # a table named `<reference_date>.csv` in ISO 8601
         self.add_local_table = add_local_table
 
     def start_requests(self):
         return [
-            Request(
-                'http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/' + url,
-                # lambda self, response: self.parse_cvs(self, response, parse_row)
-                parse_row
-            ) for url,parse_row in self.requests.items() if (self.url_filter is None or url == self.url_filter)
+            Request(self.url+path, parser)
+            for path, parser in self.requests.items()
         ]
+
+    def parse(self, response):
+        path = response.url.replace(self.url, '')
+        return self.requests[path](response)
 
     def dataset(self, response, make_item, dataset_name, parse_row):
         """
@@ -104,6 +105,7 @@ class DuoSpider(Spider):
 
 def find_available_datasets(response, extension='csv'):
     """ Get all URLS of files with a certain extension on the DUO page """
+    # TODO: merge with 'extract_csv_files'
     available_datasets = {}
     datasets = response.xpath('//tr[.//a[contains(@href, ".%s")]]' % extension)
     for dataset_file in datasets:
@@ -113,6 +115,7 @@ def find_available_datasets(response, extension='csv'):
         dataset_url = dataset_file.xpath('.//a/@href').re(r'(.*\.%s)' % extension)[0]
 
         available_datasets['http://duo.nl%s' % dataset_url] = ref_date
+
     return available_datasets
 
 def extract_csv_files(zip_url):

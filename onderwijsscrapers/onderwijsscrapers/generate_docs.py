@@ -30,18 +30,18 @@ For some fields the original Dutch term is included, in order to allow the API u
 
 """
 
-from validation import generate_documentation
-from validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
+from onderwijsscrapers.validation import generate_documentation
+from onderwijsscrapers.validation.duo import (DuoVoSchool, DuoVoBoard, DuoVoBranch, DuoPoSchool,
                             DuoPoBoard, DuoPoBranch, DuoPaoCollaboration,
                             DuoMboBoard, DuoMboInstitution)
-from validation.schoolvo import SchoolVOBranch
-from validation.owinsp import (OnderwijsInspectieVoBranch, OnderwijsInspectiePoBranch)
-from validation.ocw import OCWPoBranch
+from onderwijsscrapers.validation.schoolvo import SchoolVOBranch
+from onderwijsscrapers.validation.owinsp import (OnderwijsInspectieVoBranch, OnderwijsInspectiePoBranch)
+from onderwijsscrapers.validation.ocw import OCWPoBranch
 
-import validation.duo as duo
-import validation.schoolvo as schoolvo
-import validation.owinsp as owinsp
-import validation.ocw as ocw
+import onderwijsscrapers.validation.duo as duo
+import onderwijsscrapers.validation.schoolvo as schoolvo
+import onderwijsscrapers.validation.owinsp as owinsp
+import onderwijsscrapers.validation.ocw as ocw
 
 classes = {
     'owinsp': [
