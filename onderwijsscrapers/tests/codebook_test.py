@@ -1,4 +1,4 @@
-from onderwijsscrapers.codebooks_flat import Codebook
+from onderwijsscrapers.codebooks_flat import load_codebook, Codebook
 import csv
 
 if __name__ == '__main__':
@@ -14,9 +14,10 @@ if __name__ == '__main__':
 
     if len(sys.argv)>1:
         cb = load_codebook(sys.argv[1])
+
         pp.pprint(cb)
         print_schema(cb.schema(root=True))
-        from tabular_utilities import get_tables
+        from onderwijsscrapers.tabular_utilities import get_tables
         from os.path import splitext
         root, ext = splitext(sys.argv[2])
         filt = [sys.argv[3]] if len(sys.argv)>3 else None

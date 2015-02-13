@@ -3,19 +3,33 @@ import csv
 import re
 import colander
 from colander import SchemaNode
+from groupnested import GroupNested
 
 import os
-def load_codebook(path):
+def load_codebook(path, nested=False):
     path = os.path.join('codebooks', '%s.csv'%path)
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
-    return Codebook(csv.DictReader(open(path), delimiter=','))
+    if nested:
+        return CodebookNested(csv.DictReader(open(path), delimiter=','))
+    else:
+        return Codebook(csv.DictReader(open(path), delimiter=','))
 
 default_datatypes = {
     'int': (int, colander.Int()), 
     'float': (float, colander.Float()), 
     'string': (str, colander.String())
 }
-class Field(namedtuple('Field', ['keyed','source','cast', 'typ', 'description'])):
+def generate_unique_key(keyed_fields, name='UniqueKey'):
+    class UniqueKey(namedtuple(name, list(keyed_fields))):
+        """ A named tuple, with default None value  """
+        def __new__(cls, **kwargs):
+            kwargs = { f:kwargs.get(f, None) for f in keyed_fields }
+            return super(UniqueKey, cls).__new__(cls, **kwargs)
+        def items(self):
+            return zip(self._fields, self)
+    return UniqueKey
+
+class Field(generate_unique_key(['keyed','source','cast', 'typ', 'description'], 'Field')):
     __slots__ = ()
     def get_value(self, v):
         """ Transform a value with a regex and type it """
@@ -28,6 +42,9 @@ class Field(namedtuple('Field', ['keyed','source','cast', 'typ', 'description'])
             return
 
 class Codebook(dict):
+    """
+        Codebook
+    """
     def __init__(self, field_dicts, datatypes=default_datatypes):
         # Load the fields file
         for rule in field_dicts:
@@ -35,12 +52,101 @@ class Codebook(dict):
             if typ not in datatypes:
                 typ = 'string'
             rule['cast'], rule['typ'] = datatypes[typ]
+            try:
+                rule['keyed'] = int(rule['keyed'])
+            except ValueError:
+                rule['keyed'] = None
             name = rule.pop('field', None)
-            if '.' in name:
-                # Allow hierarchical fields
-                name = tuple(name.split('.'))
             if name:
                 self[name] = Field(**rule)
+
+        self.root = generate_unique_key([n for n in self if self[n].keyed==0])
+
+    def match_heads(self, heads):
+        # Associate each head index with some fields and head-value matches
+        keyed_per_head = defaultdict(list)
+        unkeyed_per_head = defaultdict(list)
+        unmatched_sources = set(f.source for f in self.values() if f.source)
+        for i,head in enumerate(heads):
+            for name, field in self.iteritems():
+                if field.source:
+                    m = re.match(field.source, head)
+                    if m: # add non-trivial matches
+                        if field.keyed != None:
+                            keyed_per_head[i].append(name)
+                        else:
+                            unkeyed_per_head[i].append((name, m.groupdict()))
+                        unmatched_sources.discard(field.source)
+        if unmatched_sources:
+            print 'unmatched', unmatched_sources
+
+        return keyed_per_head, unkeyed_per_head
+
+    def parse_row(self, row, keyed_per_head, unkeyed_per_head):
+        key = {}
+        root = {}
+        # fill key with keyed fields
+        for i, fieldnames in keyed_per_head.iteritems():
+            for fieldname in fieldnames:
+                for val in self[fieldname].get_value(row[i]):
+                    if self[fieldname].keyed == 0:
+                        root[fieldname] = val
+                    else:
+                        key[fieldname] = val
+        # parse rest of fields
+        for i, fieldnames in unkeyed_per_head.iteritems():
+            for (fieldname, groups) in fieldnames:
+                for val in self[fieldname].get_value(row[i]):
+                    # add other fields to root or n
+                    for name, nest_str in groups.iteritems():
+                        for nest_val in self[name].get_value(nest_str):
+                            if self[name].keyed == 0:
+                                root[name] = nest_val
+                            else:
+                                key[name] = nest_val
+                    yield root, key, {fieldname: val}
+
+    def schema(self, root=False, **kwargs):
+        schema = SchemaNode(typ=colander.Mapping(), **kwargs)
+        schema.__doc__ = schema.description
+        for name,val in self.items():
+            if val.keyed != 0 or root:
+                schema.add(SchemaNode(
+                    typ=val.typ, 
+                    name=name, 
+                    missing=colander.drop, 
+                    title=val.description))
+        seq = SchemaNode(typ=colander.Sequence(), **kwargs)
+        seq.add(schema)
+        return seq
+
+    def parse(self, heads, rows):
+        keyed_per_head, unkeyed_per_head = self.match_heads(heads)
+
+        # store items with root-keys as key
+        dataset = defaultdict(list)
+        setkey = generate_unique_key([n for n in self if self[n].keyed>0])
+
+        for row in rows:
+            parse = self.parse_row(row, keyed_per_head, unkeyed_per_head)
+            row_items = defaultdict(dict)
+            for root, key, up in parse:
+                row_items[(self.root(**root), setkey(**key))].update(up)
+            for (root, key), item in row_items.iteritems():
+                item.update(key._asdict())
+                dataset[root].append(item)
+
+        for key, data in dataset.iteritems():
+            yield dict(key._asdict()), data
+
+        
+class CodebookNested(Codebook):
+    """
+        Nested codebook
+
+    """
+    def __init__(self, field_dicts, datatypes=default_datatypes):
+        Codebook.__init__(self, field_dicts, datatypes)
 
         # nested representation
         def nest(key, val, thedict, nest_stack):
@@ -60,8 +166,6 @@ class Codebook(dict):
                 nests = set(k for k in keys if '<%s>'%str(k) in r.source)
                 stack = sorted(keys|nests, key=lambda k: -int(self[k].keyed))
                 nest(n,r, self.nested, stack)
-
-        self.root = namedtuple('Root', [n for n in self if self[n].keyed=='0'])
 
     def schema(self, root=False, **kwargs):
         def to_validator(val, name=''):
@@ -107,18 +211,7 @@ class Codebook(dict):
         return schema
 
     def parse(self, heads, rows):
-        # Associate each head index with some fields and head-value matches
-        keyed_per_head = defaultdict(list)
-        unkeyed_per_head = defaultdict(list)
-        for i,head in enumerate(heads):
-            for name, field in self.iteritems():
-                if field.source:
-                    m = re.match(field.source, head)
-                    if m: # add non-trivial matches
-                        if field.keyed:
-                            keyed_per_head[i].append(name)
-                        else:
-                            unkeyed_per_head[i].append((name, m.groupdict()))
+        keyed_per_head, unkeyed_per_head = self.match_heads(heads)
 
         # Make nested dataset for grouping values
         def no_fields(nest):
@@ -145,29 +238,3 @@ class Codebook(dict):
 
         for key, data in dataset.store['root'].iteritems():
             yield dict(key._asdict()), data.struct()
-
-        
-
-    def parse_row(self, row, keyed_per_head, unkeyed_per_head):
-        key = {}
-        root = {}
-        # fill key with keyed fields
-        for i, fieldnames in keyed_per_head.iteritems():
-            for fieldname in fieldnames:
-                for val in self[fieldname].get_value(row[i]):
-                    if self[fieldname].keyed == '0':
-                        root[fieldname] = val
-                    else:
-                        key[fieldname] = val
-        # parse rest of fields
-        for i, fieldnames in unkeyed_per_head.iteritems():
-            for (fieldname, groups) in fieldnames:
-                for val in self[fieldname].get_value(row[i]):
-                    # add other fields to root or n
-                    for name, nest_str in groups.iteritems():
-                        for nest_val in self[name].get_value(nest_str):
-                            if self[name].keyed == '0':
-                                root[name] = nest_val
-                            else:
-                                key[name] = nest_val
-                    yield root, key, {fieldname: val}
