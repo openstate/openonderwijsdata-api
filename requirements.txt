@@ -9,3 +9,11 @@ flask
 Flask-RESTful
 Flask-Cors==1.10.2
 xlrd
+twisted
+lxml
+w3lib
+cryptography
+uwsgi
+cssselect
+pyyaml
+elasticsearch==1.4.0
