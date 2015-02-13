@@ -37,7 +37,7 @@ class Field(generate_unique_key(['keyed','source','cast', 'typ', 'description'],
             # TODO: value transformations and lookups
             # if self.sub1 is not None and self.sub2 is not None:
             #     v = re.sub(self.sub1, self.sub2, v)
-            yield self.cast(v)
+            yield self.cast(v.strip())
         except ValueError:
             return
 
@@ -136,7 +136,20 @@ class Codebook(dict):
                 item.update(key._asdict())
                 dataset[root].append(item)
 
+        def deep_set(tree, stack, item):
+            """ Use a list of keys to set a nested dict """
+            for l in stack[:-1]:
+                if l not in tree:
+                    tree[l] = {}
+                tree = tree[l]
+            tree[stack[-1]] = item
+
         for key, data in dataset.iteritems():
+            for d in data:
+                for k,v in d.items():
+                    if '.' in k:
+                        d.pop(k)
+                        deep_set(d, k.split('.'), v)
             yield dict(key._asdict()), data
 
         
