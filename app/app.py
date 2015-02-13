@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, make_response
 from flask.ext import restful
 from flask.ext.restful import abort, reqparse
+from flask.ext.cors import CORS
 import rawes
 import re
 import json
@@ -11,6 +12,8 @@ from settings import (ES_URL, ES_INDEXES, ES_DOCUMENT_TYPES_PER_INDEX,
                       ES_DOCUMENT_TYPES, ES_VALIDATION_RESULTS_INDEX)
 
 app = Flask(__name__)
+cors = CORS(app)
+
 api = restful.Api(app)
 
 es = rawes.Elastic(ES_URL)
