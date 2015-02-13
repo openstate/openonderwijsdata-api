@@ -3255,13 +3255,14 @@ class DuoMboInstitutionSpider(DuoSpider):
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
                 for year in [2010, 2011, 2012, 2013, 2014]:
-                    m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
-                    if m or f:
-                        yield (year, brin), {
-                            'qualification_code': int(row['KWALIFICATIE CODE']),
-                            'participants_male': m,
-                            'participants_female': f,
-                        }
+                    if '%s MAN'%year in row and '%s VROUW'%year in row:
+                        m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
+                        if m or f:
+                            yield (year, brin), {
+                                'qualification_code': int(row['KWALIFICATIE CODE']),
+                                'participants_male': m,
+                                'participants_female': f,
+                            }
 
         # Two datasets for one file, no fancy abstraction yet
         for csv_url, reference_date in find_available_datasets(response).iteritems():
@@ -3314,15 +3315,15 @@ class DuoMboInstitutionSpider(DuoSpider):
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
                 for year in [2010, 2011, 2012, 2013, 2014]:
-
-                    participants = int(row[str(year)] or 0)
-                    if participants:
-                        yield brin, {
-                            'reference_year': year,
-                            'qualification_code': int(row['KWALIFICATIE CODE']),
-                            'grade_year': int(row['VERBLIJFSJAAR MBO']),
-                            'participants': participants,
-                        }
+                    if str(year) in row:
+                        participants = int(row[str(year)] or 0)
+                        if participants:
+                            yield brin, {
+                                'reference_year': year,
+                                'qualification_code': int(row['KWALIFICATIE CODE']),
+                                'grade_year': int(row['VERBLIJFSJAAR MBO']),
+                                'participants': participants,
+                            }
 
         return self.dataset(response, self.make_item, 'participants_per_grade_year_and_qualification', parse_row)
 
@@ -3342,15 +3343,15 @@ class DuoMboInstitutionSpider(DuoSpider):
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
                 for year in [2010, 2011, 2012, 2013, 2014]:
-
-                    m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
-                    if m or f:
-                        yield brin, {
-                            'reference_year': year,
-                            'qualification_code': int(row['KWALIFICATIE CODE']),
-                            'graduate_male': m,
-                            'graduate_female': f,
-                        }
+                    if '%s MAN'%year in row and '%s VROUW'%year in row:
+                        m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
+                        if m or f:
+                            yield brin, {
+                                'reference_year': year,
+                                'qualification_code': int(row['KWALIFICATIE CODE']),
+                                'graduate_male': m,
+                                'graduate_female': f,
+                            }
 
         return self.dataset(response, self.make_item, 'graduates_per_qualification', parse_row)
 
