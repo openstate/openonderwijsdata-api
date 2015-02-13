@@ -15,8 +15,7 @@ def get_fields(tree):
 
 for index in ES_INDEXES:
     print '==== %s ====' % index
-    with open('es_mappings/%s.json' % index) as o:
-        maps = json.load(o)
+    for maps in es.get('%s/_mapping' % index).values():
         for doc_type, tree in maps['mappings'].iteritems():
             count = es.get('%s/%s/_search' % (index, doc_type), data={
                     "query": { "match_all": {} },
