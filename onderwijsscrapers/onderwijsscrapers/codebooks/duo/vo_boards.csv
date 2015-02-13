@@ -1,0 +1,9 @@
+source,keyed,field,type,description
+BEVOEGD GEZAG NUMMER,0,board_id,string,
+BEVOEGD GEZAG NAAM,,name,string,
+GEMEENTENAAM,,municipality,string,
+GEMEENTENUMMER,,municipality_code,string,
+TELEFOONNUMMER,,phone,string,
+INTERNETADRES,,website,string,
+DENOMINATIE,,denomination,string,
+ADMINISTRATIEKANTOORNUMMER,,administrative_office_id,string,

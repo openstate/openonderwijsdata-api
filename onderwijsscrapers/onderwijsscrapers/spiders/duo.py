@@ -21,6 +21,9 @@ from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
                                      DuoPoBoard, DuoPoSchool, DuoPoBranch,
                                      DuoPaoCollaboration, DuoMboBoard, DuoMboInstitution)
 
+from onderwijsscrapers.tabular_utilities import get_stream, get_tables
+from onderwijsscrapers.codebooks import load_codebook
+
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
 
@@ -82,6 +85,28 @@ class DuoSpider(Spider):
                     school['%s_reference_date' % dataset_name] = reference_date
                     school[dataset_name] = item
                     yield school
+
+    def codebook_item(self, codebook, **kwargs):
+        codebook = load_codebook(codebook)
+
+        def parse(response):
+            datasets = find_available_datasets(response, **kwargs)
+            for url, reference_date in datasets.iteritems():
+                reference_year = reference_date.year
+                reference_date = str(reference_date)
+                # There's probably only one table, but loop just in case
+                for table in get_tables(*get_stream(url), **kwargs):
+                    rows = table.rows()
+                    head = next(rows)
+                    for key, dataset in codebook.parse(head, rows):
+                        key.setdefault('reference_year', reference_year)
+                        key['ignore_id_fields'] = ['reference_year']
+                        for d in dataset:
+                            key.update(d)
+                        item = self.item(**key)
+                        yield item
+
+        return parse
 
     def codebook_dataset(self, response, make_item, dataset_name, codebook):
         for csv_url, reference_date in find_available_datasets(response).iteritems():
@@ -434,16 +459,17 @@ def get_student_flow(table, for_po=True):
 
 class DuoVoBoardsSpider(DuoSpider):
     name = 'duo_vo_boards'
+    item = DuoVoBoard
 
     def __init__(self, *args, **kwargs):
         self.make_item = lambda board_id: DuoVoBoard(board_id=board_id)
         self.requests = {
             'vo/adressen/Adressen/besturen.asp':
-                self.parse_boards,
+                self.codebook_item('duo/vo_boards'),
             # 'vo/Financien/Financien/Kengetallen.asp':
             #     self.parse_financial_key_indicators,
-            'vo/leerlingen/Leerlingen/vo_leerlingen4.asp':
-                self.parse_vavo_students,
+            # 'vo/leerlingen/Leerlingen/vo_leerlingen4.asp':
+            #     self.parse_vavo_students,
             # 'vo/personeel/Personeel/vo_personeel_personen.asp':
             #     self.parse_vo_staff_people,
             # 'vo/personeel/Personeel/vo_personeel_fte.asp':
