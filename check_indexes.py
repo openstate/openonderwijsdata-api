@@ -25,8 +25,8 @@ for index in ES_INDEXES:
 
             if count > 0:
                 indent = len(str(count))
-                for field in get_fields(tree):
-                    missing = es.get('%s/%s/_search' % (index, doc_type), data={
+                for field in sorted(get_fields(tree)):
+                    present = count - es.get('%s/%s/_search' % (index, doc_type), data={
                             "query": {
                                 "constant_score" : {
                                     "filter" : {
@@ -36,7 +36,7 @@ for index in ES_INDEXES:
                             },
                             "size":0
                         })['hits']['total']
-                    percent = int(float(missing)/float(count)*100)
+                    percent = int(float(present)/float(count)*100)
                     print ' %s%%' % percent,
                     print (len(str(percent))-indent)*' ', len(field)*'\t','\t', 
                     print '.'.join(field)
