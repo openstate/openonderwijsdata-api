@@ -69,7 +69,12 @@ class DuoSpider(Spider):
             for row in parse_csv_file(csv_url):
                 for key, value in parse_row(row):
                     # Allow separate years
-                    year = value.pop('reference_year', None)
+                    if type(value) == dict:
+                        year = value.pop('reference_year', None)
+                        if (year, key) not in dataset:
+                            dataset[(year, key)] = []
+                    else:
+                        year = None
                     if (year, key) not in dataset:
                         dataset[(year, key)] = []
                     dataset[(year, key)].append(value)
@@ -534,8 +539,12 @@ class DuoVoBoardsSpider(DuoSpider):
                 indicators['group'] = row['GROEPERING']
 
                 for ind, ind_norm in indicators_mapping.iteritems():
-                    indicators[ind_norm] = float(row[ind].replace('.', '')
-                                                         .replace(',', '.'))
+                    if row[ind]!='':
+                        try:
+                            indicators[ind_norm] = float(row[ind].replace('.', '')
+                                .replace(',', '.'))
+                        except:
+                            log.msg('failed to convert %s'%str(row[ind]), level=log.ERROR)
 
                 yield board_id, indicators
 
@@ -675,7 +684,7 @@ class DuoVoSchoolsSpider(DuoSpider):
                     'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
                     'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
-                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
+                    'zip_code': (row['POSTCODE CORRESPONDENTIEADRES'] or '').replace(' ', '')
                 }
 
                 school['municipality_code'] = int_or_none(row['GEMEENTENUMMER'])
@@ -1223,7 +1232,7 @@ class DuoVoBranchesSpider(DuoSpider):
 
             education_type = {}
 
-            department = row['AFDELING'].strip()
+            department = (row['AFDELING'] or '').strip()
             if department:
                 education_type['department'] = department
                 if education_type['department'].lower() == 'n.v.t.':
@@ -1231,13 +1240,13 @@ class DuoVoBranchesSpider(DuoSpider):
             else:
                 education_type['department'] = None
 
-            if row['ELEMENTCODE'].strip():
+            if (row['ELEMENTCODE'] or '').strip():
                 education_type['elementcode'] = int(row['ELEMENTCODE']
                                                     .strip())
             else:
                 education_type['elementcode'] = None
 
-            lwoo = row['LWOO INDICATIE'].strip().lower()
+            lwoo = (row['LWOO INDICATIE'] or '').strip().lower()
             if lwoo:
                 if lwoo == 'j':
                     education_type['lwoo'] = True
@@ -1248,7 +1257,7 @@ class DuoVoBranchesSpider(DuoSpider):
             else:
                 education_type['lwoo'] = None
 
-            vmbo_sector = row['VMBO SECTOR'].strip()
+            vmbo_sector = (row['VMBO SECTOR'] or '').strip()
             if vmbo_sector:
                 if vmbo_sector.lower() == 'n.v.t.':
                     education_type['vmbo_sector'] = None
@@ -1257,17 +1266,18 @@ class DuoVoBranchesSpider(DuoSpider):
             else:
                 education_type['vmbo_sector'] = None
 
-            naam = row['OPLEIDINGSNAAM'].strip()
+            naam = (row['OPLEIDINGSNAAM'] or '').strip()
             education_type['education_name'] = naam or None
 
-            otype = row['ONDERWIJSTYPE VO EN LEER- OF VERBLIJFSJAAR'].strip()
+            otype = (row['ONDERWIJSTYPE VO EN LEER- OF VERBLIJFSJAAR'] or '').strip()
             education_type['education_structure'] = otype or None
 
             for available_year in range(1, 7):
                 male = int(row['LEER- OF VERBLIJFSJAAR %s - MAN'
-                           % available_year])
+                           % available_year] or 0)
                 female = int(row['LEER- OF VERBLIJFSJAAR %s - VROUW'
-                             % available_year])
+                             % available_year] or 0)
+
 
                 education_type['year_%s' % available_year] = {
                     'male': male,
@@ -2162,10 +2172,10 @@ class DuoPoSchoolsSpider(DuoSpider):
         def parse_row(row):
             if 'BRIN NUMMER' in row:
                 yield row['BRIN NUMMER'], {
-                    'cluster_1': int(row['CLUSTER 1'] or 0),
-                    'cluster_2': int(row['CLUSTER 2'] or 0),
-                    'cluster_3': int(row['CLUSTER 3'] or 0),
-                    'cluster_4': int(row['CLUSTER 4'] or 0),
+                    'cluster_1': int(float(row['CLUSTER 1'] or 0)),
+                    'cluster_2': int(float(row['CLUSTER 2'] or 0)),
+                    'cluster_3': int(float(row['CLUSTER 3'] or 0)),
+                    'cluster_4': int(float(row['CLUSTER 4'] or 0)),
                 }
         return self.dataset(response, self.make_item, 'spo_students_per_cluster', parse_row)
 
@@ -2427,6 +2437,26 @@ class DuoPoBranchesSpider(DuoSpider):
             if row.has_key('GEWICHT 1.20'):
                 row['GEWICHT 1.2'] = row['GEWICHT 1.20']
 
+            # and so did 2014
+            if row.has_key('BRIN_NUMMER'):
+                row['BRIN NUMMER'] = row['BRIN_NUMMER']
+            if row.has_key('SCHOOL_GEWICHT'):
+                row['SCHOOLGEWICHT'] = row['SCHOOL_GEWICHT']
+            if row.has_key('VESTIGINGS_NUMMER'):
+                row['VESTIGINGSNUMMER'] = row['VESTIGINGS_NUMMER']
+            if row.has_key('VEST_GEWICHT'):
+                row['SCHOOLGEWICHT'] = row['VEST_GEWICHT']
+            if row.has_key('VEST GEWICHT'):
+                row['SCHOOLGEWICHT'] = row['VEST GEWICHT']
+
+
+            if row.has_key('GEWICHT_0.00'):
+                row['GEWICHT 0'] = row['GEWICHT_0.00']
+            if row.has_key('GEWICHT_0.30'):
+                row['GEWICHT 0.3'] = row['GEWICHT_0.30']
+            if row.has_key('GEWICHT_1.20'):
+                row['GEWICHT 1.2'] = row['GEWICHT_1.20']
+
             brin = row['BRIN NUMMER'].strip()
             # Bypasses error coming from the 2011 dataset which contains and
             # empty row.
@@ -2476,6 +2506,14 @@ class DuoPoBranchesSpider(DuoSpider):
                 if row.has_key('VESTIGINS NUMMER'):
                     row['VESTIGINGSNUMMER'] = row['VESTIGINS NUMMER']
 
+                # 2014
+                if row.has_key('BRIN_NUMMER'):
+                    row['BRIN NUMMER'] = row['BRIN_NUMMER']
+                if row.has_key('GEMEENTE_NUMMER'):
+                    row['GEMEENTENUMMER'] = row['GEMEENTE_NUMMER']
+                if row.has_key('VESTIGINS_NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINS_NUMMER']
+
                 brin = row['BRIN NUMMER'].strip()
                 branch_id = int(row['VESTIGINGSNUMMER'])
                 school_id = '%s-%s' % (brin, branch_id)
@@ -2514,7 +2552,7 @@ class DuoPoBranchesSpider(DuoSpider):
                     ages_per_branch_by_student_weight[school_id] = {}
 
                 if row['GEWICHT'].strip():
-                    weight = 'student_weight_%.1f' % float(row['GEWICHT'].strip().replace(',', '.').replace('.', '_'))
+                    weight = ('student_weight_%.1f' % float(row['GEWICHT'].strip().replace(',', '.'))).replace('.', '_')
                 else:
                     weight = None
 
@@ -2665,6 +2703,14 @@ class DuoPoBranchesSpider(DuoSpider):
                 if row.has_key('VESTIGINSNUMMER'): # don't ask
                     row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
 
+                # 2014
+                if row.has_key('BRIN_NUMMER'):
+                    row['BRIN NUMMER'] = row['BRIN_NUMMER']
+                if row.has_key('GEMEENTE_NUMMER'):
+                    row['GEMEENTENUMMER'] = row['GEMEENTE_NUMMER']
+                if row.has_key('VESTIGINGS_NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS_NUMMER']
+
                 brin = row['BRIN NUMMER'].strip()
                 branch_id = 0 if not row['VESTIGINGSNUMMER'] else int(row['VESTIGINGSNUMMER'])
                 school_id = '%s-%s' % (brin, branch_id)
@@ -2681,6 +2727,8 @@ class DuoPoBranchesSpider(DuoSpider):
                 years = {}
                 possible_years = '1 2 3 4 5 6 7 8'.split()
                 for year in possible_years:
+                    if row.has_key('LEERJAAR_%s' % year):
+                        row['LEERJAAR %s' % year] = row['LEERJAAR_%s' % year]
                     if row['LEERJAAR %s' % year].strip():
                         years['year_%s' % year] = int(row['LEERJAAR %s' % year])
                     else:
@@ -2721,6 +2769,15 @@ class DuoPoBranchesSpider(DuoSpider):
                 if row.has_key('VESTIGINSNUMMER'): # don't ask
                     row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
 
+                # And so did 2014
+                if row.has_key('BRIN_NUMMER'):
+                    row['BRIN NUMMER'] = row['BRIN_NUMMER']
+                if row.has_key('VESTIGINGS_NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS_NUMMER']
+                if row.has_key('AANDUIDING_WET'):
+                    row['AANDUIDING WET'] = row['AANDUIDING_WET']
+                if row.has_key('SOORT_PRIMAIR_ONDERWIJS'):
+                    row['SOORT PRIMAIR ONDERWIJS'] = row['SOORT_PRIMAIR_ONDERWIJS']
 
                 branch = DuoPoBranch()
                 branch['brin'] = row['BRIN NUMMER'].strip()
@@ -2730,7 +2787,8 @@ class DuoPoBranchesSpider(DuoSpider):
                 # Should this be in root, or spo_students_by_birthyear?
                 branch['spo_law'] = row['AANDUIDING WET']
                 branch['spo_edu_type'] = row['SOORT PRIMAIR ONDERWIJS'] # possibly multiple with slash
-                branch['spo_cluster'] = row['CLUSTER'] # i hope they don't use slashes
+                if 'CLUSTER' in row:
+                    branch['spo_cluster'] = row['CLUSTER'] # i hope they don't use slashes
 
                 # ignoring total
                 students_by_birthyear = []
@@ -2819,7 +2877,8 @@ class DuoPoBranchesSpider(DuoSpider):
 
             # 2013 changed:
             if row.has_key('PRO'):
-                row['PrO'] = row['PRO']
+                row['PrO'] = row['PRO'] # although, sometimes rows have both???
+
             if row.has_key('VMBO BL KL'):
                 row['VMBO BL-KL'] = row['VMBO BL KL']
             if row.has_key('VMBO KL GT'):
@@ -2828,27 +2887,47 @@ class DuoPoBranchesSpider(DuoSpider):
                 row['VMBO GT-HAVO'] = row['VMBO GT HAVO']
             if row.has_key('HAVO VWO'):
                 row['HAVO-VWO'] = row['HAVO VWO']
+            
+            # 2014 changed:
+            if row.has_key('BRIN_NUMMER'):
+                row['BRIN NUMMER'] = row['BRIN_NUMMER']
+            if row.has_key('VMBO_BL_KL'):
+                row['VMBO BL-KL'] = row['VMBO_BL_KL']
+            if row.has_key('VMBO_KL_GT'):
+                row['VMBO KL-GT'] = row['VMBO_KL_GT']
+            if row.has_key('VMBO_GT_HAVO'):
+                row['VMBO GT-HAVO'] = row['VMBO_GT_HAVO']
+            if row.has_key('HAVO_VWO'):
+                row['HAVO-VWO'] = row['HAVO_VWO']
+            if row.has_key('VMBO_GT'):
+                row['VMBO GT'] = row['VMBO_GT']
+            if row.has_key('VMBO_KL'):
+                row['VMBO KL'] = row['VMBO_KL']
+            if row.has_key('VMBO_BL'):
+                row['VMBO BL'] = row['VMBO_BL']
 
 
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER'].strip()
                 branch_id = int(row['VESTIGINGSNUMMER'].strip() or 0)
-
-                yield (brin, branch_id), {
-                    # TODO intOrNone
-                    'vso' : int(row['VSO'] or 0),
-                    'pro' : int(row['PrO'] or 0),
-                    'vmbo_bl' : int(row['VMBO BL'] or 0),
-                    'vmbo_bl_kl' : int(row['VMBO BL-KL'] or 0),
-                    'vmbo_kl' : int(row['VMBO KL'] or 0),
-                    'vmbo_kl_gt' : int(row['VMBO KL-GT'] or 0),
-                    'vmbo_gt' : int(row['VMBO GT'] or 0),
-                    'vmbo_gt_havo' : int(row['VMBO GT-HAVO'] or 0),
-                    'havo' : int(row['HAVO'] or 0),
-                    'havo_vwo' : int(row['HAVO-VWO'] or 0),
-                    'vwo' : int(row['VWO'] or 0),
-                    'unknown' : int(row['ONBEKEND'] or 0),
-                    }
+                try:
+                    yield (brin, branch_id), {
+                        # TODO intOrNone
+                        'vso' : int(row['VSO'] or 0),
+                        'pro' : int(row['PrO'] or 0),
+                        'vmbo_bl' : int(row['VMBO BL'] or 0),
+                        'vmbo_bl_kl' : int(row['VMBO BL-KL'] or 0),
+                        'vmbo_kl' : int(row['VMBO KL'] or 0),
+                        'vmbo_kl_gt' : int(row['VMBO KL-GT'] or 0),
+                        'vmbo_gt' : int(row['VMBO GT'] or 0),
+                        'vmbo_gt_havo' : int(row['VMBO GT-HAVO'] or 0),
+                        'havo' : int(row['HAVO'] or 0),
+                        'havo_vwo' : int(row['HAVO-VWO'] or 0),
+                        'vwo' : int(row['VWO'] or 0),
+                        'unknown' : int(row['ONBEKEND'] or 0),
+                        }
+                except:
+                    log.msg('problem with row %s'%str(row.keys()), level=log.ERROR)
 
         return self.dataset(response, self.make_item, 'spo_students_by_advice', parse_row)
 
