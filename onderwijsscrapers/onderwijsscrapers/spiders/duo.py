@@ -3254,8 +3254,7 @@ class DuoMboInstitutionSpider(DuoSpider):
         def participants(row):
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
-                for year in [2009, 2010, 2011, 2012, 2013]:
-
+                for year in [2010, 2011, 2012, 2013, 2014]:
                     m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
                     if m or f:
                         yield (year, brin), {
@@ -3309,10 +3308,12 @@ class DuoMboInstitutionSpider(DuoSpider):
                 value = (row[key] or '').strip()
                 row[key] = value or None
                 row[key.strip()] = value or None
+            if 'BRINNUMMER' in row:
+                row['BRIN NUMMER'] = row['BRINNUMMER']
 
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
-                for year in [2009, 2010, 2011, 2012, 2013]:
+                for year in [2010, 2011, 2012, 2013, 2014]:
 
                     participants = int(row[str(year)] or 0)
                     if participants:
@@ -3340,7 +3341,7 @@ class DuoMboInstitutionSpider(DuoSpider):
 
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER']
-                for year in [2009, 2010, 2011, 2012, 2013]:
+                for year in [2010, 2011, 2012, 2013, 2014]:
 
                     m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
                     if m or f:
