@@ -1989,6 +1989,8 @@ class DuoPoBoardsSpider(DuoSpider):
                 else:
                     row[key.strip()] = '0'
 
+            if 'BEVOEGD_GEZAG_NUMMER' in row:
+                row['BEVOEGD GEZAG NUMMER'] = row['BEVOEGD_GEZAG_NUMMER']
             board_id = int(row['BEVOEGD GEZAG NUMMER'])
 
             for edu_type in possible_edu_types:
