@@ -107,6 +107,8 @@ class Codebook(dict):
                     yield root, key, {fieldname: val}
 
     def schema(self, root=False, **kwargs):
+        """ Create Colander Schema """
+        # TODO: mappings for mapping fields
         schema = SchemaNode(typ=colander.Mapping(), **kwargs)
         schema.__doc__ = schema.description
         for name,val in self.items():

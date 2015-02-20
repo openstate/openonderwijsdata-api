@@ -24,6 +24,22 @@ import colander
 import general_rules
 from onderwijsscrapers.codebooks import Codebook, load_codebook
 
+class CodebookSchema(MappingSchema):
+    def __init__(self, **kwargs):
+        codebook = getattr(self,'_codebook', None)
+        if codebook:
+            codebook = load_codebook(codebook)
+            for seq in codebook.schema():
+                for field in seq:
+                    self.add(field)
+
+        for name, codebook_file in getattr(self,'_datasets', {}).items():
+            self[name] = load_codebook(codebook_file).schema(name=name)
+            self['%s_reference_url'%name] = \
+                general_rules.website()
+            self['%s_reference_date'%name] = \
+                SchemaNode(Date(), missing=True)
+
 class FinancialKeyIndicatorsPerYear(SequenceSchema):
     @colander.instantiate()
     class financial_key_indicator_per_year(MappingSchema):
@@ -457,21 +473,26 @@ class DuoVoBranch(DuoAreaSchema, MappingSchema):
     vwo_exam_grades_reference_url = general_rules.website()
 
 
-class DuoVoBoard(MappingSchema):
+class DuoVoBoard(CodebookSchema, MappingSchema):
     """**Source:** `Voortgezet onderwijs - Adressen - 03. Adressen hoofdbesturen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/besturen.asp>`_"""
-    address = general_rules.Address( title="Address of this board.")
-    correspondence_address = general_rules.Address( title="Correspondence address of this board.")
-    board_id = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of the board of this branch.")
-    name = general_rules.name( title="Name of the board.")
-    phone = general_rules.phone( title="Phone number of the board.")
-    municipality = general_rules.municipality( title="The name of the municipality this board is located in.")
-    municipality_code = general_rules.municipality_code( title="Identifier (assigned by CBS [#cbs]_) to this municipality.")
-    administrative_office_id = SchemaNode(Int(),  title="Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances.")
-    administrative_office_id.orig = "Administratiekantoor"
-    denomination = general_rules.denomination( title="In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.")
-    reference_year = general_rules.reference_year( title="Year the boards source file was published")
-    reference_year.orig = "Peiljaar"
-    website = general_rules.website( title="URL of the webpage of the board.")
+    # address = general_rules.Address( title="Address of this board.")
+    # correspondence_address = general_rules.Address( title="Correspondence address of this board.")
+    # board_id = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of the board of this branch.")
+    # name = general_rules.name( title="Name of the board.")
+    # phone = general_rules.phone( title="Phone number of the board.")
+    # municipality = general_rules.municipality( title="The name of the municipality this board is located in.")
+    # municipality_code = general_rules.municipality_code( title="Identifier (assigned by CBS [#cbs]_) to this municipality.")
+    # administrative_office_id = SchemaNode(Int(),  title="Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances.")
+    # administrative_office_id.orig = "Administratiekantoor"
+    # denomination = general_rules.denomination( title="In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here.")
+    # reference_year = general_rules.reference_year( title="Year the boards source file was published")
+    # reference_year.orig = "Peiljaar"
+    # website = general_rules.website( title="URL of the webpage of the board.")
+
+    _codebook = 'duo/vo_boards'
+    _datasets = {
+        'staff': 'duo/vo_boards_staff'
+    }
 
     financial_key_indicators_per_year_reference_date = SchemaNode(Date(),  title="Date the financial key indicator source file was published at http://data.duo.nl", missing=True)
     financial_key_indicators_per_year_reference_date.orig = "Peiljaar"
@@ -482,13 +503,9 @@ class DuoVoBoard(MappingSchema):
     vavo_students = Codebook([
         {'field':'board_id', 'keyed':'0', 'source':'BEVOEGD GEZAG NUMMER','type':'int', 'description':''},
         {'field':'vavo', 'keyed':'', 'source':'AANTAL LEERLINGEN','type':'int', 'description':''},
-    ]).schema(description='Vavo students source bla bla')
+    ]).schema(name='vavo_students', title='Vavo students source bla bla')
 
-    staff_reference_url = general_rules.website()
-    staff_reference_date = SchemaNode(Date(), missing=True)
-    staff = load_codebook('duo/vo_boards_staff').schema()
-
-
+    
 class DuoVoSchool(DuoAreaSchema, MappingSchema):
     """ **Source:** `Voortgezet onderwijs - Adressen - 01. Adressen hoofdvestigingen <http://data.duo.nl/organisatie/open_onderwijsdata/databestanden/vo/adressen/Adressen/hoofdvestigingen.asp>`_"""
     address = general_rules.Address( title="Address of this school.")
