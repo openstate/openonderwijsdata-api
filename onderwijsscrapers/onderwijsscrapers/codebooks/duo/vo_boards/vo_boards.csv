@@ -1,10 +1,21 @@
-source,keyed,field,type,description
-BEVOEGD GEZAG NUMMER,0,board_id,string,
-BEVOEGD GEZAG NAAM,,name,string,
-GEMEENTENAAM,,municipality,string,
-GEMEENTENUMMER,,municipality_code,string,
-TELEFOONNUMMER,,phone,string,
-INTERNETADRES,,website,string,
-DENOMINATIE,,denomination,string,
-ADMINISTRATIEKANTOORNUMMER,,administrative_office_id,string,
-POSTCODE,,address.zip_code,string,
+field,keyed,type,source,description
+address.address_components.long_name,,String,,Full name of this component. (*i.e. 'Nederland'*)
+address.address_components.short_name,,String,,Abbreviated form (if applicable) of the long_name. (*i.e. 'NL'*)
+address.city,,String,,Name of the city or village this branch is located.
+address.formatted_address,,String,,Normalised address as returned by the BAG42 geocoding API [#bag42geo]_.
+address.street,,String,,Street name and number of the address of this branch.
+address.zip_code,,string,POSTCODE,"Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed."
+administrative_office_id,,string,ADMINISTRATIEKANTOORNUMMER,Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances.
+board_id,0,string,BEVOEGD GEZAG NUMMER,Identifier (assigned by :ref:`duodata`) of the board of this branch.
+correspondence_address.address_components.long_name,,String,,Full name of this component. (*i.e. 'Nederland'*)
+correspondence_address.address_components.short_name,,String,,Abbreviated form (if applicable) of the long_name. (*i.e. 'NL'*)
+correspondence_address.city,,String,,Name of the city or village this branch is located.
+correspondence_address.formatted_address,,String,,Normalised address as returned by the BAG42 geocoding API [#bag42geo]_.
+correspondence_address.street,,String,,Street name and number of the address of this branch.
+correspondence_address.zip_code,,String,,"Zip code of the address of this branch. A Dutch zip code consists of four digits, a space and two letters (*1234 AB*) [#zipcodes]_. For normalisation purposes, the whitespace is removed."
+denomination,,string,DENOMINATIE,"In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here."
+municipality,,string,GEMEENTENAAM,The name of the municipality this board is located in.
+municipality_code,,int,GEMEENTENUMMER,Identifier (assigned by CBS [#cbs]_) to this municipality.
+name,,string,BEVOEGD GEZAG NAAM,Name of the board.
+phone,,string,TELEFOONNUMMER,Phone number of the board.
+website,,string,INTERNETADRES,URL of the webpage of the board.
