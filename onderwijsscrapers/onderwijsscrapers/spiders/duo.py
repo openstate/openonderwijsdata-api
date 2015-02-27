@@ -466,13 +466,18 @@ class DuoVoBoardsSpider(DuoSpider):
         self.requests = {
             'vo/adressen/Adressen/besturen.asp':
                 self.codebook_item('duo/vo_boards'),
+                # self.parse_boards,
             # 'vo/Financien/Financien/Kengetallen.asp':
+                # self.codebook_item('duo/vo_boards/financial_key_indicators'),
             #     self.parse_financial_key_indicators,
             # 'vo/leerlingen/Leerlingen/vo_leerlingen4.asp':
+                # self.codebook_item('duo/vo_boards/vavo_students'),
             #     self.parse_vavo_students,
             # 'vo/personeel/Personeel/vo_personeel_personen.asp':
+                # self.codebook_item('duo/vo_boards/vo_staff_people', ext='.xls', filt=['per owtype-bestuur-brin-functie']),
             #     self.parse_vo_staff_people,
             # 'vo/personeel/Personeel/vo_personeel_fte.asp':
+                # self.codebook_item('duo/vo_boards/vo_staff_fte', ext='.xls', filt=['per owtype-bestuur-brin-functie']),
             #     self.parse_vo_staff_fte,
         }
         DuoSpider.__init__(self, *args, **kwargs)
@@ -636,22 +641,31 @@ class DuoVoSchoolsSpider(DuoSpider):
         self.make_item = lambda brin: DuoVoSchool(brin=brin)
         self.requests = {
             'vo/adressen/Adressen/hoofdvestigingen.asp':
+                # self.codebook_item('duo/vo_schools/vo_schools'),
                 self.parse_schools,
             'vschoolverlaten/vsv_voortgezet.asp':
+                # self.codebook_item('duo/vo_schools/dropouts'),
                 self.parse_dropouts,
             'vo/leerlingen/Leerlingen/vo_leerlingen11.asp':
+                # self.codebook_item('duo/vo_schools/students_prognosis'),
                 self.parse_students_prognosis,
             'passendow/Adressen/Adressen/passend_vo_6.asp':
+                # self.codebook_item('duo/vo_schools/vo_lo_collaboration'),
                 self.parse_vo_lo_collaboration,
             'passendow/Adressen/Adressen/passend_vo_8.asp':
+                # self.codebook_item('duo/vo_schools/pao_collaboration'),
                 self.parse_pao_collaboration,
             'vo/personeel/Personeel/vo_personeel_personen.asp':
+                # self.codebook_item('duo/vo_schools/vo_staff_people', ext='.xls', filt=['per owtype-bestuur-brin-functie']),
                 self.parse_vo_staff_people,
             'vo/personeel/Personeel/vo_personeel_fte.asp':
+                # self.codebook_item('duo/vo_schools/vo_staff_fte', ext='.xls', filt=['per owtype-bestuur-brin-functie']),
                 self.parse_vo_staff_fte,
             'vo/personeel/Personeel/vo_personeel_3.asp':
+                # self.codebook_item('duo/vo_schools/vo_staff_course', ext='.xls', filt=['per bestuur-brin-vak-graad']),
                 self.parse_vo_staff_course,
             'vo/personeel/Personeel/vo_personeel_4.asp':
+                # self.codebook_item('duo/vo_schools/vo_time_per_course', ext='.xls', filt=['per bestuur-brin-vak-graad']),
                 self.parse_vo_time_per_course,
         }
         DuoSpider.__init__(self, *args, **kwargs)
@@ -1111,26 +1125,37 @@ class DuoVoBranchesSpider(DuoSpider):
         self.make_item = lambda ((brin,branch_id)): DuoVoBranch(brin=brin,branch_id=branch_id)
         self.requests = {
             'vo/adressen/Adressen/vestigingen.asp':
+                # self.codebook_item('duo/vo_branches/vo_branches'),
                 self.parse_branches,
             'vo/leerlingen/Leerlingen/vo_leerlingen2.asp':
+                # self.codebook_item('duo/vo_branches/student_residences'),
                 self.parse_student_residences,
             'vo/leerlingen/Leerlingen/vo_leerlingen1.asp':
+                # self.codebook_item('duo/vo_branches/students_by_structure'),
                  self.parse_students_by_structure,
             'vo/leerlingen/Leerlingen/vo_leerlingen6.asp':
+                # self.codebook_item('duo/vo_branches/student_graduations'),
                 self.student_graduations,
             'vo/leerlingen/Leerlingen/vo_leerlingen7.asp':
+                # self.codebook_item('duo/vo_branches/student_exam_grades'),
                 self.student_exam_grades,
             'vo/leerlingen/Leerlingen/vo_leerlingen8.asp':
+                # self.codebook_item('duo/vo_branches/vmbo_exam_grades_per_course'),
                 self.vmbo_exam_grades_per_course,
             'vo/leerlingen/Leerlingen/vo_leerlingen9.asp':
+                # self.codebook_item('duo/vo_branches/havo_exam_grades_per_course'),
                 self.havo_exam_grades_per_course,
             'vo/leerlingen/Leerlingen/vo_leerlingen10.asp':
+                # self.codebook_item('duo/vo_branches/vwo_exam_grades_per_course'),
                 self.vwo_exam_grades_per_course,
             'vo/leerlingen/Leerlingen/vo_leerlingen3.asp':
+                # self.codebook_item('duo/vo_branches/vavo_students'),
                 self.parse_vavo_students,
             'vo/leerlingen/Leerlingen/vo_leerlingen5.asp':
+                # self.codebook_item('duo/vo_branches/students_by_finegrained_structure'),
                 self.parse_students_by_finegrained_structure,
             'Stroom/doorstromers/doorstromers/po_vo.asp':
+                # self.codebook_item('duo/vo_branches/vo_student_flow'),
                 self.parse_vo_student_flow,
         }
         DuoSpider.__init__(self, *args, **kwargs)
@@ -1860,16 +1885,22 @@ class DuoPoBoardsSpider(DuoSpider):
         self.make_item = lambda (board_id): DuoPoBoard(board_id=board_id)
         self.requests = {
             'po/adressen/Adressen/po_adressen05.asp':
+                # self.codebook_item('duo/po_boards/po_boards1'),
                 self.parse_po_boards,
             'po/adressen/Adressen/po_adressen06.asp':
+                # self.codebook_item('duo/po_boards/po_boards2'),
                 self.parse_po_boards,
             'po/Financien/Jaarrekeninggegevens/Kengetallen.asp':
+                # self.codebook_item('duo/po_boards/po_financial_key_indicators'),
                 self.parse_po_financial_key_indicators,
             'po/Leerlingen/Leerlingen/po_leerlingen7.asp':
+                # self.codebook_item('duo/po_boards/po_education_type'),
                 self.parse_po_education_type,
             'po/Onderwijspersoneel/Personeel/po_personeel_personen.asp':
+                # self.codebook_item('duo/po_boards/po_staff_people', ext='.xls', filt=['per owtype-bestuur-brin-functie']),
                 self.parse_po_staff_people,
             'po/Onderwijspersoneel/Personeel/po_personeel_fte.asp':
+                # self.codebook_item('duo/po_boards/po_staff_fte', ext='.xls', filt=['per owtype-bestuur-brin-functie']),
                 self.parse_po_staff_fte,
         }
         DuoSpider.__init__(self, *args, **kwargs)
@@ -2073,18 +2104,25 @@ class DuoPoSchoolsSpider(DuoSpider):
         self.make_item = lambda (brin): DuoPoSchool(brin=brin)
         self.requests = {
             'po/adressen/Adressen/hoofdvestigingen.asp':
+                # self.codebook_item('duo/po_schools/po_schools1'),
                 self.parse_po_schools,
             'po/adressen/Adressen/speciaal.asp':
+                # self.codebook_item('duo/po_schools/po_schools2'),
                 self.parse_po_schools,
             'po/Leerlingen/Leerlingen/po_leerlingen4.asp':
+                # self.codebook_item('duo/po_schools/spo_students_per_cluster'),
                 self.parse_spo_students_per_cluster,
             'passendow/Adressen/Adressen/passend_po_2.asp':
+                # self.codebook_item('duo/po_schools/po_lo_collaboration'),
                 self.parse_po_lo_collaboration,
             'passendow/Adressen/Adressen/passend_po_4.asp':
+                # self.codebook_item('duo/po_schools/pao_collaboration'),
                 self.parse_pao_collaboration,
             'po/Onderwijspersoneel/Personeel/po_personeel_personen.asp':
+                # self.codebook_item('duo/po_schools/po_staff_people', ext='.xls', filt=['per owtype-bestuur-brin-functie']),
                 self.parse_po_staff_people,
             'po/Onderwijspersoneel/Personeel/po_personeel_fte.asp':
+                # self.codebook_item('duo/po_schools/po_staff_fte', ext='.xls', filt=['per owtype-bestuur-brin-functie']),
                 self.parse_po_staff_fte,
         }
         DuoSpider.__init__(self, *args, **kwargs)
@@ -2275,28 +2313,40 @@ class DuoPoBranchesSpider(DuoSpider):
         self.make_item = lambda ((brin, branch_id)): DuoPoBranch(brin=brin, branch_id=branch_id)
         self.requests = {
             'po/adressen/Adressen/vest_bo.asp':
+                # self.codebook_item('duo/po_branches/po_branches1'),
                 self.parse_po_branches,
             'po/adressen/Adressen/vest_sbo.asp':
+                # self.codebook_item('duo/po_branches/po_branches2'),
                 self.parse_po_branches,
             'po/Leerlingen/Leerlingen/po_leerlingen1.asp':
+                # self.codebook_item('duo/po_branches/po_student_weight'),
                 self.parse_po_student_weight,
             'po/Leerlingen/Leerlingen/po_leerlingen3.asp':
+                # self.codebook_item('duo/po_branches/po_student_age'),
                 self.parse_po_student_age,
             'po/Leerlingen/Leerlingen/po_leerlingen9.asp':
+                # self.codebook_item('duo/po_branches/po_born_outside_nl'),
                 self.parse_po_born_outside_nl,
             'po/Leerlingen/Leerlingen/po_leerlingen11.asp':
+                # self.codebook_item('duo/po_branches/po_pupil_zipcode_by_age', ext='.zip'),
                 self.parse_po_pupil_zipcode_by_age,
             'po/Leerlingen/Leerlingen/leerjaar.asp':
+                # self.codebook_item('duo/po_branches/po_student_year'),
                 self.parse_po_student_year,
             'po/Leerlingen/Leerlingen/po_leerlingen5.asp':
+                # self.codebook_item('duo/po_branches/spo_students_by_birthyear'),
                 self.parse_spo_students_by_birthyear,
             'po/Leerlingen/Leerlingen/po_leerlingen6.asp':
+                # self.codebook_item('duo/po_branches/spo_students_by_edu_type'),
                 self.parse_spo_students_by_edu_type,
             'po/Leerlingen/Leerlingen/Schooladvies.asp':
+                # self.codebook_item('duo/po_branches/po_students_by_advice'),
                 self.parse_po_students_by_advice,
             'po/Leerlingen/Leerlingen/po_leerlingen26-10.asp':
+                # self.codebook_item('duo/po_branches/po_students_in_BRON', ext='.xls'),
                 self.parse_po_students_in_BRON,
             'Stroom/doorstromers/doorstromers/po_vo.asp':
+                # self.codebook_item('duo/po_branches/po_student_flow'),
                 self.parse_po_student_flow,
         }
         DuoSpider.__init__(self, *args, **kwargs)
@@ -3054,12 +3104,16 @@ class DuoPaoCollaborationsSpider(DuoSpider):
     def __init__(self, *args, **kwargs):
         self.requests = {
             'passendow/Adressen/Adressen/passend_po_1.asp':
+                # self.codebook_item('duo/pao_collaborations/pao_collaborations1'),
                 self.parse_collaborations,
             'passendow/Adressen/Adressen/passend_po_3.asp':
+                # self.codebook_item('duo/pao_collaborations/pao_collaborations2'),
                 self.parse_collaborations,
             'passendow/Adressen/Adressen/passend_vo_1.asp':
+                # self.codebook_item('duo/pao_collaborations/pao_collaborations3'),
                 self.parse_collaborations,
             'passendow/Adressen/Adressen/passend_vo_7.asp':
+                # self.codebook_item('duo/pao_collaborations/pao_collaborations4'),
                 self.parse_collaborations,
         }
         DuoSpider.__init__(self, *args, **kwargs)
@@ -3120,6 +3174,7 @@ class DuoMboBoardSpider(DuoSpider):
         self.make_item = lambda (board_id): DuoMboBoard(board_id=board_id)
         self.requests = {
             'mbo_/adressen/Adressen/bevoegde_gezagen.asp':
+                # self.codebook_item('duo/mbo_boards/mbo_boards'),
                 self.parse_mbo_boards,
         }
         DuoSpider.__init__(self, *args, **kwargs)
@@ -3169,8 +3224,10 @@ class DuoMboInstitutionSpider(DuoSpider):
         self.make_item = lambda (brin): DuoMboInstitution(brin=brin)
         self.requests = {
             'mbo_/adressen/Adressen/instellingen.asp':
+                # self.codebook_item('duo/mbo_institutions/mbo_institutions'),
                 self.parse_mbo_institutions,
             'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp':
+                # self.codebook_item('duo/mbo_institutions/mbo_participants_per_institution'),
                 self.parse_mbo_participants_per_institution,
         }
         DuoSpider.__init__(self, *args, **kwargs)

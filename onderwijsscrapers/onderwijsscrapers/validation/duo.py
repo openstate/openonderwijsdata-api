@@ -489,9 +489,9 @@ class DuoVoBoard(CodebookSchema, MappingSchema):
     # reference_year.orig = "Peiljaar"
     # website = general_rules.website( title="URL of the webpage of the board.")
 
-    _codebook = 'duo/vo_boards'
+    _codebook = 'duo/vo_boards/vo_boards'
     _datasets = {
-        'staff': 'duo/vo_boards_staff'
+        'staff': 'duo/vo_boards/vo_boards_staff'
     }
 
     financial_key_indicators_per_year_reference_date = SchemaNode(Date(),  title="Date the financial key indicator source file was published at http://data.duo.nl", missing=True)
@@ -707,7 +707,7 @@ class DuoMboInstitution(DuoAreaSchema, MappingSchema):
     mbo_institution_kind_code = SchemaNode(String())
     website = general_rules.website( title="Website of this institution.")
 
-    # participants_per_grade_year_and_qualification = CodebookSchema('duo/mbo_participants_grade.csv')
+    # participants_per_grade_year_and_qualification = CodebookSchema('duo/mbo_institutions/mbo_participants_grade.csv')
     participants_per_grade_year_and_qualification_reference_url = general_rules.website()
     participants_per_grade_year_and_qualification_reference_date = SchemaNode(Date(), missing=True)
 
