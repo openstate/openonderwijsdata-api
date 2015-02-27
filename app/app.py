@@ -536,6 +536,16 @@ api.add_resource(GetValidationResults, '/api/v1/get_validation_results/'
 api.add_resource(ExportTable, '/export/<index>/<doc_type>.<filetype>')
 
 
+from stats import make_statsfile
+class GetStats(restful.Resource):
+    def get(self, index, doc_type, ftype):
+        counts = make_statsfile(index, doc_type, ftype)
+        if counts:
+            response = make_response(counts)
+            response.headers['content-type'] = 'application/%s'%ftype
+            return response
+api.add_resource(GetStats, '/api/v1/stats/'
+                                       '<index>/<doc_type>.<ftype>')
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5001)
