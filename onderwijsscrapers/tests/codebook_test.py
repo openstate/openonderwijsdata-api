@@ -1,6 +1,11 @@
 from onderwijsscrapers.codebooks_flat import load_codebook, Codebook
 import csv
 
+"""
+    Usage:
+    python codebook_test.py <codebook path> <table file> <filter>
+"""
+
 if __name__ == '__main__':
     import sys, StringIO
     import pprint

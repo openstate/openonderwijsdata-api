@@ -128,9 +128,8 @@ class DuoSpider(Spider):
                     item[dataset_name] = dataset
                     yield item
 
-def find_available_datasets(response, extension='csv'):
+def find_available_datasets(response, extension='csv', filt=None):
     """ Get all URLS of files with a certain extension on the DUO page """
-    # TODO: merge with 'extract_csv_files'
     available_datasets = {}
     datasets = response.xpath('//tr[.//a[contains(@href, ".%s")]]' % extension)
     for dataset_file in datasets:
@@ -138,8 +137,10 @@ def find_available_datasets(response, extension='csv'):
         ref_date = datetime.strptime(ref_date[0], '%d %B %Y').date()
 
         dataset_url = dataset_file.xpath('.//a/@href').re(r'(.*\.%s)' % extension)[0]
+        dataset_name = dataset_file.xpath('.//a/text()')[0]
 
-        available_datasets['http://duo.nl%s' % dataset_url] = ref_date
+        if (not filt) or any(f in dataset_name for f in filt):
+            available_datasets['http://duo.nl%s' % dataset_url] = ref_date
 
     return available_datasets
 
