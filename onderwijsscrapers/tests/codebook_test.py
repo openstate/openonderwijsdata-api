@@ -1,4 +1,4 @@
-from onderwijsscrapers.codebooks_flat import load_codebook, Codebook
+from onderwijsscrapers.codebooks import load_codebook, Codebook
 import csv
 
 """
