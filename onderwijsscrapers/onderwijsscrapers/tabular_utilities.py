@@ -43,11 +43,12 @@ def get_tables(fstream, ext, filt=None):
                 yield XLSTable(wb.sheet_by_name(name))
                 # wb.unload_sheet(name) # needed?
     elif ext == '.zip':
-        for zfile in ZipFile(fstream).filelist:
-            root, ext = splitext(zfile.getinfo().filename)
+        zfiles = ZipFile(fstream)
+        for zfile in zfiles.filelist:
+            root, ext = splitext(zfile.filename)
             if (not filt) or basename(root) in filt:
                 # call recursive for files that match filter
-                for t in get_tables(zfiles.read(zfile), ext.strip('.'), filt=filt):
+                for t in get_tables(cStringIO.StringIO(zfiles.read(zfile)), ext, filt=filt):
                     yield t
 
 class CSVTable(object):
