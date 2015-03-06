@@ -171,16 +171,18 @@ class CodebookNested(Codebook):
                 nest(key, val, thedict[n], nest_stack)
             else:
                 thedict[key] = val
-        keyed_fields = set(name for name, f in self.items() if f.keyed)
-        keys = set(n for n,r in self.items() if int(r.keyed or 0) and r.source)
+        keys = set(name for name, f in self.items() if f.keyed>0)
+        # roots = set(n for n,r in self.items() if r.keyed>0 and r.source)
+        # print keyed_fields, keys
         self.nested = {}
         for n,r in self.iteritems():
-            if not r.keyed:
+            if r.keyed is None:
                 # add to tree by root keys and nested keys
                 # Don't allow hierarchical fields inside source
                 nests = set(k for k in keys if '<%s>'%str(k) in r.source)
                 stack = sorted(keys|nests, key=lambda k: -int(self[k].keyed))
                 nest(n,r, self.nested, stack)
+        print self.nested
 
     def schema(self, root=False, **kwargs):
         def to_validator(val, name=''):
