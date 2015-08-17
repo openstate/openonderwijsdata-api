@@ -6,13 +6,15 @@ from colander import SchemaNode
 from groupnested import GroupNested
 
 import os
-def load_codebook(path, nested=False):
+def load_codebook(path, nested=False, delimiter=','):
     path = os.path.join('codebooks', '%s.csv'%path)
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+    codebook_csv = csv.DictReader(open(path), delimiter=delimiter)
+
     if nested:
-        return CodebookNested(csv.DictReader(open(path), delimiter=','))
+        return CodebookNested(codebook_csv)
     else:
-        return Codebook(csv.DictReader(open(path), delimiter=','))
+        return Codebook(codebook_csv)
 
 default_datatypes = {
     'int': (int, colander.Int()), 
@@ -88,23 +90,29 @@ class Codebook(dict):
         # fill key with keyed fields
         for i, fieldnames in keyed_per_head.iteritems():
             for fieldname in fieldnames:
-                for val in self[fieldname].get_value(row[i]):
-                    if self[fieldname].keyed == 0:
-                        root[fieldname] = val
-                    else:
-                        key[fieldname] = val
+                try:
+                    for val in self[fieldname].get_value(row[i]):
+                        if self[fieldname].keyed == 0:
+                            root[fieldname] = val
+                        else:
+                            key[fieldname] = val
+                except:
+                    print row, i
         # parse rest of fields
         for i, fieldnames in unkeyed_per_head.iteritems():
             for (fieldname, groups) in fieldnames:
-                for val in self[fieldname].get_value(row[i]):
-                    # add other fields to root or n
-                    for name, nest_str in groups.iteritems():
-                        for nest_val in self[name].get_value(nest_str):
-                            if self[name].keyed == 0:
-                                root[name] = nest_val
-                            else:
-                                key[name] = nest_val
-                    yield root, key, {fieldname: val}
+                try:
+                    for val in self[fieldname].get_value(row[i]):
+                        # add other fields to root or n
+                        for name, nest_str in groups.iteritems():
+                            for nest_val in self[name].get_value(nest_str):
+                                if self[name].keyed == 0:
+                                    root[name] = nest_val
+                                else:
+                                    key[name] = nest_val
+                        yield root, key, {fieldname: val}
+                except:
+                    pass # malformed row
 
     def schema(self, root=False, **kwargs):
         """ Create Colander Schema """

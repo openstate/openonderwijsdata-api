@@ -21,9 +21,8 @@ from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
                                      DuoPoBoard, DuoPoSchool, DuoPoBranch,
                                      DuoPaoCollaboration, DuoMboBoard, DuoMboInstitution)
 
-from onderwijsscrapers.tabular_utilities import get_stream, get_tables
+from onderwijsscrapers.tabular_utilities import get_stream, get_tables, next_n_extended
 from onderwijsscrapers.codebooks import load_codebook
-
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 
 
@@ -88,6 +87,7 @@ class DuoSpider(Spider):
 
     def codebook_item(self, codebook, **kwargs):
         codebook = load_codebook(codebook)
+        headers = kwargs.get('headers', 1)
 
         def parse(response):
             datasets = find_available_datasets(response, **kwargs)
@@ -97,7 +97,7 @@ class DuoSpider(Spider):
                 # There's probably only one table, but loop just in case
                 for table in get_tables(*get_stream(url), **kwargs):
                     rows = table.rows()
-                    head = next(rows)
+                    head = [';'.join(f) for f in next_n_extended(rows, headers)]
                     for key, dataset in codebook.parse(head, rows):
                         key.setdefault('reference_year', reference_year)
                         key['ignore_id_fields'] = ['reference_year']

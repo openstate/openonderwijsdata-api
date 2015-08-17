@@ -3,7 +3,7 @@ import csv
 
 """
     Usage:
-    python codebook_test.py <codebook path> <table file> <filter>
+    python codebook_test.py <codebook path> <table file> <filter> <# head rows>
 """
 
 if __name__ == '__main__':
@@ -22,13 +22,17 @@ if __name__ == '__main__':
 
         pp.pprint(cb)
         print_schema(cb.schema(root=True))
-        from onderwijsscrapers.tabular_utilities import get_tables
+        from onderwijsscrapers.tabular_utilities import get_tables, next_n_extended
         from os.path import splitext
         root, ext = splitext(sys.argv[2])
-        filt = [sys.argv[3]] if len(sys.argv)>3 else None
+        argv = dict(enumerate(sys.argv))
+        filt = argv.get(3, None)
+        head_rows = int(argv.get(4, 1))
+
         for table in get_tables(open(sys.argv[2]), ext, filt=filt):
             rows = table.rows()
-            head = next(rows)
+            # head = next(rows)
+            head = [';'.join(f) for f in next_n_extended(rows, head_rows)]
             key, val = next(cb.parse(head, rows))
             print key
             print cb.schema(root=False).deserialize(val)

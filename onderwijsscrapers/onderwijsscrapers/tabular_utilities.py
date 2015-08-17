@@ -7,6 +7,7 @@ from os import devnull
 from os.path import basename, splitext
 from zipfile import ZipFile
 import requests
+from collections import defaultdict
 
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')
 """
@@ -89,3 +90,10 @@ def extend_to_blank(l, extend=''):
     for i in l:
         extend = i or extend
         yield extend
+
+def next_n_extended(rows, n, extend=''):
+    fields = defaultdict(list)
+    for _ in range(n):
+        for i,f in enumerate(extend_to_blank(next(rows), extend=extend)):
+            fields[i].append(f)
+    return fields.values()
