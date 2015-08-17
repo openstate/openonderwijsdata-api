@@ -3,7 +3,7 @@
 """
 Data
 ====
-The data that is made available through the API originates from different sources: :ref:`duodata`, :ref:`schoolvodata` and the :ref:`owinspdata`. Each of these sources provides different types of data, from school assessments to financial figures. For each source the available fields are described, as well as the data they contain.
+The data that is made available through the API now originates only from :ref:`duodata`. For each source the available fields are described, as well as the data they contain.
 
 The data sources present their data aggregated on different *granularities*: financial data is usually aggregated to the level of the school *board*, whereas the number of students is available for specific locations (*branch*) of a school. In order to represent the data properly, the following entities are defined for different levels of education: *board*, *school*, *branch*. Currently there are two types of education are available, primary and secondary education (respectively in Dutch: *primair onderwijs* or *po* and *voortgezet onderwijs* or *vo*). Examples of the *vo* entities:
 
@@ -110,22 +110,6 @@ with open(data_rst_file, 'w') as o:
     for n in sorted(docs['duo'].keys(), key=lambda x: x.lower()):
         t = docs['duo'][n]
         o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'duo' })
-
-    o.write(schoolvo.__doc__)
-    for n in ["SchoolVOBranch"]:
-        t = docs['schoolvo'].pop(n)
-        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'schoolvo' })
-    for n in sorted(docs['schoolvo'].keys(), key=lambda x: x.lower()):
-        t = docs['schoolvo'][n]
-        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'schoolvo' })
-
-    o.write(owinsp.__doc__)
-    for n in ["OnderwijsInspectiePoBranch", "OnderwijsInspectieVoBranch"]:
-        t = docs['owinsp'].pop(n)
-        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'owinsp' })
-    for n in sorted(docs['owinsp'].keys(), key=lambda x: x.lower()):
-        t = docs['owinsp'][n]
-        o.write(table_template % {'name': n, 'name_line': '^'*len(n), 'docstring': t, 'source': 'owinsp' })
 
     o.write("""
 **Footnotes**
