@@ -4,12 +4,11 @@ from flask.ext.restful import abort, reqparse
 from flask.ext.cors import CORS
 import rawes
 import re
-import json
-import csv
-import io
+
 
 from settings import (ES_URL, ES_INDEXES, ES_DOCUMENT_TYPES_PER_INDEX,
                       ES_DOCUMENT_TYPES, ES_VALIDATION_RESULTS_INDEX)
+from export import ExportTable
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -424,85 +423,6 @@ class GetValidationResults(restful.Resource):
         }
         print query
         return es.get('%s/_search' % (ES_VALIDATION_RESULTS_INDEX), data=query)
-
-class ExportTable(restful.Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('fields', type=str)
-
-    def get(self, filetype, index, doc_type):
-        # Return an error if the requested index does not exist
-        if index not in ES_INDEXES:
-            abort(400, message='Index "%s" does not exist' % index)
-
-        # Return an error if the requested doctype does not exist in the
-        # requested index
-        if doc_type not in ES_DOCUMENT_TYPES_PER_INDEX[index]:
-            abort(400, message='Doctype "%s" does not exist in index "%s"'
-                               % (doc_type, index))
-
-        def iter_flattened_doc(root, branch, name_part, keys):
-            """ Flatten a nested doc into rows """
-            def name(k):
-                return '.'.join([name_part,k]) if name_part else k
-            row = dict(root) # copy row
-            for k,v in branch.iteritems():
-                if type(v) is not list and name(k) in keys:
-                    row[name(k)] = v.encode('utf-8') if type(v)==unicode else v
-            has_nest = False
-            for k,v in branch.iteritems():
-                if type(v) is list:
-                    has_nest = True
-                    for i in v:
-                        for j in iter_flattened_doc(row, i, name(k), keys):
-                            yield j
-            if not has_nest:
-                yield row
-
-        # Make a CSV table
-        args = self.parser.parse_args()
-        keys = args['fields'].split(',') if args['fields'] else []
-        query = {"query": { "match_all": {} } }
-        query["_source"] = keys
-        query["size"] = 100000
-
-        # get nested keys from mapping
-        mapping = es.get('%s/%s/_mapping'% (index, doc_type))
-        if mapping.keys():
-            mapping = mapping[mapping.keys()[0]]['mappings'][doc_type]
-            def maptree(t, nest):
-                for n, prop in t['properties'].iteritems():
-                    if 'properties' in prop:
-                        for m in maptree(prop, nest+[n]):
-                            yield m
-                    else:
-                        yield nest+[n]
-            keys = ['.'.join(k) for k in maptree(mapping, []) if (k[0] in keys) or not keys]
-        else:
-            keys = []
-
-        tree = es.get('%s/%s/_search'% (index, doc_type), data=query)
-        if not tree['hits']['hits']:
-            abort(400, message='No documents of type "%s" in index "%s"'
-                               % (doc_type, index))
-
-        if filetype == 'json':
-            tree = [hit['_source'] for hit in tree['hits']['hits']]
-            response = make_response(json.dumps(tree))
-            response.headers['content-type'] = 'application/json'
-            return response
-        elif filetype == 'csv':  
-            output = io.BytesIO()
-            dict_writer = csv.DictWriter(output, fieldnames=keys)
-            dict_writer.writeheader()
-            for hit in tree['hits']['hits']:
-                for row in iter_flattened_doc({}, hit['_source'], '', set(keys)):
-                    dict_writer.writerow(row)
-
-            response = make_response(str(output.getvalue()))
-            response.headers['content-type'] = 'text/csv'
-            return response
-        else:
-            abort(400, message='Export filetype %s is not supported'%filetype)
 
 api.add_resource(Search, '/api/v1/search')
 api.add_resource(GetDocument, '/api/v1/get_document/<index>/<doc_type>/<doc_id>')

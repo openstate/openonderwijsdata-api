@@ -16,3 +16,4 @@ cryptography
 uwsgi
 cssselect
 pyyaml
+elasticsearch
