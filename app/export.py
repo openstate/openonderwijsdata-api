@@ -26,8 +26,12 @@ def iter_flattened_doc(root, branch, name_part, keys):
         if type(v) is list:
             has_nest = True
             for i in v:
-                for j in iter_flattened_doc(row, i, name(k), keys):
-                    yield j
+                if isinstance(i, basestring):
+                    for j in iter_flattened_doc(row, {name(k): i}, name_part, keys):
+                        yield j
+                else:
+                    for j in iter_flattened_doc(row, i, name(k), keys):
+                        yield j
     if not has_nest:
         yield row
 
@@ -56,7 +60,7 @@ class ExportTable(restful.Resource):
         query["_source"] = keys
 
         # get nested keys from mapping
-        mapping = es.indices.get_mapping(index="duo",doc_type="vo_board")
+        mapping = es.indices.get_mapping(index=index,doc_type=doc_type)
         if mapping.keys():
             mapping = mapping[mapping.keys()[0]]['mappings'][doc_type]
             def maptree(t, nest):
@@ -70,6 +74,10 @@ class ExportTable(restful.Resource):
                     if (k[0] in keys) or not keys]
         else:
             keys = []
+
+        import logging
+        import sys
+        logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
         hits = list(elasticsearch.helpers.scan(es, index = index, 
             doc_type = doc_type, query=query))
