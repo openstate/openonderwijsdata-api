@@ -94,6 +94,7 @@ API
    :query doctypes: comma separated list of document types that should be included in the search. *Optional*, *default*: search all available doctypes.
    :query size: the number of documents to return. *Optional*, *default*: 10, *min*: 1, *max*: 500.
    :query from: the offset from the first result in the result set. For example, when ``size=10`` and the total number of hits is 20, ``from=10`` will return result 10 to 20. *Optional*, *default*: 0.
+   :query scraped_after: Filter results based on after when the information was scraped. The date string should be formatted according to `ISO8601 <http://en.wikipedia.org/wiki/ISO_8601>`_.
    :statuscode 200: OK, no errors.
    :statuscode 400: Bad Request. An accompanying error message will explain why the request was invalid.
 

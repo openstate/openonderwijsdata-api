@@ -239,6 +239,7 @@ class Search(restful.Resource):
                         default=','.join(ES_DOCUMENT_TYPES))
     parser.add_argument('size', type=int, default=10)
     parser.add_argument('from', type=int, default=0)
+    parser.add_argument('scraped_after', type=str)
 
     filters = {
         'brin': 'brin',
@@ -248,7 +249,8 @@ class Search(restful.Resource):
         'zip_code': 'address.zip_code',
         'city': 'address.city',
         'geo_location': 'address.geo_location',
-        'reference_year': 'reference_year'
+        'reference_year': 'reference_year',
+        'scraped_after': 'meta.item_scraped_at',
     }
 
     def get(self):
@@ -316,20 +318,13 @@ class Search(restful.Resource):
                 query['query']['filtered']['filter'] = {'and': []}
 
             arg_value = args[arg]
-            if type(arg_value) is str and arg != 'geo_location':
+            if type(arg_value) is str and arg not in ['geo_location', 'scraped_after']:
                 arg_value = arg_value.lower().split(' ')
 
             if type(arg_value) is int:
                 arg_value = [arg_value]
 
-            if arg != 'geo_location':
-                query['query']['filtered']['filter']['and'].append({
-                    'terms': {
-                        field: arg_value,
-                        'execution': 'and'
-                    }
-                })
-            else:
+            if arg == 'geo_location':
                 coords = re.sub(r'\s{1,}', ' ', args[arg])
                 query['query']['filtered']['filter']['and'].append({
                     'geo_distance': {
@@ -337,7 +332,22 @@ class Search(restful.Resource):
                         'distance': args['geo_distance']
                     }
                 })
-
+            elif arg == 'scraped_after':
+                query['query']['filtered']['filter']['and'].append({
+                    'range': {
+                        field: {
+                            'gte': arg_value
+                        },
+                    }
+                })
+            else:
+                query['query']['filtered']['filter']['and'].append({
+                    'terms': {
+                        field: arg_value,
+                        'execution': 'and'
+                    }
+                })
+                
         # Number of hits to return and the offset
         query['size'] = args['size']
         query['from'] = args['from']
