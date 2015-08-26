@@ -285,8 +285,8 @@ class Search(restful.Resource):
             abort(400, message='No query or filter specified')
 
         # Validate the 'size' and 'from' arguments
-        if args['size'] > 50 or args['size'] < 1:
-            abort(400, message='Size must be between 1 and 50')
+        if args['size'] > 500 or args['size'] < 1:
+            abort(400, message='Size must be between 1 and 500')
 
         query = {'query': {'filtered': {'query': {}}}}
 

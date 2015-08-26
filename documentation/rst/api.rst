@@ -92,7 +92,7 @@ API
    :query order: Return results in descending (``desc``) or ascending (``asc``) order.*Optional*, *default*: ``asc``.
    :query indexes: comma separated list of index names that should be searched. *Optional*, *default*: search all available indexes.
    :query doctypes: comma separated list of document types that should be included in the search. *Optional*, *default*: search all available doctypes.
-   :query size: the number of documents to return. *Optional*, *default*: 10, *min*: 1, *max*: 50.
+   :query size: the number of documents to return. *Optional*, *default*: 10, *min*: 1, *max*: 500.
    :query from: the offset from the first result in the result set. For example, when ``size=10`` and the total number of hits is 20, ``from=10`` will return result 10 to 20. *Optional*, *default*: 0.
    :statuscode 200: OK, no errors.
    :statuscode 400: Bad Request. An accompanying error message will explain why the request was invalid.
