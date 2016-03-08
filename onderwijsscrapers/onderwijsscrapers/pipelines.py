@@ -21,7 +21,11 @@ class OnderwijsscrapersPipeline(object):
     def process_item(self, item, spider):
         # Check if the fields that identify the item are present. If not,
         # log and drop the item.
-        id_fields = settings['EXPORT_SETTINGS'][spider.name]['id_fields']
+        if spider.name in settings['EXPORT_SETTINGS']:
+            id_fields = settings['EXPORT_SETTINGS'][spider.name]['id_fields']
+        else:
+            print spider.doc_type
+            id_fields = settings['EXPORT_SETTINGS'][spider.doc_type]['id_fields']
         if not all(field in item for field in id_fields):
             log.msg('Dropped item, not all required fields are present. %s'
                 % item, level=log.WARNING, spider=spider)

@@ -1,0 +1,21 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,integer,,,
+board_id,string,BEVOEGD GEZAG,,
+brin,string,BRIN NUMMER,,
+subject,string,VAK,,
+degree,integer,GRAAD,,
+time,integer,AANTAL LESUREN (?P<reference_year>\d+),,
+time_male,integer,AANTAL LESUREN +MANNEN (?P<reference_year>\d+),,
+time_female,integer,AANTAL LESUREN VROUWEN (?P<reference_year>\d+),,
+time_gender_unknown,integer,AANTAL LESUREN PERSONEEL GESLACHT ONBEKEND(?P<reference_year>\d+),,
+time_temp,integer,AANTAL LESUREN PERSONEEL IN TIJDELIJKE DIENST (?P<reference_year>\d+),,
+time_perm,integer,AANTAL LESUREN PERSONEEL IN VASTE DIENST (?P<reference_year>\d+),,
+time_sub,integer,AANTAL LESUREN PERSONEEL IN DIENST ALS VERVANGING (?P<reference_year>\d+),,
+time_not_app,integer,AANTAL LESUREN PERSONEEL IN DIENST ZONDER BENOEMING (?P<reference_year>\d+),,not appointed
+time_unk,integer,AANTAL LESUREN PERSONEEL IN DIENST MET ONBEKEND DIENSTVERBAND (?P<reference_year>\d+),,appointment unknown
+time_age_range,string,,,
+time_age_count,integer,AANTAL LESUREN PERSONEEL (?P<time_age_range>.+) JAAR (?P<reference_year>\d+),,
+age_mean,number,GEMIDDELDE LEEFTIJD (?P<reference_year>\d+),,
+age_mean_male,number,GEMIDDELDE LEEFTIJD MAN (?P<reference_year>\d+),,
+age_mean_female,number,GEMIDDELDE LEEFTIJD VROUW (?P<reference_year>\d+),,

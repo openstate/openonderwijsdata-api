@@ -1,0 +1,20 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+address.city,string,PLAATSNAAM,,
+address.street_name,string,STRAATNAAM,,
+address.street_number,string,HUISNUMMER-TOEVOEGING,,
+address.postal_code,string,POSTCODE,,
+administrative_office_id,integer,ADMINISTRATIEKANTOORNUMMER,,
+board_id,integer,BEVOEGD GEZAG NUMMER,,
+correspondence_address.city,string,PLAATSNAAM CORRESPONDENTIEADRES,,
+correspondence_address.street_name,string,STRAATNAAM CORRESPONDENTIEADRES,,
+correspondence_address.street_number,string,HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES,,
+correspondence_address.postal_code,string,POSTCODE CORRESPONDENTIEADRES,,
+denomination,string,DENOMINATIE,,
+municipality,string,GEMEENTENAAM,,
+municipality_code,integer,GEMEENTENUMMER,,
+name,string,BEVOEGD GEZAG NAAM,,
+phone,string,TELEFOONNUMMER,,
+spo_edu_type,string,SOORT PRIMAIR ONDERWIJS,,Special Education Type
+website,string,INTERNETADRES,,

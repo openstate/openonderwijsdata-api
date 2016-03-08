@@ -1,0 +1,9 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+brin,string,BRIN.?NUMMER,,
+branch_id,string,VESTIGING?S.?NUMMER,,
+student_weight,string,.*GEWICHT,,Weight category of these students
+age,integer,,,
+students,integer,.*?(?P<age>\d+|JONGER).*?,,Number of children of this age
+,,TOTAAL,,

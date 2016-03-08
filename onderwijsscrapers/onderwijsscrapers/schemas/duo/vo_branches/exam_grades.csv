@@ -1,0 +1,15 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+brin,string,BRIN ?NUMMER,,
+branch_id,string,VESTIGINGSNUMMER,,
+education_structure,string,ONDERWIJSTYPE VO,,Level of education [#edu_in_holland]_
+education_structure_vmbo,string,LEERWEG,,Level of education [#edu_in_holland]_
+sector,,AFDELING,,
+vmbo_sector,,VMBO SECTOR,,
+candidates,,EXAMENKANDIDATEN,,
+passed,,GESLAAGDEN,,
+failed,,GEZAKTEN,,
+avg_grade_school_exam,,GEMIDDELD CIJFER SCHOOLEXAMEN,,The average grade for school exams
+avg_grade_central_exam,,GEMIDDELD CIJFER CENTRAAL EXAMEN,,The average grade for central exams.
+avg_final_grade,,GEMIDDELD CIJFER CIJFERLIJST,,The final average grade. This average is based on the grades on the final list of grades

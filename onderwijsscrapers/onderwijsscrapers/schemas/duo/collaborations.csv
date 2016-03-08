@@ -1,0 +1,13 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+address.city,string,PLAATSNAAM,,
+address.street,string,ADRES,,
+address.postal_code,string,POSTCODE,,
+board_id,integer,BEVOEGD GEZAG.*,,
+collaboration_id,string,ADMINISTRATIENUMMER,,
+correspondence_address.city,string,PLAATS CORRESPONDENTIEADRES,,
+correspondence_address.street,string,CORRESPONDENTIEADRES,,
+correspondence_address.postal_code,string,POSTCODE CORRESPONDENTIEADRES,,
+name,string,SAMENWERKINGSVERBAND,,
+website,string,INTERNET,,

@@ -1,0 +1,7 @@
+web,file_title,table,codebook,title,primaryKey,description
+https://duo.nl/open_onderwijsdata/databestanden/po/adressen/adressen_po_5.jsp,,,boards,po_boards,reference_year board_id,
+https://duo.nl/open_onderwijsdata/databestanden/po/adressen/adressen_po_6.jsp,,,boards,po_boards,reference_year board_id,
+https://duo.nl/open_onderwijsdata/databestanden/po/adressen/adressen_po_7.jsp,,,boards,po_boards,reference_year board_id,
+https://duo.nl/open_onderwijsdata/databestanden/po/Financien/po_jaarrekening/kengetallen.jsp,15. PO Kengetallen .*,,boards/financial_key_indicators,financial_key_indicators,reference_year board_id,
+https://duo.nl/open_onderwijsdata/databestanden/po/Leerlingen/po_owsoort_denominatie.jsp,,,po_boards/student_education_type,student_education_type,reference_year board_id,
+https://duo.nl/open_onderwijsdata/databestanden/po/Onderwijspersoneel/po_personeel1.jsp,NONE,per owtype-bestuur-brin-functie,staff/staff,staff,reference_year board_id,

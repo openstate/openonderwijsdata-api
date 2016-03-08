@@ -1,0 +1,6 @@
+name,type,source_titles_match,source_values_match,description
+brin,brin,BRIN NUMMER,,
+reference_year,reference_year,,,
+qualification_code,integer,KWALIFICATIE CODE,,
+participant_male,integer,(?P<reference_year>\d{4}) MAN,,
+participant_female,integer,(?P<reference_year>\d{4}) VROUW,,

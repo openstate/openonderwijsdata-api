@@ -1,0 +1,8 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+brin,string,BRIN.?NUMMER,,
+branch_id,string,VESTIGING?S.?NUMMER,,
+birthyear,integer,,,
+students,integer,.*?(?P<birthyear>\d{4}).*?,,Number of children born in this year
+,,TOTAAL,,

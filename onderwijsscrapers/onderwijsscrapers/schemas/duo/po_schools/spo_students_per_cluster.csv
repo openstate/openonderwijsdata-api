@@ -1,0 +1,16 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+brin,string,BRIN.?NUMMER,,
+cluster_1,integer,CLUSTER.1,,Number of pupils in schools for visually handicapped students
+cluster_2,integer,CLUSTER.2,,"Number of pupils in schools for auditory / communicatively disabled students: deaf, hard of hearing, severe speech difficulties."
+cluster_3,integer,CLUSTER.3,,"Number of pupils in schools for pupils with physical and / or intellectual disabilities: very difficult learning, protracted illness with physical disabilities."
+cluster_4,integer,CLUSTER.4,,"Number of pupils in schools for pupils with psychiatric disorders and severe learning and / or behavioral problems, chronically ill students without disabilities and students associated with university-associated institutes that provide assistance to children with complex learning, behavioral or emotional problems (*Pedologisch Instituut*)."
+,,AANDUIDING.WET,,
+,,BEVOEGD.GEZAG.NUMMER,,
+,,DENOMINATIE,,
+,,GEMEENTENAAM,,
+,,GEMEENTE ?NUMMER,,
+,,INSTELLINGSNAAM.*,,
+,,INSTELLINGSSOORT SPECIAAL ONDERWIJS,,
+,,PROVINCIE,,

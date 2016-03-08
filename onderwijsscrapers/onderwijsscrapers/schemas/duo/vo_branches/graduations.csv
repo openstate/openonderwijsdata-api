@@ -1,0 +1,19 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,,Date of measurement
+brin,string,BRIN ?NUMMER,,
+branch_id,string,VESTIGINGSNUMMER,,
+reference_year,string,,,The school year the graduations apply to
+department,string,OPLEIDINGSNAAM,,Department
+inspectioncode,string,INSPECTIECODE,,
+,,EXAMENKANDIDATEN SCHOOLJAAR - TOTAAL \d{4}-(?P<reference_year>\d{4}),,
+candidates_male,integer,EXAMENKANDIDATEN SCHOOLJAAR - MAN \d{4}-(?P<reference_year>\d{4}),,Male
+candidates_unkown,integer,EXAMENKANDIDATEN SCHOOLJAAR - ONBEKEND \d{4}-(?P<reference_year>\d{4}),,Unkown
+candidates_female,integer,EXAMENKANDIDATEN SCHOOLJAAR - VROUW \d{4}-(?P<reference_year>\d{4}),,Female
+,,GESLAAGDEN SCHOOLJAAR - TOTAAL \d{4}-(?P<reference_year>\d{4}),,
+passed_male,integer,GESLAAGDEN SCHOOLJAAR - MAN \d{4}-(?P<reference_year>\d{4}),,Male
+passed_unkown,integer,GESLAAGDEN SCHOOLJAAR - ONBEKEND \d{4}-(?P<reference_year>\d{4}),,Unkown
+passed_female,integer,GESLAAGDEN SCHOOLJAAR - VROUW \d{4}-(?P<reference_year>\d{4}),,Female
+,,SLAAG% SCHOOLJAAR - TOTAAL \d{4}-(?P<reference_year>\d{4}),,
+pass_percentage_male,integer,SLAAG\% SCHOOLJAAR - MAN \d{4}-(?P<reference_year>\d{4}),,Male
+pass_percentage_unkown,integer,SLAAG\% SCHOOLJAAR - ONBEKEND \d{4}-(?P<reference_year>\d{4}),,Unkown
+pass_percentage_female,integer,SLAAG\% SCHOOLJAAR - VROUW \d{4}-(?P<reference_year>\d{4}),,Female

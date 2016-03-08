@@ -1,0 +1,13 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+brin,string,BRIN.?NUMMER,,
+branch_id,string,VESTIGING?S.?NUMMER,,
+school_weight,string,.+GEWICHT,,Weight of this branch
+impulse_area,string,IMPULSGEBIED,,
+student_weight_0_0,integer,GEWICHT.?0.*,,Number of children in weight category 0.0
+student_weight_0_3,integer,GEWICHT.?0.3.*,,Number of children in weight category 0.3
+student_weight_1_2,integer,GEWICHT.?1.2.*,,Number of children in weight category 1.2
+student_weight,integer,,,Weight
+age,integer,,,Student age group
+students,integer,,,Number of children at this age in the key's weight category at this branch.

@@ -5,7 +5,7 @@ from scrapy.http import Request
 import os
 import urlparse, urllib
 
-from onderwijsscrapers.codebooks import Codebook
+# from onderwijsscrapers.codebooks import Codebook
 from onderwijsscrapers.items import ROASurvey
 
 

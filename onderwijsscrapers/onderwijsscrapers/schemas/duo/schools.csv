@@ -1,0 +1,35 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+address.city,string,PLAATSNAAM,,Name of the city or village this branch is located.
+address.street_name,string,STRAATNAAM,,Street name of the address of this branch.
+address.street_number,string,HUISNUMMER-TOEVOEGING,,Street number of the address of this branch.
+address.postal_code,string,POSTCODE,,"Zip code of the address of this branch. A Dutch postal code consists of four digits, a space and two letters (*1234 AB*) [#postalcodes]_. For normalisation purposes, the whitespace is removed."
+board_id,integer,BEVOEGD GEZAG NUMMER,,Identifier (assigned by :ref:`duodata`) of the board of this school.
+brin,string,BRIN ?NUMMER,,"'Basis Registratie Instellingen-nummer', identifier of the school this branch belongs to. Alphanumeric, four characters long."
+corop_area,string,COROPGEBIED NAAM,,"A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data."
+corop_area_code,integer,COROPGEBIED CODE,,Identifier of the corop_area.
+correspondence_address.city,string,PLAATSNAAM CORRESPONDENTIEADRES,,Name of the city or village this branch is located.
+correspondence_address.street_name,string,STRAATNAAM CORRESPONDENTIEADRES,,Street name of the address of this branch.
+correspondence_address.street_number,string,HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES,,Street number of the address of this branch.
+correspondence_address.postal_code,string,POSTCODE CORRESPONDENTIEADRES,,"Zip code of the address of this branch. A Dutch postal code consists of four digits, a space and two letters (*1234 AB*) [#postalcodes]_. For normalisation purposes, the whitespace is removed."
+denomination,string,DENOMINATIE,,"In the Netherlands, schools can be based on a (religious [#denomination]_) conviction, which is denoted here."
+education_area,string,ONDERWIJSGEBIED NAAM,,Education areas are aggregations of nodal areas based on regional origins and destinations of students in secondary education.
+education_area_code,integer,ONDERWIJSGEBIED CODE,,Identifier of the education_area.
+municipality,string,GEMEENTENAAM,,The name of the municipality this branch is located in.
+municipality_code,integer,GEMEENTENUMMER,,Identifier (assigned by CBS [#cbs]_) to this municipality.
+name,string,INSTELLINGSNAAM,,Name of this school
+nodal_area,string,NODAAL GEBIED NAAM,,Area defined for the planning of distribution of secondary schools.
+nodal_area_code,integer,NODAAL GEBIED CODE,,Identifier of the nodal_area.
+phone,string,TELEFOONNUMMER,,Phone number of the school.
+province,string,PROVINCIE,,The province [#provinces]_ this branch is situated in.
+rmc_region,string,RMC-REGIO NAAM,,Area that is used for the coordination of school dropouts.
+rmc_region_code,integer,RMC-REGIO CODE,,Identifier of the rmc_region.
+rpa_area,string,RPA-GEBIED NAAM,,Area defined to cluster information on the labour market.
+rpa_area_code,integer,RPA-GEBIED CODE,,Identifier of the rpa_area.
+spo_cluster,integer,CLUSTER,,Special Education Cluster
+spo_edu_type,string,SOORT PRIMAIR ONDERWIJS,,Special Education Type
+website,string,INTERNETADRES,,Website of this school.
+wgr_area,string,WGR-GEBIED NAAM,,Cluster of municipalities per collaborating region according to the 'Wet gemeenschappelijke regelingen' [#wgr_law]_.
+wgr_area_code,integer,WGR-GEBIED CODE,,Identifier of the wgr_area.
+,,ONDERWIJSSTRUCTUUR,,

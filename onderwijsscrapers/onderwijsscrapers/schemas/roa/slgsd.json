@@ -1,0 +1,2850 @@
+{
+    "codebook": "ROASchool leaver and graduate survey data",
+    "version": "september 2014",
+    "fields": {
+        "administrative": {
+                "Name": "Administrative variables",
+                "Variable": "administrative"
+            },
+        "competencies_importance": {
+                "Name": "Competencies: Importance for job and preferred attention in study programme",
+                "Variable": "competencies_importance"
+            },
+        "competencies_prepared": {
+                "Name": "Competencies: Prepared for in study programme and needed in subsequent education",
+                "Variable": "competencies_prepared"
+            },
+        "competencies_level": {
+                "Name": "Competencies: required level and own level",
+                "Variable": "competencies_level"
+            },
+        "follow_up_study": {
+            "Name": "Follow-up study programme",
+                "Variable": "follow_up_study"
+            },
+        "job_charateristics": {
+            "Name": "Job charateristics",
+                "Variable": "job_charateristics"
+            },
+        "respondent_charateristics": {
+            "Name": "Respondent characteristics",
+                "Variable": "respondent_charateristics"
+            },
+        "study_programme": {
+            "Name": "Study programme",
+                "Variable": "study_programme"
+            },
+
+        "admcode": {
+            "Format": "F8.0 numeric 8 positions, no decimals",
+            "Name": "Administrative code",
+            "Variable": "administrative.admcode"
+        },
+        "case_id": {
+            "Format": "F15.0, numeric 15 positions, no decimals",
+            "Name": "Case ID number",
+            "Variable": "administrative.case_id"
+        },
+        "qmode": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Questionnaire mode",
+            "Values": {
+                  "1": "Paper",
+                  "2": "Internet",
+                  "4": "Telephone"
+                  },
+            "Variable": "administrative.qmode"
+        },
+        "qyear": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Year of conducting the survey",
+            "Values": "1999 - 2013",
+            "Variable": "administrative.qyear"
+        },
+        "wf": {
+            "Format": "F8.2 numeric 8 positions, 2 decimals",
+            "Name": "Weight",
+            "Variable": "administrative.wf"
+        },
+    
+        "attadapt": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: adaptability",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attadapt"
+        },
+        "attcommc": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: commercial skills",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attcommc"
+        },
+        "attcreat": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: be creative and take intiatives",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attcreat"
+        },
+        "attict": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: knowledge and use of ICT",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attict"
+        },
+        "attkhsrg": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: knowledge of environmental and health and safety regulations",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attkhsrg"
+        },
+        "attknowl": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: knowledge of own discipline",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attknowl"
+        },
+        "attlangu": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: foreign languages",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attlangu"
+        },
+        "attopmnm": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: knowledge of operational management",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attopmnm"
+        },
+        "attpknot": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: pass on knowledge to others",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attpknot"
+        },
+        "attplan": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: plan, organize and coordinate activities",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attplan"
+        },
+        "attpreci": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: accuracy and precision",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attpreci"
+        },
+        "attsoci": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: social skills",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attsoci"
+        },
+        "attsolve": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: problem solving",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attsolve"
+        },
+        "attspeak": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: speaking skills",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attspeak"
+        },
+        "attteam": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme:  work in a team",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attteam"
+        },
+        "attuseks": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: practical use of knowledge and skills",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attuseks"
+        },
+        "attwrite": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: writing skills",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attwrite"
+        },
+        "attwwsp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Preferred attention in study programme: work without supervision",
+            "Values": {
+                  "1": "Less attention",
+                  "2": "Not less and not more attention",
+                  "3": "More attention"
+                  },
+            "Variable": "competencies_importance.attwwsp"
+        },
+        "impadapt": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: adaptability",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impadapt"
+        },
+        "impcommc": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job:  commercial skills",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impcommc"
+        },
+        "impcreat": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: be creative and take intiatives",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impcreat"
+        },
+        "impict": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: knowledge and use of ICT",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impict"
+        },
+        "impkhsrg": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: knowledge of environmental and health and safety regulations",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impkhsrg"
+        },
+        "impknowl": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: knowledge of own discipline",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impknowl"
+        },
+        "implangu": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: foreign languages",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.implangu"
+        },
+        "impopmnm": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: knowledge of operational management",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impopmnm"
+        },
+        "imppknot": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: pass on knowledge to others",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.imppknot"
+        },
+        "impplan": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: plan, organize and coordinate activities",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impplan"
+        },
+        "imppreci": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: accuracy and precision",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.imppreci"
+        },
+        "impsoci": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: social skills",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impsoci"
+        },
+        "impsolve": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: problem solving",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impsolve"
+        },
+        "impspeak": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: speaking skills",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impspeak"
+        },
+        "impteam": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: work in a team",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impteam"
+        },
+        "impuseks": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: practical use of knowledge and skills",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impuseks"
+        },
+        "impwrite": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: writing skills",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impwrite"
+        },
+        "impwwsp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Importance for job: work without supervision",
+            "Values": {
+                  "1": "Very unimportant",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very important"
+                  },
+            "Variable": "competencies_importance.impwwsp"
+        },
+    
+        "needcomp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Needed in subsequent education: use computers",
+            "Values": {
+                  "1": "Almost never",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "A lot"
+                  },
+            "Variable": "competencies_prepared.needcomp"
+        },
+        "needknow": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Needed in subsequent education: knowledge of own discipline",
+            "Values": {
+                  "1": "Almost never",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "A lot"
+                  },
+            "Variable": "competencies_prepared.needknow"
+        },
+        "needlang": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Needed in subsequent education: Dutch language",
+            "Values": {
+                  "1": "Almost never",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "A lot"
+                  },
+            "Variable": "competencies_prepared.needlang"
+        },
+        "needprac": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Needed in subsequent education: work in practice",
+            "Values": {
+                  "1": "Almost never",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "A lot"
+                  },
+            "Variable": "competencies_prepared.needprac"
+        },
+        "needwotm": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Needed in subsequent education: work in a team",
+            "Values": {
+                  "1": "Almost never",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "A lot"
+                  },
+            "Variable": "competencies_prepared.needwotm"
+        },
+        "needwwsp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Needed in subsequent education: work without supervision",
+            "Values": {
+                  "1": "Almost never",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "A lot"
+                  },
+            "Variable": "competencies_prepared.needwwsp"
+        },
+        "prepcomp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Prepared for in study programme: use computers",
+            "Values": {
+                  "1": "Badly prepared",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Well prepared"
+                  },
+            "Variable": "competencies_prepared.prepcomp"
+        },
+        "prepknow": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Prepared for in study programme: knowledge of own discipline",
+            "Values": {
+                  "1": "Badly prepared",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Well prepared"
+                  },
+            "Variable": "competencies_prepared.prepknow"
+        },
+        "preplang": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Prepared for in study programme: Dutch language",
+            "Values": {
+                  "1": "Badly prepared",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Well prepared"
+                  },
+            "Variable": "competencies_prepared.preplang"
+        },
+        "prepprac": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Prepared for in study programme: work in practice",
+            "Values": {
+                  "1": "Badly prepared",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Well prepared"
+                  },
+            "Variable": "competencies_prepared.prepprac"
+        },
+        "prepwotm": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Prepared for in study programme: work in a team",
+            "Values": {
+                  "1": "Badly prepared",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Well prepared"
+                  },
+            "Variable": "competencies_prepared.prepwotm"
+        },
+        "prepwwsp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Prepared for in study programme: work without supervision",
+            "Values": {
+                  "1": "Badly prepared",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Well prepared"
+                  },
+            "Variable": "competencies_prepared.prepwwsp"
+        },
+    
+        "owlacoop": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to cooperate productively with others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlacoop"
+        },
+        "owladact": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to take decisive action",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owladact"
+        },
+        "owlalert": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to recognize problems and opportunities",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlalert"
+        },
+        "owlanath": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level for job: ability to think analytical",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlanath"
+        },
+        "owlarlog": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to reason logically",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlarlog"
+        },
+        "owlawwsp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to perform your work without supervision",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlawwsp"
+        },
+        "owlbudgt": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: abilty to work within budget/plan/guideline",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlbudgt"
+        },
+        "owlcripr": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level for job: ability to critically review practically-orientated research",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlcripr"
+        },
+        "owlgtinf": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to gather information",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlgtinf"
+        },
+        "owlict": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to use ICT",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlict"
+        },
+        "owlideas": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to come up with new ideas and solutions",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlideas"
+        },
+        "owlkmtpr": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level for job: knowledge of methods and techniques for pract.-orientated research",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlkmtpr"
+        },
+        "owllangu": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to communicate in foreign languages",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owllangu"
+        },
+        "owllearn": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to learn new things",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owllearn"
+        },
+        "owlmeano": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: abilty to make meaning clear to others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlmeano"
+        },
+        "owlmobot": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to mobilize the capacities of others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlmobot"
+        },
+        "owlothfo": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: knowledge of other fields or disciplines",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlothfo"
+        },
+        "owlothpv": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: willingness to respect the point of view of others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlothpv"
+        },
+        "owlownfo": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: knowledge of own field or discipline",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlownfo"
+        },
+        "owlownpv": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: willingness to stand up for your own point of view",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlownpv"
+        },
+        "owlperfo": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to perform well under pressure",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlperfo"
+        },
+        "owlpract": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to apply field-specific knowledge in practice",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlpract"
+        },
+        "owlprior": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to distinguish main priorities from side issues",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlprior"
+        },
+        "owlqidea": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: willingness to question your own and others' ideas",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlqidea"
+        },
+        "owlrelat": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to draw connections",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlrelat"
+        },
+        "owlwrpr": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level for job: ability to write reports on pract.-orientated research",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlwrpr"
+        },
+        "owlwsno": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: willingness to stick your neck out",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owlwsno"
+        },
+        "ownadapt": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to adapt",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownadapt"
+        },
+        "ownappkn": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to apply knowledge and skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownappkn"
+        },
+        "owncommc": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: commercial skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owncommc"
+        },
+        "owninict": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ICT knowledge",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owninict"
+        },
+        "owninit": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to take initiative",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owninit"
+        },
+        "owninreg": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: knowledge of health and safety regulations",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.owninreg"
+        },
+        "ownlangus": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: foreign languages",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownlangus"
+        },
+        "ownnum": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: numeracy",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownnum"
+        },
+        "ownopmng": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: management knowledge",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownopmng"
+        },
+        "ownpknow": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: professional knowledge",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownpknow"
+        },
+        "ownplan": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: planning/organizing skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownplan"
+        },
+        "ownpreci": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: accuracy and precision",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownpreci"
+        },
+        "ownrteam": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to work in a team",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownrteam"
+        },
+        "ownself": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: self-reliance",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownself"
+        },
+        "ownsoci": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to socialize with others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownsoci"
+        },
+        "ownsolve": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: ability to solve problems",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownsolve"
+        },
+        "ownspeak": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: speaking skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownspeak"
+        },
+        "ownteach": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: teaching skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownteach"
+        },
+        "ownwrite": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Own level: writing skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.ownwrite"
+        },
+        "rqlacoop": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to cooperate productively with others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlacoop"
+        },
+        "rqladact": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to take decisive action",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqladact"
+        },
+        "rqladapt": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to adapt",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqladapt"
+        },
+        "rqlalert": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to recognize problems and opportunities",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlalert"
+        },
+        "rqlanath": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to think analytical",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlanath"
+        },
+        "rqlappkn": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to apply knowledge and skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlappkn"
+        },
+        "rqlarlog": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to reason logically",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlarlog"
+        },
+        "rqlawwsp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to perform your work without supervision",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlawwsp"
+        },
+        "rqlbudgt": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: abilty to work within budget/plan/guideline",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlbudgt"
+        },
+        "rqlcommc": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: commercial skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlcommc"
+        },
+        "rqlcripr": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to critically review practically-orientated research",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlcripr"
+        },
+        "rqlgtinf": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to gather information",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlgtinf"
+        },
+        "rqlict": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to use ICT",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlict"
+        },
+        "rqlideas": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to come up with new ideas and solutions",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlideas"
+        },
+        "rqlinict": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ICT knowledge",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlinict"
+        },
+        "rqlinit": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to take initiative",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlinit"
+        },
+        "rqlinreg": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: knowledge of health and safety regulations",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlinreg"
+        },
+        "rqlkmtpr": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: knowledge of methods and techniques for pract.-orientated research",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlkmtpr"
+        },
+        "rqllangu": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to communicate in foreign languages",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqllangu"
+        },
+        "rqllangus": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: foreign languages",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqllangus"
+        },
+        "rqllearn": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to learn new things",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqllearn"
+        },
+        "rqlmeano": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: abilty to make meaning clear to others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlmeano"
+        },
+        "rqlmobot": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to mobilize the capacities of others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlmobot"
+        },
+        "rqlnum": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: numeracy",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlnum"
+        },
+        "rqlopmng": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: management knowledge",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlopmng"
+        },
+        "rqlothfo": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: knowledge of other fields or disciplines",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlothfo"
+        },
+        "rqlothpv": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: willingness to respect the point of view of others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlothpv"
+        },
+        "rqlownfo": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: knowledge of own field or discipline",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlownfo"
+        },
+        "rqlownpv": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: willingness to stand up for your own point of view",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlownpv"
+        },
+        "rqlperfo": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to perform well under pressure",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlperfo"
+        },
+        "rqlpknow": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: professional knowledge",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlpknow"
+        },
+        "rqlplan": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: planning/organizing skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlplan"
+        },
+        "rqlpract": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to apply field-specific knowledge in practice",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlpract"
+        },
+        "rqlpreci": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: accuracy and precision",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlpreci"
+        },
+        "rqlprior": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to distinguish main priorities from side issues",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlprior"
+        },
+        "rqlqidea": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: willingness to question your own and others' ideas",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlqidea"
+        },
+        "rqlrelat": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to draw connections",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlrelat"
+        },
+        "rqlrteam": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to work in a team",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlrteam"
+        },
+        "rqlself": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: self-reliance",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlself"
+        },
+        "rqlsoci": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to socialize with others",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlsoci"
+        },
+        "rqlsolve": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to solve problems",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlsolve"
+        },
+        "rqlspeak": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: speaking skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlspeak"
+        },
+        "rqlteach": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: teaching skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlteach"
+        },
+        "rqlwrite": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: writing skills",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlwrite"
+        },
+        "rqlwrpr": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: ability to write reports on pract.-orientated research",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlwrpr"
+        },
+        "rqlwsno": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Required level for job: willingness to stick your neck out",
+            "Values": {
+                  "1": "Basic",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Excelent"
+                  },
+            "Variable": "competencies_level.rqlwsno"
+        },
+    
+        "edu2": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Further education",
+            "Values": {
+                  "1": "Yes",
+                  "2": "No"
+                  },
+            "Variable": "follow_up_study.edu2"
+        },
+        "edu2crebo": {
+            "Format": "F6.0 - numeric, 6 position, no decimals",
+            "Name": "Follow-up study programme: national education register code CREBO",
+            "Values": "      see classification list",
+            "Variable": "follow_up_study.edu2crebo"
+        },
+        "edu2croho": {
+            "Format": "F6.0 - numeric, 6 position, no decimals",
+            "Name": "Follow-up study programme: national educatio register code CROHO",
+            "Values": "      see classification list",
+            "Variable": "follow_up_study.edu2croho"
+        },
+        "edu2fiel1": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Follow-up study programme: broad field of education and training EUROSTAT",
+            "Values": {
+                  "0": "General Programmes",
+                  "1": "Education",
+                  "2": "Humanities and Arts",
+                  "3": "Social sciences, Business and Law",
+                  "4": "Science, Mathematics and Computing",
+                  "5": "Engineering, Manufacturing and Construction",
+                  "6": "Agriculture and Veterinary",
+                  "7": "Health and Welfare",
+                  "8": "Services"
+                  },
+            "Variable": "follow_up_study.edu2fiel1"
+        },
+        "edu2fiel2": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Follow-up study programme: narrow field of education and training EUROSTAT",
+            "Values": {
+                  "00": "General Programmes",
+                  "01": "Basic/broad, general programmes",
+                  "08": "Literacy and numeracy",
+                  "09": "Personal skills",
+                  "10": "Education",
+                  "14": "Teacher training and education science",
+                  "20": "Humanities and Arts",
+                  "21": "Arts",
+                  "22": "Humanities",
+                  "30": "Social sciences, Business and Law",
+                  "31": "Social and behavioural science",
+                  "32": "Journalism and information",
+                  "34": "Business and administration",
+                  "38": "Law",
+                  "40": "Science, Mathematics and Computing",
+                  "42": "Life science",
+                  "44": "Physical science",
+                  "46": "Mathematics and statistics",
+                  "48": "Computing",
+                  "50": "Engineering, Manufacturing and Construction",
+                  "52": "Engineering and engineering trades",
+                  "54": "Manufacturing and processing",
+                  "58": "Architecture and building",
+                  "60": "Agriculture and Veterinary",
+                  "62": "Agriculture, forestry and fishery",
+                  "64": "Veterinary",
+                  "70": "Health and Welfare",
+                  "72": "Health",
+                  "76": "Social services",
+                  "80": "Services",
+                  "81": "Personal services",
+                  "84": "transport services",
+                  "85": "Environmental protection",
+                  "86": "Security services"
+                  },
+            "Variable": "follow_up_study.edu2fiel2"
+        },
+        "edu2fiel3": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Follow-up study programme: detailed field of education and training EUROSTAT",
+            "Values": {
+                  "000": "General Programmes",
+                  "010": "Basic/broad, general programmes",
+                  "080": "Literacy and numeracy",
+                  "090": "Personal skills",
+                  "100": "Education",
+                  "140": "Teacher training and education science (broad programmes)",
+                  "141": "Teaching and training",
+                  "142": "Education science",
+                  "143": "training for pre-school teachers",
+                  "144": "training for teachers at basic levels",
+                  "145": "training for teachers with subject specialisation",
+                  "146": "training for teachers of vocational subjects",
+                  "200": "Humanities and Arts",
+                  "210": "Arts (broad programmes)",
+                  "211": "Fine arts",
+                  "212": "Music and performing arts",
+                  "213": "Audio-visual techniques and media production",
+                  "214": "Design",
+                  "215": "Craft skills",
+                  "220": "Humanities (broad programmes)",
+                  "221": "Religion and theology",
+                  "222": "Foreign languages and cultures",
+                  "223": "Mother tongue",
+                  "225": "History and archeology",
+                  "226": "Philosophy and ethics",
+                  "300": "Social sciences, Business and Law",
+                  "310": "Social and behavioural science (broad programmes)",
+                  "311": "Psychology",
+                  "312": "Sociology and cultural studies",
+                  "313": "Political science and civics",
+                  "314": "Economics",
+                  "320": "Journalism and information",
+                  "321": "Journalism and reporting",
+                  "322": "Library, information, archive",
+                  "340": "Business and administration (broad programmes)",
+                  "341": "Wholesale and retail sales",
+                  "342": "Marketing and advertising",
+                  "343": "Finance, banking, insurance",
+                  "344": "Accounting and taxation",
+                  "345": "Management and administration",
+                  "346": "Secretarial and office work",
+                  "347": "Working life",
+                  "380": "Law",
+                  "400": "Science, Mathematics and Computing",
+                  "420": "Life science",
+                  "421": "Biology and biochemistry",
+                  "422": "Environmental science",
+                  "440": "Physical science (broad programmes)",
+                  "441": "Physics",
+                  "442": "Chemistry",
+                  "443": "Earth science",
+                  "460": "Mathematics and Statistics",
+                  "461": "Mathematics",
+                  "462": "Statistics",
+                  "480": "Computing",
+                  "481": "Computer science",
+                  "482": "Computer use",
+                  "500": "Engineering, Manufacturing and Construction",
+                  "520": "Engineering and engineering trades (broad programmes)",
+                  "521": "Mechanics and metal work",
+                  "522": "Electricity and energy",
+                  "523": "Electronics and automation",
+                  "524": "Chemical and process",
+                  "525": "Motor vehicles, ships and aircraft",
+                  "540": "Manufacturing and processing (broad programmes)",
+                  "541": "Food processing",
+                  "542": "Textiles, clothes, footwear, leather",
+                  "543": "Materials (wood, paper, plastic, glass)",
+                  "544": "Mining and extraction",
+                  "580": "Architecture and building",
+                  "581": "Architecture and town planning",
+                  "582": "Building and civil engineering",
+                  "600": "Agriculture and Veterinary",
+                  "620": "Agriculture,forestry and Fishery (broad programmes)",
+                  "621": "Crop and livestock production",
+                  "622": "Horticulture",
+                  "623": "Forestry",
+                  "624": "Fisheries",
+                  "640": "Veterinary",
+                  "700": "Health and Welfare",
+                  "720": "Health (broad programmes)",
+                  "721": "Medicine",
+                  "723": "Nursing and caring",
+                  "724": "Dental studies",
+                  "725": "Medical diagnostic and treatment technology",
+                  "726": "Therapy and rehabilitation",
+                  "727": "Pharmacy",
+                  "760": "Social Services",
+                  "761": "Child care and youth services",
+                  "762": "Social work and counselling",
+                  "800": "Services",
+                  "810": "Personal services (broad programmes)",
+                  "811": "Hotel, restaurant and catering",
+                  "812": "travel, tourism and leisure",
+                  "813": "Sports",
+                  "814": "Domestic services",
+                  "815": "Hair and beauty services",
+                  "840": "transport services",
+                  "850": "Environmental protection (broad programmes)",
+                  "851": "Environmental protection technology",
+                  "852": "Natural environment and wildlife",
+                  "853": "Community sanitation services",
+                  "860": "Security services (broad programmes)",
+                  "861": "Protection of property and persons",
+                  "862": "Occupational health and safety",
+                  "863": "Military"
+                  },
+            "Variable": "follow_up_study.edu2fiel3"
+        },
+        "edu2ilt": {
+            "Format": "F6.0 - numeric, 6 position, no decimals",
+            "Name": "Follow-up study programme: national education register code ILT",
+            "Values": "      see classification list",
+            "Variable": "follow_up_study.edu2ilt"
+        },
+        "edu2iscd": {
+            "Format": "A10 - string 3 characters",
+            "Name": "Follow-up study programme: ISCED 97 code",
+            "Values": {
+                  "0": "Pre-primary education",
+                  "1": "Primary education",
+                  "2": "A Lower secondary education: leading to access ISCED 3A and 3B",
+                  "2": "B Lower secondary education: leading to access ISCED 3C",
+                  "2": "C Lower secondary education: primarily focused on access to labour market",
+                  "3": "A (Upper) Secondary education: leading to access ISCED 5A",
+                  "3": "B (Upper) Secondary education: leading to access ISCED 5B     3 C (Upper) Secondary education: primarily focused on access to labour market and access to ISCED 3 and 4",
+                  "4": "A Post-secondary non tertiary education: leading to access ISCED 5A",
+                  "4": "B Post-secondary non tertiary education: leading to access ISCED 5B",
+                  "4": "C Post-secondary non tertiary education: primarily focused on access to labour market",
+                  "5": "A First stage of tertiary education: largely theoratically based",
+                  "5": "B First stage of tertiary education: practical orientated",
+                  "6": "Second stage of tertiary education"
+                  },
+            "Variable": "follow_up_study.edu2iscd"
+        },
+        "edu2lev1": {
+            "Format": "F3.0 numeric 3 positions, no decimals",
+            "Name": "Follow-up study programme: main level",
+            "Remark": "Variable is based on ROA education classification",
+            "Values": {
+                  "10": "Senior general secondary and pre-university education",
+                  "40": "Preparatory secondary vocational education",
+                  "60": "Secondary vocational education levels 1/2",
+                  "70": "Secondary vocational education levels 3/4",
+                  "90": "Secondary vocational education apprenticeship system levels 1/2",
+                  "100": "Secondary vocational education apprenticeship system levels 3/4",
+                  "110": "Higher vocational education: Associate degree",
+                  "120": "Higher vocational education: Bachelor",
+                  "130": "Higher vocational education: Master",
+                  "140": "Academic higher education: Bachelor",
+                  "150": "Academic higher education: Pre-master",
+                  "160": "Academic higher education: Master",
+                  "170": "Post academic study programme",
+                  "180": "Post academic Phd. programme"
+                  },
+            "Variable": "follow_up_study.edu2lev1"
+        },
+        "edu2lev2": {
+            "Format": "F3.0 numeric 3 positions, no decimals",
+            "Name": "Follow-up study programme: main level and broad field",
+            "Remark": "Variable is based on ROA education classification",
+            "Values": {
+                  "12": "Senior general secondary education",
+                  "13": "Pre-university education",
+                  "41": "Individualized pre-vocational education",
+                  "42": "Preparatory sec. voc. education (agricultural)",
+                  "43": "Preparatory sec. voc. education (technical)",
+                  "44": "Preparatory sec. voc. education (economics)",
+                  "45": "Preparatory sec. voc. education (health and welfare)",
+                  "46": "Preparatory sec. voc. education (theoretical track)",
+                  "47": "Preparatory sec. voc. education n.e.c.",
+                  "61": "Sec. voc. education levels 1/2 (agricultural)",
+                  "62": "Sec. voc. education levels 1/2 (technical)",
+                  "63": "Sec. voc. education levels 1/2 (economics)",
+                  "64": "Sec. voc. education levels 1/2 (health and welfare)",
+                  "65": "Sec. voc. education levels 1/2 (humanities/arts/social and behavioural programmes)",
+                  "69": "Sec. voc. education level 1 general orientation programme",
+                  "71": "Sec. voc. education levels 3/4 (agricultural)",
+                  "72": "Sec. voc. education levels 3/4 (technical)",
+                  "73": "Sec. voc. education levels 3/4 (economics)",
+                  "74": "Sec. voc. education levels 3/4 (health and welfare)",
+                  "75": "Sec. voc. education levels 3/4 (humanities/arts/social and behavioural programmes)",
+                  "91": "Sec. voc. education apprenticeship system levels 1/2 (agricultural)",
+                  "92": "Sec. voc. education apprenticeship system levels 1/2 (technical)",
+                  "93": "Sec. voc. education apprenticeship system levels 1/2 (economics)",
+                  "94": "Sec. voc. education apprenticeship system levels 1/2 (health and welfare)",
+                  "101": "Sec. voc. education apprenticeship system levels 3/4 (agricultural)",
+                  "102": "Sec. voc. education apprenticeship system levels 3/4 (technical)",
+                  "103": "Sec. voc. education apprenticeship system levels 3/4 (economics)",
+                  "104": "Sec. voc. education apprenticeship system levels 3/4 (health and welfare)     105 Sec. voc. education apprenticeship system levels 3/4 (humanities/arts/social and behavioural programmes)",
+                  "111": "Higher voc. education (agricultural)",
+                  "112": "Higher voc. education (educational)",
+                  "113": "Higher voc. education (technical)",
+                  "114": "Higher voc. education (economics)",
+                  "115": "Higher voc. education (health)",
+                  "116": "Higher voc. education (social and behavioural programmes)",
+                  "117": "Higher voc. education (arts and humanities)",
+                  "118": "Higher voc. education (law)",
+                  "119": "Higher voc. education (science/mathematics and computing)",
+                  "121": "Academic higher education (agricultural)",
+                  "122": "Academic higher education (educational)",
+                  "123": "Academic higher education (technical)",
+                  "124": "Academic higher education (economics)",
+                  "125": "Academic higher education (health)",
+                  "126": "Academic higher education (social and behavioural programmes)",
+                  "127": "Academic higher education (arts and humanities)",
+                  "128": "Academic higher education (law)",
+                  "129": "Academic higher education (science/mathematics and computing)",
+                  "131": "Post higher vocational education programme",
+                  "141": "Phd programme",
+                  "142": "Post academic design programme",
+                  "143": "Post academic study programme",
+                  "151": "Higher education master programme (Pre BaMa)"
+                  },
+            "Variable": "follow_up_study.edu2lev2"
+        },
+        "edu2lev3": {
+            "Format": "F2.0 numeric 2 positions, no decimals",
+            "Name": "Follow-up study programme: detailed level",
+            "Remark": "Variable is based on ROA education classification",
+            "Values": {
+                  "1": "Senior general secondary education",
+                  "2": "Pre-university education",
+                  "3": "Preparatory secondary vocational education",
+                  "4": "Secondary vocational education levels 1",
+                  "5": "Secondary vocational education levels 2",
+                  "6": "Secondary vocational education levels 3",
+                  "7": "Secondary vocational education levels 4",
+                  "8": "Secondary vocational education apprenticeship system levels 1",
+                  "9": "Secondary vocational education apprenticeship system levels 2",
+                  "10": "Secondary vocational education apprenticeship system levels 3",
+                  "11": "Secondary vocational education apprenticeship system levels 4",
+                  "12": "Higher vocational education",
+                  "13": "Academic higher education"
+                  },
+            "Variable": "follow_up_study.edu2lev3"
+        },
+        "edu2match": {
+            "Format": "F2.0 - numeric, 1 position, no decimals",
+            "Name": "Match between study programme and follow-up study programme",
+            "Values": {
+                  "1": "Good",
+                  "2": "Reasonably good",
+                  "3": "Not very good",
+                  "4": "Poor"
+                  },
+            "Variable": "follow_up_study.edu2match"
+        },
+        "edu2qual": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current situation with respect to follow-up study programme",
+            "Values": {
+                  "1": "Still following the study programme",
+                  "2": "Gained qualification",
+                  "3": "Left without qualification"
+                  },
+            "Variable": "follow_up_study.edu2qual"
+        },
+        "edu2roa": {
+            "Format": "F8.0 - numeric, 8 position, no decimals",
+            "Name": "Follow-up study programme: code ROA education classification",
+            "Values": "      see classification list",
+            "Variable": "follow_up_study.edu2roa"
+        },
+        "edu2soi": {
+            "Format": "F6.0 - numeric, 6 position, no decimals",
+            "Name": "Follow-up study programme: national education classification code SOI",
+            "Values": "      see classification list",
+            "Variable": "follow_up_study.edu2soi"
+        },
+        "training": {
+            "Format": "F2.0 - numeric, 2 position, no decimals",
+            "Name": "Followed short course or in-house training",
+            "Values": {
+                  "1": "Yes",
+                  "2": "No"
+                  },
+            "Variable": "follow_up_study.training"
+        },
+    
+        "career": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job:  does job have good career opportunities?",
+            "Values": {
+                  "1": "almost none",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "very many"
+                  },
+            "Variable": "job_charateristics.career"
+        },
+        "empstat": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Employment status",
+            "Remark": "People with paid work for more than 12 hours per week are 'employed'. People with no paid work or paid    work for less than 12 hours and who are looking for (other) paid work are considerd to be 'unemployed'. Respondents who consider themselves to be 'students' are excluded from this variable and have therefore no employment status.",
+            "Values": {
+                  "1": "Employed",
+                  "2": "Unemployed"
+                  },
+            "Variable": "job_charateristics.empstat"
+        },
+        "jobcity": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Current job: city",
+            "Values": "      see classification list",
+            "Variable": "job_charateristics.jobcity"
+        },
+        "jobcontr": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: type of contract",
+            "Values": {
+                  "1": "Temping contract",
+                  "2": "Paid employment",
+                  "3": "Apprenticeship contract",
+                  "4": "Government-subsidized job",
+                  "5": "Working in family business",
+                  "6": "Self-employed",
+                  "7": "Other"
+                  },
+            "Variable": "job_charateristics.jobcontr"
+        },
+        "jobctry": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Current job: country",
+            "Values": "      see classification list",
+            "Variable": "job_charateristics.jobctry"
+        },
+        "jobfield": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: required field of study vs qualification",
+            "Values": {
+                  "1": "Own or related field",
+                  "2": "Another or no particular field"
+                  },
+            "Variable": "job_charateristics.jobfield"
+        },
+        "jobhours": {
+            "Format": "F2.0 - numeric, 2 position, no decimals",
+            "Name": "Current job: number of regular working hours per week",
+            "Values": "0 - 99",
+            "Variable": "job_charateristics.jobhours"
+        },
+        "jobinchour": {
+            "Format": "F8.2 - numeric, 8 position, 2 decimals",
+            "Name": "Current job: gross earnings per hour (euros)",
+            "Remark": "values are indexed to 2012 price levels",
+            "Variable": "job_charateristics.jobinchour"
+        },
+        "jobincmth": {
+            "Format": "F8.2 - numeric, 8 position, 2 decimals",
+            "Name": "Current job: gross monthly earnings (euros)",
+            "Remark": "values are indexed to 2012 price levels",
+            "Variable": "job_charateristics.jobincmth"
+        },
+        "jobisco1": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Current job: International Standard Classification of Occupations, major group (ISCO88)",
+            "Values": "      see classification list",
+            "Variable": "job_charateristics.jobisco1"
+        },
+        "jobisco2": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Current job: International Standard Classification of Occupations, sub-major group (ISCO88)",
+            "Values": "      see classification list",
+            "Variable": "job_charateristics.jobisco2"
+        },
+        "jobisco3": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Current job: International Standard Classification of Occupations, minor group (ISCO88)",
+            "Values": "      see classification list",
+            "Variable": "job_charateristics.jobisco3"
+        },
+        "jobisco4": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Current job: International Standard Classification of Occupations, unit group (ISCO88)",
+            "Values": "      see classification list",
+            "Variable": "job_charateristics.jobisco4"
+        },
+        "jobisic1": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Current job: International Standard Industrial Classification, section (ISIC rev. 4)",
+            "Values": "      see classification list",
+            "Variable": "job_charateristics.jobisic1"
+        },
+        "jobisic2": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Current job: International Standard Industrial Classification, division (ISIC rev. 4)",
+            "Values": "      see classification list",
+            "Variable": "job_charateristics.jobisic2"
+        },
+        "joblevel": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: required level of education vs qualification",
+            "Values": {
+                  "1": "Own level or higher",
+                  "2": "Lower level"
+                  },
+            "Variable": "job_charateristics.joblevel"
+        },
+        "jobmatch": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Match between job and education",
+            "Values": {
+                  "1": "Good",
+                  "2": "Sufficient",
+                  "3": "Moderate",
+                  "4": "Bad"
+                  },
+            "Variable": "job_charateristics.jobmatch"
+        },
+        "joborgsz": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: size of the company (incl. other branches)",
+            "Values": {
+                  "1": "1 - 9 persons",
+                  "2": "10 - 99 persons",
+                  "3": "100 or more"
+                  },
+            "Variable": "job_charateristics.joborgsz"
+        },
+        "jobprov": {
+            "Format": "F2.0 - numeric, 2 position, no decimals",
+            "Name": "Current job: province",
+            "Values": {
+                  "1": "Groningen",
+                  "2": "Friesland",
+                  "3": "Drenthe",
+                  "4": "Overijssel",
+                  "5": "Gelderland",
+                  "6": "Utrecht",
+                  "7": "Noord-Holland",
+                  "8": "Zuid-Holland",
+                  "9": "Zeeland",
+                  "10": "Noord-Brabant",
+                  "11": "Limburg",
+                  "12": "Flevoland",
+                  "98": "Foreign country"
+                  },
+            "Variable": "job_charateristics.jobprov"
+        },
+        "jobregion": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: region",
+            "Values": {
+                  "1": "North",
+                  "2": "East",
+                  "3": "West",
+                  "4": "South",
+                  "8": "Forgeign country"
+                  },
+            "Variable": "job_charateristics.jobregion"
+        },
+        "jobsatis": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: satisfaction with current work",
+            "Values": {
+                  "1": "very dissatisfied",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "very satisfied"
+                  },
+            "Variable": "job_charateristics.jobsatis"
+        },
+        "jobsearch": {
+            "Format": "F2.0 - numeric, 2 position, no decimals",
+            "Name": "Months unemployed before first job",
+            "Values": "0 - 99",
+            "Variable": "job_charateristics.jobsearch"
+        },
+        "jobsupv": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: supervize other people?",
+            "Values": {
+                  "1": "Yes",
+                  "2": "No"
+                  },
+            "Variable": "job_charateristics.jobsupv"
+        },
+        "jobtemp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: fixed term or temporary contract",
+            "Values": {
+                  "1": "Fixed term temporary contract",
+                  "2": "Unlimited term contract"
+                  },
+            "Variable": "job_charateristics.jobtemp"
+        },
+        "labforce": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Labour force status",
+            "Remark": "The labour force consists of people with paid work for more than 12 hours per week and people who are    looking for paid work. Respondents who consider themselves to be 'students' are labeled as 'not in labour force'.",
+            "Values": {
+                  "1": "In labour force",
+                  "2": "Not in labour force"
+                  },
+            "Variable": "job_charateristics.labforce"
+        },
+        "skillshort": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: to what extent are capacities lacking?",
+            "Values": {
+                  "1": "not at all",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "to a large extent"
+                  },
+            "Variable": "job_charateristics.skillshort"
+        },
+        "skilluse": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Current job: to what extent are capacities utilized?",
+            "Values": {
+                  "1": "not at all",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "to a large extent"
+                  },
+            "Variable": "job_charateristics.skilluse"
+        },
+    
+        "age": {
+            "Format": "F2.0 - numeric, 2 position, no decimals",
+            "Name": "Age",
+            "Values": "15 - 76",
+            "Variable": "respondent_charateristics.age"
+        },
+        "ctrybirth": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Country of birth",
+            "Values": "      see classification list",
+            "Variable": "respondent_charateristics.ctrybirth"
+        },
+        "ctryrsp": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Country live at present",
+            "Values": "      see classification list",
+            "Variable": "respondent_charateristics.ctryrsp"
+        },
+        "gender": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Gender",
+            "Values": {
+                  "1": "Male",
+                  "2": "Female"
+                  },
+            "Variable": "respondent_charateristics.gender"
+        },
+        "migrant": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Immigrant status respondent",
+            "Remark": "Based on the CBS definition of 'Westerse allochtoon'.",
+            "Values": {
+                  "1": "Western immigrant",
+                  "2": "Non-western immigrant",
+                  "3": "Not a migrant"
+                  },
+            "Variable": "respondent_charateristics.migrant"
+        },
+        "provrsp": {
+            "Format": "F2.0 - numeric, 2 position, no decimals",
+            "Name": "Province live at present",
+            "Values": {
+                  "1": "Groningen",
+                  "2": "Friesland",
+                  "3": "Drenthe",
+                  "4": "Overijssel",
+                  "5": "Gelderland",
+                  "6": "Utrecht",
+                  "7": "Noord-Holland",
+                  "8": "Zuid-Holland",
+                  "9": "Zeeland",
+                  "10": "Noord-Brabant",
+                  "11": "Limburg",
+                  "12": "Flevoland",
+                  "98": "Foreign country"
+                  },
+            "Variable": "respondent_charateristics.provrsp"
+        },
+        "regionrsp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Region live at present",
+            "Values": {
+                  "1": "North",
+                  "2": "East",
+                  "3": "West",
+                  "4": "South",
+                  "8": "Foreign country"
+                  },
+            "Variable": "respondent_charateristics.regionrsp"
+        },
+    
+        "eduabrd": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: follow part of study programma abroad",
+            "Values": {
+                  "1": "No",
+                  "2": "Yes"
+                  },
+            "Variable": "study_programme.eduabrd"
+        },
+        "eduagain": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: would respondent choose same study programme again?",
+            "Values": {
+                  "1": "Same programme same level",
+                  "2": "Different programme same level"
+                  },
+            "Variable": "study_programme.eduagain"
+        },
+        "educohort": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Study programme: year of completion",
+            "Values": "1998 - 2012",
+            "Variable": "study_programme.educohort"
+        },
+        "educrebo": {
+            "Format": "F6.0 numeric 6 positions, no decimals",
+            "Name": "Study programme: national education register code CREBO",
+            "Values": "      see classification list",
+            "Variable": "study_programme.educrebo"
+        },
+        "educroho": {
+            "Format": "F6.0 numeric 6 positions, no decimals",
+            "Name": "Study programme: national education register code CROHO",
+            "Values": "      see classification list",
+            "Variable": "study_programme.educroho"
+        },
+        "edudvlpm": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: opinion on study programme as a good basis for further developing skills",
+            "Values": {
+                  "1": "Not at all",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very good"
+                  },
+            "Variable": "study_programme.edudvlpm"
+        },
+        "edufiel1": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Study programme: broad field of education and training EUROSTAT",
+            "Values": {
+                  "0": "General Programmes",
+                  "1": "Education",
+                  "2": "Humanities and Arts",
+                  "3": "Social sciences, Business and Law",
+                  "4": "Science, Mathematics and Computing",
+                  "5": "Engineering, Manufacturing and Construction",
+                  "6": "Agriculture and Veterinary",
+                  "7": "Health and Welfare",
+                  "8": "Services"
+                  },
+            "Variable": "study_programme.edufiel1"
+        },
+        "edufiel2": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Study programme: narrow field of education and training EUROSTAT",
+            "Values": {
+                  "00": "General Programmes",
+                  "01": "Basic/broad, general programmes",
+                  "08": "Literacy and numeracy",
+                  "09": "Personal skills",
+                  "10": "Education",
+                  "14": "Teacher training and education science",
+                  "20": "Humanities and Arts",
+                  "21": "Arts",
+                  "22": "Humanities",
+                  "30": "Social sciences, Business and Law",
+                  "31": "Social and behavioural science",
+                  "32": "Journalism and information",
+                  "34": "Business and administration",
+                  "38": "Law",
+                  "40": "Science, Mathematics and Computing",
+                  "42": "Life science",
+                  "44": "Physical science",
+                  "46": "Mathematics and statistics",
+                  "48": "Computing",
+                  "50": "Engineering, Manufacturing and Construction",
+                  "52": "Engineering and engineering trades",
+                  "54": "Manufacturing and processing",
+                  "58": "Architecture and building",
+                  "60": "Agriculture and Veterinary",
+                  "62": "Agriculture, forestry and fishery",
+                  "64": "Veterinary",
+                  "70": "Health and Welfare",
+                  "72": "Health",
+                  "76": "Social services",
+                  "80": "Services",
+                  "81": "Personal services",
+                  "84": "transport services",
+                  "85": "Environmental protection",
+                  "86": "Security services"
+                  },
+            "Variable": "study_programme.edufiel2"
+        },
+        "edufiel3": {
+            "Format": "F4.0 - numeric, 4 position, no decimals",
+            "Name": "Study programme: detailed field of education and training EUROSTAT",
+            "Values": {
+                  "000": "General Programmes",
+                  "010": "Basic/broad, general programmes",
+                  "080": "Literacy and numeracy",
+                  "090": "Personal skills",
+                  "100": "Education",
+                  "140": "Teacher training and education science (broad programmes)",
+                  "141": "Teaching and training",
+                  "142": "Education science",
+                  "143": "training for pre-school teachers",
+                  "144": "training for teachers at basic levels",
+                  "145": "training for teachers with subject specialisation",
+                  "146": "training for teachers of vocational subjects",
+                  "200": "Humanities and Arts",
+                  "210": "Arts (broad programmes)",
+                  "211": "Fine arts",
+                  "212": "Music and performing arts",
+                  "213": "Audio-visual techniques and media production",
+                  "214": "Design",
+                  "215": "Craft skills",
+                  "220": "Humanities (broad programmes)",
+                  "221": "Religion and theology",
+                  "222": "Foreign languages and cultures",
+                  "223": "Mother tongue",
+                  "225": "History and archeology",
+                  "226": "Philosophy and ethics",
+                  "300": "Social sciences, Business and Law",
+                  "310": "Social and behavioural science (broad programmes)",
+                  "311": "Psychology",
+                  "312": "Sociology and cultural studies",
+                  "313": "Political science and civics",
+                  "314": "Economics",
+                  "320": "Journalism and information",
+                  "321": "Journalism and reporting",
+                  "322": "Library, information, archive",
+                  "340": "Business and administration (broad programmes)",
+                  "341": "Wholesale and retail sales",
+                  "342": "Marketing and advertising",
+                  "343": "Finance, banking, insurance",
+                  "344": "Accounting and taxation",
+                  "345": "Management and administration",
+                  "346": "Secretarial and office work",
+                  "347": "Working life",
+                  "380": "Law",
+                  "400": "Science, Mathematics and Computing",
+                  "420": "Life science",
+                  "421": "Biology and biochemistry",
+                  "422": "Environmental science",
+                  "440": "Physical science (broad programmes)",
+                  "441": "Physics",
+                  "442": "Chemistry",
+                  "443": "Earth science",
+                  "460": "Mathematics and Statistics",
+                  "461": "Mathematics",
+                  "462": "Statistics",
+                  "480": "Computing",
+                  "481": "Computer science",
+                  "482": "Computer use",
+                  "500": "Engineering, Manufacturing and Construction",
+                  "520": "Engineering and engineering trades (broad programmes)",
+                  "521": "Mechanics and metal work",
+                  "522": "Electricity and energy",
+                  "523": "Electronics and automation",
+                  "524": "Chemical and process",
+                  "525": "Motor vehicles, ships and aircraft",
+                  "540": "Manufacturing and processing (broad programmes)",
+                  "541": "Food processing",
+                  "542": "Textiles, clothes, footwear, leather",
+                  "543": "Materials (wood, paper, plastic, glass)",
+                  "544": "Mining and extraction",
+                  "580": "Architecture and building",
+                  "581": "Architecture and town planning",
+                  "582": "Building and civil engineering",
+                  "600": "Agriculture and Veterinary",
+                  "620": "Agriculture,forestry and Fishery (broad programmes)",
+                  "621": "Crop and livestock production",
+                  "622": "Horticulture",
+                  "623": "Forestry",
+                  "624": "Fisheries",
+                  "640": "Veterinary",
+                  "700": "Health and Welfare",
+                  "720": "Health (broad programmes)",
+                  "721": "Medicine",
+                  "723": "Nursing and caring",
+                  "724": "Dental studies",
+                  "725": "Medical diagnostic and treatment technology",
+                  "726": "Therapy and rehabilitation",
+                  "727": "Pharmacy",
+                  "760": "Social Services",
+                  "761": "Child care and youth services",
+                  "762": "Social work and counselling",
+                  "800": "Services",
+                  "810": "Personal services (broad programmes)",
+                  "811": "Hotel, restaurant and catering",
+                  "812": "travel, tourism and leisure",
+                  "813": "Sports",
+                  "814": "Domestic services",
+                  "815": "Hair and beauty services",
+                  "840": "transport services",
+                  "850": "Environmental protection (broad programmes)",
+                  "851": "Environmental protection technology",
+                  "852": "Natural environment and wildlife",
+                  "853": "Community sanitation services",
+                  "860": "Security services (broad programmes)",
+                  "861": "Protection of property and persons",
+                  "862": "Occupational health and safety",
+                  "863": "Military"
+                  },
+            "Variable": "study_programme.edufiel3"
+        },
+        "edugrade": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: average exam grade",
+            "Values": {
+                  "1": "6",
+                  "2": "6.5",
+                  "3": "7",
+                  "4": "7.5",
+                  "5": "8",
+                  "6": "8.5 or higher"
+                  },
+            "Variable": "study_programme.edugrade"
+        },
+        "eduilt": {
+            "Format": "F6.0 numeric 6 positions, no decimals",
+            "Name": "Study programme: national education register code ILT",
+            "Values": "      see classification list",
+            "Variable": "study_programme.eduilt"
+        },
+        "eduint": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: internship or workplacement experience",
+            "Values": {
+                  "1": "No",
+                  "2": "Yes"
+                  },
+            "Variable": "study_programme.eduint"
+        },
+        "eduintfo": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: internship or workplacement experience abroad",
+            "Values": {
+                  "1": "No",
+                  "2": "Yes"
+                  },
+            "Variable": "study_programme.eduintfo"
+        },
+        "eduintnl": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: internship or workplacement experience in Netherlands",
+            "Values": {
+                  "1": "No",
+                  "2": "Yes"
+                  },
+            "Variable": "study_programme.eduintnl"
+        },
+        "eduiscd": {
+            "Format": "A10 - string 3 characters",
+            "Name": "Study programme: ISCED 97 code",
+            "Values": {
+                  "0": "Pre-primary education",
+                  "1": "Primary education",
+                  "2": "A Lower secondary education: leading to access ISCED 3A and 3B",
+                  "2": "B Lower secondary education: leading to access ISCED 3C",
+                  "2": "C Lower secondary education: primarily focused on access to labour market",
+                  "3": "A (Upper) Secondary education: leading to access ISCED 5A",
+                  "3": "B (Upper) Secondary education: leading to access ISCED 5B     3 C (Upper) Secondary education: primarily focused on access to labour market and access to ISCED 3 and 4",
+                  "4": "A Post-secondary non tertiary education: leading to access ISCED 5A",
+                  "4": "B Post-secondary non tertiary education: leading to access ISCED 5B",
+                  "4": "C Post-secondary non tertiary education: primarily focused on access to labour market",
+                  "5": "A First stage of tertiary education: largely theoratically based",
+                  "5": "B First stage of tertiary education: practical orientated",
+                  "6": "Second stage of tertiary education"
+                  },
+            "Variable": "study_programme.eduiscd"
+        },
+        "edulabmk": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: opinion on study programme as a good basis to start working",
+            "Values": {
+                  "1": "Not at all",
+                  "2": "-",
+                  "3": "-",
+                  "4": "-",
+                  "5": "Very good"
+                  },
+            "Variable": "study_programme.edulabmk"
+        },
+        "edulev1": {
+            "Format": "F3.0 numeric 3 positions, no decimals",
+            "Name": "Study programme: main level",
+            "Remark": "Variable is based on ROA education classification",
+            "Values": {
+                  "10": "Senior general secondary and pre-university education",
+                  "40": "Preparatory secondary vocational education",
+                  "60": "Secondary vocational education levels 1/2",
+                  "70": "Secondary vocational education levels 3/4",
+                  "90": "Secondary vocational education apprenticeship system levels 1/2",
+                  "100": "Secondary vocational education apprenticeship system levels 3/4",
+                  "110": "Higher vocational education",
+                  "120": "Academic higher education"
+                  },
+            "Variable": "study_programme.edulev1"
+        },
+        "edulev2": {
+            "Format": "F3.0 numeric 3 positions, no decimals",
+            "Name": "Study programme: main level and broad field",
+            "Remark": "Variable is based on ROA education classification",
+            "Values": {
+                  "12": "Senior general secondary education",
+                  "13": "Pre-university education",
+                  "41": "Individualized pre-vocational education",
+                  "42": "Preparatory sec. voc. education (agricultural)",
+                  "43": "Preparatory sec. voc. education (technical)",
+                  "44": "Preparatory sec. voc. education (economics)",
+                  "45": "Preparatory sec. voc. education (health and welfare)",
+                  "46": "Preparatory sec. voc. education (theoretical track)",
+                  "47": "Preparatory sec. voc. education (intersectoral tracks)     61 Sec. voc. education levels 1/2 (agricultural)",
+                  "62": "Sec. voc. education levels 1/2 (technical)",
+                  "63": "Sec. voc. education levels 1/2 (economics)",
+                  "64": "Sec. voc. education levels 1/2 (health and welfare)",
+                  "65": "Sec. voc. education levels 1/2 (humanities/arts/social and behavioural programmes)",
+                  "71": "Sec. voc. education levels 3/4 (agricultural)",
+                  "72": "Sec. voc. education levels 3/4 (technical)",
+                  "73": "Sec. voc. education levels 3/4 (economics)",
+                  "74": "Sec. voc. education levels 3/4 (health and welfare)",
+                  "75": "Sec. voc. education levels 3/4 (humanities/arts/social and behavioural programmes)",
+                  "91": "Sec. voc. education apprenticeship system levels 1/2 (agricultural)",
+                  "92": "Sec. voc. education apprenticeship system levels 1/2 (technical)",
+                  "93": "Sec. voc. education apprenticeship system levels 1/2 (economics)",
+                  "94": "Sec. voc. education apprenticeship system levels 1/2 (health and welfare)",
+                  "101": "Sec. voc. education apprenticeship system levels 3/4 (agricultural)",
+                  "102": "Sec. voc. education apprenticeship system levels 3/4 (technical)",
+                  "103": "Sec. voc. education apprenticeship system levels 3/4 (economics)",
+                  "104": "Sec. voc. education apprenticeship system levels 3/4 (health and welfare)     105 Sec. voc. education apprenticeship system levels 3/4 (humanities/arts/social and behavioural programmes)",
+                  "111": "Higher voc. education (agricultural)",
+                  "112": "Higher voc. education (educational)",
+                  "113": "Higher voc. education (technical)",
+                  "114": "Higher voc. education (economics)",
+                  "115": "Higher voc. education (health)",
+                  "116": "Higher voc. education (social and behavioural programmes)",
+                  "117": "Higher voc. education (arts and humanities)",
+                  "121": "Academic higher education (agricultural)",
+                  "122": "Academic higher education (educational)",
+                  "123": "Academic higher education (technical)",
+                  "124": "Academic higher education (economics)",
+                  "125": "Academic higher education (health)",
+                  "126": "Academic higher education (social and behavioural programmes)",
+                  "127": "Academic higher education (arts and humanities)",
+                  "128": "Academic higher education (law)",
+                  "129": "Academic higher education (science/mathematics and computing)"
+                  },
+            "Variable": "study_programme.edulev2"
+        },
+        "edulev3": {
+            "Format": "F3.0 - numeric, 2 position, no decimals",
+            "Name": "Study programme: detailed level",
+            "Remark": "Variable is based on ROA education classification",
+            "Values": {
+                  "1": "Senior general secondary education",
+                  "2": "Pre-university education",
+                  "3": "Preparatory secondary vocational education",
+                  "4": "Secondary vocational education levels 1",
+                  "5": "Secondary vocational education levels 2",
+                  "6": "Secondary vocational education levels 3",
+                  "7": "Secondary vocational education levels 4",
+                  "8": "Secondary vocational education apprenticeship system levels 1",
+                  "9": "Secondary vocational education apprenticeship system levels 2",
+                  "10": "Secondary vocational education apprenticeship system levels 3",
+                  "11": "Secondary vocational education apprenticeship system levels 4",
+                  "12": "Higher vocational education",
+                  "13": "Academic higher education"
+                  },
+            "Variable": "study_programme.edulev3"
+        },
+        "edumgexp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: management experience in (student-) organisations",
+            "Values": {
+                  "1": "No",
+                  "2": "Yes"
+                  },
+            "Variable": "study_programme.edumgexp"
+        },
+        "eduprov": {
+            "Format": "F2.0 - numeric, 2 position, no decimals",
+            "Name": "Study programme: province",
+            "Values": {
+                  "1": "Groningen",
+                  "2": "Friesland",
+                  "3": "Drenthe",
+                  "4": "Overijssel",
+                  "5": "Gelderland",
+                  "6": "Utrecht",
+                  "7": "Noord-Holland",
+                  "8": "Zuid-Holland",
+                  "9": "Zeeland",
+                  "10": "Noord-Brabant",
+                  "11": "Limburg",
+                  "12": "Flevoland",
+                  "98": "Foreign country"
+                  },
+            "Variable": "study_programme.eduprov"
+        },
+        "eduregion": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: region",
+            "Values": {
+                  "1": "North",
+                  "2": "East",
+                  "3": "West",
+                  "4": "South",
+                  "8": "Foreign country"
+                  },
+            "Variable": "study_programme.eduregion"
+        },
+        "eduroa": {
+            "Format": "F8.0 numeric 8 positions, no decimals",
+            "Name": "Study programme: code ROA education classification",
+            "Values": "      see classification list",
+            "Variable": "study_programme.eduroa"
+        },
+        "edusoi": {
+            "Format": "F6.0 numeric 6 positions, no decimals",
+            "Name": "Study programme: national education classification code SOI",
+            "Values": "      see classification list",
+            "Variable": "study_programme.edusoi"
+        },
+        "edutype": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: type",
+            "Values": {
+                  "1": "Full-time programme",
+                  "2": "Part-time programme",
+                  "3": "Dual programme"
+                  },
+            "Variable": "study_programme.edutype"
+        },
+        "eduwrkexp": {
+            "Format": "F1.0 - numeric, 1 position, no decimals",
+            "Name": "Study programme: relevant workexperience (not internships)",
+            "Values": {
+                  "1": "No",
+                  "2": "Yes"
+                  },
+            "Variable": "study_programme.eduwrkexp"
+        }
+    }
+}

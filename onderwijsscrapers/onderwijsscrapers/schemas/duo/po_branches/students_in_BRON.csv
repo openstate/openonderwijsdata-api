@@ -1,0 +1,12 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+brin,string,.*\nBRIN.?NUMMER,,
+branch_id,integer,.*\nVESTIGING?S.?NUMMER,,
+total,number,.*\nAANTAL LEERLINGEN TOTAAL,,
+age_4_to_7,number,.*\n4 T/M 7 JAAR,,
+age_8_older,number,.*\n8 JAAR EN OUDER,,
+weight_0,number,.*\nGEWICHT 0.00,,
+weight_0_3,number,.*\nGEWICHT 0.30,,
+weight_1_2,number,.*\nGEWICHT 1.20,,
+noat,number,.*\nNOAT,,

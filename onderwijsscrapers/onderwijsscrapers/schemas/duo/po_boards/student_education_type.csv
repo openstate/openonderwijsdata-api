@@ -1,0 +1,6 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+board_id,integer,BEVOEGD.?GEZAG.?NUMMER,,
+edu_type,string,,,
+students,integer,(?P<edu_type>.+O),,

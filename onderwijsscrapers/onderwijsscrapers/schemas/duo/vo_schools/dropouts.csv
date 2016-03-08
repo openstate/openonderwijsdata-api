@@ -1,0 +1,15 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,,Date of measurement
+brin,string,BRIN ?NUMMER,,
+,,GEMEENTE SCHOOL,,
+,,INSTELLINGSNAAM,,
+,,PROFIEL,,
+,,RMC SCHOOL,,
+,,SOORT VOORTGEZET ONDERWIJS,,
+reference_year,integer,JAAR,,
+education_structure,string,ONDERWIJSSTRUCTUUR EN LEERJAAR,,Level of education [#edu_in_holland]_.
+total_students,integer,AANTAL DEELNEMERS,,Total students for the given year at this school.
+total_dropouts,integer,AANTAL VSV ERS,,Total dropouts for the given year at this school.
+dropouts_with_vmbo_diploma,integer,AANTAL VSV ERS MET VMBO DIPLOMA,,Number of dropouts having a VMBO diploma [#vmbo]_.
+dropouts_with_mbo1_dimploma,integer,AANTAL VSV ERS MET MBO1 DIPLOMA,,Number of dropouts having a MBO 1 diploma (apprenticeship level) [#mbo1]_.
+dropouts_without_diploma,integer,AANTAL VSV ERS ZONDER DIPLOMA,,Number of dropouts having no diploma.

@@ -1,0 +1,9 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+non_vavo,integer,AANTAL LEERLINGEN,,
+vavo,integer,AANTAL VO LEERLINGEN UITBESTEED AAN VAVO,,
+,string,BEVOEGD GEZAG NAAM,,
+board_id,integer,BEVOEGD GEZAG NUMMER,,
+,,DENOMINATIE,,
+,,TOTAAL AANTAL LEERLINGEN,,

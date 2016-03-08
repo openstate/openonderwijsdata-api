@@ -1,0 +1,8 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+brin,string,SCHOOLJAAR.+?MBO.+?\nBRIN.?NUMMER,,
+qualification,integer,SCHOOLJAAR.+?MBO.+?\nKWALIFICATIE.CODE,,
+from_vo_brin,string,SCHOOLJAAR.+?VO.+?\nBRIN.?NUMMER,,
+from_vo_branch_id,integer,SCHOOLJAAR.+?VO.+?\nVESTIGING?S.?NUMMER,,
+in_flow,integer,.*?\nAANTAL DOORSTROMERS,,

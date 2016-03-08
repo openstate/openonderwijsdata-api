@@ -1,0 +1,17 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+brin,string,BRIN.?NUMMER,,
+branch_id,string,VESTIGING?S.?NUMMER,,
+vso,integer,VSO,,
+pro,integer,PrO,,
+vmbo_bl,integer,VMBO.BL,,
+vmbo_bl_kl,integer,VMBO.BL.KL,,
+vmbo_kl,integer,VMBO.KL,,
+vmbo_kl_gt,integer,VMBO.KL.GT,,
+vmbo_gt,integer,VMBO.GT,,
+vmbo_gt_havo,integer,VMBO.GT.HAVO,,
+havo,integer,HAVO,,
+havo_vwo,integer,HAVO.VWO,,
+vwo,integer,VWO,,
+unknown,integer,ONBEKEND,,

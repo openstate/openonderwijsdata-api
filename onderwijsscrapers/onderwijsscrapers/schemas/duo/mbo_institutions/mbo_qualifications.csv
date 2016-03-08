@@ -1,0 +1,12 @@
+name,type,source_titles_match,source_values_match,description
+reference_date,string,meta:peildatum,(?P<reference_year>\d+).*,Date of measurement
+reference_year,,,,
+brin,brin,BRIN NUMMER,,
+mbo_type,mbo_type,TYPE MBO,,
+qualification_level,integer,KWALIFICATIE NIVEAU,,
+qualification_code,integer,KWALIFICATIE CODE,,
+qualification_name,string,KWALIFICATIE NAAM,,
+mbo_sector,mbo_sector,MBO SECTOR,,
+mbo_industry,string,BEDRIJFSTAK MBO,,
+brin_knowledge_centre_mbo,brin,BRIN NUMMER KENNISCENTRUM,,
+knowledge_centre_mbo,string,NAAM KENNISCENTRUM,,
