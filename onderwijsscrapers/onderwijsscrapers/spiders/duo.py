@@ -56,6 +56,7 @@ def schematable2fields(schematable):
             fields.append( descriptor )
     return fields
 
+## Spiders
 
 class DuoSpider(CrawlSpider):
     name = 'duo'
@@ -96,7 +97,7 @@ class DuoSpider(CrawlSpider):
             for scrape in self.match_scrapes(source, scrapes):
                 for table in self.match_scrape_tables(source, scrape):
                     
-                    schema_name = source.get('codebook')
+                    schema_name = source.get('schema')
                     fname = os.path.join(self.schema_dir, schema_name+'.csv')
                     schema = {"fields": schematable2fields(open(fname))}
                     schema = Transformer(schema, metadata=scrape)
@@ -107,7 +108,6 @@ class DuoSpider(CrawlSpider):
                     rows = (row.values() for row in table.dicts())
                     for doc in structure(schema.transform(rows)):
                         yield FlexibleItem(**doc)
-                        break
 
     def get_scrapes(self, response):
         """Scrape the page for links to tables"""

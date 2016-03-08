@@ -1,4 +1,4 @@
-web,file_title,table,codebook,title,primaryKey,description
+web,file_title,table,schema,title,primaryKey,description
 https://duo.nl/open_onderwijsdata/databestanden/po/adressen/adressen_po_5.jsp,,,boards,po_boards,reference_year board_id,
 https://duo.nl/open_onderwijsdata/databestanden/po/adressen/adressen_po_6.jsp,,,boards,po_boards,reference_year board_id,
 https://duo.nl/open_onderwijsdata/databestanden/po/adressen/adressen_po_7.jsp,,,boards,po_boards,reference_year board_id,
