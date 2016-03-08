@@ -80,28 +80,42 @@
 				</li>
 			{% endfor %}
 			</ul>
-		</ul>
-	</div>
-	<div class="col-sm-4">
-		<h4>Onderwijsinspectie</h4>
-		<ul class="unstyled">
-			<li>
-				<span><abbr title="Vestigingen scholen primair onderwijs">PO School branches</abbr></span>
-				<span class="badge pull-right">{{ counts['onderwijsinspectie_po_branches']['facets']['doc_types']['total'] }}</span>
-			</li>
-			<li>
-				<span><abbr title="Vestigingen scholen voortgezet onderwijs">VO School branches</abbr></span>
-				<span class="badge pull-right">{{ counts['onderwijsinspectie_vo_branches']['facets']['doc_types']['total'] }}</span>
-			</li>
-		</ul>
-	</div>
-	<div class="col-sm-4">
-		<h4>Venster voor Verantwoording</h4>
-		<ul class="unstyled">
-			<li>
-				<span><abbr title="Vestigingen scholen voortgezet onderwijs">VO School branches</abbr></span>
-				<span class="badge pull-right">{{ counts['schoolvo']['facets']['doc_types']['total'] }}</span>
-			</li>
+			<li><span><abbr title="Mbo Bevoegde Gezagen">Mbo Boards</abbr></span></li>
+			<ul>
+			{% for year in counts['duo_mbo_boards']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+			{% endfor %}
+			</ul>
+			<li><span><abbr title="Mbo Instellingen">Mbo Institutions</abbr></span></li>
+			<ul>
+				{% for year in counts['duo_mbo_institutions']['facets']['years']['terms'] %}
+					<li>
+						<span>{{ year['term'] }}</span>
+						<span class="badge pull-right">{{ year['count'] }}</span>
+					</li>
+				{% endfor %}
+			</ul>
+			<li><span><abbr title="Hoger Onderwijs Bevoegde Gezagen">Ho Boards</abbr></span></li>
+			<ul>
+				{% for year in counts['duo_ho_boards']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+				{% endfor %}
+			</ul>
+			<li><span><abbr title="Hoger Onderwijs Instellingen">Ho Institutions</abbr></span></li>
+			<ul>
+				{% for year in counts['duo_ho_institutions']['facets']['years']['terms'] %}
+				<li>
+					<span>{{ year['term'] }}</span>
+					<span class="badge pull-right">{{ year['count'] }}</span>
+				</li>
+				{% endfor %}
+			</ul>
 		</ul>
 	</div>
 </div>

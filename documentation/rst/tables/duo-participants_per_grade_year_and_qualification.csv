@@ -1,0 +1,4 @@
+Field,Type,Original term,Description
+"qualification_code","integer","","Unique code for the program and level"
+"grade_year","integer","","The grade year that the students are in (years of education completed +1)"
+"participants","integer","","Number of participants"

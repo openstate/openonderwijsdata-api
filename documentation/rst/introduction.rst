@@ -50,41 +50,6 @@ Currently included data
     * Addresses (geocoded)
 
 
-* Onderwijsinspectie
-
-  * Address (geocoded)
-  * General information: board id, BRIN, branch id, website, etc.
-  * Current ratings of education structures (*huidig inspectieoordeel*)
-  * Historical ratings of education structures
-  * Links to available inspection reports
-
-* Vensters voor Verantwoording
-
-  * Address (geocoded)
-  * General information: board id, BRIN, branch id, website, etc.
-  * Average hours of education planned and realized
-  * Parent and student satisfaction suruvey results
-  * School costs
-
-* Onderwijsinspectie via the Ministry of Education, Culture and Science (*Onderwijs, Cultuur en Wetenschap*)
-
-  * Primary school final examination scores (*eindresultaten van leerlingen van groep 8 op basisscholen*)
-
-* Onderwijsinspectie via DANS (*Data Archiving and Networked Services*)
-
-  * **Documented in Dutch**
-
-    * Algemene gegevens
-    * Opbrengstenoordeel
-    * Driejaarsgemiddelde van verschil tussen cijfer schoolexamen en centraal examen
-    * Opbrengstenkaart
-    * Adviesgegevens
-    * In-, door-, en uitstroomgegevens
-    * Examenkandidaten
-    * Examencijfers
-    * Leerlingen met indicatie LWOO (Leerweg Ondersteunend Onderwijs)
-    * Achtergrondgegevens
-
 Access data
 --------------------------------
 The :doc:`api` section describes how the data in the OpenOnderwijs API can be accessed through a REST interface.

@@ -1,12 +1,16 @@
-ES_URL = 'localhost:9200'
-ES_INDEXES = set(['duo', 'schoolvo', 'onderwijsinspectie'])
-ES_DOCUMENT_TYPES_PER_INDEX = {
-    'duo': set(['vo_school', 'vo_branch', 'vo_board', 'po_school', 'po_branch',
-                'po_board', 'pao_collaboration']),
-    'schoolvo': set(['vo_branch']),
-    'onderwijsinspectie': set(['vo_branch', 'po_branch'])
-}
+import yaml
+import os
+with open(os.path.join(os.path.dirname(__file__), "config.yaml"), 'r') as f:
+    config = yaml.load(f)
+
+ES_URL = os.getenv('ES_URL', config['elasticsearch']['host'])
+ES_INDEXES = set(config['elasticsearch']['indexes'])
+ES_DOCUMENT_TYPES_PER_INDEX = {}
+for i in ES_INDEXES:
+    ES_DOCUMENT_TYPES_PER_INDEX[i] = set(config['elasticsearch']['types_per_index'][i])
+
 ES_DOCUMENT_TYPES = set()
+
 for index, doctypes in ES_DOCUMENT_TYPES_PER_INDEX.iteritems():
     ES_DOCUMENT_TYPES = ES_DOCUMENT_TYPES | doctypes
 ES_VALIDATION_RESULTS_INDEX = 'onderwijsdata_validation'

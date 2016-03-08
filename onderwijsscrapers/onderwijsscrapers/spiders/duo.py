@@ -8,7 +8,7 @@ from os.path import basename
 import os
 from zipfile import ZipFile
 from collections import defaultdict
-from itertools import islice
+from itertools import islice, chain
 import pprint
 
 import requests
@@ -16,10 +16,11 @@ from scrapy import log
 from scrapy.spider import Spider
 from scrapy.http import Request
 
-from onderwijsscrapers.codebooks import Codebook
 from onderwijsscrapers.items import (DuoVoBoard, DuoVoSchool, DuoVoBranch,
                                      DuoPoBoard, DuoPoSchool, DuoPoBranch,
-                                     DuoPaoCollaboration, DuoMboBoard, DuoMboInstitution)
+                                     DuoPaoCollaboration, DuoMboBoard, DuoMboInstitution,
+                                     DuoHoBoard, DuoHoInstitution
+                                     )
 
 from onderwijsscrapers.tabular_utilities import get_stream, get_tables, next_n_extended
 from onderwijsscrapers.codebooks import load_codebook
@@ -49,13 +50,16 @@ class DuoSpider(Spider):
         Parse a file that has a whole table (not just one value) per DUO item.
         So for example, for every school it has students per level, or something per year.
         Or just possibly multiple values (so it can be used as single nesting).
+
         It adds that dataset as an array of objects.
         This is a SequenceSchema in validation.
 
         parse_row should return a key (like the tuple (brin, branch_id))
         and one item of the dataset for this brin
 
-        This is a SequenceSchema in validation
+        If `reference_year` is defined in the item, add it for that year.
+
+        TODO: generalize for multiple datasets per row
 
         Args:
            make_item (function): takes a key and returns a DUO item
@@ -72,14 +76,24 @@ class DuoSpider(Spider):
             dataset = {}
             for row in parse_csv_file(csv_url):
                 for key, value in parse_row(row):
-                    if key not in dataset:
-                        dataset[key] = []
-                    dataset[key].append(value)
+                    # Allow separate years
+                    if type(value) == dict:
+                        year = value.pop('reference_year', None)
+                        if (year, key) not in dataset:
+                            dataset[(year, key)] = []
+                    else:
+                        year = None
+                    if (year, key) not in dataset:
+                        dataset[(year, key)] = []
+                    dataset[(year, key)].append(value)
 
-            for key, item in dataset.iteritems():
+            for (year, key), item in dataset.iteritems():
                 if key is not None:
                     school = make_item(key)
-                    school['reference_year'] = reference_year
+                    if year is None:
+                        school['reference_year'] = reference_year
+                    else:
+                        school['reference_year'] = year
                     school['%s_reference_url' % dataset_name] = csv_url
                     school['%s_reference_date' % dataset_name] = reference_date
                     school[dataset_name] = item
@@ -501,6 +515,8 @@ class DuoVoBoardsSpider(DuoSpider):
                 board['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
                                          row['HUISNUMMER-TOEVOEGING']),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'zip_code': row['POSTCODE'].replace(' ', ''),
                     'city': row['PLAATSNAAM']
                 }
@@ -510,6 +526,8 @@ class DuoVoBoardsSpider(DuoSpider):
                     board['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'])
+                    board['correspondence_address']['street_name'] = row['STRAATNAAM CORRESPONDENTIEADRES']
+                    board['correspondence_address']['street_number'] = row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']
                 else:
                     board['correspondence_address']['street'] = None
 
@@ -579,8 +597,12 @@ class DuoVoBoardsSpider(DuoSpider):
                 indicators['group'] = row['GROEPERING']
 
                 for ind, ind_norm in indicators_mapping.iteritems():
-                    indicators[ind_norm] = float(row[ind].replace('.', '')
-                                                         .replace(',', '.'))
+                    if row[ind]!='':
+                        try:
+                            indicators[ind_norm] = float(row[ind].replace('.', '')
+                                .replace(',', '.'))
+                        except:
+                            log.msg('failed to convert %s'%str(row[ind]), level=log.ERROR)
 
                 yield board_id, indicators
 
@@ -707,6 +729,8 @@ class DuoVoSchoolsSpider(DuoSpider):
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
                                          row['HUISNUMMER-TOEVOEGING']),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'city': row['PLAATSNAAM'],
                     'zip_code': row['POSTCODE'].replace(' ', '')
                 }
@@ -715,8 +739,10 @@ class DuoVoSchoolsSpider(DuoSpider):
                     'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                                          row['HUISNUMMER-TOEVOEGING '
                                              'CORRESPONDENTIEADRES']),
+                    'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
-                    'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
+                    'zip_code': (row['POSTCODE CORRESPONDENTIEADRES'] or '').replace(' ', '')
                 }
 
                 school['municipality_code'] = int_or_none(row['GEMEENTENUMMER'])
@@ -1178,6 +1204,8 @@ class DuoVoBranchesSpider(DuoSpider):
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'].strip(),
                                          row['HUISNUMMER-TOEVOEGING'].strip()),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'city': row['PLAATSNAAM'].strip(),
                     'zip_code': row['POSTCODE'].strip().replace(' ', '')
                 }
@@ -1215,6 +1243,8 @@ class DuoVoBranchesSpider(DuoSpider):
                     school['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'].strip(),
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'].strip())
+                    school['correspondence_address']['street_name'] = row['STRAATNAAM CORRESPONDENTIEADRES']
+                    school['correspondence_address']['street_number'] = row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']
                 else:
                     school['correspondence_address']['street'] = None
 
@@ -1271,7 +1301,7 @@ class DuoVoBranchesSpider(DuoSpider):
 
             education_type = {}
 
-            department = row['AFDELING'].strip()
+            department = (row['AFDELING'] or '').strip()
             if department:
                 education_type['department'] = department
                 if education_type['department'].lower() == 'n.v.t.':
@@ -1279,13 +1309,13 @@ class DuoVoBranchesSpider(DuoSpider):
             else:
                 education_type['department'] = None
 
-            if row['ELEMENTCODE'].strip():
+            if (row['ELEMENTCODE'] or '').strip():
                 education_type['elementcode'] = int(row['ELEMENTCODE']
                                                     .strip())
             else:
                 education_type['elementcode'] = None
 
-            lwoo = row['LWOO INDICATIE'].strip().lower()
+            lwoo = (row['LWOO INDICATIE'] or '').strip().lower()
             if lwoo:
                 if lwoo == 'j':
                     education_type['lwoo'] = True
@@ -1296,7 +1326,7 @@ class DuoVoBranchesSpider(DuoSpider):
             else:
                 education_type['lwoo'] = None
 
-            vmbo_sector = row['VMBO SECTOR'].strip()
+            vmbo_sector = (row['VMBO SECTOR'] or '').strip()
             if vmbo_sector:
                 if vmbo_sector.lower() == 'n.v.t.':
                     education_type['vmbo_sector'] = None
@@ -1305,17 +1335,18 @@ class DuoVoBranchesSpider(DuoSpider):
             else:
                 education_type['vmbo_sector'] = None
 
-            naam = row['OPLEIDINGSNAAM'].strip()
+            naam = (row['OPLEIDINGSNAAM'] or '').strip()
             education_type['education_name'] = naam or None
 
-            otype = row['ONDERWIJSTYPE VO EN LEER- OF VERBLIJFSJAAR'].strip()
+            otype = (row['ONDERWIJSTYPE VO EN LEER- OF VERBLIJFSJAAR'] or '').strip()
             education_type['education_structure'] = otype or None
 
             for available_year in range(1, 7):
                 male = int(row['LEER- OF VERBLIJFSJAAR %s - MAN'
-                           % available_year])
+                           % available_year] or 0)
                 female = int(row['LEER- OF VERBLIJFSJAAR %s - VROUW'
-                             % available_year])
+                             % available_year] or 0)
+
 
                 education_type['year_%s' % available_year] = {
                     'male': male,
@@ -1927,6 +1958,8 @@ class DuoPoBoardsSpider(DuoSpider):
                 board['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
                                          row['HUISNUMMER-TOEVOEGING']),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'zip_code': row['POSTCODE'].replace(' ', ''),
                     'city': row['PLAATSNAAM']
                 }
@@ -1936,6 +1969,8 @@ class DuoPoBoardsSpider(DuoSpider):
                     board['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'])
+                    board['correspondence_address']['street_name'] = row['STRAATNAAM CORRESPONDENTIEADRES']
+                    board['correspondence_address']['street_number'] = row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']
                 else:
                     board['correspondence_address']['street'] = None
 
@@ -2038,6 +2073,8 @@ class DuoPoBoardsSpider(DuoSpider):
                 else:
                     row[key.strip()] = '0'
 
+            if 'BEVOEGD_GEZAG_NUMMER' in row:
+                row['BEVOEGD GEZAG NUMMER'] = row['BEVOEGD_GEZAG_NUMMER']
             board_id = int(row['BEVOEGD GEZAG NUMMER'])
 
             for edu_type in possible_edu_types:
@@ -2166,6 +2203,8 @@ class DuoPoSchoolsSpider(DuoSpider):
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'],
                                          row['HUISNUMMER-TOEVOEGING']),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'city': row['PLAATSNAAM'],
                     'zip_code': row['POSTCODE'].replace(' ', '')
                 }
@@ -2174,6 +2213,8 @@ class DuoPoSchoolsSpider(DuoSpider):
                     'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                                          row['HUISNUMMER-TOEVOEGING '
                                              'CORRESPONDENTIEADRES']),
+                    'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
                     'city': row['PLAATSNAAM CORRESPONDENTIEADRES'],
                     'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', '')
                 }
@@ -2212,10 +2253,10 @@ class DuoPoSchoolsSpider(DuoSpider):
         def parse_row(row):
             if 'BRIN NUMMER' in row:
                 yield row['BRIN NUMMER'], {
-                    'cluster_1': int(row['CLUSTER 1'] or 0),
-                    'cluster_2': int(row['CLUSTER 2'] or 0),
-                    'cluster_3': int(row['CLUSTER 3'] or 0),
-                    'cluster_4': int(row['CLUSTER 4'] or 0),
+                    'cluster_1': int(float(row['CLUSTER 1'] or 0)),
+                    'cluster_2': int(float(row['CLUSTER 2'] or 0)),
+                    'cluster_3': int(float(row['CLUSTER 3'] or 0)),
+                    'cluster_4': int(float(row['CLUSTER 4'] or 0)),
                 }
         return self.dataset(response, self.make_item, 'spo_students_per_cluster', parse_row)
 
@@ -2379,6 +2420,8 @@ class DuoPoBranchesSpider(DuoSpider):
                 school['address'] = {
                     'street': '%s %s' % (row['STRAATNAAM'].strip(),
                                          row['HUISNUMMER-TOEVOEGING'].strip()),
+                    'street_name': row['STRAATNAAM'],
+                    'street_number': row['HUISNUMMER-TOEVOEGING'],
                     'city': row['PLAATSNAAM'].strip(),
                     'zip_code': row['POSTCODE'].strip().replace(' ', '')
                 }
@@ -2410,6 +2453,8 @@ class DuoPoBranchesSpider(DuoSpider):
                     school['correspondence_address']['street'] = '%s %s'\
                         % (row['STRAATNAAM CORRESPONDENTIEADRES'].strip(),
                            row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'].strip())
+                    school['correspondence_address']['street_name'] = row['STRAATNAAM CORRESPONDENTIEADRES']
+                    school['correspondence_address']['street_number'] = row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']
                 else:
                     school['correspondence_address']['street'] = None
 
@@ -2485,6 +2530,26 @@ class DuoPoBranchesSpider(DuoSpider):
             if row.has_key('GEWICHT 1.20'):
                 row['GEWICHT 1.2'] = row['GEWICHT 1.20']
 
+            # and so did 2014
+            if row.has_key('BRIN_NUMMER'):
+                row['BRIN NUMMER'] = row['BRIN_NUMMER']
+            if row.has_key('SCHOOL_GEWICHT'):
+                row['SCHOOLGEWICHT'] = row['SCHOOL_GEWICHT']
+            if row.has_key('VESTIGINGS_NUMMER'):
+                row['VESTIGINGSNUMMER'] = row['VESTIGINGS_NUMMER']
+            if row.has_key('VEST_GEWICHT'):
+                row['SCHOOLGEWICHT'] = row['VEST_GEWICHT']
+            if row.has_key('VEST GEWICHT'):
+                row['SCHOOLGEWICHT'] = row['VEST GEWICHT']
+
+
+            if row.has_key('GEWICHT_0.00'):
+                row['GEWICHT 0'] = row['GEWICHT_0.00']
+            if row.has_key('GEWICHT_0.30'):
+                row['GEWICHT 0.3'] = row['GEWICHT_0.30']
+            if row.has_key('GEWICHT_1.20'):
+                row['GEWICHT 1.2'] = row['GEWICHT_1.20']
+
             brin = row['BRIN NUMMER'].strip()
             # Bypasses error coming from the 2011 dataset which contains and
             # empty row.
@@ -2534,6 +2599,14 @@ class DuoPoBranchesSpider(DuoSpider):
                 if row.has_key('VESTIGINS NUMMER'):
                     row['VESTIGINGSNUMMER'] = row['VESTIGINS NUMMER']
 
+                # 2014
+                if row.has_key('BRIN_NUMMER'):
+                    row['BRIN NUMMER'] = row['BRIN_NUMMER']
+                if row.has_key('GEMEENTE_NUMMER'):
+                    row['GEMEENTENUMMER'] = row['GEMEENTE_NUMMER']
+                if row.has_key('VESTIGINS_NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINS_NUMMER']
+
                 brin = row['BRIN NUMMER'].strip()
                 branch_id = int(row['VESTIGINGSNUMMER'])
                 school_id = '%s-%s' % (brin, branch_id)
@@ -2572,7 +2645,7 @@ class DuoPoBranchesSpider(DuoSpider):
                     ages_per_branch_by_student_weight[school_id] = {}
 
                 if row['GEWICHT'].strip():
-                    weight = 'student_weight_%.1f' % float(row['GEWICHT'].strip().replace(',', '.').replace('.', '_'))
+                    weight = ('student_weight_%.1f' % float(row['GEWICHT'].strip().replace(',', '.'))).replace('.', '_')
                 else:
                     weight = None
 
@@ -2723,6 +2796,14 @@ class DuoPoBranchesSpider(DuoSpider):
                 if row.has_key('VESTIGINSNUMMER'): # don't ask
                     row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
 
+                # 2014
+                if row.has_key('BRIN_NUMMER'):
+                    row['BRIN NUMMER'] = row['BRIN_NUMMER']
+                if row.has_key('GEMEENTE_NUMMER'):
+                    row['GEMEENTENUMMER'] = row['GEMEENTE_NUMMER']
+                if row.has_key('VESTIGINGS_NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS_NUMMER']
+
                 brin = row['BRIN NUMMER'].strip()
                 branch_id = 0 if not row['VESTIGINGSNUMMER'] else int(row['VESTIGINGSNUMMER'])
                 school_id = '%s-%s' % (brin, branch_id)
@@ -2739,6 +2820,8 @@ class DuoPoBranchesSpider(DuoSpider):
                 years = {}
                 possible_years = '1 2 3 4 5 6 7 8'.split()
                 for year in possible_years:
+                    if row.has_key('LEERJAAR_%s' % year):
+                        row['LEERJAAR %s' % year] = row['LEERJAAR_%s' % year]
                     if row['LEERJAAR %s' % year].strip():
                         years['year_%s' % year] = int(row['LEERJAAR %s' % year])
                     else:
@@ -2779,6 +2862,15 @@ class DuoPoBranchesSpider(DuoSpider):
                 if row.has_key('VESTIGINSNUMMER'): # don't ask
                     row['VESTIGINGSNUMMER'] = row['VESTIGINSNUMMER']
 
+                # And so did 2014
+                if row.has_key('BRIN_NUMMER'):
+                    row['BRIN NUMMER'] = row['BRIN_NUMMER']
+                if row.has_key('VESTIGINGS_NUMMER'):
+                    row['VESTIGINGSNUMMER'] = row['VESTIGINGS_NUMMER']
+                if row.has_key('AANDUIDING_WET'):
+                    row['AANDUIDING WET'] = row['AANDUIDING_WET']
+                if row.has_key('SOORT_PRIMAIR_ONDERWIJS'):
+                    row['SOORT PRIMAIR ONDERWIJS'] = row['SOORT_PRIMAIR_ONDERWIJS']
 
                 branch = DuoPoBranch()
                 branch['brin'] = row['BRIN NUMMER'].strip()
@@ -2788,7 +2880,8 @@ class DuoPoBranchesSpider(DuoSpider):
                 # Should this be in root, or spo_students_by_birthyear?
                 branch['spo_law'] = row['AANDUIDING WET']
                 branch['spo_edu_type'] = row['SOORT PRIMAIR ONDERWIJS'] # possibly multiple with slash
-                branch['spo_cluster'] = row['CLUSTER'] # i hope they don't use slashes
+                if 'CLUSTER' in row:
+                    branch['spo_cluster'] = row['CLUSTER'] # i hope they don't use slashes
 
                 # ignoring total
                 students_by_birthyear = []
@@ -2877,7 +2970,8 @@ class DuoPoBranchesSpider(DuoSpider):
 
             # 2013 changed:
             if row.has_key('PRO'):
-                row['PrO'] = row['PRO']
+                row['PrO'] = row['PRO'] # although, sometimes rows have both???
+
             if row.has_key('VMBO BL KL'):
                 row['VMBO BL-KL'] = row['VMBO BL KL']
             if row.has_key('VMBO KL GT'):
@@ -2886,27 +2980,47 @@ class DuoPoBranchesSpider(DuoSpider):
                 row['VMBO GT-HAVO'] = row['VMBO GT HAVO']
             if row.has_key('HAVO VWO'):
                 row['HAVO-VWO'] = row['HAVO VWO']
+            
+            # 2014 changed:
+            if row.has_key('BRIN_NUMMER'):
+                row['BRIN NUMMER'] = row['BRIN_NUMMER']
+            if row.has_key('VMBO_BL_KL'):
+                row['VMBO BL-KL'] = row['VMBO_BL_KL']
+            if row.has_key('VMBO_KL_GT'):
+                row['VMBO KL-GT'] = row['VMBO_KL_GT']
+            if row.has_key('VMBO_GT_HAVO'):
+                row['VMBO GT-HAVO'] = row['VMBO_GT_HAVO']
+            if row.has_key('HAVO_VWO'):
+                row['HAVO-VWO'] = row['HAVO_VWO']
+            if row.has_key('VMBO_GT'):
+                row['VMBO GT'] = row['VMBO_GT']
+            if row.has_key('VMBO_KL'):
+                row['VMBO KL'] = row['VMBO_KL']
+            if row.has_key('VMBO_BL'):
+                row['VMBO BL'] = row['VMBO_BL']
 
 
             if row['BRIN NUMMER']:
                 brin = row['BRIN NUMMER'].strip()
                 branch_id = int(row['VESTIGINGSNUMMER'].strip() or 0)
-
-                yield (brin, branch_id), {
-                    # TODO intOrNone
-                    'vso' : int(row['VSO'] or 0),
-                    'pro' : int(row['PrO'] or 0),
-                    'vmbo_bl' : int(row['VMBO BL'] or 0),
-                    'vmbo_bl_kl' : int(row['VMBO BL-KL'] or 0),
-                    'vmbo_kl' : int(row['VMBO KL'] or 0),
-                    'vmbo_kl_gt' : int(row['VMBO KL-GT'] or 0),
-                    'vmbo_gt' : int(row['VMBO GT'] or 0),
-                    'vmbo_gt_havo' : int(row['VMBO GT-HAVO'] or 0),
-                    'havo' : int(row['HAVO'] or 0),
-                    'havo_vwo' : int(row['HAVO-VWO'] or 0),
-                    'vwo' : int(row['VWO'] or 0),
-                    'unknown' : int(row['ONBEKEND'] or 0),
-                    }
+                try:
+                    yield (brin, branch_id), {
+                        # TODO intOrNone
+                        'vso' : int(row['VSO'] or 0),
+                        'pro' : int(row['PrO'] or 0),
+                        'vmbo_bl' : int(row['VMBO BL'] or 0),
+                        'vmbo_bl_kl' : int(row['VMBO BL-KL'] or 0),
+                        'vmbo_kl' : int(row['VMBO KL'] or 0),
+                        'vmbo_kl_gt' : int(row['VMBO KL-GT'] or 0),
+                        'vmbo_gt' : int(row['VMBO GT'] or 0),
+                        'vmbo_gt_havo' : int(row['VMBO GT-HAVO'] or 0),
+                        'havo' : int(row['HAVO'] or 0),
+                        'havo_vwo' : int(row['HAVO-VWO'] or 0),
+                        'vwo' : int(row['VWO'] or 0),
+                        'unknown' : int(row['ONBEKEND'] or 0),
+                        }
+                except:
+                    log.msg('problem with row %s'%str(row.keys()), level=log.ERROR)
 
         return self.dataset(response, self.make_item, 'spo_students_by_advice', parse_row)
 
@@ -3195,6 +3309,8 @@ class DuoMboBoardSpider(DuoSpider):
 
                 yield DuoMboBoard(
                     reference_year = reference_year,
+                    ignore_id_fields = ['reference_year'],
+
                     board_id = int(row['BEVOEGD GEZAG NUMMER']),
 
                     address = {
@@ -3203,10 +3319,12 @@ class DuoMboBoardSpider(DuoSpider):
                         'zip_code': row['POSTCODE'].replace(' ', ''),
                         'city': row['PLAATSNAAM']
                     },
-                    administrative_office_id = int(row['ADMINISTRATIEKANTOORNUMMER']),
+                    administrative_office_id = int_or_none(row['ADMINISTRATIEKANTOORNUMMER']),
                     correspondence_address = {
                         'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                                              row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                        'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
                         'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
                         'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
                     },
@@ -3228,8 +3346,11 @@ class DuoMboInstitutionSpider(DuoSpider):
                 # self.codebook_item('duo/mbo_institutions/mbo_institutions'),
                 self.parse_mbo_institutions,
             'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp':
-                # self.codebook_item('duo/mbo_institutions/mbo_participants_per_institution'),
-                self.parse_mbo_participants_per_institution,
+                self.parse_mbo_participants,
+            'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname8.asp':
+                self.parse_mbo_participants_grade_year,
+            'mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname12.asp':
+                self.parse_mbo_graduates,
         }
         DuoSpider.__init__(self, *args, **kwargs)
 
@@ -3248,6 +3369,7 @@ class DuoMboInstitutionSpider(DuoSpider):
 
                 yield DuoMboInstitution(
                     reference_year = reference_year,
+                    ignore_id_fields = ['reference_year'],
 
                     brin = row['BRIN NUMMER'],
                     board_id = row['BEVOEGD GEZAG NUMMER'],
@@ -3256,13 +3378,15 @@ class DuoMboInstitutionSpider(DuoSpider):
                     correspondence_address =  {
                         'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
                                              row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                        'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
                         'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
                         'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
                     },
                     denomination = row['DENOMINATIE'],
                     municipality = row['GEMEENTENAAM'],
                     municipality_code = int(row['GEMEENTENUMMER']),
-                    adress = {
+                    address = {
                         'street': '%s %s' % (row['STRAATNAAM'],
                                              row['HUISNUMMER-TOEVOEGING']),
                         'zip_code': row['POSTCODE'].replace(' ', ''),
@@ -3283,4 +3407,259 @@ class DuoMboInstitutionSpider(DuoSpider):
                     wgr_area_code = int(row['WGR-GEBIED CODE']),
                     mbo_institution_kind = row['MBO INSTELLINGSSOORT - NAAM'],
                     mbo_institution_kind_code = row['MBO INSTELLINGSOORT - CODE'],
+<<<<<<< HEAD
+                )
+=======
+                )
+
+    def parse_mbo_participants(self, response):
+        """
+        Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
+        Parse "3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
+
+        For qualifications and participants per qualification
+        """
+        def qualifications(row):
+            if row['BRIN NUMMER']:
+                brin = row['BRIN NUMMER']
+
+                yield brin, {
+                    'qualification_code': int(row['KWALIFICATIE CODE']),
+                    'mbo_type': row['TYPE MBO'],
+                    'qualification_level': int(row['KWALIFICATIENIVEAU']),
+                    'qualification_name': row['KWALIFICATIE NAAM'],
+                    'mbo_sector': row['MBO SECTOR'],
+                    'mbo_industry': row['BEDRIJFSTAK MBO'],
+                    'brin_knowledge_centre_mbo': row['BRIN NUMMER KENNISCENTRUM'],
+                    'knowledge_centre_mbo': row['NAAM KENNISCENTRUM'],
+                }
+
+        def participants(row):
+            if row['BRIN NUMMER']:
+                brin = row['BRIN NUMMER']
+                for year in [2010, 2011, 2012, 2013, 2014]:
+                    if '%s MAN'%year in row and '%s VROUW'%year in row:
+                        m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
+                        if m or f:
+                            yield (year, brin), {
+                                'qualification_code': int(row['KWALIFICATIE CODE']),
+                                'participants_male': m,
+                                'participants_female': f,
+                            }
+
+        # Two datasets for one file, no fancy abstraction yet
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+
+            dataset = {}
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    value = (row[key] or '').strip()
+                    row[key] = value or None
+                    row[key.strip()] = value or None
+                # Qualifications
+                for brin, value in qualifications(row):
+                    if (reference_year, brin) not in dataset:
+                        dataset[(reference_year, brin)] = {'qualifications':[], 'participants_per_qualification':[]}
+                    dataset[(reference_year, brin)]['qualifications'].append(value)
+                # Participants
+                for key, value in participants(row):
+                    if key not in dataset:
+                        dataset[key] = {'qualifications':[], 'participants_per_qualification':[]}
+                    dataset[key]['participants_per_qualification'].append(value)
+
+            for (year, key), item in dataset.iteritems():
+                if key is not None:
+                    school = self.make_item(key)
+                    school['reference_year'] = year
+                    for dataset_name in item:
+                        school['%s_reference_url' % dataset_name] = csv_url
+                        school['%s_reference_date' % dataset_name] = reference_date
+                        school[dataset_name] = item[dataset_name]
+                    yield school
+
+    def parse_mbo_participants_grade_year(self, response):
+        """
+        Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
+        Parse "8. Per instelling, bestuur, gemeente, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, verblijfsjaar"
+
+        """
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
+            if 'BRINNUMMER' in row:
+                row['BRIN NUMMER'] = row['BRINNUMMER']
+
+            if row['BRIN NUMMER']:
+                brin = row['BRIN NUMMER']
+                for year in [2010, 2011, 2012, 2013, 2014]:
+                    if str(year) in row:
+                        participants = int(row[str(year)] or 0)
+                        if participants:
+                            yield brin, {
+                                'reference_year': year,
+                                'qualification_code': int(row['KWALIFICATIE CODE']),
+                                'grade_year': int(row['VERBLIJFSJAAR MBO']),
+                                'participants': participants,
+                            }
+
+        return self.dataset(response, self.make_item, 'participants_per_grade_year_and_qualification', parse_row)
+
+    def parse_mbo_graduates(self, response):
+        """
+        Middelbaar beroepsonderwijs > Deelnemers > Onderwijsdeelnemers
+        Parse "10. Gediplomeerden per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht"
+
+        """
+        def parse_row(row):
+            # strip leading and trailing whitespace.
+            for key in row.keys():
+                value = (row[key] or '').strip()
+                row[key] = value or None
+                row[key.strip()] = value or None
+
+            if row['BRIN NUMMER']:
+                brin = row['BRIN NUMMER']
+                for year in [2010, 2011, 2012, 2013, 2014]:
+                    if '%s MAN'%year in row and '%s VROUW'%year in row:
+                        m,f = int(row['%s MAN'%year] or 0), int(row['%s VROUW'%year] or 0)
+                        if m or f:
+                            yield brin, {
+                                'reference_year': year,
+                                'qualification_code': int(row['KWALIFICATIE CODE']),
+                                'graduate_male': m,
+                                'graduate_female': f,
+                            }
+
+        return self.dataset(response, self.make_item, 'graduates_per_qualification', parse_row)
+
+class DuoHoInstitutionsSpider(DuoSpider):
+    name = 'duo_ho_institutions'
+
+    def __init__(self, *args, **kwargs):
+        self.make_item = lambda (brin): DuoHoInstitution(brin=brin)
+        self.requests = {
+            'ho/adressen_ho/adressen/adressen_instellingen.asp':
+                self.parse_hbo_university_addresses,
+            # 'ho/adressen_ho/adressen/pabo.asp':
+            #     self.parse_pabo_addresses,
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
+
+    def parse_hbo_university_addresses(self, response):
+        """
+        Parse: "01. Adressen hbo instellingen en universiteiten"
+        """
+
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                yield DuoHoInstitution(
+                    reference_year = reference_year,
+                    ignore_id_fields = ['reference_year'],
+                    ho_type = row['SOORT HO'],
+                    brin = row['BRIN NUMMER'],
+                    board_id = row['BEVOEGD GEZAG NUMMER'],
+                    corop_area = row['COROPGEBIED NAAM'],
+                    corop_area_code = int(row['COROPGEBIED CODE']),
+                    correspondence_address =  {
+                        'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                                             row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                        'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
+                        'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
+                        'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
+                    },
+                    denomination = row['DENOMINATIE'],
+                    municipality = row['GEMEENTENAAM'],
+                    municipality_code = int(row['GEMEENTENUMMER']),
+                    address = {
+                        'street': '%s %s' % (row['STRAATNAAM'],
+                                             row['HUISNUMMER-TOEVOEGING']),
+                        'zip_code': row['POSTCODE'].replace(' ', ''),
+                        'city': row['PLAATSNAAM']
+                    },
+                    name = row['INSTELLINGSNAAM'],
+                    nodal_area = row['NODAAL GEBIED NAAM'],
+                    nodal_area_code = int(row['NODAAL GEBIED CODE']),
+                    education_area = row['ONDERWIJSGEBIED NAAM'],
+                    education_area_code = int(row['ONDERWIJSGEBIED CODE']),
+                    rpa_area = row['RPA-GEBIED NAAM'],
+                    rpa_area_code = int(row['RPA-GEBIED CODE']),
+                    rmc_region = row['RMC-REGIO NAAM'],
+                    rmc_region_code = int(row['RMC-REGIO CODE']),
+                    phone = row['TELEFOONNUMMER'],
+                    website = row['INTERNETADRES'],
+                    wgr_area = row['WGR-GEBIED NAAM'],
+                    wgr_area_code = int(row['WGR-GEBIED CODE']),
+                )
+
+    def parse_pabo_addresses(self, response):
+        """
+        Parse: "02. Adressen pabo instellingen"
+        """
+
+        return self.dataset(response, self.make_item, 'dropouts_per_year', parse_row)
+
+class DuoHoBoardsSpider(DuoSpider):
+    name = 'duo_ho_boards'
+
+    def __init__(self, *args, **kwargs):
+        self.make_item = lambda (board_id): DuoHoBoard(board_id=board_id)
+        self.requests = {
+            'ho/adressen_ho/adressen/adressen_bg.asp':
+                self.parse_ho_boards
+        }
+        DuoSpider.__init__(self, *args, **kwargs)
+
+    def parse_ho_boards(self, response):
+        """
+        Hoger onderwijs > Adressen > Adressen
+        Parse "03. Adressen bevoegde gezagen"
+        """
+        for csv_url, reference_date in find_available_datasets(response).iteritems():
+            reference_year = reference_date.year
+            reference_date = str(reference_date)
+            for row in parse_csv_file(csv_url):
+                # strip leading and trailing whitespace.
+                for key in row.keys():
+                    row[key] = row[key].strip()
+
+                yield DuoHoBoard(
+                    reference_year = reference_year,
+                    ignore_id_fields = ['reference_year'],
+
+                    board_id = int(row['BEVOEGD GEZAG NUMMER']),
+
+                    address = {
+                        'street': '%s %s' % (row['STRAATNAAM'],
+                                             row['HUISNUMMER-TOEVOEGING']),
+                        'zip_code': row['POSTCODE'].replace(' ', ''),
+                        'city': row['PLAATSNAAM']
+                    },
+                    administrative_office_id = int_or_none(row['ADMINISTRATIEKANTOORNUMMER']),
+                    correspondence_address = {
+                        'street': '%s %s' % (row['STRAATNAAM CORRESPONDENTIEADRES'],
+                                             row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES']),
+                        'street_name': row['STRAATNAAM CORRESPONDENTIEADRES'],
+                        'street_number': row['HUISNUMMER-TOEVOEGING CORRESPONDENTIEADRES'],
+                        'zip_code': row['POSTCODE CORRESPONDENTIEADRES'].replace(' ', ''),
+                        'city': row['PLAATSNAAM CORRESPONDENTIEADRES']
+                    },
+                    denomination = row['DENOMINATIE'],
+                    municipality = row['GEMEENTENAAM'],
+                    municipality_code = int(row['GEMEENTENUMMER']) if row['GEMEENTENUMMER'] != '' else '',
+                    name = row['BEVOEGD GEZAG NAAM'],
+                    phone = row['TELEFOONNUMMER'],
+                    website = row['INTERNETADRES'],
                 )

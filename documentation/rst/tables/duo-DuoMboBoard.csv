@@ -1,0 +1,11 @@
+Field,Type,Original term,Description
+"address",":ref:`duo-Address`","","Address of this board."
+"administrative_office_id","integer","","Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances."
+"board_id","integer","","Identifier (assigned by :ref:`duodata`) of this board."
+"correspondence_address",":ref:`duo-Address`","","Correspondence address of this board."
+"denomination","string","","Denomination"
+"municipality","string","","Municipality"
+"municipality_code","integer","","Municipality Code"
+"name","string","","Name of the board."
+"phone","string","","Phone number of the board."
+"website","string","","Website of this board."

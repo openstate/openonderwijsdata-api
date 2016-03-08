@@ -31,7 +31,6 @@ def bag42_geocode(address):
     try:
         result = json.loads(resp.read())
     except:
-        print resp.text
         log.msg('Unable to decode JSON object: %s' % resp.read(), level=log.ERROR)
         return None
     if result['status'] != 'OK':

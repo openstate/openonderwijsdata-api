@@ -1,7 +1,0 @@
-field;repl;description;type;keyed;source;pattern
-"code";;"Administrative code";int;1;"admcode";
-"administrative";;"Administrative variables";;;;
-"administrative.case_id";;"Case ID number";int;;"case_id";
-"administrative.qmode";;"Questionnaire mode";int;;"qmode";
-"administrative.qyear";;"Year of conducting the survey";int;;"qyear";
-"administrative.wf";;"Weight";int;;"wf";

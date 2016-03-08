@@ -29,8 +29,8 @@ class OnderwijsscrapersPipeline(object):
             return
 
         item_id = '-'.join([str(item[field]) for field in id_fields])
-        print '=' * 10
-        print item_id
+        # print '=' * 10
+        # print item_id
 
         if item_id not in self.items:
             self.items[item_id] = dict(item)

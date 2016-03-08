@@ -1,13 +1,18 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, make_response
 from flask.ext import restful
 from flask.ext.restful import abort, reqparse
+from flask.ext.cors import CORS
 import rawes
 import re
 
+
 from settings import (ES_URL, ES_INDEXES, ES_DOCUMENT_TYPES_PER_INDEX,
                       ES_DOCUMENT_TYPES, ES_VALIDATION_RESULTS_INDEX)
+from export import ExportTable
 
 app = Flask(__name__)
+cors = CORS(app)
+
 api = restful.Api(app)
 
 es = rawes.Elastic(ES_URL)
@@ -131,6 +136,42 @@ def index():
         "size": 0
     })
 
+    counts['duo_mbo_boards'] = es.get('duo/mbo_board/_search', data={
+        "facets": {
+            "years": {
+                "terms": {"field": "reference_year", "order": "term"}
+            }
+        },
+        "size": 0
+    })
+
+    counts['duo_mbo_institutions'] = es.get('duo/mbo_institution/_search', data={
+        "facets": {
+            "years": {
+                "terms": {"field": "reference_year", "order": "term"}
+            }
+        },
+        "size": 0
+    })
+
+    counts['duo_ho_boards'] = es.get('duo/ho_board/_search', data={
+        "facets": {
+            "years": {
+                "terms": {"field": "reference_year", "order": "term"}
+            }
+        },
+        "size": 0
+    })
+
+    counts['duo_ho_institutions'] = es.get('duo/ho_institution/_search', data={
+        "facets": {
+            "years": {
+                "terms": {"field": "reference_year", "order": "term"}
+            }
+        },
+        "size": 0
+    })
+
     type_names = {
         'po_board': 'Boards (primary)',
         'vo_board': 'Boards (secondary)',
@@ -138,7 +179,11 @@ def index():
         'vo_school': 'Schools (secondary)',
         'po_branch': 'School Branches (primary)',
         'vo_branch': 'School Branches (secondary)',
-        'pao_collaboration': 'Collaborations (special)'
+        'pao_collaboration': 'Collaborations (special)',
+        'mbo_board': 'Boards (vocational)',
+        'mbo_institution': 'Institutions (vocational)',
+        'ho_board': 'Boards (vocational)',
+        'ho_institution': 'Institutions (vocational)',
     }
 
     return render_template('index.html', counts=counts, type_names=type_names)
@@ -194,6 +239,7 @@ class Search(restful.Resource):
                         default=','.join(ES_DOCUMENT_TYPES))
     parser.add_argument('size', type=int, default=10)
     parser.add_argument('from', type=int, default=0)
+    parser.add_argument('scraped_after', type=str)
 
     filters = {
         'brin': 'brin',
@@ -203,7 +249,8 @@ class Search(restful.Resource):
         'zip_code': 'address.zip_code',
         'city': 'address.city',
         'geo_location': 'address.geo_location',
-        'reference_year': 'reference_year'
+        'reference_year': 'reference_year',
+        'scraped_after': 'meta.item_scraped_at',
     }
 
     def get(self):
@@ -240,8 +287,8 @@ class Search(restful.Resource):
             abort(400, message='No query or filter specified')
 
         # Validate the 'size' and 'from' arguments
-        if args['size'] > 50 or args['size'] < 1:
-            abort(400, message='Size must be between 1 and 50')
+        if args['size'] > 500 or args['size'] < 1:
+            abort(400, message='Size must be between 1 and 500')
 
         query = {'query': {'filtered': {'query': {}}}}
 
@@ -271,20 +318,13 @@ class Search(restful.Resource):
                 query['query']['filtered']['filter'] = {'and': []}
 
             arg_value = args[arg]
-            if type(arg_value) is str and arg != 'geo_location':
+            if type(arg_value) is str and arg not in ['geo_location', 'scraped_after']:
                 arg_value = arg_value.lower().split(' ')
 
             if type(arg_value) is int:
                 arg_value = [arg_value]
 
-            if arg != 'geo_location':
-                query['query']['filtered']['filter']['and'].append({
-                    'terms': {
-                        field: arg_value,
-                        'execution': 'and'
-                    }
-                })
-            else:
+            if arg == 'geo_location':
                 coords = re.sub(r'\s{1,}', ' ', args[arg])
                 query['query']['filtered']['filter']['and'].append({
                     'geo_distance': {
@@ -292,7 +332,22 @@ class Search(restful.Resource):
                         'distance': args['geo_distance']
                     }
                 })
-
+            elif arg == 'scraped_after':
+                query['query']['filtered']['filter']['and'].append({
+                    'range': {
+                        field: {
+                            'gte': arg_value
+                        },
+                    }
+                })
+            else:
+                query['query']['filtered']['filter']['and'].append({
+                    'terms': {
+                        field: arg_value,
+                        'execution': 'and'
+                    }
+                })
+                
         # Number of hits to return and the offset
         query['size'] = args['size']
         query['from'] = args['from']
@@ -336,7 +391,7 @@ class GetDocument(restful.Resource):
         if doc_type not in ES_DOCUMENT_TYPES_PER_INDEX[index]:
             abort(400, message='Doctype "%s" does not exist in index "%s"'
                                % (doc_type, index))
- 
+
         try:
             doc = es.get('%s/%s/%s' % (index, doc_type, doc_id))
         except rawes.elastic_exception.ElasticException, error:
@@ -383,7 +438,19 @@ api.add_resource(Search, '/api/v1/search')
 api.add_resource(GetDocument, '/api/v1/get_document/<index>/<doc_type>/<doc_id>')
 api.add_resource(GetValidationResults, '/api/v1/get_validation_results/'
                                        '<index>/<doc_type>/<doc_id>')
+api.add_resource(ExportTable, '/export/<index>/<doc_type>.<filetype>')
 
+
+from stats import make_statsfile
+class GetStats(restful.Resource):
+    def get(self, index, doc_type, ftype):
+        counts = make_statsfile(index, doc_type, ftype)
+        if counts:
+            response = make_response(counts)
+            response.headers['content-type'] = 'application/%s'%ftype
+            return response
+api.add_resource(GetStats, '/api/v1/stats/'
+                                       '<index>/<doc_type>.<ftype>')
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5001)

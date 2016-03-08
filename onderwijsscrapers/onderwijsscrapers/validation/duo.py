@@ -389,9 +389,52 @@ class SPOStudentsByBirthyear(SequenceSchema):
         students = SchemaNode(Int(), title="Number of students born in this year")
 
 
+class MboQualifications(SequenceSchema):
+    """**Source:** `3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp>`"""
+    @colander.instantiate()
+    class qualifications(MappingSchema):
+        qualification_code = SchemaNode(Int(), title="Unique code for the program and level")
+        qualification_code.orig = 'Kwalificatie Code'
+        mbo_type = SchemaNode(String(), title="")
+        mbo_type.orig = 'Type Mbo'
+        qualification_level = SchemaNode(Int())
+        qualification_level.orig = 'Kwalificatie Niveau'
+        qualification_name = SchemaNode(String(), title="Name for the program and level combination")
+        qualification_name.orig = 'Kwalificatie Naam'
+        mbo_sector = SchemaNode(String(), title="")
+        mbo_sector.orig = 'Mbo Sector'
+        mbo_industry = SchemaNode(String(), title="")
+        mbo_industry.orig = 'Bedrijfstak Mbo'
+        brin_knowledge_centre_mbo = general_rules.brin(title="Brin code of the knowledge center associated with this institution")
+        brin_knowledge_centre_mbo.orig = 'Brin Nummer Kenniscentrum'
+        knowledge_centre_mbo = SchemaNode(String(),title="Name of the knowledge center associated with this institution")
+        knowledge_centre_mbo.orig = 'Naam Kenniscentrum'
+
+class MboParticipantsPerQualification(SequenceSchema):
+    """**Source:** `3. Per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname3.asp>`"""
+    @colander.instantiate()
+    class participants_per_qualification(MappingSchema):
+        qualification_code = SchemaNode(Int(), title="Unique code for the program and level")
+        participants_male = SchemaNode(Int(), title="Number of male participants")
+        participants_female = SchemaNode(Int(), title="Number of female participants")
 
 
+class MboParticipantsPerGradeYearAndQualification(SequenceSchema):
+    """**Source:** `8. Per instelling, bestuur, gemeente, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, verblijfsjaar <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname8.asp>`"""
+    @colander.instantiate()
+    class participants_per_grade_year_and_qualification(MappingSchema):
+        qualification_code = SchemaNode(Int(), title="Unique code for the program and level")
+        grade_year = SchemaNode(Int(), title="The grade year that the students are in (years of education completed +1)")
+        participants = SchemaNode(Int(), title="Number of participants")
 
+
+class MboGraduatesPerQualification(SequenceSchema):
+    """**Source:** `10. Gediplomeerden per instelling, plaats, kenniscentrum, sector, bedrijfstak, type mbo, opleiding, niveau, geslacht <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/mbo_/Onderwijsdeelnemers/Onderwijsdeelnemers/mbo_deelname12.asp>`"""
+    @colander.instantiate()
+    class graduates_per_qualification(MappingSchema):
+        qualification_code = SchemaNode(Int(), title="Unique code for the program and level")
+        graduates_male = SchemaNode(Int(), title="Number of male graduates")
+        graduates_female = SchemaNode(Int(), title="Number of female graduates")
 
 class DuoAreaSchema(MappingSchema):
     corop_area = general_rules.corop_area( title="A COROP area in the Netherlands is a region consisting of several municipalities, and is primarily used by research institutions to present statistical data." )
@@ -707,21 +750,47 @@ class DuoMboInstitution(DuoAreaSchema, MappingSchema):
     mbo_institution_kind_code = SchemaNode(String())
     website = general_rules.website( title="Website of this institution.")
 
-    # participants_per_grade_year_and_qualification = CodebookSchema('duo/mbo_institutions/mbo_participants_grade.csv')
-    participants_per_grade_year_and_qualification_reference_url = general_rules.website()
-    participants_per_grade_year_and_qualification_reference_date = SchemaNode(Date(), missing=True)
+    qualifications = MboQualifications()
+    qualifications_reference_url = general_rules.website()
+    qualifications_reference_date = SchemaNode(Date(), missing=True)
 
-if __name__ == '__main__':
-    import sys, inspect
+    participants_per_qualification = MboParticipantsPerQualification(title="The number of students per qualification, per gender")
+    participants_per_qualification_reference_url = general_rules.website(title="URL of the source file.")
+    participants_per_qualification_reference_date = SchemaNode(Date(), missing=True, title="Date the source file was published at http://data.duo.nl")
 
-    def print_schema(sch, n=0):
-        if inspect.isclass(sch):
-            sch = sch()
-        print ' '*n, sch.name, '(%s)' % type(sch.typ).__name__
-        for s in sch:
-            if type(sch.typ).__name__ in ['Mapping', 'Sequence']:
-                print_schema(s, n+1)
+    participants_per_grade_year_and_qualification = MboParticipantsPerGradeYearAndQualification(title="The number of students per grade year and qualification")
+    participants_per_grade_year_and_qualification_reference_url = general_rules.website(title="URL of the source file.")
+    participants_per_grade_year_and_qualification_reference_date = SchemaNode(Date(), missing=True, title="Date the source file was published at http://data.duo.nl")
 
-    for s in [DuoPoBoard, DuoPoSchool, DuoPoBranch, DuoVoBoard, DuoVoSchool, DuoVoBranch]:
-        print s.__name__
-        print_schema(s)
+    graduates_per_qualification = MboGraduatesPerQualification(title="The number of graduated students per qualification, per gender")
+    graduates_per_qualification_reference_url = general_rules.website(title="URL of the source file.")
+    graduates_per_qualification_reference_date = SchemaNode(Date(), missing=True, title="Date the source file was published at http://data.duo.nl")
+
+class DuoHoBoard(MappingSchema):
+    """**Source:** `Hoger onderwijs - Adressen - Adressen - 03. Adressen bevoegde gezagen <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/ho/adressen_ho/adressen/adressen_bg.asp`_"""
+    ho_type = SchemaNode(String(), title="Type of higher education (hbo/wo)")
+    address = general_rules.Address( title="Address of this board.")
+    administrative_office_id = SchemaNode(Int(),  title="Identifier (assigned by :ref:`duodata`) for the accountancy firm that manages this board finances.")
+    board_id  = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of this board." )
+    correspondence_address = general_rules.Address( title="Correspondence address of this board.")
+    denomination = general_rules.denomination()
+    municipality = general_rules.municipality()
+    municipality_code = general_rules.municipality_code()
+    name = general_rules.name( title="Name of the board." )
+    phone = general_rules.phone( title="Phone number of the board." )
+    website = general_rules.url( title="Website of this board." )
+
+
+class DuoHoInstitution(DuoAreaSchema, MappingSchema):
+    """**Source:** `Hoger onderwijs - Adressen - Adressen - 01. Adressen hbo instellingen en universiteiten <http://www.ib-groep.nl/organisatie/open_onderwijsdata/databestanden/ho/adressen_ho/adressen/adressen_instellingen.asp`_"""
+    ho_type = SchemaNode(String(), title="Type of higher education (hbo/wo)")
+    brin = general_rules.brin( title="'Basis Registratie Instellingen-nummer', identifier of the institution. Alphanumeric, four characters long.")
+    board_id  = general_rules.board_id( title="Identifier (assigned by :ref:`duodata`) of the board of this institution." )
+    correspondence_address = general_rules.Address( title="Correspondence address of this institution.")
+    denomination = general_rules.denomination()
+    municipality = general_rules.municipality()
+    municipality_code = general_rules.municipality_code()
+    address = general_rules.Address( title="Address of this institution.")
+    name = general_rules.name( title="Name of the institution." )
+    phone = general_rules.phone( title="Phone number of the institution." )
+    website = general_rules.website( title="Website of this institution.")
