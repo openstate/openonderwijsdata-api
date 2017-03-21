@@ -43,32 +43,27 @@ Run a crawler:
 
 Some commands on how to [backup and restore Elasticsearch indices](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/modules-snapshots.html#_shared_file_system_repository).
 
-The following commands are assumed to be executed in the Docker container. You can enter the container using this command (exit it using `CTRL+d`):
-```
-   $ sudo docker exec -it docker_c-ood-app_1 bash
-```
-
 Create a new backup location in the root directory of the OOD repository (do this on the machine which should be backupped AND the machine where you want to restore the backup) and make sure Elasticsearch can write to it, e.g.:
 ```
-   $ mkdir backups
-   $ curl -XPUT 'http://localhost:9200/_snapshot/my_backup' -d '{"type": "fs", "settings": {"location": "/opt/ood/backups"}}'
+mkdir backups
+sudo docker exec docker_c-ood-app_1 curl -XPUT 'http://localhost:9200/_snapshot/my_backup' -d '{"type": "fs", "settings": {"location": "/opt/ood/backups"}}'
 ```
 
 Save all indices/cluster with a snapshot:
 ```
-   $ curl -XPUT "http://localhost:9200/_snapshot/my_backup/ood_backup"
+sudo docker exec docker_c-ood-app_1 curl -XPUT "http://localhost:9200/_snapshot/my_backup/ood_backup"
 ```
 
 Copy the `backups` directory containing the snapshot into the `openonderwijs-data` directory on the other machine (on this other machine, make sure you created a backup location as described above).
 
 Remove any indices which are already present on the new machine (assuming you don't want to keep that data):
 ```
-   $ curl -XDELETE 'http://localhost:9200/_all'
+sudo docker exec docker_c-ood-app_1 curl -XDELETE 'http://localhost:9200/_all'
 ```
 
 Restore the snapshot:
 ```
-   $ curl -XPOST "http://localhost:9200/_snapshot/my_backup/o0d_backup/_restore"
+sudo docker exec docker_c-ood-app_1 curl -XPOST "http://localhost:9200/_snapshot/my_backup/ood_backup/_restore"
 ```
 
 ## Contributing
