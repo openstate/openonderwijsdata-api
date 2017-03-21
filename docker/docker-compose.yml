@@ -1,0 +1,28 @@
+version: '2'
+services:
+  c-ood-nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile-nginx
+    volumes:
+      - ./nginx/:/etc/nginx/
+      - ../onderwijsscrapers/onderwijsscrapers/export:/usr/share/nginx/html/dumps
+      - ../documentation/_build/html:/usr/share/nginx/html/documentation
+    networks:
+      - nginx-load-balancer
+      - ood
+    restart: always
+  c-ood-app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/opt/ood
+    networks:
+      - ood
+    restart: always
+networks:
+  ood:
+  nginx-load-balancer:
+    external:
+      name: docker_nginx-load-balancer

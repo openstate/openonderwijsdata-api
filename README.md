@@ -1,11 +1,11 @@
 # Open Onderwijs Data API
 
 ## Important links
- - [Open Onderwijs Data homepage](http://www.openonderwijsdata.nl/)
- - [Official source code repo](https://github.com/openstate/openonderwijsdata-api/)
- - [Documentation](http://api.openonderwijsdata.nl/documentation/)
- - [Currently included data](http://api.openonderwijsdata.nl/documentation/rst/introduction.html#currently-included-data)
- - [Issue tracker](https://github.com/openstate/openonderwijsdata-api/issues)
+- [Open Onderwijs Data homepage](http://www.openonderwijsdata.nl/)
+- [Official source code repo](https://github.com/openstate/openonderwijsdata-api/)
+- [Documentation](http://api.openonderwijsdata.nl/documentation/)
+- [Currently included data](http://api.openonderwijsdata.nl/documentation/rst/introduction.html#currently-included-data)
+- [Issue tracker](https://github.com/openstate/openonderwijsdata-api/issues)
 
 ## Bugs and feature requests
 
@@ -19,17 +19,57 @@ We use [Sphinx](http://sphinx-doc.org/) to create the documentation. The source 
 
 ## Getting Started
 
-To run the code yourself locally using the Elasticsearch exporter, do the following:
+Installation:
 
-1. Make sure up-to-date versions of Python 2, [bower](http://www.bower.io) and [Elasticsearch](http://www.elasticsearch.org/) are installed, and install the dependencies in `requirements.txt` (Protip: use `pip install -r requirements.txt`).
-2. Start elasticsearch and specify its port in `onderwijsscrapers/onderwijsscrapers/settings.py` or `local_settings.py`.
-3. Navigate your terminal to `onderwijsscrapers/` and run the scrapy spider for the datasets you're interested in:
+- Install [Docker Compose](https://docs.docker.com/compose/install/)
+- Clone this repository and `cd` to `openonderwijsdata-api/docker`
+- (optional) If you're developing then uncomment the ``Development`` and comment the ``Production`` sections in ``docker/nginx/conf.d/default.conf`` and ``conf/supervisor.conf``. You will then use Flask's development webserver instead of uWSGI, which is useful because changes to the code are automatically reloaded. You can also remove the lines ``restart: always`` from ``docker/docker-compose.yml`` otherwise the containers will automatically start when you start your machine. In ``docker/docker-compose.yml`` you might want to remove the line containing ``- nginx-load-balancer`` listed in the networks section of the ``c-ood-nginx`` service as well as the last three lines (shown below) as they are specific to our setup and not needed for general usage:
+```
+  nginx-load-balancer:
+    external:
+      name: docker_nginx-load-balancer
+```
+- Build and start containers: `sudo docker-compose up -d`
+- Install bower packages: `sudo docker exec docker_c-ood-app_1 bower install --allow-root`
+- Generate documentation: `sudo docker exec docker_c-ood-app_1 sh -c 'cd documentation && make html'`
+- The API is now locally accessible from the host via `http://<CONTAINER IP ADDRESS>` (look up the container's IP address using `sudo docker inspect --format='{{range $index, $element := .NetworkSettings.Networks}}{{if eq $index "docker_ood"}}{{.IPAddress}}{{end}}{{end}}' docker_c-ood-nginx_1`)
 
-	```
-		scrapy crawl <spider-name>
-	```
-4. Install client-side dependencies with `bower install`.
-5. Run `app/app.py` to start the webserver and browse the API locally on your machine (http://localhost:5001/)
+Run a crawler:
+
+- List all spiders: `sudo docker exec docker_c-ood-app_1 sh -c 'cd onderwijsscrapers && scrapy list'`
+- Run the spider you want: `sudo docker exec docker_c-ood-app_1 sh -c 'cd onderwijsscrapers && scrapy crawl <spider-name>'`
+
+## Backup and restore
+
+Some commands on how to [backup and restore Elasticsearch indices](https://www.elastic.co/guide/en/elasticsearch/reference/1.4/modules-snapshots.html#_shared_file_system_repository).
+
+The following commands are assumed to be executed in the Docker container. You can enter the container using this command (exit it using `CTRL+d`):
+```
+   $ sudo docker exec -it docker_c-ood-app_1 bash
+```
+
+Create a new backup location in the root directory of the OOD repository (do this on the machine which should be backupped AND the machine where you want to restore the backup) and make sure Elasticsearch can write to it, e.g.:
+```
+   $ mkdir backups
+   $ curl -XPUT 'http://localhost:9200/_snapshot/my_backup' -d '{"type": "fs", "settings": {"location": "/opt/ood/backups"}}'
+```
+
+Save all indices/cluster with a snapshot:
+```
+   $ curl -XPUT "http://localhost:9200/_snapshot/my_backup/ood_backup"
+```
+
+Copy the `backups` directory containing the snapshot into the `openonderwijs-data` directory on the other machine (on this other machine, make sure you created a backup location as described above).
+
+Remove any indices which are already present on the new machine (assuming you don't want to keep that data):
+```
+   $ curl -XDELETE 'http://localhost:9200/_all'
+```
+
+Restore the snapshot:
+```
+   $ curl -XPOST "http://localhost:9200/_snapshot/my_backup/o0d_backup/_restore"
+```
 
 ## Contributing
 
